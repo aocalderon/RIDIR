@@ -1,0 +1,2 @@
+{ "type": "Feature", "properties": { "id": "A1", "population": 500, "pci": 75 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 0.0, 0.0 ], [ 10.0, 0.0 ], [ 10.0, 5.0 ], [ 0.0, 5.0 ], [ 0.0, 0.0 ] ] ] } },
+{ "type": "Feature", "properties": { "id": "A2", "population": 200, "pci": 100 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 0.0, 5.0 ], [ 0.0, 10.0 ], [ 10.0, 10.0 ], [ 10.0, 5.0 ], [ 0.0, 5.0 ] ] ] } }
