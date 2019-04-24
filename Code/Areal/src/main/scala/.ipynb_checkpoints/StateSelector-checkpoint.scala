@@ -102,7 +102,7 @@ object StateSelector{
       }.toDF("Search").groupBy($"Search").count().orderBy(desc("count"))
       val nBySearch = bySearch.count()
       log("Counting geoms", timer, nBySearch)
-      bySearch.show(nBySearch.toInt, truncate=false)
+      bySearch.show(30)
     }
     val sample = sourceRDD.rawSpatialRDD.rdd.map{ s =>
       val wkt = s.toText()
