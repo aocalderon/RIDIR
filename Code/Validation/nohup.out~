@@ -1,0 +1,13 @@
+2019-04-18 22:01:53,405 => Script started                |      0.00|         0
+2019-04-18 22:01:58,582 => Source read                   |      5.18|     72693
+2019-04-18 22:02:03,148 => Target read                   |      4.56|     61332
+/home/acald013/opt/miniconda3/envs/tobler/lib/python3.7/site-packages/geopandas/base.py:29: UserWarning: GeoSeries crs mismatch: {'init': 'epsg:4326'} and {}
+  other.crs))
+Traceback (most recent call last):
+  File "./GeoPandasRunner.py", line 68, in <module>
+    main()
+  File "./GeoPandasRunner.py", line 58, in main
+    (SU, UT) = area_tables(sourceGPD, targetGPD)
+  File "/home/acald013/opt/tobler/tobler/area_weighted.py", line 48, in area_tables
+    SU = np.zeros((n_s, n_u)) # holds area of intersection of source geom with union geom
+MemoryError
