@@ -17,16 +17,19 @@ def log(msg, t, n):
     logging.info("{:30s}|{:10.2f}|{:10}".format(msg, round((clocktime() - t) / 1000.0, 2), n))
 
 def main():
+    # Starting script...
     totalStart = clocktime()
     timer = clocktime()
-    logging.basicConfig(format='%(asctime)s => %(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s|%(message)s', level=logging.INFO)
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", "-s", help="Source polygon file...")
     parser.add_argument("--target", "-t", help="Target polygon file...")
+    parser.add_argument("--tag", "-g", default="", help="Additional tag for information purposes...")
     parser.add_argument("--format", "-f", default="wkt", help="File format...")
     args = parser.parse_args()
     source = args.source
     target = args.target
+    tag = args.tag
     log("Script started", timer, 0)
 
     # Reading data
@@ -54,15 +57,19 @@ def main():
         targetGPD = gpd.GeoDataFrame(data, geometry='geom')
         nTargetGPD = len(targetGPD.index)
         log("Target read", timer, nTargetGPD)
+
+    # Calling area_tables method...
     areaStart = clocktime()
     (SU, UT) = area_tables(sourceGPD, targetGPD)
     areaEnd = clocktime()
     log("GeoPandas area_tables", areaStart, 0)
-    log("Script finished", totalStart, 0)
-    totalEnd = clocktime()
+
+    # Finishig script...
     areaTime  = (areaEnd - areaStart) / 1000.0
+    totalEnd = clocktime()
     totalTime = (totalEnd - totalStart) / 1000.0
-    logging.info("GeoPandas;{:.2f};{:.2f}".format(totalTime, areaTime))
+    logging.info("GeoPandas|{}|{:.2f}|{:.2f}".format(tag, totalTime, areaTime))
+    log("Script finished", totalStart, 0)
     
 if __name__ == '__main__':
     main()
