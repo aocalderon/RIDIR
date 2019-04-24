@@ -1,0 +1,350 @@
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 21:42:39,934|Script started                |      0.00|         0
+2019-04-23 21:42:40,024|Source read                   |      0.09|       584
+2019-04-23 21:42:40,088|Target read                   |      0.06|       787
+2019-04-23 21:42:41,899|GeoPandas area_tables         |      1.81|         0
+2019-04-23 21:42:41,899|GeoPandas|10%|1.97|1.81
+2019-04-23 21:42:41,899|Script finished               |      1.97|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 21:42:42,679|Script started                |      0.00|         0
+2019-04-23 21:42:42,837|Source read                   |      0.16|      1151
+2019-04-23 21:42:42,960|Target read                   |      0.12|      1581
+2019-04-23 21:42:48,264|GeoPandas area_tables         |      5.30|         0
+2019-04-23 21:42:48,264|GeoPandas|20%|5.58|5.30
+2019-04-23 21:42:48,264|Script finished               |      5.58|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 21:42:49,048|Script started                |      0.00|         0
+2019-04-23 21:42:49,273|Source read                   |      0.23|      1695
+2019-04-23 21:42:49,454|Target read                   |      0.18|      2342
+2019-04-23 21:43:00,281|GeoPandas area_tables         |     10.83|         0
+2019-04-23 21:43:00,281|GeoPandas|30%|11.23|10.83
+2019-04-23 21:43:00,281|Script finished               |     11.23|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 21:43:01,077|Script started                |      0.00|         0
+2019-04-23 21:43:01,380|Source read                   |      0.30|      2289
+2019-04-23 21:43:01,625|Target read                   |      0.24|      3160
+2019-04-23 21:43:22,517|GeoPandas area_tables         |     20.89|         0
+2019-04-23 21:43:22,517|GeoPandas|40%|21.44|20.89
+2019-04-23 21:43:22,517|Script finished               |     21.44|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 21:43:23,311|Script started                |      0.00|         0
+2019-04-23 21:43:23,673|Source read                   |      0.36|      2864
+2019-04-23 21:43:23,983|Target read                   |      0.31|      3960
+2019-04-23 21:43:58,617|GeoPandas area_tables         |     34.63|         0
+2019-04-23 21:43:58,617|GeoPandas|50%|35.31|34.63
+2019-04-23 21:43:58,617|Script finished               |     35.31|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 21:43:59,415|Script started                |      0.00|         0
+2019-04-23 21:43:59,854|Source read                   |      0.44|      3461
+2019-04-23 21:44:00,229|Target read                   |      0.37|      4748
+2019-04-23 21:44:52,760|GeoPandas area_tables         |     52.53|         0
+2019-04-23 21:44:52,760|GeoPandas|60%|53.35|52.53
+2019-04-23 21:44:52,760|Script finished               |     53.35|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 21:44:53,566|Script started                |      0.00|         0
+2019-04-23 21:44:54,077|Source read                   |      0.51|      4025
+2019-04-23 21:44:54,502|Target read                   |      0.42|      5534
+2019-04-23 21:46:04,899|GeoPandas area_tables         |     70.40|         0
+2019-04-23 21:46:04,899|GeoPandas|70%|71.33|70.40
+2019-04-23 21:46:04,899|Script finished               |     71.33|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 21:46:05,709|Script started                |      0.00|         0
+2019-04-23 21:46:06,291|Source read                   |      0.58|      4666
+2019-04-23 21:46:06,798|Target read                   |      0.51|      6380
+2019-04-23 21:47:41,631|GeoPandas area_tables         |     94.83|         0
+2019-04-23 21:47:41,631|GeoPandas|80%|95.92|94.83
+2019-04-23 21:47:41,631|Script finished               |     95.92|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 21:47:42,453|Script started                |      0.00|         0
+2019-04-23 21:47:43,102|Source read                   |      0.65|      5270
+2019-04-23 21:47:43,655|Target read                   |      0.55|      7185
+2019-04-23 21:49:41,674|GeoPandas area_tables         |    118.02|         0
+2019-04-23 21:49:41,674|GeoPandas|90%|119.22|118.02
+2019-04-23 21:49:41,674|Script finished               |    119.22|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 21:49:42,509|Script started                |      0.00|         0
+2019-04-23 21:49:43,213|Source read                   |      0.70|      5846
+2019-04-23 21:49:43,824|Target read                   |      0.61|      7953
+2019-04-23 21:52:10,683|GeoPandas area_tables         |    146.86|         0
+2019-04-23 21:52:10,683|GeoPandas|100%|148.18|146.86
+2019-04-23 21:52:10,683|Script finished               |    148.18|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 21:52:11,530|Script started                |      0.00|         0
+2019-04-23 21:52:11,619|Source read                   |      0.09|       584
+2019-04-23 21:52:11,684|Target read                   |      0.07|       787
+2019-04-23 21:52:13,491|GeoPandas area_tables         |      1.81|         0
+2019-04-23 21:52:13,491|GeoPandas|10%|1.96|1.81
+2019-04-23 21:52:13,491|Script finished               |      1.96|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 21:52:14,275|Script started                |      0.00|         0
+2019-04-23 21:52:14,432|Source read                   |      0.16|      1151
+2019-04-23 21:52:14,558|Target read                   |      0.13|      1581
+2019-04-23 21:52:19,846|GeoPandas area_tables         |      5.29|         0
+2019-04-23 21:52:19,847|GeoPandas|20%|5.57|5.29
+2019-04-23 21:52:19,847|Script finished               |      5.57|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 21:52:20,632|Script started                |      0.00|         0
+2019-04-23 21:52:20,858|Source read                   |      0.23|      1695
+2019-04-23 21:52:21,039|Target read                   |      0.18|      2342
+2019-04-23 21:52:32,013|GeoPandas area_tables         |     10.97|         0
+2019-04-23 21:52:32,014|GeoPandas|30%|11.38|10.97
+2019-04-23 21:52:32,014|Script finished               |     11.38|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 21:52:32,800|Script started                |      0.00|         0
+2019-04-23 21:52:33,102|Source read                   |      0.30|      2289
+2019-04-23 21:52:33,344|Target read                   |      0.24|      3160
+2019-04-23 21:52:54,215|GeoPandas area_tables         |     20.87|         0
+2019-04-23 21:52:54,215|GeoPandas|40%|21.42|20.87
+2019-04-23 21:52:54,215|Script finished               |     21.42|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 21:52:55,014|Script started                |      0.00|         0
+2019-04-23 21:52:55,379|Source read                   |      0.36|      2864
+2019-04-23 21:52:55,688|Target read                   |      0.31|      3960
+2019-04-23 21:53:30,276|GeoPandas area_tables         |     34.59|         0
+2019-04-23 21:53:30,276|GeoPandas|50%|35.26|34.59
+2019-04-23 21:53:30,276|Script finished               |     35.26|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 21:53:31,078|Script started                |      0.00|         0
+2019-04-23 21:53:31,517|Source read                   |      0.44|      3461
+2019-04-23 21:53:31,894|Target read                   |      0.38|      4748
+2019-04-23 21:54:24,120|GeoPandas area_tables         |     52.23|         0
+2019-04-23 21:54:24,120|GeoPandas|60%|53.04|52.23
+2019-04-23 21:54:24,120|Script finished               |     53.04|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 21:54:24,928|Script started                |      0.00|         0
+2019-04-23 21:54:25,440|Source read                   |      0.51|      4025
+2019-04-23 21:54:25,866|Target read                   |      0.42|      5534
+2019-04-23 21:55:36,319|GeoPandas area_tables         |     70.45|         0
+2019-04-23 21:55:36,319|GeoPandas|70%|71.39|70.45
+2019-04-23 21:55:36,319|Script finished               |     71.39|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 21:55:37,137|Script started                |      0.00|         0
+2019-04-23 21:55:37,717|Source read                   |      0.58|      4666
+2019-04-23 21:55:38,211|Target read                   |      0.49|      6380
+2019-04-23 21:57:13,126|GeoPandas area_tables         |     94.92|         0
+2019-04-23 21:57:13,126|GeoPandas|80%|95.99|94.92
+2019-04-23 21:57:13,127|Script finished               |     95.99|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 21:57:13,955|Script started                |      0.00|         0
+2019-04-23 21:57:14,600|Source read                   |      0.65|      5270
+2019-04-23 21:57:15,152|Target read                   |      0.55|      7185
+2019-04-23 21:59:13,817|GeoPandas area_tables         |    118.67|         0
+2019-04-23 21:59:13,817|GeoPandas|90%|119.86|118.67
+2019-04-23 21:59:13,817|Script finished               |    119.86|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 21:59:14,651|Script started                |      0.00|         0
+2019-04-23 21:59:15,358|Source read                   |      0.71|      5846
+2019-04-23 21:59:15,971|Target read                   |      0.61|      7953
+2019-04-23 22:01:42,566|GeoPandas area_tables         |    146.59|         0
+2019-04-23 22:01:42,567|GeoPandas|100%|147.92|146.59
+2019-04-23 22:01:42,567|Script finished               |    147.92|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 22:01:43,411|Script started                |      0.00|         0
+2019-04-23 22:01:43,500|Source read                   |      0.09|       584
+2019-04-23 22:01:43,570|Target read                   |      0.07|       787
+2019-04-23 22:01:45,375|GeoPandas area_tables         |      1.80|         0
+2019-04-23 22:01:45,375|GeoPandas|10%|1.97|1.80
+2019-04-23 22:01:45,375|Script finished               |      1.97|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 22:01:46,159|Script started                |      0.00|         0
+2019-04-23 22:01:46,317|Source read                   |      0.16|      1151
+2019-04-23 22:01:46,442|Target read                   |      0.12|      1581
+2019-04-23 22:01:51,711|GeoPandas area_tables         |      5.27|         0
+2019-04-23 22:01:51,711|GeoPandas|20%|5.55|5.27
+2019-04-23 22:01:51,711|Script finished               |      5.55|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 22:01:52,497|Script started                |      0.00|         0
+2019-04-23 22:01:52,722|Source read                   |      0.23|      1695
+2019-04-23 22:01:52,902|Target read                   |      0.18|      2342
+2019-04-23 22:02:03,805|GeoPandas area_tables         |     10.90|         0
+2019-04-23 22:02:03,805|GeoPandas|30%|11.31|10.90
+2019-04-23 22:02:03,805|Script finished               |     11.31|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 22:02:04,595|Script started                |      0.00|         0
+2019-04-23 22:02:04,898|Source read                   |      0.30|      2289
+2019-04-23 22:02:05,144|Target read                   |      0.25|      3160
+2019-04-23 22:02:25,990|GeoPandas area_tables         |     20.84|         0
+2019-04-23 22:02:25,990|GeoPandas|40%|21.40|20.84
+2019-04-23 22:02:25,990|Script finished               |     21.40|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 22:02:26,782|Script started                |      0.00|         0
+2019-04-23 22:02:27,145|Source read                   |      0.36|      2864
+2019-04-23 22:02:27,453|Target read                   |      0.31|      3960
+2019-04-23 22:03:02,088|GeoPandas area_tables         |     34.64|         0
+2019-04-23 22:03:02,089|GeoPandas|50%|35.31|34.64
+2019-04-23 22:03:02,089|Script finished               |     35.31|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 22:03:02,887|Script started                |      0.00|         0
+2019-04-23 22:03:03,328|Source read                   |      0.44|      3461
+2019-04-23 22:03:03,702|Target read                   |      0.37|      4748
+2019-04-23 22:03:55,947|GeoPandas area_tables         |     52.24|         0
+2019-04-23 22:03:55,947|GeoPandas|60%|53.06|52.24
+2019-04-23 22:03:55,947|Script finished               |     53.06|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 22:03:56,752|Script started                |      0.00|         0
+2019-04-23 22:03:57,263|Source read                   |      0.51|      4025
+2019-04-23 22:03:57,690|Target read                   |      0.43|      5534
+2019-04-23 22:05:08,310|GeoPandas area_tables         |     70.62|         0
+2019-04-23 22:05:08,310|GeoPandas|70%|71.56|70.62
+2019-04-23 22:05:08,310|Script finished               |     71.56|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 22:05:09,122|Script started                |      0.00|         0
+2019-04-23 22:05:09,705|Source read                   |      0.58|      4666
+2019-04-23 22:05:10,199|Target read                   |      0.49|      6380
+2019-04-23 22:06:45,176|GeoPandas area_tables         |     94.98|         0
+2019-04-23 22:06:45,176|GeoPandas|80%|96.06|94.98
+2019-04-23 22:06:45,176|Script finished               |     96.06|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 22:06:45,998|Script started                |      0.00|         0
+2019-04-23 22:06:46,640|Source read                   |      0.64|      5270
+2019-04-23 22:06:47,189|Target read                   |      0.55|      7185
+2019-04-23 22:08:45,155|GeoPandas area_tables         |    117.97|         0
+2019-04-23 22:08:45,155|GeoPandas|90%|119.16|117.97
+2019-04-23 22:08:45,155|Script finished               |    119.16|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 22:08:45,988|Script started                |      0.00|         0
+2019-04-23 22:08:46,693|Source read                   |      0.71|      5846
+2019-04-23 22:08:47,307|Target read                   |      0.61|      7953
+2019-04-23 22:11:14,056|GeoPandas area_tables         |    146.75|         0
+2019-04-23 22:11:14,056|GeoPandas|100%|148.07|146.75
+2019-04-23 22:11:14,056|Script finished               |    148.07|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 22:12:33,049|Script started                |      0.00|         0
+2019-04-23 22:12:33,138|Source read                   |      0.09|       584
+2019-04-23 22:12:33,204|Target read                   |      0.07|       787
+2019-04-23 22:12:35,025|GeoPandas area_tables         |      1.82|         0
+2019-04-23 22:12:35,025|GeoPandas|10%|1.98|1.82
+2019-04-23 22:12:35,025|Script finished               |      1.98|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 22:12:35,804|Script started                |      0.00|         0
+2019-04-23 22:12:35,961|Source read                   |      0.16|      1151
+2019-04-23 22:12:36,086|Target read                   |      0.12|      1581
+2019-04-23 22:12:41,364|GeoPandas area_tables         |      5.28|         0
+2019-04-23 22:12:41,364|GeoPandas|20%|5.56|5.28
+2019-04-23 22:12:41,365|Script finished               |      5.56|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 22:12:42,147|Script started                |      0.00|         0
+2019-04-23 22:12:42,372|Source read                   |      0.23|      1695
+2019-04-23 22:12:42,553|Target read                   |      0.18|      2342
+2019-04-23 22:12:53,471|GeoPandas area_tables         |     10.92|         0
+2019-04-23 22:12:53,471|GeoPandas|30%|11.32|10.92
+2019-04-23 22:12:53,471|Script finished               |     11.32|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 22:12:54,265|Script started                |      0.00|         0
+2019-04-23 22:12:54,566|Source read                   |      0.30|      2289
+2019-04-23 22:12:54,809|Target read                   |      0.24|      3160
+2019-04-23 22:13:15,639|GeoPandas area_tables         |     20.83|         0
+2019-04-23 22:13:15,639|GeoPandas|40%|21.38|20.83
+2019-04-23 22:13:15,639|Script finished               |     21.38|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 22:13:16,435|Script started                |      0.00|         0
+2019-04-23 22:13:16,797|Source read                   |      0.36|      2864
+2019-04-23 22:13:17,107|Target read                   |      0.31|      3960
+2019-04-23 22:13:51,858|GeoPandas area_tables         |     34.75|         0
+2019-04-23 22:13:51,858|GeoPandas|50%|35.42|34.75
+2019-04-23 22:13:51,858|Script finished               |     35.42|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 22:13:52,663|Script started                |      0.00|         0
+2019-04-23 22:13:53,099|Source read                   |      0.44|      3461
+2019-04-23 22:13:53,467|Target read                   |      0.37|      4748
+2019-04-23 22:14:45,595|GeoPandas area_tables         |     52.13|         0
+2019-04-23 22:14:45,595|GeoPandas|60%|52.93|52.13
+2019-04-23 22:14:45,595|Script finished               |     52.93|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 22:14:46,411|Script started                |      0.00|         0
+2019-04-23 22:14:46,918|Source read                   |      0.51|      4025
+2019-04-23 22:14:47,346|Target read                   |      0.43|      5534
+2019-04-23 22:15:57,991|GeoPandas area_tables         |     70.64|         0
+2019-04-23 22:15:57,991|GeoPandas|70%|71.58|70.64
+2019-04-23 22:15:57,991|Script finished               |     71.58|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 22:15:58,802|Script started                |      0.00|         0
+2019-04-23 22:15:59,383|Source read                   |      0.58|      4666
+2019-04-23 22:15:59,877|Target read                   |      0.49|      6380
+2019-04-23 22:17:34,458|GeoPandas area_tables         |     94.58|         0
+2019-04-23 22:17:34,458|GeoPandas|80%|95.66|94.58
+2019-04-23 22:17:34,458|Script finished               |     95.66|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 22:17:35,281|Script started                |      0.00|         0
+2019-04-23 22:17:35,926|Source read                   |      0.65|      5270
+2019-04-23 22:17:36,476|Target read                   |      0.55|      7185
+2019-04-23 22:19:34,762|GeoPandas area_tables         |    118.28|         0
+2019-04-23 22:19:34,762|GeoPandas|90%|119.48|118.28
+2019-04-23 22:19:34,762|Script finished               |    119.48|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 22:19:35,595|Script started                |      0.00|         0
+2019-04-23 22:19:36,301|Source read                   |      0.71|      5846
+2019-04-23 22:19:36,920|Target read                   |      0.62|      7953
+2019-04-23 22:22:03,501|GeoPandas area_tables         |    146.58|         0
+2019-04-23 22:22:03,501|GeoPandas|100%|147.91|146.58
+2019-04-23 22:22:03,501|Script finished               |    147.91|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 22:22:04,341|Script started                |      0.00|         0
+2019-04-23 22:22:04,431|Source read                   |      0.09|       584
+2019-04-23 22:22:04,495|Target read                   |      0.06|       787
+2019-04-23 22:22:06,316|GeoPandas area_tables         |      1.82|         0
+2019-04-23 22:22:06,316|GeoPandas|10%|1.98|1.82
+2019-04-23 22:22:06,317|Script finished               |      1.98|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 22:22:07,159|Script started                |      0.00|         0
+2019-04-23 22:22:07,317|Source read                   |      0.16|      1151
+2019-04-23 22:22:07,442|Target read                   |      0.12|      1581
+2019-04-23 22:22:12,728|GeoPandas area_tables         |      5.29|         0
+2019-04-23 22:22:12,728|GeoPandas|20%|5.57|5.29
+2019-04-23 22:22:12,728|Script finished               |      5.57|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 22:22:13,514|Script started                |      0.00|         0
+2019-04-23 22:22:13,740|Source read                   |      0.23|      1695
+2019-04-23 22:22:13,920|Target read                   |      0.18|      2342
+2019-04-23 22:22:24,760|GeoPandas area_tables         |     10.84|         0
+2019-04-23 22:22:24,761|GeoPandas|30%|11.25|10.84
+2019-04-23 22:22:24,761|Script finished               |     11.25|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 22:22:25,552|Script started                |      0.00|         0
+2019-04-23 22:22:25,854|Source read                   |      0.30|      2289
+2019-04-23 22:22:26,098|Target read                   |      0.24|      3160
+2019-04-23 22:22:46,936|GeoPandas area_tables         |     20.84|         0
+2019-04-23 22:22:46,936|GeoPandas|40%|21.39|20.84
+2019-04-23 22:22:46,936|Script finished               |     21.39|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 22:22:47,731|Script started                |      0.00|         0
+2019-04-23 22:22:48,094|Source read                   |      0.36|      2864
+2019-04-23 22:22:48,402|Target read                   |      0.31|      3960
+2019-04-23 22:23:23,275|GeoPandas area_tables         |     34.87|         0
+2019-04-23 22:23:23,275|GeoPandas|50%|35.54|34.87
+2019-04-23 22:23:23,275|Script finished               |     35.54|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 22:23:24,075|Script started                |      0.00|         0
+2019-04-23 22:23:24,512|Source read                   |      0.44|      3461
+2019-04-23 22:23:24,880|Target read                   |      0.37|      4748
+2019-04-23 22:24:16,945|GeoPandas area_tables         |     52.07|         0
+2019-04-23 22:24:16,945|GeoPandas|60%|52.87|52.07
+2019-04-23 22:24:16,945|Script finished               |     52.87|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 22:24:17,753|Script started                |      0.00|         0
+2019-04-23 22:24:18,262|Source read                   |      0.51|      4025
+2019-04-23 22:24:18,685|Target read                   |      0.42|      5534
+2019-04-23 22:25:28,845|GeoPandas area_tables         |     70.16|         0
+2019-04-23 22:25:28,845|GeoPandas|70%|71.09|70.16
+2019-04-23 22:25:28,845|Script finished               |     71.09|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 22:25:29,659|Script started                |      0.00|         0
+2019-04-23 22:25:30,241|Source read                   |      0.58|      4666
+2019-04-23 22:25:30,733|Target read                   |      0.49|      6380
+2019-04-23 22:27:06,587|GeoPandas area_tables         |     95.85|         0
+2019-04-23 22:27:06,587|GeoPandas|80%|96.93|95.85
+2019-04-23 22:27:06,587|Script finished               |     96.93|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 22:27:07,411|Script started                |      0.00|         0
+2019-04-23 22:27:08,057|Source read                   |      0.65|      5270
+2019-04-23 22:27:08,610|Target read                   |      0.55|      7185
+2019-04-23 22:29:07,345|GeoPandas area_tables         |    118.73|         0
+2019-04-23 22:29:07,345|GeoPandas|90%|119.94|118.73
+2019-04-23 22:29:07,345|Script finished               |    119.94|         0
+python /home/acald013/RIDIR/Code/Validation/GeoPandasRunner.py --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 22:29:08,182|Script started                |      0.00|         0
+2019-04-23 22:29:08,889|Source read                   |      0.71|      5846
+2019-04-23 22:29:09,506|Target read                   |      0.62|      7953
+2019-04-23 22:31:35,942|GeoPandas area_tables         |    146.44|         0
+2019-04-23 22:31:35,942|GeoPandas|100%|147.76|146.44
+2019-04-23 22:31:35,942|Script finished               |    147.76|         0
