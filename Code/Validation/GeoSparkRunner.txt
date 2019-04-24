@@ -1,0 +1,500 @@
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 23:40:25,509|Session app-20190423234025-0065 started           |  1.90|     0
+2019-04-23 23:40:35,831|Source read                                       | 10.32|   584
+2019-04-23 23:40:38,920|Target read                                       |  3.09|   787
+2019-04-23 23:40:44,925|Spatial join done                                 |  6.00|   266
+2019-04-23 23:40:45,572|Join results flattened                            |  6.65|   325
+2019-04-23 23:40:46,396|Area intersection computed                        |  7.47|   325
+2019-04-23 23:40:47,265|GeoSpark area_tables                              |  8.35|   325
+2019-04-23 23:40:47,266|GeoSpark|10%|23.66|8.35
+2019-04-23 23:40:47,336|Session app-20190423234025-0065 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 23:40:52,291|Session app-20190423234051-0066 started           |  1.89|     0
+2019-04-23 23:41:02,752|Source read                                       | 10.46|  1151
+2019-04-23 23:41:04,861|Target read                                       |  2.11|  1581
+2019-04-23 23:41:13,584|Spatial join done                                 |  8.72|   878
+2019-04-23 23:41:14,717|Join results flattened                            |  9.85|  1269
+2019-04-23 23:41:16,360|Area intersection computed                        | 11.50|  1269
+2019-04-23 23:41:17,699|GeoSpark area_tables                              | 12.84|  1269
+2019-04-23 23:41:17,700|GeoSpark|20%|27.30|12.84
+2019-04-23 23:41:17,775|Session app-20190423234051-0066 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 23:41:22,751|Session app-20190423234122-0067 started           |  1.90|     0
+2019-04-23 23:41:33,204|Source read                                       | 10.45|  1695
+2019-04-23 23:41:34,512|Target read                                       |  1.31|  2342
+2019-04-23 23:41:44,153|Spatial join done                                 |  9.64|  1649
+2019-04-23 23:41:45,658|Join results flattened                            | 11.14|  2782
+2019-04-23 23:41:47,698|Area intersection computed                        | 13.18|  2782
+2019-04-23 23:41:49,608|GeoSpark area_tables                              | 15.10|  2782
+2019-04-23 23:41:49,609|GeoSpark|30%|28.76|15.10
+2019-04-23 23:41:49,683|Session app-20190423234122-0067 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 23:41:54,729|Session app-20190423234154-0068 started           |  1.93|     0
+2019-04-23 23:42:05,241|Source read                                       | 10.51|  2289
+2019-04-23 23:42:08,399|Target read                                       |  3.16|  3160
+2019-04-23 23:42:13,863|Spatial join done                                 |  5.46|  2595
+2019-04-23 23:42:14,953|Join results flattened                            |  6.55|  5152
+2019-04-23 23:42:16,351|Area intersection computed                        |  7.95|  5152
+2019-04-23 23:42:17,571|GeoSpark area_tables                              |  9.17|  5152
+2019-04-23 23:42:17,571|GeoSpark|40%|24.77|9.17
+2019-04-23 23:42:17,645|Session app-20190423234154-0068 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 23:42:22,555|Session app-20190423234222-0069 started           |  1.85|     0
+2019-04-23 23:42:32,960|Source read                                       | 10.40|  2864
+2019-04-23 23:42:34,205|Target read                                       |  1.25|  3960
+2019-04-23 23:42:40,106|Spatial join done                                 |  5.90|  3531
+2019-04-23 23:42:41,234|Join results flattened                            |  7.03|  8055
+2019-04-23 23:42:42,911|Area intersection computed                        |  8.70|  8055
+2019-04-23 23:42:44,353|GeoSpark area_tables                              | 10.15|  8055
+2019-04-23 23:42:44,353|GeoSpark|50%|23.65|10.15
+2019-04-23 23:42:44,427|Session app-20190423234222-0069 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 23:42:49,335|Session app-20190423234248-0070 started           |  1.86|     0
+2019-04-23 23:42:59,964|Source read                                       | 10.63|  3461
+2019-04-23 23:43:01,252|Target read                                       |  1.29|  4748
+2019-04-23 23:43:07,418|Spatial join done                                 |  6.16|  4447
+2019-04-23 23:43:08,727|Join results flattened                            |  7.47| 11736
+2019-04-23 23:43:10,572|Area intersection computed                        |  9.32| 11736
+2019-04-23 23:43:12,160|GeoSpark area_tables                              | 10.91| 11736
+2019-04-23 23:43:12,160|GeoSpark|60%|24.68|10.91
+2019-04-23 23:43:12,231|Session app-20190423234248-0070 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 23:43:17,271|Session app-20190423234316-0071 started           |  1.96|     0
+2019-04-23 23:43:27,971|Source read                                       | 10.70|  4025
+2019-04-23 23:43:29,306|Target read                                       |  1.34|  5534
+2019-04-23 23:43:35,311|Spatial join done                                 |  6.00|  5348
+2019-04-23 23:43:36,529|Join results flattened                            |  7.22| 16022
+2019-04-23 23:43:38,374|Area intersection computed                        |  9.07| 16022
+2019-04-23 23:43:39,813|GeoSpark area_tables                              | 10.51| 16022
+2019-04-23 23:43:39,813|GeoSpark|70%|24.51|10.51
+2019-04-23 23:43:39,889|Session app-20190423234316-0071 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 23:43:44,886|Session app-20190423234344-0072 started           |  1.90|     0
+2019-04-23 23:43:55,599|Source read                                       | 10.71|  4666
+2019-04-23 23:43:56,819|Target read                                       |  1.22|  6380
+2019-04-23 23:44:02,730|Spatial join done                                 |  5.91|  6278
+2019-04-23 23:44:03,829|Join results flattened                            |  7.01| 21397
+2019-04-23 23:44:06,046|Area intersection computed                        |  9.22| 21397
+2019-04-23 23:44:07,691|GeoSpark area_tables                              | 10.87| 21397
+2019-04-23 23:44:07,692|GeoSpark|80%|24.71|10.87
+2019-04-23 23:44:07,763|Session app-20190423234344-0072 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 23:44:12,719|Session app-20190423234412-0073 started           |  1.89|     0
+2019-04-23 23:44:23,293|Source read                                       | 10.57|  5270
+2019-04-23 23:44:24,513|Target read                                       |  1.22|  7185
+2019-04-23 23:44:31,125|Spatial join done                                 |  6.61|  7158
+2019-04-23 23:44:32,317|Join results flattened                            |  7.80| 27091
+2019-04-23 23:44:34,585|Area intersection computed                        | 10.07| 27091
+2019-04-23 23:44:36,442|GeoSpark area_tables                              | 11.93| 27091
+2019-04-23 23:44:36,442|GeoSpark|90%|25.61|11.93
+2019-04-23 23:44:36,515|Session app-20190423234412-0073 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 23:44:41,432|Session app-20190423234441-0074 started           |  1.85|     0
+2019-04-23 23:44:51,896|Source read                                       | 10.46|  5846
+2019-04-23 23:44:53,105|Target read                                       |  1.21|  7953
+2019-04-23 23:45:00,920|Spatial join done                                 |  7.81|  7953
+2019-04-23 23:45:02,146|Join results flattened                            |  9.04| 33372
+2019-04-23 23:45:04,815|Area intersection computed                        | 11.71| 33372
+2019-04-23 23:45:06,913|GeoSpark area_tables                              | 13.81| 33372
+2019-04-23 23:45:06,913|GeoSpark|100%|27.34|13.81
+2019-04-23 23:45:06,984|Session app-20190423234441-0074 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 23:45:11,943|Session app-20190423234511-0075 started           |  1.90|     0
+2019-04-23 23:45:21,426|Source read                                       |  9.48|   584
+2019-04-23 23:45:23,573|Target read                                       |  2.15|   787
+2019-04-23 23:45:31,794|Spatial join done                                 |  8.22|   266
+2019-04-23 23:45:32,438|Join results flattened                            |  8.86|   325
+2019-04-23 23:45:33,221|Area intersection computed                        |  9.65|   325
+2019-04-23 23:45:33,960|GeoSpark area_tables                              | 10.39|   325
+2019-04-23 23:45:33,960|GeoSpark|10%|23.92|10.39
+2019-04-23 23:45:34,032|Session app-20190423234511-0075 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 23:45:39,041|Session app-20190423234538-0076 started           |  1.95|     0
+2019-04-23 23:45:48,878|Source read                                       |  9.84|  1151
+2019-04-23 23:45:50,940|Target read                                       |  2.06|  1581
+2019-04-23 23:46:00,722|Spatial join done                                 |  9.78|   878
+2019-04-23 23:46:02,041|Join results flattened                            | 11.10|  1269
+2019-04-23 23:46:03,535|Area intersection computed                        | 12.59|  1269
+2019-04-23 23:46:04,822|GeoSpark area_tables                              | 13.88|  1269
+2019-04-23 23:46:04,823|GeoSpark|20%|27.73|13.88
+2019-04-23 23:46:04,894|Session app-20190423234538-0076 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 23:46:09,808|Session app-20190423234609-0077 started           |  1.86|     0
+2019-04-23 23:46:20,151|Source read                                       | 10.34|  1695
+2019-04-23 23:46:22,304|Target read                                       |  2.15|  2342
+2019-04-23 23:46:29,890|Spatial join done                                 |  7.58|  1649
+2019-04-23 23:46:31,585|Join results flattened                            |  9.28|  2782
+2019-04-23 23:46:33,617|Area intersection computed                        | 11.31|  2782
+2019-04-23 23:46:35,496|GeoSpark area_tables                              | 13.19|  2782
+2019-04-23 23:46:35,496|GeoSpark|30%|27.54|13.19
+2019-04-23 23:46:35,567|Session app-20190423234609-0077 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 23:46:40,521|Session app-20190423234640-0078 started           |  1.92|     0
+2019-04-23 23:46:50,997|Source read                                       | 10.48|  2289
+2019-04-23 23:46:53,317|Target read                                       |  2.32|  3160
+2019-04-23 23:46:58,870|Spatial join done                                 |  5.55|  2595
+2019-04-23 23:47:00,002|Join results flattened                            |  6.68|  5152
+2019-04-23 23:47:01,483|Area intersection computed                        |  8.16|  5152
+2019-04-23 23:47:02,756|GeoSpark area_tables                              |  9.44|  5152
+2019-04-23 23:47:02,757|GeoSpark|40%|24.16|9.44
+2019-04-23 23:47:02,829|Session app-20190423234640-0078 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 23:47:07,822|Session app-20190423234707-0079 started           |  1.91|     0
+2019-04-23 23:47:18,255|Source read                                       | 10.43|  2864
+2019-04-23 23:47:19,571|Target read                                       |  1.32|  3960
+2019-04-23 23:47:25,724|Spatial join done                                 |  6.15|  3531
+2019-04-23 23:47:26,932|Join results flattened                            |  7.36|  8055
+2019-04-23 23:47:28,764|Area intersection computed                        |  9.19|  8055
+2019-04-23 23:47:30,333|GeoSpark area_tables                              | 10.76|  8055
+2019-04-23 23:47:30,333|GeoSpark|50%|24.42|10.76
+2019-04-23 23:47:30,407|Session app-20190423234707-0079 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 23:47:35,360|Session app-20190423234734-0080 started           |  1.89|     0
+2019-04-23 23:47:45,953|Source read                                       | 10.59|  3461
+2019-04-23 23:47:47,145|Target read                                       |  1.19|  4748
+2019-04-23 23:47:53,288|Spatial join done                                 |  6.14|  4447
+2019-04-23 23:47:54,566|Join results flattened                            |  7.42| 11736
+2019-04-23 23:47:56,729|Area intersection computed                        |  9.58| 11736
+2019-04-23 23:47:58,519|GeoSpark area_tables                              | 11.37| 11736
+2019-04-23 23:47:58,519|GeoSpark|60%|25.05|11.37
+2019-04-23 23:47:58,592|Session app-20190423234734-0080 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 23:48:03,635|Session app-20190423234803-0081 started           |  1.95|     0
+2019-04-23 23:48:14,135|Source read                                       | 10.50|  4025
+2019-04-23 23:48:15,338|Target read                                       |  1.20|  5534
+2019-04-23 23:48:21,300|Spatial join done                                 |  5.96|  5348
+2019-04-23 23:48:22,376|Join results flattened                            |  7.04| 16022
+2019-04-23 23:48:24,262|Area intersection computed                        |  8.92| 16022
+2019-04-23 23:48:25,757|GeoSpark area_tables                              | 10.42| 16022
+2019-04-23 23:48:25,757|GeoSpark|70%|24.07|10.42
+2019-04-23 23:48:25,833|Session app-20190423234803-0081 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 23:48:30,836|Session app-20190423234830-0082 started           |  1.93|     0
+2019-04-23 23:48:41,303|Source read                                       | 10.47|  4666
+2019-04-23 23:48:42,503|Target read                                       |  1.20|  6380
+2019-04-23 23:48:48,636|Spatial join done                                 |  6.13|  6278
+2019-04-23 23:48:49,764|Join results flattened                            |  7.26| 21397
+2019-04-23 23:48:51,875|Area intersection computed                        |  9.37| 21397
+2019-04-23 23:48:53,541|GeoSpark area_tables                              | 11.04| 21397
+2019-04-23 23:48:53,542|GeoSpark|80%|24.64|11.04
+2019-04-23 23:48:53,615|Session app-20190423234830-0082 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 23:48:58,597|Session app-20190423234858-0083 started           |  1.90|     0
+2019-04-23 23:49:08,956|Source read                                       | 10.36|  5270
+2019-04-23 23:49:10,327|Target read                                       |  1.37|  7185
+2019-04-23 23:49:16,875|Spatial join done                                 |  6.55|  7158
+2019-04-23 23:49:18,135|Join results flattened                            |  7.81| 27091
+2019-04-23 23:49:20,443|Area intersection computed                        | 10.11| 27091
+2019-04-23 23:49:22,347|GeoSpark area_tables                              | 12.02| 27091
+2019-04-23 23:49:22,347|GeoSpark|90%|25.66|12.02
+2019-04-23 23:49:22,417|Session app-20190423234858-0083 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 23:49:27,400|Session app-20190423234927-0084 started           |  1.91|     0
+2019-04-23 23:49:38,044|Source read                                       | 10.64|  5846
+2019-04-23 23:49:39,238|Target read                                       |  1.19|  7953
+2019-04-23 23:49:46,609|Spatial join done                                 |  7.37|  7953
+2019-04-23 23:49:47,948|Join results flattened                            |  8.71| 33372
+2019-04-23 23:49:50,523|Area intersection computed                        | 11.28| 33372
+2019-04-23 23:49:52,357|GeoSpark area_tables                              | 13.12| 33372
+2019-04-23 23:49:52,358|GeoSpark|100%|26.87|13.12
+2019-04-23 23:49:52,427|Session app-20190423234927-0084 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 23:49:57,353|Session app-20190423234956-0085 started           |  1.87|     0
+2019-04-23 23:50:06,892|Source read                                       |  9.54|   584
+2019-04-23 23:50:09,926|Target read                                       |  3.03|   787
+2019-04-23 23:50:16,937|Spatial join done                                 |  7.01|   266
+2019-04-23 23:50:17,577|Join results flattened                            |  7.65|   325
+2019-04-23 23:50:18,348|Area intersection computed                        |  8.42|   325
+2019-04-23 23:50:19,058|GeoSpark area_tables                              |  9.13|   325
+2019-04-23 23:50:19,058|GeoSpark|10%|23.58|9.13
+2019-04-23 23:50:19,131|Session app-20190423234956-0085 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 23:50:24,178|Session app-20190423235023-0086 started           |  1.94|     0
+2019-04-23 23:50:34,694|Source read                                       | 10.51|  1151
+2019-04-23 23:50:37,993|Target read                                       |  3.30|  1581
+2019-04-23 23:50:45,557|Spatial join done                                 |  7.56|   878
+2019-04-23 23:50:46,776|Join results flattened                            |  8.78|  1269
+2019-04-23 23:50:48,547|Area intersection computed                        | 10.55|  1269
+2019-04-23 23:50:50,009|GeoSpark area_tables                              | 12.02|  1269
+2019-04-23 23:50:50,010|GeoSpark|20%|27.77|12.02
+2019-04-23 23:50:50,084|Session app-20190423235023-0086 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 23:50:55,144|Session app-20190423235054-0087 started           |  1.96|     0
+2019-04-23 23:51:05,668|Source read                                       | 10.52|  1695
+2019-04-23 23:51:06,896|Target read                                       |  1.23|  2342
+2019-04-23 23:51:15,808|Spatial join done                                 |  8.91|  1649
+2019-04-23 23:51:17,171|Join results flattened                            | 10.27|  2782
+2019-04-23 23:51:19,385|Area intersection computed                        | 12.49|  2782
+2019-04-23 23:51:21,359|GeoSpark area_tables                              | 14.46|  2782
+2019-04-23 23:51:21,359|GeoSpark|30%|28.18|14.46
+2019-04-23 23:51:21,432|Session app-20190423235054-0087 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 23:51:26,438|Session app-20190423235126-0088 started           |  1.90|     0
+2019-04-23 23:51:37,006|Source read                                       | 10.57|  2289
+2019-04-23 23:51:39,945|Target read                                       |  2.94|  3160
+2019-04-23 23:51:45,668|Spatial join done                                 |  5.72|  2595
+2019-04-23 23:51:46,744|Join results flattened                            |  6.80|  5152
+2019-04-23 23:51:48,234|Area intersection computed                        |  8.29|  5152
+2019-04-23 23:51:49,408|GeoSpark area_tables                              |  9.46|  5152
+2019-04-23 23:51:49,409|GeoSpark|40%|24.87|9.46
+2019-04-23 23:51:49,484|Session app-20190423235126-0088 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 23:51:54,427|Session app-20190423235154-0089 started           |  1.88|     0
+2019-04-23 23:52:04,820|Source read                                       | 10.39|  2864
+2019-04-23 23:52:06,088|Target read                                       |  1.27|  3960
+2019-04-23 23:52:12,111|Spatial join done                                 |  6.02|  3531
+2019-04-23 23:52:13,411|Join results flattened                            |  7.32|  8055
+2019-04-23 23:52:15,091|Area intersection computed                        |  9.00|  8055
+2019-04-23 23:52:16,533|GeoSpark area_tables                              | 10.44|  8055
+2019-04-23 23:52:16,534|GeoSpark|50%|23.99|10.44
+2019-04-23 23:52:16,606|Session app-20190423235154-0089 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 23:52:21,555|Session app-20190423235221-0090 started           |  1.89|     0
+2019-04-23 23:52:31,949|Source read                                       | 10.39|  3461
+2019-04-23 23:52:33,077|Target read                                       |  1.13|  4748
+2019-04-23 23:52:39,293|Spatial join done                                 |  6.21|  4447
+2019-04-23 23:52:40,466|Join results flattened                            |  7.39| 11736
+2019-04-23 23:52:42,375|Area intersection computed                        |  9.30| 11736
+2019-04-23 23:52:44,032|GeoSpark area_tables                              | 10.95| 11736
+2019-04-23 23:52:44,032|GeoSpark|60%|24.36|10.95
+2019-04-23 23:52:44,106|Session app-20190423235221-0090 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 23:52:49,066|Session app-20190423235248-0091 started           |  1.89|     0
+2019-04-23 23:52:59,843|Source read                                       | 10.78|  4025
+2019-04-23 23:53:01,084|Target read                                       |  1.24|  5534
+2019-04-23 23:53:06,857|Spatial join done                                 |  5.77|  5348
+2019-04-23 23:53:07,901|Join results flattened                            |  6.81| 16022
+2019-04-23 23:53:09,628|Area intersection computed                        |  8.54| 16022
+2019-04-23 23:53:11,095|GeoSpark area_tables                              | 10.01| 16022
+2019-04-23 23:53:11,095|GeoSpark|70%|23.92|10.01
+2019-04-23 23:53:11,165|Session app-20190423235248-0091 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 23:53:16,203|Session app-20190423235315-0092 started           |  1.96|     0
+2019-04-23 23:53:26,634|Source read                                       | 10.43|  4666
+2019-04-23 23:53:27,822|Target read                                       |  1.19|  6380
+2019-04-23 23:53:34,250|Spatial join done                                 |  6.43|  6278
+2019-04-23 23:53:35,491|Join results flattened                            |  7.67| 21397
+2019-04-23 23:53:37,380|Area intersection computed                        |  9.56| 21397
+2019-04-23 23:53:38,983|GeoSpark area_tables                              | 11.16| 21397
+2019-04-23 23:53:38,984|GeoSpark|80%|24.74|11.16
+2019-04-23 23:53:39,051|Session app-20190423235315-0092 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 23:53:44,064|Session app-20190423235343-0093 started           |  1.92|     0
+2019-04-23 23:53:54,797|Source read                                       | 10.73|  5270
+2019-04-23 23:53:56,091|Target read                                       |  1.29|  7185
+2019-04-23 23:54:03,360|Spatial join done                                 |  7.27|  7158
+2019-04-23 23:54:04,726|Join results flattened                            |  8.63| 27091
+2019-04-23 23:54:07,069|Area intersection computed                        | 10.98| 27091
+2019-04-23 23:54:08,907|GeoSpark area_tables                              | 12.82| 27091
+2019-04-23 23:54:08,908|GeoSpark|90%|26.76|12.82
+2019-04-23 23:54:08,981|Session app-20190423235343-0093 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 23:54:13,900|Session app-20190423235413-0094 started           |  1.85|     0
+2019-04-23 23:54:24,417|Source read                                       | 10.52|  5846
+2019-04-23 23:54:25,577|Target read                                       |  1.16|  7953
+2019-04-23 23:54:33,163|Spatial join done                                 |  7.58|  7953
+2019-04-23 23:54:34,497|Join results flattened                            |  8.92| 33372
+2019-04-23 23:54:37,115|Area intersection computed                        | 11.54| 33372
+2019-04-23 23:54:39,236|GeoSpark area_tables                              | 13.66| 33372
+2019-04-23 23:54:39,236|GeoSpark|100%|27.19|13.66
+2019-04-23 23:54:39,309|Session app-20190423235413-0094 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 23:54:44,314|Session app-20190423235443-0095 started           |  1.91|     0
+2019-04-23 23:54:54,566|Source read                                       | 10.25|   584
+2019-04-23 23:54:57,781|Target read                                       |  3.22|   787
+2019-04-23 23:55:03,903|Spatial join done                                 |  6.12|   266
+2019-04-23 23:55:04,540|Join results flattened                            |  6.76|   325
+2019-04-23 23:55:05,402|Area intersection computed                        |  7.62|   325
+2019-04-23 23:55:06,165|GeoSpark area_tables                              |  8.38|   325
+2019-04-23 23:55:06,166|GeoSpark|10%|23.76|8.38
+2019-04-23 23:55:06,237|Session app-20190423235443-0095 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 23:55:11,198|Session app-20190423235510-0096 started           |  1.88|     0
+2019-04-23 23:55:20,666|Source read                                       |  9.47|  1151
+2019-04-23 23:55:22,741|Target read                                       |  2.08|  1581
+2019-04-23 23:55:32,678|Spatial join done                                 |  9.93|   878
+2019-04-23 23:55:33,965|Join results flattened                            | 11.22|  1269
+2019-04-23 23:55:35,720|Area intersection computed                        | 12.98|  1269
+2019-04-23 23:55:37,108|GeoSpark area_tables                              | 14.37|  1269
+2019-04-23 23:55:37,109|GeoSpark|20%|27.79|14.37
+2019-04-23 23:55:37,179|Session app-20190423235510-0096 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-23 23:55:42,158|Session app-20190423235541-0097 started           |  1.91|     0
+2019-04-23 23:55:52,657|Source read                                       | 10.50|  1695
+2019-04-23 23:55:53,908|Target read                                       |  1.25|  2342
+2019-04-23 23:56:02,878|Spatial join done                                 |  8.97|  1649
+2019-04-23 23:56:04,323|Join results flattened                            | 10.41|  2782
+2019-04-23 23:56:06,387|Area intersection computed                        | 12.48|  2782
+2019-04-23 23:56:08,255|GeoSpark area_tables                              | 14.35|  2782
+2019-04-23 23:56:08,256|GeoSpark|30%|28.01|14.35
+2019-04-23 23:56:08,331|Session app-20190423235541-0097 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-23 23:56:13,323|Session app-20190423235612-0098 started           |  1.91|     0
+2019-04-23 23:56:23,694|Source read                                       | 10.37|  2289
+2019-04-23 23:56:26,735|Target read                                       |  3.04|  3160
+2019-04-23 23:56:32,509|Spatial join done                                 |  5.77|  2595
+2019-04-23 23:56:33,542|Join results flattened                            |  6.80|  5152
+2019-04-23 23:56:34,993|Area intersection computed                        |  8.26|  5152
+2019-04-23 23:56:36,176|GeoSpark area_tables                              |  9.44|  5152
+2019-04-23 23:56:36,176|GeoSpark|40%|24.77|9.44
+2019-04-23 23:56:36,250|Session app-20190423235612-0098 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-23 23:56:41,242|Session app-20190423235640-0099 started           |  1.89|     0
+2019-04-23 23:56:51,655|Source read                                       | 10.41|  2864
+2019-04-23 23:56:52,905|Target read                                       |  1.25|  3960
+2019-04-23 23:56:58,698|Spatial join done                                 |  5.79|  3531
+2019-04-23 23:56:59,867|Join results flattened                            |  6.96|  8055
+2019-04-23 23:57:01,521|Area intersection computed                        |  8.61|  8055
+2019-04-23 23:57:02,937|GeoSpark area_tables                              | 10.03|  8055
+2019-04-23 23:57:02,937|GeoSpark|50%|23.59|10.03
+2019-04-23 23:57:03,012|Session app-20190423235640-0099 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-23 23:57:08,015|Session app-20190423235707-0100 started           |  1.92|     0
+2019-04-23 23:57:18,649|Source read                                       | 10.63|  3461
+2019-04-23 23:57:19,832|Target read                                       |  1.18|  4748
+2019-04-23 23:57:26,411|Spatial join done                                 |  6.58|  4447
+2019-04-23 23:57:27,720|Join results flattened                            |  7.89| 11736
+2019-04-23 23:57:29,743|Area intersection computed                        |  9.91| 11736
+2019-04-23 23:57:31,479|GeoSpark area_tables                              | 11.65| 11736
+2019-04-23 23:57:31,479|GeoSpark|60%|25.39|11.65
+2019-04-23 23:57:31,553|Session app-20190423235707-0100 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-23 23:57:36,516|Session app-20190423235736-0101 started           |  1.92|     0
+2019-04-23 23:57:47,154|Source read                                       | 10.64|  4025
+2019-04-23 23:57:48,340|Target read                                       |  1.19|  5534
+2019-04-23 23:57:54,785|Spatial join done                                 |  6.44|  5348
+2019-04-23 23:57:55,856|Join results flattened                            |  7.51| 16022
+2019-04-23 23:57:57,700|Area intersection computed                        |  9.36| 16022
+2019-04-23 23:57:59,070|GeoSpark area_tables                              | 10.73| 16022
+2019-04-23 23:57:59,070|GeoSpark|70%|24.47|10.73
+2019-04-23 23:57:59,140|Session app-20190423235736-0101 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-23 23:58:04,029|Session app-20190423235803-0102 started           |  1.84|     0
+2019-04-23 23:58:14,503|Source read                                       | 10.47|  4666
+2019-04-23 23:58:15,741|Target read                                       |  1.24|  6380
+2019-04-23 23:58:21,935|Spatial join done                                 |  6.19|  6278
+2019-04-23 23:58:23,094|Join results flattened                            |  7.35| 21397
+2019-04-23 23:58:25,132|Area intersection computed                        |  9.39| 21397
+2019-04-23 23:58:26,788|GeoSpark area_tables                              | 11.05| 21397
+2019-04-23 23:58:26,788|GeoSpark|80%|24.60|11.05
+2019-04-23 23:58:26,862|Session app-20190423235803-0102 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-23 23:58:31,811|Session app-20190423235831-0103 started           |  1.89|     0
+2019-04-23 23:58:42,313|Source read                                       | 10.50|  5270
+2019-04-23 23:58:43,452|Target read                                       |  1.14|  7185
+2019-04-23 23:58:50,095|Spatial join done                                 |  6.64|  7158
+2019-04-23 23:58:51,343|Join results flattened                            |  7.89| 27091
+2019-04-23 23:58:53,631|Area intersection computed                        | 10.18| 27091
+2019-04-23 23:58:55,452|GeoSpark area_tables                              | 12.00| 27091
+2019-04-23 23:58:55,452|GeoSpark|90%|25.53|12.00
+2019-04-23 23:58:55,526|Session app-20190423235831-0103 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-23 23:59:00,504|Session app-20190423235900-0104 started           |  1.90|     0
+2019-04-23 23:59:11,283|Source read                                       | 10.78|  5846
+2019-04-23 23:59:12,475|Target read                                       |  1.19|  7953
+2019-04-23 23:59:19,595|Spatial join done                                 |  7.12|  7953
+2019-04-23 23:59:20,962|Join results flattened                            |  8.48| 33372
+2019-04-23 23:59:23,600|Area intersection computed                        | 11.12| 33372
+2019-04-23 23:59:25,588|GeoSpark area_tables                              | 13.11| 33372
+2019-04-23 23:59:25,589|GeoSpark|100%|26.99|13.11
+2019-04-23 23:59:25,664|Session app-20190423235900-0104 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source0.wkt --target ~/Datasets/Validation/SampleCA_target0.wkt --tag 10%
+2019-04-23 23:59:30,591|Session app-20190423235930-0105 started           |  1.88|     0
+2019-04-23 23:59:40,671|Source read                                       | 10.08|   584
+2019-04-23 23:59:43,565|Target read                                       |  2.89|   787
+2019-04-23 23:59:49,727|Spatial join done                                 |  6.16|   266
+2019-04-23 23:59:50,469|Join results flattened                            |  6.90|   325
+2019-04-23 23:59:51,308|Area intersection computed                        |  7.74|   325
+2019-04-23 23:59:52,060|GeoSpark area_tables                              |  8.50|   325
+2019-04-23 23:59:52,060|GeoSpark|10%|23.35|8.49
+2019-04-23 23:59:52,134|Session app-20190423235930-0105 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source1.wkt --target ~/Datasets/Validation/SampleCA_target1.wkt --tag 20%
+2019-04-23 23:59:57,148|Session app-20190423235956-0106 started           |  1.94|     0
+2019-04-24 00:00:07,790|Source read                                       | 10.64|  1151
+2019-04-24 00:00:11,046|Target read                                       |  3.26|  1581
+2019-04-24 00:00:18,603|Spatial join done                                 |  7.55|   878
+2019-04-24 00:00:19,774|Join results flattened                            |  8.72|  1269
+2019-04-24 00:00:21,324|Area intersection computed                        | 10.28|  1269
+2019-04-24 00:00:22,657|GeoSpark area_tables                              | 11.61|  1269
+2019-04-24 00:00:22,657|GeoSpark|20%|27.45|11.61
+2019-04-24 00:00:22,732|Session app-20190423235956-0106 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source2.wkt --target ~/Datasets/Validation/SampleCA_target2.wkt --tag 30%
+2019-04-24 00:00:27,385|Session app-20190424000027-0107 started           |  1.87|     0
+2019-04-24 00:00:38,086|Source read                                       | 10.70|  1695
+2019-04-24 00:00:40,261|Target read                                       |  2.17|  2342
+2019-04-24 00:00:47,862|Spatial join done                                 |  7.60|  1649
+2019-04-24 00:00:49,423|Join results flattened                            |  9.16|  2782
+2019-04-24 00:00:51,556|Area intersection computed                        | 11.29|  2782
+2019-04-24 00:00:53,419|GeoSpark area_tables                              | 13.16|  2782
+2019-04-24 00:00:53,419|GeoSpark|30%|27.91|13.16
+2019-04-24 00:00:53,493|Session app-20190424000027-0107 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source3.wkt --target ~/Datasets/Validation/SampleCA_target3.wkt --tag 40%
+2019-04-24 00:00:58,497|Session app-20190424000058-0108 started           |  1.91|     0
+2019-04-24 00:01:09,150|Source read                                       | 10.65|  2289
+2019-04-24 00:01:12,211|Target read                                       |  3.06|  3160
+2019-04-24 00:01:17,778|Spatial join done                                 |  5.56|  2595
+2019-04-24 00:01:18,738|Join results flattened                            |  6.52|  5152
+2019-04-24 00:01:20,261|Area intersection computed                        |  8.05|  5152
+2019-04-24 00:01:21,429|GeoSpark area_tables                              |  9.22|  5152
+2019-04-24 00:01:21,430|GeoSpark|40%|24.85|9.22
+2019-04-24 00:01:21,504|Session app-20190424000058-0108 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source4.wkt --target ~/Datasets/Validation/SampleCA_target4.wkt --tag 50%
+2019-04-24 00:01:26,491|Session app-20190424000126-0109 started           |  1.90|     0
+2019-04-24 00:01:37,001|Source read                                       | 10.51|  2864
+2019-04-24 00:01:38,279|Target read                                       |  1.28|  3960
+2019-04-24 00:01:44,069|Spatial join done                                 |  5.79|  3531
+2019-04-24 00:01:45,126|Join results flattened                            |  6.84|  8055
+2019-04-24 00:01:46,747|Area intersection computed                        |  8.47|  8055
+2019-04-24 00:01:48,163|GeoSpark area_tables                              |  9.88|  8055
+2019-04-24 00:01:48,163|GeoSpark|50%|23.57|9.88
+2019-04-24 00:01:48,235|Session app-20190424000126-0109 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source5.wkt --target ~/Datasets/Validation/SampleCA_target5.wkt --tag 60%
+2019-04-24 00:01:53,270|Session app-20190424000152-0110 started           |  1.93|     0
+2019-04-24 00:02:03,921|Source read                                       | 10.65|  3461
+2019-04-24 00:02:05,051|Target read                                       |  1.13|  4748
+2019-04-24 00:02:11,356|Spatial join done                                 |  6.30|  4447
+2019-04-24 00:02:12,621|Join results flattened                            |  7.57| 11736
+2019-04-24 00:02:14,538|Area intersection computed                        |  9.48| 11736
+2019-04-24 00:02:16,244|GeoSpark area_tables                              | 11.19| 11736
+2019-04-24 00:02:16,244|GeoSpark|60%|24.91|11.19
+2019-04-24 00:02:16,318|Session app-20190424000152-0110 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source6.wkt --target ~/Datasets/Validation/SampleCA_target6.wkt --tag 70%
+2019-04-24 00:02:21,356|Session app-20190424000220-0111 started           |  1.93|     0
+2019-04-24 00:02:32,077|Source read                                       | 10.72|  4025
+2019-04-24 00:02:33,286|Target read                                       |  1.21|  5534
+2019-04-24 00:02:39,153|Spatial join done                                 |  5.86|  5348
+2019-04-24 00:02:40,209|Join results flattened                            |  6.92| 16022
+2019-04-24 00:02:42,129|Area intersection computed                        |  8.84| 16022
+2019-04-24 00:02:43,747|GeoSpark area_tables                              | 10.46| 16022
+2019-04-24 00:02:43,747|GeoSpark|70%|24.32|10.46
+2019-04-24 00:02:43,821|Session app-20190424000220-0111 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source7.wkt --target ~/Datasets/Validation/SampleCA_target7.wkt --tag 80%
+2019-04-24 00:02:48,841|Session app-20190424000248-0112 started           |  1.95|     0
+2019-04-24 00:02:59,577|Source read                                       | 10.74|  4666
+2019-04-24 00:03:00,706|Target read                                       |  1.13|  6380
+2019-04-24 00:03:06,774|Spatial join done                                 |  6.06|  6278
+2019-04-24 00:03:07,946|Join results flattened                            |  7.24| 21397
+2019-04-24 00:03:09,982|Area intersection computed                        |  9.27| 21397
+2019-04-24 00:03:11,659|GeoSpark area_tables                              | 10.95| 21397
+2019-04-24 00:03:11,659|GeoSpark|80%|24.77|10.95
+2019-04-24 00:03:11,731|Session app-20190424000248-0112 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source8.wkt --target ~/Datasets/Validation/SampleCA_target8.wkt --tag 90%
+2019-04-24 00:03:16,769|Session app-20190424000316-0113 started           |  1.95|     0
+2019-04-24 00:03:27,357|Source read                                       | 10.59|  5270
+2019-04-24 00:03:28,622|Target read                                       |  1.27|  7185
+2019-04-24 00:03:35,226|Spatial join done                                 |  6.60|  7158
+2019-04-24 00:03:36,414|Join results flattened                            |  7.79| 27091
+2019-04-24 00:03:38,628|Area intersection computed                        | 10.00| 27091
+2019-04-24 00:03:40,443|GeoSpark area_tables                              | 11.82| 27091
+2019-04-24 00:03:40,443|GeoSpark|90%|25.63|11.82
+2019-04-24 00:03:40,515|Session app-20190424000316-0113 closed
+spark-submit /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --source ~/Datasets/Validation/SampleCA_source9.wkt --target ~/Datasets/Validation/SampleCA_target9.wkt --tag 100%
+2019-04-24 00:03:45,437|Session app-20190424000345-0114 started           |  1.88|     0
+2019-04-24 00:03:56,018|Source read                                       | 10.58|  5846
+2019-04-24 00:03:57,224|Target read                                       |  1.21|  7953
+2019-04-24 00:04:04,666|Spatial join done                                 |  7.44|  7953
+2019-04-24 00:04:06,059|Join results flattened                            |  8.83| 33372
+2019-04-24 00:04:08,538|Area intersection computed                        | 11.31| 33372
+2019-04-24 00:04:10,638|GeoSpark area_tables                              | 13.41| 33372
+2019-04-24 00:04:10,639|GeoSpark|100%|27.09|13.41
+2019-04-24 00:04:10,713|Session app-20190424000345-0114 closed
