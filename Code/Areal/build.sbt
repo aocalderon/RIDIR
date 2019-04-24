@@ -15,5 +15,5 @@ libraryDependencies += "org.datasyslab" % "geospark" % GeoSparkVersion
 libraryDependencies += "org.datasyslab" % "JTSplus" % "0.1.4"
 libraryDependencies += "com.lihaoyi" %% "requests" % "0.1.7"
 
-mainClass in (Compile, run) := Some("Areal")
-mainClass in (Compile, packageBin) := Some("Areal")
+mainClass in (Compile, run) := Some("GeoSparkRunner")
+mainClass in (Compile, packageBin) := Some("GeoSparkRunner")
