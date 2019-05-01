@@ -1,6 +1,9 @@
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.catalyst.ScalaReflection
+import org.apache.spark.sql.types.StructType
 import org.apache.spark.rdd.RDD
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geospark.enums.{GridType, IndexType}
@@ -15,6 +18,9 @@ import scala.collection.JavaConverters._
 object InterpolatorSketch{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val geofactory: GeometryFactory = new GeometryFactory()
+
+  case class Attributes(ID: Int, tarea: Double, population: Int, income: Double, pci: Double)
+  val attributeSchema = ScalaReflection.schemaFor[Attributes].dataType.asInstanceOf[StructType]
 
   var gridType: GridType = GridType.QUADTREE
   var indexType: IndexType = IndexType.QUADTREE
@@ -33,7 +39,7 @@ object InterpolatorSketch{
     targetRDD.spatialPartitioning(sourceRDD.getPartitioner)
     sourceRDD.buildIndex(indexType, buildOnSpatialPartitionedRDD)
 
-    val joined = JoinQuery.SpatialJoinQuery(sourceRDD, targetRDD, usingIndex, considerBoundaryIntersection)
+    val joined = JoinQuery.SpatialJoinQuery(targetRDD, sourceRDD, usingIndex, considerBoundaryIntersection)
     val nJoined = joined.count()
     log("Spatial join done", timer, nJoined)
 
@@ -56,6 +62,65 @@ object InterpolatorSketch{
     log("Area intersection computed", timer, nAreaTable)
 
     areal
+  }
+
+  def area_interpolate(spark: SparkSession, sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry], extensive_variables: List[String]): Unit = {
+    import spark.implicits._
+
+    val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
+    areas.show(truncate = false)
+
+    val extensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
+      val attr = s.getUserData().toString().split("\t")
+      val id = attr(0).toInt
+      val tarea = s.getArea()
+      val population = attr(1).toInt
+      val income = attr(3).toDouble
+      (id, tarea, population, income)
+    }.toDF("ID", "tarea", "population", "income")
+
+    val table_extensive = areas.join(extensiveAttributes, $"SID" === $"ID")
+      .withColumn("tpopulation", $"area" / $"tarea" * $"population")
+      .withColumn("tincome", $"area" / $"tarea" * $"income")
+
+    table_extensive.orderBy($"SID").show(truncate = false)
+
+    val target_extensive = table_extensive.select("TID", "tpopulation", "tincome")
+      .groupBy($"TID")
+      .agg(
+        sum($"tpopulation").as("population"),
+        sum($"tincome").as("income")
+      )
+
+    target_extensive.orderBy($"TID").show(truncate = false)
+
+    val intensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
+      val attr = s.getUserData().toString().split("\t")
+      val id = attr(0).toInt
+      val pci = attr(2).toDouble
+      (id, pci)
+    }.toDF("IDS", "pci")
+    val targetAreas = targetRDD.rawSpatialRDD.rdd.map{ t =>
+      val attr = t.getUserData().toString().split("\t")
+      val id = attr(0).toInt
+      val tarea = t.getArea()
+      (id, tarea)
+    }.toDF("IDT", "tarea")
+
+    val table_intensive = areas.join(targetAreas, $"TID" === $"IDT", "left_outer")
+      .join(intensiveAttributes, $"SID" === $"IDS", "left_outer")
+      .withColumn("tpci", $"area" / $"tarea" * $"pci")
+
+    table_intensive.orderBy($"TID").show(truncate = false)
+
+    val target_intensive = table_intensive.select("TID", "tpci")
+      .groupBy($"TID")
+      .agg(
+        sum($"tpci").as("pci")
+      )
+
+    target_intensive.orderBy($"TID").show(truncate = false)
+
   }
 
   def main(args: Array[String]) = {
@@ -130,25 +195,22 @@ object InterpolatorSketch{
       map{ s =>
         val geom = new WKTReader(geofactory).read(s.getString(0))
         val id = s.getString(1)
-        val population = s.getString(2).toInt
-        val pci = s.getString(3).toDouble
-        val income = population * pci
-        val userData = s"$id\t$population\t$pci\t$income"
-        geom.setUserData(userData)
+        geom.setUserData(id)
         geom
       }
     targetRDD.setRawSpatialRDD(targetWKT)
     val nTargetRDD = targetRDD.rawSpatialRDD.rdd.count()
     log("Target read", timer, nTargetRDD)
     // Calling area_table method...
-    val areal = area_table(sourceRDD, targetRDD)
+    val extensive = List("population", "income")
+    area_interpolate(spark, sourceRDD, targetRDD, extensive)
 
     // Reporting results...
     timer = clocktime
-    areal.toDF("SourceID", "TargetID", "Area").show(truncate=false)
+    //areal.toDF("SourceID", "TargetID", "Area").show(truncate=false)
     val ttime = "%.2f".format((clocktime - totalTime) / 1000.0)
     logger.info(s"Total execution time: $ttime s")    
-    logger.info(s"AREAL;$cores;$executors;$partitions;$ttime;${areal.count()};$appID")
+    //logger.info(s"AREAL;$cores;$executors;$partitions;$ttime;${areal.count()};$appID")
     if(!local){
       val url = s"http://${host}:4040/api/v1/applications/${appID}/executors"
       val r = requests.get(url)
