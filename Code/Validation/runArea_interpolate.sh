@@ -1,0 +1,1 @@
+spark-submit --class InterpolatorSketch /home/acald013/RIDIR/Code/Areal/target/scala-2.11/areal_2.11-0.1.jar --local --cores 12 --partitions 1 --source ~/RIDIR/Datasets/A.wkt --target ~/RIDIR/Datasets/B.wkt
