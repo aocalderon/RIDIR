@@ -12,12 +12,12 @@ import org.slf4j.{LoggerFactory, Logger}
 import scala.collection.JavaConverters._
 import java.io.PrintWriter
 
-object StateSelector{
+object StateSelector2{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val geofactory: GeometryFactory = new GeometryFactory()
 
   def main(args: Array[String]) = {
-    val params     = new StateSelectorConf(args)
+    val params     = new StateSelector2Conf(args)
     val source     = params.source()
     val target     = params.target()
     val output     = params.output()
@@ -219,7 +219,7 @@ object StateSelector{
   }
 }
 
-class StateSelectorConf(args: Seq[String]) extends ScallopConf(args) {
+class StateSelector2Conf(args: Seq[String]) extends ScallopConf(args) {
   val source:     ScallopOption[String]  = opt[String]  (required = true)
   val target:     ScallopOption[String]  = opt[String]  (required = true)
   val output:     ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
