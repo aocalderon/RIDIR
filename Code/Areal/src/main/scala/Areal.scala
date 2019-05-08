@@ -1,6 +1,7 @@
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
 import org.apache.spark.rdd.RDD
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geospark.enums.{GridType, IndexType}
@@ -54,6 +55,66 @@ object Areal{
 
     areal
   }
+
+  def area_interpolate(spark: SparkSession, sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry],
+    extensive_variables: List[String], intensive_variables: List[String]): Unit = {
+    import spark.implicits._
+
+    val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
+    areas.show(truncate = false)
+
+    val extensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
+      val attr = s.getUserData().toString().split("\t")
+      val id = attr(0).toInt
+      val tarea = s.getArea()
+      val population = attr(1).toDouble
+      (id, tarea, population)
+    }.toDF("ID", "tarea", "population")
+
+    extensiveAttributes.show()
+
+    val table_extensive = areas.join(extensiveAttributes, $"SID" === $"ID")
+      .withColumn("tpopulation", $"area" / $"tarea" * $"population")
+
+    table_extensive.orderBy($"SID").show(truncate = false)
+
+    val target_extensive = table_extensive.select("TID", "tpopulation")
+      .groupBy($"TID")
+      .agg(
+        sum($"tpopulation").as("population")
+      )
+
+    target_extensive.orderBy($"TID").show(truncate = false)
+/*
+    val intensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
+      val attr = s.getUserData().toString().split("\t")
+      val id = attr(0).toInt
+      val pci = attr(2).toDouble
+      (id, pci)
+    }.toDF("IDS", "pci")
+    val targetAreas = targetRDD.rawSpatialRDD.rdd.map{ t =>
+      val attr = t.getUserData().toString().split("\t")
+      val id = attr(0).toInt
+      val tarea = t.getArea()
+      (id, tarea)
+    }.toDF("IDT", "tarea")
+
+    val table_intensive = areas.join(targetAreas, $"TID" === $"IDT", "left_outer")
+      .join(intensiveAttributes, $"SID" === $"IDS", "left_outer")
+      .withColumn("tpci", $"area" / $"tarea" * $"pci")
+
+    table_intensive.orderBy($"TID").show(truncate = false)
+
+    val target_intensive = table_intensive.select("TID", "tpci")
+      .groupBy($"TID")
+      .agg(
+        sum($"tpci").as("pci")
+      )
+
+    target_intensive.orderBy($"TID").show(truncate = false)
+ */  
+ }
+
 
   def main(args: Array[String]) = {
     val params     = new ArealConf(args)

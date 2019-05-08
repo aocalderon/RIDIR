@@ -64,7 +64,8 @@ object InterpolatorSketch{
     areal
   }
 
-  def area_interpolate(spark: SparkSession, sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry], extensive_variables: List[String]): Unit = {
+  def area_interpolate(spark: SparkSession, sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry],
+    extensive_variables: List[String], intensive_variables: List[String]): Unit = {
     import spark.implicits._
 
     val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
@@ -120,7 +121,6 @@ object InterpolatorSketch{
       )
 
     target_intensive.orderBy($"TID").show(truncate = false)
-
   }
 
   def main(args: Array[String]) = {
@@ -203,7 +203,8 @@ object InterpolatorSketch{
     log("Target read", timer, nTargetRDD)
     // Calling area_table method...
     val extensive = List("population", "income")
-    area_interpolate(spark, sourceRDD, targetRDD, extensive)
+    val intensive = List("pci")
+    area_interpolate(spark, sourceRDD, targetRDD, extensive, intensive)
 
     // Reporting results...
     timer = clocktime
