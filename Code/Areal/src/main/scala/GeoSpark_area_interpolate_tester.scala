@@ -96,7 +96,6 @@ object GeoSpark_area_interpolate_tester{
     // Calling area_table method...
 
     Areal.partitions = partitions
-    //val tobler = Areal.area_table(sourceRDD, targetRDD)
     val extensive = List("population")
     val intensive = List("")
     Areal.area_interpolate(spark, sourceRDD, targetRDD, extensive, intensive)

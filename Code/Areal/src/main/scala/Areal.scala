@@ -57,11 +57,10 @@ object Areal{
   }
 
   def area_interpolate(spark: SparkSession, sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry],
-    extensive_variables: List[String], intensive_variables: List[String]): Unit = {
+    extensive_variables: List[String], intensive_variables: List[String]): RDD[(Int, Double)]= {
     import spark.implicits._
 
     val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
-    areas.show(truncate = false)
 
     val extensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
       val attr = s.getUserData().toString().split("\t")
@@ -71,13 +70,8 @@ object Areal{
       (id, tarea, population)
     }.toDF("ID", "tarea", "population")
 
-    extensiveAttributes.show()
-
     val table_extensive = areas.join(extensiveAttributes, $"SID" === $"ID")
       .withColumn("tpopulation", $"area" / $"tarea" * $"population")
-
-    table_extensive.orderBy($"SID").show(truncate = false)
-
     val target_extensive = table_extensive.select("TID", "tpopulation")
       .groupBy($"TID")
       .agg(
@@ -85,6 +79,8 @@ object Areal{
       )
 
     target_extensive.orderBy($"TID").show(truncate = false)
+
+    target_extensive.orderBy($"TID").rdd.map(e => (e.getInt(0), e.getDouble(1)))
 /*
     val intensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
       val attr = s.getUserData().toString().split("\t")
