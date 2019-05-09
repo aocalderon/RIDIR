@@ -22,7 +22,6 @@ object GeoSpark_area_interpolate_tester{
     val source     = params.source()
     val target     = params.target()
     val output     = params.output()
-    val state      = params.state()
     val host       = params.host()
     val port       = params.port()
     val partitions = params.partitions()
@@ -102,7 +101,7 @@ object GeoSpark_area_interpolate_tester{
     val extensive = List("population")
     val intensive = List("")
     val estimates = Areal.area_interpolate(spark, sourceRDD, targetRDD, extensive, intensive)
-    val pw = new PrintWriter(s"${output}/${state}_geospark_test.tsv")
+    val pw = new PrintWriter(output)
     pw.write(estimates.map(t => s"${t._2}\n").collect().mkString(""))
     pw.close()
 
@@ -150,8 +149,7 @@ object GeoSpark_area_interpolate_tester{
 class GeoSpark_area_interpolate_testerConf(args: Seq[String]) extends ScallopConf(args) {
   val source:     ScallopOption[String]  = opt[String]  (required = true)
   val target:     ScallopOption[String]  = opt[String]  (required = true)
-  val output:     ScallopOption[String]  = opt[String]  (default = Some("/home/acald013/RIDIR/Datasets/AreaInterpolateValidation/"))
-  val state:      ScallopOption[String]  = opt[String]  (default = Some("MD"))
+  val output:     ScallopOption[String]  = opt[String]  (default = Some("/tmp/output.tsv"))
   val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
