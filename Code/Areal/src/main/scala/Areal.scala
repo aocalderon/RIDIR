@@ -18,8 +18,9 @@ object Areal{
   var indexType: IndexType = IndexType.QUADTREE
   var partitions: Int = 1024
   var nAreaTable: Long = 0
+  var debug: Boolean = false
 
-  def area_table(sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry]): RDD[(Int, Int, Double)] = {
+  def area_table(sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry]): RDD[(String, String, Double)] = {
     // Doing spatial join...
     var timer = clocktime
     val considerBoundaryIntersection = true // Only return gemeotries fully covered by each query window in queryWindowRDD
@@ -31,7 +32,7 @@ object Areal{
     targetRDD.spatialPartitioning(sourceRDD.getPartitioner)
     sourceRDD.buildIndex(indexType, buildOnSpatialPartitionedRDD)
 
-    val joined = JoinQuery.SpatialJoinQuery(sourceRDD, targetRDD, usingIndex, considerBoundaryIntersection)
+    val joined = JoinQuery.SpatialJoinQuery(targetRDD, sourceRDD, usingIndex, considerBoundaryIntersection)
     val nJoined = joined.count()
     log("Spatial join done", timer, nJoined)
 
@@ -43,10 +44,14 @@ object Areal{
     val nFlattened = flattened.count()
     log("Join results flattened", timer, nFlattened)
 
+    if(debug){
+      flattened.take(5).map(f => s"${f._1.getUserData.toString()}\t${f._2.getUserData.toString()} ").foreach(println)
+    }
+
     // Computing intersection area...
     val areal = flattened.map{ pair =>
-      val source_id  = pair._1.getUserData.toString().split("\t")(0).toInt
-      val target_id  = pair._2.getUserData.toString().split("\t")(0).toInt
+      val source_id  = pair._1.getUserData.toString().split("\t")(0)
+      val target_id  = pair._2.getUserData.toString().split("\t")(0)
       val area = pair._1.intersection(pair._2).getArea
       (source_id, target_id, area)
     }
@@ -57,30 +62,55 @@ object Areal{
   }
 
   def area_interpolate(spark: SparkSession, sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry],
-    extensive_variables: List[String], intensive_variables: List[String]): RDD[(Int, Double)]= {
+    extensive_variables: List[String], intensive_variables: List[String]): RDD[(String, Double)]= {
     import spark.implicits._
 
     val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
-
-    val extensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
+    if(debug) {
+      areas.show()
+    }
+    var timer = clocktime
+    val sourceAreas = sourceRDD.rawSpatialRDD.rdd.map{ s =>
       val attr = s.getUserData().toString().split("\t")
-      val id = attr(0).toInt
+      val id = attr(0)
       val tarea = s.getArea()
       val population = attr(1).toDouble
       (id, tarea, population)
-    }.toDF("ID", "tarea", "population")
+    }.toDF("IDS", "source_area", "population")
+    val nSourcesAreas = sourceAreas.count()
+    log("Sources Areas", timer, nSourcesAreas)
 
-    val table_extensive = areas.join(extensiveAttributes, $"SID" === $"ID")
-      .withColumn("tpopulation", $"area" / $"tarea" * $"population")
+    timer = clocktime
+    val targetAreas = targetRDD.rawSpatialRDD.rdd.map{ t =>
+      val attr = t.getUserData().toString().split("\t")
+      val id = attr(0)
+      val tarea = t.getArea()
+      (id, tarea)
+    }.toDF("IDT", "target_area")
+    val nTargetAreas = targetAreas.count()
+    log("Target Areas", timer, nTargetAreas)
+    
+    timer = clocktime
+    val table_extensive = targetAreas.join(areas, $"IDT" === $"TID")
+      .join(sourceAreas, $"IDS" === $"SID")
+      .withColumn("tpopulation", $"area" / $"source_area" * $"population")
+    val nTable_extensive = table_extensive.count()
+    log("Table extensive", timer, nTable_extensive)
+
+    if(debug){
+      table_extensive.show(truncate = false)
+    }
+
+    timer = clocktime
     val target_extensive = table_extensive.select("TID", "tpopulation")
       .groupBy($"TID")
       .agg(
         sum($"tpopulation").as("population")
       )
-
-    target_extensive.orderBy($"TID").show(truncate = false)
-
-    target_extensive.orderBy($"TID").rdd.map(e => (e.getInt(0), e.getDouble(1)))
+    val nTarget_extensive = target_extensive.count()
+    log("Target extensive", timer, nTarget_extensive)
+    
+    target_extensive.orderBy($"TID").rdd.map(e => (e.getString(0), e.getDouble(1)))
 /*
     val intensiveAttributes = sourceRDD.rawSpatialRDD.rdd.map{ s =>
       val attr = s.getUserData().toString().split("\t")
@@ -122,9 +152,9 @@ object Areal{
     val index      = params.index()
     val cores      = params.cores()
     val executors  = params.executors()
-    val debug      = params.debug()
     val local      = params.local()
-    partitions = params.partitions()
+    debug          = params.debug()
+    partitions     = params.partitions()
     var master     = ""
     if(local){
       master = "local[cores]"
