@@ -69,7 +69,7 @@ object StateSelector2{
     val sourceIDs = sourceRDD.rawSpatialRDD.rdd.zipWithUniqueId.map{ s =>
       val id = s._2
       val geom = s._1
-      geom.setUserData(s"${id}\t${geom.getUserData.toString()}")
+      geom.setUserData(s"S${id}\t${geom.getUserData.toString()}")
       geom
     }.persist(StorageLevel.MEMORY_ONLY)
     sourceRDD.setRawSpatialRDD(sourceIDs)
@@ -82,7 +82,7 @@ object StateSelector2{
     val targetIDs = targetRDD.rawSpatialRDD.rdd.zipWithUniqueId.map{ t =>
       val id = t._2
       val geom = t._1
-      geom.setUserData(s"${id}\t${geom.getUserData.toString()}")
+      geom.setUserData(s"T${id}")
       geom
     }.persist(StorageLevel.MEMORY_ONLY)
     targetRDD.setRawSpatialRDD(targetIDs)
@@ -136,23 +136,29 @@ object StateSelector2{
     targetRDD.spatialPartitioning(sourceRDD.getPartitioner)
     sourceRDD.buildIndex(indexType, buildOnSpatialPartitionedRDD)
 
-    val joined = JoinQuery.SpatialJoinQuery(sourceRDD, targetRDD, usingIndex, considerBoundaryIntersection)
+    val joined = JoinQuery.SpatialJoinQuery(targetRDD, sourceRDD, usingIndex, considerBoundaryIntersection)
     val nJoined = joined.count()
     log("Spatial join done", timer, nJoined)
 
+    joined.keys().rdd.map{ p =>
+      p.getUserData.toString()
+    }.toDF("Keys").show(truncate = false)
+    joined.values().rdd.flatMap(_.asScala).map{ p =>
+      p.getUserData.toString()
+    }.toDF("Values").distinct().show(truncate = false)
+
     // Saving sources...
     timer = clocktime
-    val sourceWkts = joined.rdd.map{ pair =>
-        val s = pair._1
-        val t = pair._2
-        val arrSource = s.getUserData.toString().split("\t")
-        val arrTarget = t.asScala.head.getUserData.toString().split("\t")
-        (arrTarget(1), s"${s.toText()}\t${arrTarget(0)}\t${arrTarget(2)}")
+    val sourceWkts = joined.keys().rdd.map{ s =>
+        val arr = s.getUserData.toString().split("\t")
+        (arr(1), s"${s.toText()}\t${arr(0)}\t${arr(2)}")
       }
-      .toDF("State", "WKT").groupBy($"State")
+      .toDF("State", "WKT").distinct()
+      .groupBy($"State")
       .agg(collect_list("WKT").as("WKT"))
-    .persist(StorageLevel.MEMORY_ONLY)
+      .persist(StorageLevel.MEMORY_ONLY)
     val nSourceWkts = sourceWkts.count()
+    sourceWkts.show()
 
     for(s <- sourceWkts.collect()){
       val sourceName = s"${output}/${s.getString(0)}_source.wkt"
@@ -163,12 +169,18 @@ object StateSelector2{
 
     // Saving targets...
     timer = clocktime
-    val targetWkts = joined.rdd.flatMap(_._2.asScala).map{ t =>
-        val arr = t.getUserData.toString().split("\t")
-        (arr(1), s"${t.toText()}\t${arr(0)}")
-    }.toDF("State", "WKT").distinct().
-      groupBy($"State").agg(collect_list("WKT").as("WKT")).
-      persist(StorageLevel.MEMORY_ONLY)
+    val targetWkts = joined.rdd.flatMap{ pair =>
+        val s = pair._1
+        val t = pair._2
+        val state = s.getUserData.toString().split("\t")(1)
+        t.asScala.map{ p =>
+          val arr = p.getUserData.toString().split("\t")
+          (state, s"${p.toText()}\t${arr(0)}")
+        }
+      }.toDF("State", "WKT").distinct()
+      .groupBy($"State")
+      .agg(collect_list("WKT").as("WKT"))
+      .persist(StorageLevel.MEMORY_ONLY)
     val nTargetWkts = targetWkts.count()
 
     for(s <- targetWkts.collect()){

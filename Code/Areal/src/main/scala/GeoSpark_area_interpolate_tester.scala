@@ -19,7 +19,9 @@ object GeoSpark_area_interpolate_tester{
 
   def main(args: Array[String]) = {
     val params     = new GeoSpark_area_interpolate_testerConf(args)
-    val input      = params.input()
+    val source     = params.source()
+    val target     = params.target()
+    val output     = params.output()
     val state      = params.state()
     val host       = params.host()
     val port       = params.port()
@@ -66,7 +68,7 @@ object GeoSpark_area_interpolate_tester{
     timer = clocktime
     val sourceRDD = new SpatialRDD[Geometry]()
     val sourceWKT = spark.read.option("header", "false").option("delimiter", "\t").
-      csv(s"${input}/${state}_source.wkt").rdd.
+      csv(source).rdd.
       map{ s =>
         val geom = new WKTReader(geofactory).read(s.getString(0))
         val id = s.getString(1)
@@ -82,7 +84,7 @@ object GeoSpark_area_interpolate_tester{
     timer = clocktime
     val targetRDD = new SpatialRDD[Geometry]()
     val targetWKT = spark.read.option("header", "false").option("delimiter", "\t").
-      csv(s"${input}/${state}_target.wkt").rdd.
+      csv(target).rdd.
       map{ s =>
         val geom = new WKTReader(geofactory).read(s.getString(0))
         val id = s.getString(1)
@@ -95,13 +97,14 @@ object GeoSpark_area_interpolate_tester{
 
     // Calling area_table method...
 
+    Areal.debug = debug
     Areal.partitions = partitions
     val extensive = List("population")
     val intensive = List("")
-    Areal.area_interpolate(spark, sourceRDD, targetRDD, extensive, intensive)
-    //val pw = new PrintWriter(s"${input}/${state}_geospark_test.tsv")
-    //pw.write(tobler.map(t => s"${t._1}\t${t._2}\t${t._3}\n").collect().mkString(""))
-    //pw.close()
+    val estimates = Areal.area_interpolate(spark, sourceRDD, targetRDD, extensive, intensive)
+    val pw = new PrintWriter(s"${output}/${state}_geospark_test.tsv")
+    pw.write(estimates.map(t => s"${t._2}\n").collect().mkString(""))
+    pw.close()
 
     // Closing session...
     timer = clocktime
@@ -145,11 +148,13 @@ object GeoSpark_area_interpolate_tester{
 }
 
 class GeoSpark_area_interpolate_testerConf(args: Seq[String]) extends ScallopConf(args) {
-  val input:      ScallopOption[String]  = opt[String]  (required = true)
-  val state:      ScallopOption[String]  = opt[String]  (required = true)
+  val source:     ScallopOption[String]  = opt[String]  (required = true)
+  val target:     ScallopOption[String]  = opt[String]  (required = true)
+  val output:     ScallopOption[String]  = opt[String]  (default = Some("/home/acald013/RIDIR/Datasets/AreaInterpolateValidation/"))
+  val state:      ScallopOption[String]  = opt[String]  (default = Some("MD"))
   val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
-  val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(8))
+  val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
   val executors:  ScallopOption[Int]     = opt[Int]     (default = Some(3))
   val grid:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val index:      ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
