@@ -54,7 +54,7 @@ object Areal{
       val target_id  = pair._2.getUserData.toString().split("\t")(0)
       val area = pair._1.intersection(pair._2).getArea
       (source_id, target_id, area)
-    }
+    }.filter(a => a._3 > 0.0)
     nAreaTable = areal.count()
     log("Area intersection computed", timer, nAreaTable)
 
