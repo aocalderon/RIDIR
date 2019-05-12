@@ -12,7 +12,7 @@ import sys
 DATASET_PATH = sys.argv[1]
 STATE = sys.argv[2]
 
-data = pd.read_csv("{}/{}_source.wkt".format(DATASET_PATH, STATE), sep = '\t', header = None, names = ["geom", "id"])
+data = pd.read_csv("{}/{}_source.wkt".format(DATASET_PATH, STATE), sep = '\t', header = None, names = ["geom", "id", "pop"])
 data['geom'] = data['geom'].apply(wkt.loads)
 source = gpd.GeoDataFrame(data, geometry='geom')
 source.head()
