@@ -72,13 +72,17 @@ object GeoSpark_area_interpolate_tester2{
         val geom = new WKTReader(geofactory).read(s.getString(0))
         val geoid = s.getString(1)
         val extensive = s.getString(2)
-        val intensive = s.getString(3)
+        var intensive = s.getString(3)
+        if(intensive == "null"){ intensive = "0"  }
+
         geom.setUserData(s"S$geoid\t$extensive\t$intensive")
         geom
       }
     sourceRDD.setRawSpatialRDD(sourceWKT)
     val nSourceRDD = sourceRDD.rawSpatialRDD.rdd.count()
     log("Source read", timer, nSourceRDD)
+
+    if(debug){ sourceRDD.rawSpatialRDD.rdd.map(_.getUserData.toString()).toDF().show(false) }
 
     // Reading target...
     timer = clocktime
@@ -95,8 +99,9 @@ object GeoSpark_area_interpolate_tester2{
     val nTargetRDD = targetRDD.rawSpatialRDD.rdd.count()
     log("Target read", timer, nTargetRDD)
 
-    // Calling area_table method...
+    if(debug){ targetRDD.rawSpatialRDD.rdd.map(_.getUserData.toString()).toDF().show(false) }
 
+    // Calling area_table method...
     Areal.debug = debug
     Areal.partitions = partitions
     val extensive = List("extensive")
