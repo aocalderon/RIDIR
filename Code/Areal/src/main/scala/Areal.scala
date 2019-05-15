@@ -141,6 +141,81 @@ object Areal{
  */  
  }
 
+  def area_interpolate2(spark: SparkSession, sourceRDD: SpatialRDD[Geometry], targetRDD: SpatialRDD[Geometry],
+    extensive_variables: List[String], intensive_variables: List[String]): (RDD[(String, Double)], RDD[(String, Double)]) = {
+    import spark.implicits._
+
+    val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
+    if(debug) {
+      areas.show()
+    }
+    var timer = clocktime
+    val sourceAreas = sourceRDD.rawSpatialRDD.rdd.map{ s =>
+      val attr = s.getUserData().toString().split("\t")
+      val id = attr(0)
+      val tarea = s.getArea()
+      val extensive = attr(1).toDouble
+      val intensive = attr(2).toDouble
+      (id, tarea, extensive, intensive)
+    }.toDF("IDS", "source_area", "extensive", "intensive")
+    val nSourcesAreas = sourceAreas.count()
+    log("Sources Areas", timer, nSourcesAreas)
+
+    timer = clocktime
+    val targetAreas = targetRDD.rawSpatialRDD.rdd.map{ t =>
+      val attr = t.getUserData().toString().split("\t")
+      val id = attr(0)
+      val tarea = t.getArea()
+      (id, tarea)
+    }.toDF("IDT", "target_area")
+    val nTargetAreas = targetAreas.count()
+    log("Target Areas", timer, nTargetAreas)
+    
+    timer = clocktime
+    val table_extensive = targetAreas.join(areas, $"IDT" === $"TID")
+      .join(sourceAreas, $"IDS" === $"SID")
+      .withColumn("textensive", $"area" / $"source_area" * $"extensive")
+    val nTable_extensive = table_extensive.count()
+    log("Table extensive", timer, nTable_extensive)
+
+    if(debug){
+      table_extensive.show(truncate = false)
+    }
+
+    timer = clocktime
+    val target_extensive = table_extensive.select("TID", "textensive")
+      .groupBy($"TID")
+      .agg(
+        sum($"textensive").as("extensive")
+      )
+    val nTarget_extensive = target_extensive.count()
+    log("Target extensive", timer, nTarget_extensive)
+    
+    val extensive = target_extensive.orderBy($"TID").rdd.map(e => (e.getString(0), e.getDouble(1)))
+
+    val table_intensive = targetAreas.join(areas, $"TID" === $"IDT")
+      .join(sourceAreas, $"SID" === $"IDS")
+      .withColumn("tintensive", $"area" / $"target_area" * $"intensive")
+    val nTable_intensive = table_intensive.count()
+    log("Table intensive", timer, nTable_intensive)
+
+    if(debug){
+      table_intensive.show(truncate = false)
+    }
+
+    timer = clocktime
+    val target_intensive = table_intensive.select("TID", "tintensive")
+      .groupBy($"TID")
+      .agg(
+        sum($"tintensive").as("intensive")
+      )
+    val nTarget_intensive = target_intensive.count()
+    log("Target intensive", timer, nTarget_intensive)
+
+    val intensive = target_intensive.orderBy($"TID").rdd.map(i => (i.getString(0), i.getDouble(1)))
+
+    (extensive, intensive)
+ }
 
   def main(args: Array[String]) = {
     val params     = new ArealConf(args)
