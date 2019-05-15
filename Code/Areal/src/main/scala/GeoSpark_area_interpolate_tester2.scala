@@ -21,7 +21,6 @@ object GeoSpark_area_interpolate_tester2{
     val params     = new GeoSpark_area_interpolate_tester2Conf(args)
     val source     = params.source()
     val target     = params.target()
-    val output     = params.output()
     val host       = params.host()
     val port       = params.port()
     val partitions = params.partitions()
@@ -72,12 +71,13 @@ object GeoSpark_area_interpolate_tester2{
         val geom = new WKTReader(geofactory).read(s.getString(0))
         val geoid = s.getString(1)
         val extensive = s.getString(2)
-        var intensive = s.getString(3)
-        if(intensive == "null"){ intensive = "0"  }
+        val intensive = s.getString(3)
+        var flag = true
+        if(intensive == "null"){ flag = false  }
 
         geom.setUserData(s"S$geoid\t$extensive\t$intensive")
-        geom
-      }
+        (geom, flag)
+      }.filter(_._2).map(_._1)
     sourceRDD.setRawSpatialRDD(sourceWKT)
     val nSourceRDD = sourceRDD.rawSpatialRDD.rdd.count()
     log("Source read", timer, nSourceRDD)
@@ -108,13 +108,19 @@ object GeoSpark_area_interpolate_tester2{
     val intensive = List("intensive")
     val estimates = Areal.area_interpolate2(spark, sourceRDD, targetRDD, extensive, intensive)
 
-    estimates._1.toDF("tid", "extensive").show(false)
+    val rextensive = estimates._1.toDF("tid", "extensive").orderBy("extensive")
+    rextensive.show(false)
 
-    estimates._2.toDF("tid", "intensive").show(false)
+    val rintensive = estimates._2.toDF("tid", "intensive").orderBy("intensive")
+    rintensive.show(false)
 
-    //val pw = new PrintWriter(output)
-    //pw.write(estimates._1.map(t => s"${t._2}\n").collect().mkString(""))
-    //pw.close()
+    val pw1 = new PrintWriter(params.outextensive())
+    pw1.write(rextensive.map(t => s"${t.getString(0)}\t${t.getDouble(1)}\n").collect().mkString(""))
+    pw1.close()
+
+    val pw2 = new PrintWriter(params.outintensive())
+    pw2.write(rintensive.map(t => s"${t.getString(0)}\t${t.getDouble(1)}\n").collect().mkString(""))
+    pw2.close()
 
     // Closing session...
     timer = clocktime
@@ -160,7 +166,8 @@ object GeoSpark_area_interpolate_tester2{
 class GeoSpark_area_interpolate_tester2Conf(args: Seq[String]) extends ScallopConf(args) {
   val source:     ScallopOption[String]  = opt[String]  (required = true)
   val target:     ScallopOption[String]  = opt[String]  (required = true)
-  val output:     ScallopOption[String]  = opt[String]  (default = Some("/tmp/output.tsv"))
+  val outextensive:     ScallopOption[String]  = opt[String]  (default = Some("/tmp/geospark_extensive.tsv"))
+  val outintensive:     ScallopOption[String]  = opt[String]  (default = Some("/tmp/geospark_intensive.tsv"))
   val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))

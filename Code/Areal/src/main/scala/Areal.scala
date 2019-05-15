@@ -180,6 +180,7 @@ object Areal{
 
     if(debug){
       table_extensive.show(truncate = false)
+      table_extensive.filter($"IDS".isNull).show(false)
     }
 
     timer = clocktime
