@@ -59,7 +59,8 @@ object Areal{
       val target_id  = pair._2.getUserData.toString().split("\t")(0)
       val area = pair._1.intersection(pair._2).getArea
       (source_id, target_id, area)
-    }.filter(a => a._3 > 0.0)
+    }
+    //.filter(a => a._3 > 0.0)
     nAreaTable = areal.count()
     log("Area intersection computed", timer, nAreaTable)
 
@@ -208,7 +209,7 @@ object Areal{
           (a.getString(0), a.getString(1), area)
         }.toDF("SID", "TID", "area"), $"TID" === $"IDT")
       .join(sourceAreas, $"SID" === $"IDS")
-      .withColumn("tintensive", $"target_area" / $"area" * $"intensive")
+      .withColumn("tintensive", $"area" / $"target_area" * $"intensive")
     val nTable_intensive = table_intensive.count()
     log("Table intensive", timer, nTable_intensive)
 
