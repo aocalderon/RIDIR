@@ -11,6 +11,7 @@ import com.vividsolutions.jts.geom.Geometry
 import org.rogach.scallop._
 import org.slf4j.{LoggerFactory, Logger}
 import scala.collection.JavaConverters._
+import java.io.PrintWriter
 
 object Areal{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -151,11 +152,21 @@ object Areal{
     extensive_variables: List[String], intensive_variables: List[String]): (RDD[(String, Double)], RDD[(String, Double)]) = {
     import spark.implicits._
 
+    var timer = clocktime
     val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
+    val nAreas = areas.count()
+    log("Area tables", timer, nAreas)
+
+
     if(debug) {
       areas.orderBy($"TID").show(20, false)
+      val pwa = new PrintWriter("/tmp/geospark_intersections.tsv")
+      pwa.write(areas.map(a => s"${a.getString(0)}\t${a.getString(1)}\t${a.getDouble(2)}\n").collect().mkString(""))
+      pwa.close()
+      logger.info("Intersections saved.")
     }
-    var timer = clocktime
+
+    timer = clocktime
     val sourceAreas = sourceRDD.rawSpatialRDD.rdd.map{ s =>
       val attr = s.getUserData().toString().split("\t")
       val id = attr(0)
