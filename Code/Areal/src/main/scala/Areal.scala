@@ -45,7 +45,12 @@ object Areal{
     log("Join results flattened", timer, nFlattened)
 
     if(debug){
-      flattened.take(5).map(f => s"${f._1.getUserData.toString()}\t${f._2.getUserData.toString()} ").foreach(println)
+      flattened.map{ pair =>
+        val source_id  = pair._1.getUserData.toString().split("\t")(0)
+        val target_id  = pair._2.getUserData.toString().split("\t")(0)
+        val area = pair._1.intersection(pair._2).getArea
+        s"$target_id\t$source_id\t${pair._1.getArea()}\t${pair._2.getArea()}\t$area"
+      }.sortBy(_.split("\t")(0)).take(20).foreach(println)
     }
 
     // Computing intersection area...
@@ -147,7 +152,7 @@ object Areal{
 
     val areas = area_table(sourceRDD, targetRDD).toDF("SID", "TID", "area")
     if(debug) {
-      areas.show()
+      areas.orderBy($"TID").show(20, false)
     }
     var timer = clocktime
     val sourceAreas = sourceRDD.rawSpatialRDD.rdd.map{ s =>
@@ -179,8 +184,7 @@ object Areal{
     log("Table extensive", timer, nTable_extensive)
 
     if(debug){
-      table_extensive.show(truncate = false)
-      table_extensive.filter($"IDS".isNull).show(false)
+      table_extensive.orderBy($"IDT").show(20, false)
     }
 
     timer = clocktime
@@ -201,7 +205,7 @@ object Areal{
     log("Table intensive", timer, nTable_intensive)
 
     if(debug){
-      table_intensive.show(truncate = false)
+      table_intensive.orderBy($"IDT").show(1576, false)
     }
 
     timer = clocktime
