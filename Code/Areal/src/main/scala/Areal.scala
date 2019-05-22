@@ -198,9 +198,17 @@ object Areal{
     
     val extensive = target_extensive.orderBy($"TID").rdd.map(e => (e.getString(0), e.getDouble(1)))
 
-    val table_intensive = targetAreas.join(areas, $"TID" === $"IDT")
+    val table_intensive = targetAreas
+      .join(
+        areas.map{ a =>
+          var area = a.getDouble(2)
+          if(area == 0){
+            area = 1
+          }
+          (a.getString(0), a.getString(1), area)
+        }.toDF("SID", "TID", "area"), $"TID" === $"IDT")
       .join(sourceAreas, $"SID" === $"IDS")
-      .withColumn("tintensive", $"area" / $"target_area" * $"intensive")
+      .withColumn("tintensive", $"target_area" / $"area" * $"intensive")
     val nTable_intensive = table_intensive.count()
     log("Table intensive", timer, nTable_intensive)
 
