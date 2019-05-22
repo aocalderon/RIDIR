@@ -71,13 +71,12 @@ object GeoSpark_area_interpolate_tester2{
         val geom = new WKTReader(geofactory).read(s.getString(0))
         val geoid = s.getString(1)
         val extensive = s.getString(2)
-        val intensive = s.getString(3)
-        var flag = true
-        if(intensive == "null"){ flag = false  }
+        var intensive = s.getString(3)
+        if(intensive == "null"){ intensive = "0.0"  }
 
         geom.setUserData(s"S$geoid\t$extensive\t$intensive")
-        (geom, flag)
-      }.filter(_._2).map(_._1)
+        geom
+      }
     sourceRDD.setRawSpatialRDD(sourceWKT)
     val nSourceRDD = sourceRDD.rawSpatialRDD.rdd.count()
     log("Source read", timer, nSourceRDD)
