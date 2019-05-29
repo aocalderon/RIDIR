@@ -18,7 +18,7 @@ source = gpd.GeoDataFrame(data, geometry='geom')
 print(source.head())
 print("Source: {}".format(source.shape))
 
-targetFile = "/home/and/RIDIR/Datasets/phili_1990.wkt"
+targetFile = "/home/and/RIDIR/Datasets/phili_outliers.wkt"
 data = pd.read_csv(targetFile, sep = '\t', header = None, names = ["geom", "id"])
 data['geom'] = data['geom'].apply(wkt.loads)
 target = gpd.GeoDataFrame(data, geometry='geom')
