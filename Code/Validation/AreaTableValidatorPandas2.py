@@ -18,14 +18,14 @@ import geopandas as gpd
 import sys
 
 #%%
-sourceFile = "/home/and/RIDIR/Datasets/phili_2010.wkt"
+sourceFile = "/home/acald013/RIDIR/Datasets/phili_2010.wkt"
 data = pd.read_csv(sourceFile, sep = '\t', header = None, names = ["geometry", "id", "ext", "int"])
 data['geometry'] = data['geometry'].apply(wkt.loads)
 source = gpd.GeoDataFrame(data, geometry='geometry')
 print(source.head())
 print("Source: {}".format(source.shape))
 
-targetFile = "/home/and/RIDIR/Datasets/phili_outliers.wkt"
+targetFile = "/home/acald013/RIDIR/Datasets/phili_outliers.wkt"
 data = pd.read_csv(targetFile, sep = '\t', header = None, names = ["geometry", "id"])
 data['geometry'] = data['geometry'].apply(wkt.loads)
 target = gpd.GeoDataFrame(data, geometry='geometry')
@@ -117,3 +117,5 @@ intensive = ["int"]
 estimates = area_interpolate(source, target, extensive_variables = extensive, intensive_variables = intensive)
 rextensive = estimates[0]
 rintensive = estimates[1]
+
+print(rintensive)

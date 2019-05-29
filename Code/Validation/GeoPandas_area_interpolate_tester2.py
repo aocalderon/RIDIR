@@ -9,6 +9,48 @@ import geopandas as gpd
 import sys
 import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--source", "-s", help="Source polygon file...")
+parser.add_argument("--target", "-t", help="Target polygon file...")
+parser.add_argument("--outextensive", "-e", default="/tmp/geopandas_extensive.tsv", help="Output extensive file...")
+parser.add_argument("--outintensive", "-i", default="/tmp/geopandas_intensive.tsv", help="Output intensive file...")
+args = parser.parse_args()
+
+data = pd.read_csv(args.source, sep = '\t', header = None, names = ["geometry", "geoid", "extensive", "intensive"])
+data['geometry'] = data['geometry'].apply(wkt.loads)
+source = gpd.GeoDataFrame(data, geometry='geometry')
+print(source.head())
+print("Source: {}".format(source.count()))
+
+data = pd.read_csv(args.target, sep = '\t', header  = None, names = ["geometry", "geoid"])
+data['geometry'] = data['geometry'].apply(wkt.loads)
+target = gpd.GeoDataFrame(data, geometry='geometry')
+print(target.head())
+print("Target: {}".format(target.count()))
+
+extensive = ["extensive"]
+intensive = ["intensive"]
+
+"""
+sourceFile = "/home/acald013/RIDIR/Datasets/phili_2010.wkt"
+data = pd.read_csv(sourceFile, sep = '\t', header = None, names = ["geometry", "geoid", "ext", "int"])
+data['geometry'] = data['geometry'].apply(wkt.loads)
+source = gpd.GeoDataFrame(data, geometry='geometry')
+print(source.head())
+print("Source: {}".format(source.shape))
+
+targetFile = "/home/acald013/RIDIR/Datasets/phili_outliers.wkt"
+data = pd.read_csv(targetFile, sep = '\t', header = None, names = ["geometry", "geoid"])
+data['geometry'] = data['geometry'].apply(wkt.loads)
+target = gpd.GeoDataFrame(data, geometry='geometry')
+print(target.head())
+print("Target: {}".format(target.shape))
+
+extensive = ["ext"]
+intensive = ["int"]
+"""
+
+#%%
 def area_tables(source_df, target_df):
     if _check_crs(source_df, target_df):
         pass
@@ -19,14 +61,14 @@ def area_tables(source_df, target_df):
     n_t = target_df.shape[0]
     _left = np.arange(n_s)
     _right = np.arange(n_t)
-    source_df.loc[:, '_left'] = _left  # create temporary index for union
-    target_df.loc[:, '_right'] = _right # create temporary index for union
+    source_df.loc[:, '_left'] = _left  # create temporary index for union                                                                                                                                  
+    target_df.loc[:, '_right'] = _right # create temporary index for union                                                                                                                                 
     res_union = gpd.overlay(source_df, target_df, how='union')
     n_u, _ = res_union.shape
-    SU = np.zeros((n_s, n_u)) # holds area of intersection of source geom with union geom
-    UT = np.zeros((n_u, n_t)) # binary table mapping union geom to target geom
+    SU = np.zeros((n_s, n_u)) # holds area of intersection of source geom with union geom                                                                                                                  
+    UT = np.zeros((n_u, n_t)) # binary table mapping union geom to target geom                                                                                                                             
     for index, row in res_union.iterrows():
-        # only union polygons that intersect both a source and a target geometry matter 
+        # only union polygons that intersect both a source and a target geometry matter                                                                                                                    
         if not np.isnan(row['_left']) and not np.isnan(row['_right']):
             s_id = int(row['_left'])
             t_id = int(row['_right'])
@@ -88,31 +130,11 @@ def _nan_check(df, column):
         print('nan values in variable: {var}, replacing with 0.0'.format(var=column))
     return values
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--source", "-s", help="Source polygon file...")
-parser.add_argument("--target", "-t", help="Target polygon file...")
-parser.add_argument("--outextensive", "-e", default="/tmp/geopandas_extensive.tsv", help="Output extensive file...")
-parser.add_argument("--outintensive", "-i", default="/tmp/geopandas_intensive.tsv", help="Output intensive file...")
-args = parser.parse_args()
-
-data = pd.read_csv(args.source, sep = '\t', header = None, names = ["geometry", "geoid", "extensive", "intensive"])
-data = data[np.isfinite(data['intensive'])]
-data['geometry'] = data['geometry'].apply(wkt.loads)
-source = gpd.GeoDataFrame(data, geometry='geometry')
-print(source.head())
-print("Source: {}".format(source.count()))
-
-data = pd.read_csv(args.target, sep = '\t', header  = None, names = ["geometry", "geoid"])
-data['geometry'] = data['geometry'].apply(wkt.loads)
-target = gpd.GeoDataFrame(data, geometry='geometry')
-print(target.head())
-print("Target: {}".format(target.count()))
-
-extensive = ["extensive"]
-intensive = ["intensive"]
 estimates = area_interpolate(source, target, extensive_variables = extensive, intensive_variables = intensive)
 rextensive = estimates[0]
 rintensive = estimates[1]
+
+print(rintensive)
 
 count = 0
 extensiveFile = open(args.outextensive, "w")
