@@ -214,6 +214,7 @@ object Areal{
     val table_intensive = areasByTarget
       .join(areas, $"IDT" === $"TID")
       .join(sourceAreas, $"SID" === $"IDS")
+      .withColumn("weights", 1.0 / $"target_area")
       .withColumn("tintensive", $"area" / $"target_area" * $"intensive")
     val nTable_intensive = table_intensive.count()
     log("Table intensive", timer, nTable_intensive)
