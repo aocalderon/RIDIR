@@ -11,7 +11,7 @@ from tobler import area_tables
 import sys
 
 #%%
-sourceFile = "/home/and/RIDIR/Datasets/phili_2000a.wkt"
+sourceFile = "/home/and/RIDIR/Datasets/phili_2010.wkt"
 data = pd.read_csv(sourceFile, sep = '\t', header = None, names = ["geom", "id", "ext", "int"])
 data['geom'] = data['geom'].apply(wkt.loads)
 source = gpd.GeoDataFrame(data, geometry='geom')
@@ -28,7 +28,7 @@ print("Target: {}".format(target.shape))
 #%%
 (SU, UT) = area_tables(source, target)
 
-intensive_variable = ["int"]
+intensive_variables = ["int"]
 ST = np.dot(SU, UT)
 area = ST.sum(axis=0)
 den = np.diag(1./ (area + (area == 0)))
