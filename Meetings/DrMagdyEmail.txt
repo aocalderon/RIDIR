@@ -1,0 +1,13 @@
+Thanks for the explanation and for the resources. I still did not get the intersection and other operations part, but let's get better understanding over time. It would be also great if whenever you have time, not immediately, you answer the following six questions for the problem. Generally, answering at least the first three questions clearly helps you to understand your problem better and helps outsider to understand the problem briefly. You do not have to work on this immediately, whenever you have time, you work on their answers and they will make things clearer. In your answers, assume someone who is an outsider and did not attend any of our meetings, to train yourself on clear explanation of your research.
+
+(1) What is the problem?
+(2) Why is it important?
+(3) Why is it challenging?
+(4) What are the limitations of related work?
+(5) What are our novel contributions? (this might need more time to be answered as our solution is being developed)
+(6) What is the validation method? (e.g., empirical experiments, theoretical proofs, or other methods)
+
+Thanks
+
+Regards,
+Amr Magdy
