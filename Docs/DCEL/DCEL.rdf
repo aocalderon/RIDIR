@@ -1,0 +1,929 @@
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:z="http://www.zotero.org/namespaces/export#"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:bib="http://purl.org/net/biblio#"
+ xmlns:foaf="http://xmlns.com/foaf/0.1/"
+ xmlns:link="http://purl.org/rss/1.0/modules/link/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/"
+ xmlns:vcard="http://nwalsh.com/rdf/vCard#">
+    <bib:Article rdf:about="http://www.worldscientific.com/doi/abs/10.1142/S0218195998000308">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:0218-1959,%201793-6357"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Barequet</foaf:surname>
+                        <foaf:givenname>Gill</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_468"/>
+        <link:link rdf:resource="#item_448"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://www.worldscientific.com/doi/abs/10.1142/S0218195998000308</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <bib:pages>619-636</bib:pages>
+        <dc:date>10/1998</dc:date>
+        <dcterms:dateSubmitted>2019-06-03 16:13:05</dcterms:dateSubmitted>
+        <z:libraryCatalog>Crossref</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>In this paper we describe the DCEL system: a geometric software package which implements a polyhedral programming environment. This package enables fast prototyping of geometric algorithms for polyhedra or for polyhedral surfaces. We provide an overview of the system's functionality and demonstrate its use in several applications.</dcterms:abstract>
+        <dc:title>DCEL: A Polyhedral Database and Programming Environment</dc:title>
+        <z:shortTitle>DCEL</z:shortTitle>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:0218-1959,%201793-6357">
+        <prism:volume>08</prism:volume>
+        <prism:number>05n06</prism:number>
+        <dc:title>International Journal of Computational Geometry &amp; Applications</dc:title>
+        <dc:identifier>ISSN 0218-1959, 1793-6357</dc:identifier>
+        <dc:identifier>DOI 10.1142/S0218195998000308</dc:identifier>
+    </bib:Journal>
+    <bib:Memo rdf:about="#item_468">
+        <rdf:value>&lt;p&gt;Present description of a databased oriented implementation of DCEL...&lt;/p&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_448">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/448/Barequet - 1998 - DCEL A Polyhedral Database and Programming Enviro.pdf"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=CE27AADFB8F6CAA630EE081393F8C15A?doi=10.1.1.45.2801&amp;rep=rep1&amp;type=pdf</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 16:13:03</dcterms:dateSubmitted>
+        <dc:title>Barequet - 1998 - DCEL A Polyhedral Database and Programming Enviro.pdf</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Book rdf:about="urn:isbn:978-0-387-96131-6">
+        <z:itemType>book</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Series>
+               <dc:title>Monographs in Computer Science</dc:title>
+            </bib:Series>
+        </dcterms:isPartOf>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>New York</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>Springer-Verlag</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Preparata</foaf:surname>
+                        <foaf:givenname>Franco P.</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Shamos</foaf:surname>
+                        <foaf:givenname>Michael</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_469"/>
+        <link:link rdf:resource="#item_451"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.springer.com/us/book/9780387961316</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dc:identifier>ISBN 978-0-387-96131-6</dc:identifier>
+        <dc:date>1985</dc:date>
+        <dcterms:dateSubmitted>2019-06-03 16:25:10</dcterms:dateSubmitted>
+        <z:libraryCatalog>www.springer.com</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>From the reviews: &quot;This book offers a coherent treatment, at the graduate textbook level, of the field that has come to be known in the last decade or so as computational geometry. ... ... The book is well organized and lucidly written; a timely contribution by two founders of the field. It clearly demonstrates that computational geometry in the plane is now a fairly well-understood branch of computer science and mathematics. It also points the way to the solution of the more challenging problems in dimensions higher than two.&quot; #Mathematical Reviews#1 &quot;... This remarkable book is a comprehensive and systematic study on research results obtained especially in the last ten years. The very clear presentation concentrates on basic ideas, fundamental combinatorial structures, and crucial algorithmic techniques. The plenty of results is clever organized following these guidelines and within the framework of some detailed case studies. A large number of figures and examples also aid the understanding of the material. Therefore, it can be highly recommended as an early graduate text but it should prove also to be essential to researchers and professionals in applied fields of computer-aided design, computer graphics, and robotics.&quot; #Biometrical Journal#2</dcterms:abstract>
+        <dc:title>Computational Geometry: An Introduction</dc:title>
+        <z:shortTitle>Computational Geometry</z:shortTitle>
+    </bib:Book>
+    <bib:Memo rdf:about="#item_469">
+        <rdf:value>&lt;p&gt;Introduction and definition of DCEL's...&lt;/p&gt;
+&lt;p&gt; &lt;/p&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_451">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/451/9780387961316.html"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.springer.com/us/book/9780387961316</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 16:25:14</dcterms:dateSubmitted>
+        <dc:title>Snapshot</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="#item_453">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf>
+           <bib:Journal></bib:Journal>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Gonzalez</foaf:surname>
+                        <foaf:givenname>Joseph E</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Xin</foaf:surname>
+                        <foaf:givenname>Reynold S</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Dave</foaf:surname>
+                        <foaf:givenname>Ankur</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Crankshaw</foaf:surname>
+                        <foaf:givenname>Daniel</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Franklin</foaf:surname>
+                        <foaf:givenname>Michael J</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Stoica</foaf:surname>
+                        <foaf:givenname>Ion</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_471"/>
+        <link:link rdf:resource="#item_452"/>
+        <bib:pages>16</bib:pages>
+        <z:libraryCatalog>Zotero</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>In pursuit of graph processing performance, the systems community has largely abandoned general-purpose distributed dataﬂow frameworks in favor of specialized graph processing systems that provide tailored programming abstractions and accelerate the execution of iterative graph algorithms. In this paper we argue that many of the advantages of specialized graph processing systems can be recovered in a modern general-purpose distributed dataﬂow system. We introduce GraphX, an embedded graph processing framework built on top of Apache Spark, a widely used distributed dataﬂow system. GraphX presents a familiar composable graph abstraction that is sufﬁcient to express existing graph APIs, yet can be implemented using only a few basic dataﬂow operators (e.g., join, map, group-by). To achieve performance parity with specialized graph systems, GraphX recasts graph-speciﬁc optimizations as distributed join optimizations and materialized view maintenance. By leveraging advances in distributed dataﬂow frameworks, GraphX brings low-cost fault tolerance to graph processing. We evaluate GraphX on real workloads and demonstrate that GraphX achieves an order of magnitude performance gain over the base dataﬂow framework and matches the performance of specialized graph processing systems while enabling a wider range of computation.</dcterms:abstract>
+        <dc:title>GraphX: Graph Processing in a Distributed Dataﬂow Framework</dc:title>
+    </bib:Article>
+    <bib:Memo rdf:about="#item_471">
+        <rdf:value>&lt;p&gt;Implementation of graph operation on top of Apache Spark...&lt;/p&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_452">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/452/Gonzalez et al. - GraphX Graph Processing in a Distributed Dataﬂow .pdf"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.usenix.org/system/files/conference/osdi14/osdi14-paper-gonzalez.pdf</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 16:31:00</dcterms:dateSubmitted>
+        <dc:title>Gonzalez et al. - GraphX Graph Processing in a Distributed Dataﬂow .pdf</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="#item_454">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <prism:volume>2</prism:volume>
+                <dc:title>JoCG</dc:title>
+                <dc:identifier>DOI 10.20382/jocg.v2i1a4</dc:identifier>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Asano</foaf:surname>
+                        <foaf:givenname>Tetsuo</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Rote</foaf:surname>
+                        <foaf:givenname>Günter</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_457"/>
+        <link:link rdf:resource="#item_456"/>
+        <link:link rdf:resource="#item_455"/>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Adjacency list</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Algorithm</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Data structure</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Delaunay triangulation</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Doubly connected edge list</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Enumerated type</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>File spanning</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Largest empty sphere</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Minimum spanning tree</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>NL-complete</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>On the fly</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Read-only memory</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+            <z:AutomaticTag>
+               <rdf:value>Shortest path problem</rdf:value>
+            </z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Time complexity</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Tree traversal</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Voronoi diagram</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <bib:pages>46-68</bib:pages>
+        <dc:date>2009</dc:date>
+        <z:libraryCatalog>Semantic Scholar</z:libraryCatalog>
+        <dcterms:abstract>Constant-work-space algorithms may use only constantly many cells of storage in addition to their input, which is provided as a read-only array. We show how to construct several geometric structures efficiently in the constant-work-space model. Traditional algorithms process the input into a suitable data structure (like a doubly-connected edge list) that allows efficient traversal of the structure at hand. In the constant-work-space setting, however, we cannot afford to do this. Instead, we provide operations that compute the desired features on the fly by accessing the input with no extra space. The whole geometric structure can be obtained by using these operations to enumerate all the features. Of course, we must pay for the space savings by slower running times. While the standard data structure allows us to implement traversal operations in constant time, our schemes typically take linear time to read the input data in each step. We begin with two simple problems: triangulating a planar point set and finding the trapezoidal decomposition of a simple polygon. In both cases adjacent features can be enumerated in linear time per step, resulting in total quadratic running time to output the whole structure. Actually, we show that the former result carries over to the Delaunay triangulation, and hence the Voronoi diagram. This also means that we can compute the largest empty circle of a planar point set in quadratic time and constant work-space. As another application, we demonstrate how to enumerate the features of an Euclidean minimum spanning tree (EMST) in quadratic time per step, so that the whole EMST can be found in cubic time using constant work-space. Finally, we describe how to compute a shortest geodesic path between two points in a simple polygon. Although the shortest path problem in general graphs is NL-complete [18], this constrained problem can be solved in quadratic time using only constant work-space.</dcterms:abstract>
+        <dc:title>Constant-Working-Space Algorithms for Geometric Problems</dc:title>
+    </bib:Article>
+    <bib:Memo rdf:about="#item_457">
+        <rdf:value>&lt;ul&gt;
+&lt;li&gt;About DCEL: &quot;Traditional algorithms for finding these structures proceed by constructing a suitable data structure (typically a doubly-connected edge list, DCEL, or a similar structure that allows to traverse and manipulate the features of the structure in question. These operations usually consist of finding the clockwise next edge for a given edge incident to one of its endpoints; finding the triangles or trapezoids incident to a given edge; finding the twin edge for a given edge; etc. With the DCEL at hand, these operations can be carried out in constant time. In our setting, however, we do not have the space for such a structure at our disposal.&quot;&lt;/li&gt;
+&lt;li&gt; &lt;/li&gt;
+&lt;/ul&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_456">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/456/Asano and Rote - 2009 - Constant-Working-Space Algorithms for Geometric Pr.pdf"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://pdfs.semanticscholar.org/47d6/ada5cceba42ea060f02eabd31932557bfa55.pdf</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 16:57:55</dcterms:dateSubmitted>
+        <dc:title>Full Text PDF</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <z:Attachment rdf:about="#item_455">
+        <z:itemType>attachment</z:itemType>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://api.semanticscholar.org/47d6ada5cceba42ea060f02eabd31932557bfa55</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 16:57:55</dcterms:dateSubmitted>
+        <dc:title>Semantic Scholar Link</dc:title>
+        <z:linkMode>3</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Book rdf:about="urn:isbn:978-3-540-77973-5">
+        <z:itemType>book</z:itemType>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>Berlin Heidelberg</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>Springer-Verlag</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Berg</foaf:surname>
+                        <foaf:givenname>Mark de</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Cheong</foaf:surname>
+                        <foaf:givenname>Otfried</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Kreveld</foaf:surname>
+                        <foaf:givenname>Marc van</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Overmars</foaf:surname>
+                        <foaf:givenname>Mark</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_470"/>
+        <link:link rdf:resource="#item_459"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.springer.com/us/book/9783540779735</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <prism:edition>3</prism:edition>
+        <dc:identifier>ISBN 978-3-540-77973-5</dc:identifier>
+        <dc:date>2008</dc:date>
+        <dcterms:dateSubmitted>2019-06-03 17:00:04</dcterms:dateSubmitted>
+        <z:libraryCatalog>www.springer.com</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>Computational geometry emerged from the ?eld of algorithms design and analysis in the late 1970s. It has grown into a recognized discipline with its own journals, conferences, and a large community of active researchers. The success of the ?eld as a research discipline can on the one hand be explained from the beauty of the problems studied and the solutions obtained, and, on the other hand, by the many application domains—computer graphics, geographic information systems (GIS), robotics, and others—in which geometric algorithms play a fundamental role. For many geometric problems the early algorithmic solutions were either slow or dif?cult to understand and implement. In recent years a number of new algorithmic techniques have been developed that improved and simpli?ed many of the previous approaches. In this textbook we have tried to make these modern algorithmic solutions accessible to a large audience. The book has been written as a textbook for a course in computational geometry, but it can also be used for self-study.</dcterms:abstract>
+        <dc:title>Computational Geometry: Algorithms and Applications</dc:title>
+        <z:shortTitle>Computational Geometry</z:shortTitle>
+    </bib:Book>
+    <bib:Memo rdf:about="#item_470">
+        <rdf:value>&lt;p&gt;Definition and basic concepts.  Illustrate more examples...&lt;/p&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_459">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/459/9783540779735.html"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.springer.com/us/book/9783540779735</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 17:00:07</dcterms:dateSubmitted>
+        <dc:title>Snapshot</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>text/html</link:type>
+    </z:Attachment>
+    <bib:Article rdf:about="https://www.tandfonline.com/doi/full/10.1080/13658816.2018.1508689">
+        <z:itemType>journalArticle</z:itemType>
+        <dcterms:isPartOf rdf:resource="urn:issn:1365-8816,%201362-3087"/>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Zhou</foaf:surname>
+                        <foaf:givenname>Chen</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Chen</foaf:surname>
+                        <foaf:givenname>Zhenjie</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Li</foaf:surname>
+                        <foaf:givenname>Manchun</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_462"/>
+        <link:link rdf:resource="#item_460"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.tandfonline.com/doi/full/10.1080/13658816.2018.1508689</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <bib:pages>2402-2426</bib:pages>
+        <dc:date>2018-12-02</dc:date>
+        <dcterms:dateSubmitted>2019-06-03 17:08:44</dcterms:dateSubmitted>
+        <z:libraryCatalog>Crossref</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>Polygon intersection is an important spatial data-handling process, on which many spatial operations are based. However, this process is computationally intensive because it involves the detection and calculation of polygon intersections. We addressed this computation issue based on two perspectives. First, we improved a method called boundary algebra ﬁlling to eﬃciently rasterize the input polygons. Polygon intersections were subsequently detected in the cells of the raster. Owing to the use of a raster data structure, this method oﬀers advantages of reduced task dependence and improved performance. Based on this method, we developed parallel strategies for diﬀerent procedures in terms of workload decomposition and task scheduling. Thus, the workload across diﬀerent parallel processes can be balanced. The results suggest that our method can eﬀectively accelerate the process of polygon intersection. When addressing datasets with 1,409,020 groups of overlapping polygons, our method could reduce the total execution time from 987.82 to 53.66 s, thereby obtaining an optimal speedup ratio of 18.41 while consistently balancing the workloads. We also tested the eﬀect of task scheduling on the parallel eﬃciency, showing that reducing the total runtime is eﬀective, especially for a lower number of processes. Finally, the good scalability of the method is demonstrated.</dcterms:abstract>
+        <dc:title>A parallel method to accelerate spatial operations involving polygon intersections</dc:title>
+    </bib:Article>
+    <bib:Journal rdf:about="urn:issn:1365-8816,%201362-3087">
+        <prism:volume>32</prism:volume>
+        <prism:number>12</prism:number>
+        <dc:title>International Journal of Geographical Information Science</dc:title>
+        <dc:identifier>ISSN 1365-8816, 1362-3087</dc:identifier>
+        <dc:identifier>DOI 10.1080/13658816.2018.1508689</dc:identifier>
+    </bib:Journal>
+    <bib:Memo rdf:about="#item_462">
+        <rdf:value>&lt;ul&gt;
+&lt;li&gt;They use rasterization of the polygon layers...&lt;/li&gt;
+&lt;li&gt;Improved a method called &quot;boundary algebra filling&quot; to efficiently rasterize the input polygons.&lt;/li&gt;
+&lt;li&gt;Developed parallel strategies for different procedures in terms of workload decomposition and task scheduling.&lt;/li&gt;
+&lt;li&gt;They use one-dimensional arrays to store information about the polygons and run-length encoding method (RLE) to to correctly extract the IDs of the polygons from the raster pixels overlapped by these polygons.&lt;/li&gt;
+&lt;li&gt;Explain in details the design and implementation of the workload decomposition (based on polygon rasterization and intersection calculation) and the task scheduling (load balancing to mitigate data skewing).&lt;/li&gt;
+&lt;li&gt;The parallel algorithm was implemented using C++ under the Message Passing Interface&lt;br /&gt;(MPI) environment using OpenMPI.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No DCEL structure used.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_460">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/460/Zhou et al. - 2018 - A parallel method to accelerate spatial operations.pdf"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://www.tandfonline.com/doi/pdf/10.1080/13658816.2018.1508689?needAccess=true</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 17:08:43</dcterms:dateSubmitted>
+        <dc:title>Zhou et al. - 2018 - A parallel method to accelerate spatial operations.pdf</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <rdf:Description rdf:about="urn:isbn:978-1-4503-3974-2">
+        <z:itemType>conferencePaper</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <dc:identifier>ISBN 978-1-4503-3974-2</dc:identifier>
+                <dc:identifier>DOI 10.1145/2835185.2835188</dc:identifier>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <dc:publisher>
+           <foaf:Organization><foaf:name>ACM Press</foaf:name></foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Magalhães</foaf:surname>
+                        <foaf:givenname>Salles V. G.</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Andrade</foaf:surname>
+                        <foaf:givenname>Marcus V. A.</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Franklin</foaf:surname>
+                        <foaf:givenname>W. Randolph</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Li</foaf:surname>
+                        <foaf:givenname>Wenli</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_472"/>
+        <link:link rdf:resource="#item_463"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://dl.acm.org/citation.cfm?doid=2835185.2835188</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <bib:pages>45-54</bib:pages>
+        <dc:date>2015</dc:date>
+        <dcterms:dateSubmitted>2019-06-03 17:22:44</dcterms:dateSubmitted>
+        <z:libraryCatalog>Crossref</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>We present EPUG-Overlay (Exact Parallel Uniform Grid Overlay), an algorithm to overlay two maps that is fast and parallel, has no roundoﬀ errors, and is freely available. EPUG-Overlay combines several novel aspects. It represents coordinates with rational numbers, thereby ensuring exact computations with no roundoﬀ errors and the ensuing sliver problems and topological impossibilities. For eﬃciency, EPUG-Overlay performs the map overlay in parallel, thereby utilizing the ubiquitous multicore architecture. Our application goes beyond merely using existing packages, which are ineﬃcient when used in parallel on large problems. Indeed, overlaying two maps with 53,000,000 edges and 730,000 faces took only 322 elapsed seconds (plus 116 seconds for I/O) on a dual 8-core 3.1 GHz Intel Xeon E5-2687 workstation. In contrast, GRASS, executing sequentially and generating roundoﬀ errors, takes 5300 seconds.</dcterms:abstract>
+        <dc:title>Fast exact parallel map overlay using a two-level uniform grid</dc:title>
+    </rdf:Description>
+    <bib:Memo rdf:about="#item_472">
+        <rdf:value>&lt;ul&gt;
+&lt;li&gt;Performs the map overlay in parallel, thereby utilizing the ubiquitous multicore architecture.&lt;/li&gt;
+&lt;li&gt;Do not involve DCEL structure neither MapReduce paradigm.&lt;/li&gt;
+&lt;li&gt;Use two-level grid partitioning strategy...&lt;/li&gt;
+&lt;li&gt;&quot;The exact grid size is not too important for the time because varying it a factor of two in either direction from the optimum often increases the time by much less than 50%. Therefore, we used a conservative empirical formula for the grid size that gave a good execution time and a feasible memory size.&quot;&lt;/li&gt;
+&lt;/ul&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_463">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/463/Magalhães et al. - 2015 - Fast exact parallel map overlay using a two-level .pdf"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://delivery.acm.org/10.1145/2840000/2835188/p45-magalhaes.pdf?ip=169.235.25.87&amp;id=2835188&amp;acc=CHORUS&amp;key=CA367851C7E3CE77%2E07CD0F60A1F839E0%2E4D4702B0C3E38B35%2E6D218144511F3437&amp;__acm__=1559582976_5848085ad20fade85a8b339edd9bec35</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 17:22:42</dcterms:dateSubmitted>
+        <dc:title>Magalhães et al. - 2015 - Fast exact parallel map overlay using a two-level .pdf</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <bib:BookSection rdf:about="urn:isbn:978-3-540-66247-1%20978-3-540-48482-0">
+        <z:itemType>bookSection</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Book>
+                <prism:volume>1651</prism:volume>
+                <dc:identifier>ISBN 978-3-540-66247-1 978-3-540-48482-0</dc:identifier>
+                <dc:title>Advances in Spatial Databases</dc:title>
+            </bib:Book>
+        </dcterms:isPartOf>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>Berlin, Heidelberg</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>Springer Berlin Heidelberg</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <z:seriesEditors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Goos</foaf:surname>
+                        <foaf:givenname>Gerhard</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Hartmanis</foaf:surname>
+                        <foaf:givenname>Juris</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>van Leeuwen</foaf:surname>
+                        <foaf:givenname>Jan</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </z:seriesEditors>
+        <bib:editors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Güting</foaf:surname>
+                        <foaf:givenname>Ralf Hartmut</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Papadias</foaf:surname>
+                        <foaf:givenname>Dimitris</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Lochovsky</foaf:surname>
+                        <foaf:givenname>Fred</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:editors>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Becker</foaf:surname>
+                        <foaf:givenname>Ludger</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Giesen</foaf:surname>
+                        <foaf:givenname>André</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Hinrichs</foaf:surname>
+                        <foaf:givenname>Klaus H.</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Vahrenhold</foaf:surname>
+                        <foaf:givenname>Jan</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_467"/>
+        <link:link rdf:resource="#item_465"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://link.springer.com/10.1007/3-540-48482-5_17</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <bib:pages>270-285</bib:pages>
+        <dc:date>1999</dc:date>
+        <dc:description>DOI: 10.1007/3-540-48482-5_17</dc:description>
+        <dcterms:dateSubmitted>2019-06-03 17:27:40</dcterms:dateSubmitted>
+        <z:libraryCatalog>Crossref</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>We consider the problem of performing polygonal map overlay and the reﬁnement step of spatial overlay joins. We show how to adapt algorithms from computational geometry to solve these problems for massive data sets. A performance study with artiﬁcial and real-world data sets helps to identify the algorithm that should be used for given input data.</dcterms:abstract>
+        <dc:title>Algorithms for Performing Polygonal Map Overlay and Spatial Join on Massive Data Sets</dc:title>
+    </bib:BookSection>
+    <bib:Memo rdf:about="#item_467">
+        <rdf:value>&lt;ul&gt;
+&lt;li&gt;No parallel methods...&lt;/li&gt;
+&lt;li&gt;Explore filter and refinement steps, focusing on the last one...&lt;/li&gt;
+&lt;li&gt;Work with main-memory methods, in particular, the Plane-sweep algorithm for intersecting geometric figures...&lt;/li&gt;
+&lt;li&gt;Handling of massive dataset by the so-called &quot;√N rule&quot;: for a given set of N line segments and a fixed vertical line L there are at most O( √N ) intersections between the line segments and the line L.&lt;/li&gt;
+&lt;/ul&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_465">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/465/Becker et al. - 1999 - Algorithms for Performing Polygonal Map Overlay an.pdf"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>https://link.springer.com/content/pdf/10.1007%2F3-540-48482-5_17.pdf</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-03 17:27:38</dcterms:dateSubmitted>
+        <dc:title>Becker et al. - 1999 - Algorithms for Performing Polygonal Map Overlay an.pdf</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <rdf:Description rdf:about="urn:isbn:978-0-7695-4979-8">
+        <z:itemType>conferencePaper</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <dcterms:isPartOf>
+                   <bib:Series><dc:title>IPDPSW '13</dc:title></bib:Series>
+                </dcterms:isPartOf>
+                <dc:identifier>ISBN 978-0-7695-4979-8</dc:identifier>
+                <dc:identifier>DOI 10.1109/IPDPSW.2013.254</dc:identifier>
+                <dc:title>Proceedings of the 2013 IEEE 27th International Symposium on Parallel and Distributed Processing Workshops and PhD Forum</dc:title>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>Washington, DC, USA</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>IEEE Computer Society</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Puri</foaf:surname>
+                        <foaf:givenname>Satish</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Agarwal</foaf:surname>
+                        <foaf:givenname>Dinesh</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>He</foaf:surname>
+                        <foaf:givenname>Xi</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Prasad</foaf:surname>
+                        <foaf:givenname>Sushil K.</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_475"/>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Cloud Computing</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>GIS</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>MapReduce</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>Polygon Overlay</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://dx.doi.org/10.1109/IPDPSW.2013.254</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <bib:pages>1009–1016</bib:pages>
+        <dc:date>2013</dc:date>
+        <dcterms:dateSubmitted>2019-06-04 18:18:12</dcterms:dateSubmitted>
+        <z:libraryCatalog>ACM Digital Library</z:libraryCatalog>
+        <dc:title>MapReduce Algorithms for GIS Polygonal Overlay Processing</dc:title>
+    </rdf:Description>
+    <bib:Memo rdf:about="#item_475">
+        <rdf:value>&lt;ul&gt;
+&lt;li&gt;They revisit the distributed polygon overlay problem and its implementation on MapReduce platform.&lt;/li&gt;
+&lt;li&gt;Vector data is much more complex than raster data computation.&lt;/li&gt;
+&lt;li&gt;They present the adaptation and implementation of a polygon overlay algorithm (Algorithm 1) and describe a system to execute distributed version of this algorithm on a Linux cluster using Hadoop MapReduce framework.&lt;/li&gt;
+&lt;li&gt;Partitioning vector data evenly to yield good load&lt;br /&gt;balance is non-trivial. Polygon overlay has to deal with two heterogeneous data sets.&lt;/li&gt;
+&lt;li&gt;&quot;We analyze and report Intersection overlay operation in our paper since it is the most widely used and representative operation. Nevertheless, our system can be extended to other operations as well without any change.&quot;&lt;/li&gt;
+&lt;li&gt;&quot;Our rigorous instrumentation of the timing characteristics of various phases of the algorithm point out portions of the algorithm which are easily amenable to scalable speedups and some others which are not.&quot;&lt;/li&gt;
+&lt;li&gt;Technical contributions include:&lt;br /&gt;• porting an MPI based spatial overlay system (GPC library) to Hadoop MapReduce platform,&lt;br /&gt;• an overlay algorithm with chaining of MapReduce jobs,&lt;br /&gt;• a grid based overlay algorithm with a single map and reduce phase, and&lt;br /&gt;• an overlay algorithm with map phase only using&lt;br /&gt;DistributedCache.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No DCEL structure related.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;</rdf:value>
+    </bib:Memo>
+    <rdf:Description rdf:about="urn:isbn:978-1-4503-5490-5">
+        <z:itemType>conferencePaper</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <dc:identifier>ISBN 978-1-4503-5490-5</dc:identifier>
+                <dc:identifier>DOI 10.1145/3139958.3139967</dc:identifier>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <dc:publisher>
+           <foaf:Organization><foaf:name>ACM Press</foaf:name></foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Sabek</foaf:surname>
+                        <foaf:givenname>Ibrahim</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Mokbel</foaf:surname>
+                        <foaf:givenname>Mohamed F.</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_478"/>
+        <link:link rdf:resource="#item_476"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://dl.acm.org/citation.cfm?doid=3139958.3139967</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <bib:pages>1-10</bib:pages>
+        <dc:date>2017</dc:date>
+        <dcterms:dateSubmitted>2019-06-05 15:54:18</dcterms:dateSubmitted>
+        <z:libraryCatalog>Crossref</z:libraryCatalog>
+        <z:language>en</z:language>
+        <dcterms:abstract>This paper provides the first attempt for a full-fledged query optimizer for MapReduce-based spatial join algorithms. The optimizer develops its own taxonomy that covers almost all possible ways of doing a spatial join for any two input datasets. The optimizer comes in two flavors; cost-based and rule-based. Given two input data sets, the cost-based query optimizer evaluates the costs of all possible options in the developed taxonomy, and selects the one with the lowest cost. The rule-based query optimizer abstracts the developed cost models of the cost-based optimizer into a set of simple easy-tocheck heuristic rules. Then, it applies its rules to select the lowest cost option. Both query optimizers are deployed and experimentally evaluated inside a widely used open-source MapReduce-based big spatial data system. Exhaustive experiments show that both query optimizers are always successful in taking the right decision for spatially joining any two datasets of up to 500GB each.</dcterms:abstract>
+        <dc:title>On Spatial Joins in MapReduce</dc:title>
+    </rdf:Description>
+    <bib:Memo rdf:about="#item_478">
+        <rdf:value>&lt;ul&gt;
+&lt;li&gt;Present 8 options to perform spatial partitions in two datasets previous to the join phase.
+&lt;ul&gt;
+&lt;li&gt;if both dataset are not partitioned:
+&lt;ul&gt;
+&lt;li&gt;Grid&lt;/li&gt;
+&lt;li&gt;QuadTree&lt;/li&gt;
+&lt;li&gt;KDTree&lt;/li&gt;
+&lt;li&gt;STR&lt;/li&gt;
+&lt;li&gt;STR+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;If one of the has been partitioned:
+&lt;ul&gt;
+&lt;li&gt;Use that partitions in the other dataset.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;If both have been partitioned:
+&lt;ul&gt;
+&lt;li&gt;Use partitions from dataset 1 in dataset 2&lt;/li&gt;
+&lt;li&gt;Use partitions from dataset 2 in dataset 1&lt;/li&gt;
+&lt;li&gt;Perform a 1-to-N join&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Evaluate the cost of each option:
+&lt;ul&gt;
+&lt;li&gt;Cost-based query optimizer:  Evaluation cost (formulas) for each option using estimated parameters and statistics.&lt;/li&gt;
+&lt;li&gt;Rule-based query optimizer:  Provide three heuristic rules based on the number of partitions (if present) to choose an option (options 1,4,6 and 8).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No DCEL structure&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;</rdf:value>
+    </bib:Memo>
+    <z:Attachment rdf:about="#item_476">
+        <z:itemType>attachment</z:itemType>
+        <rdf:resource rdf:resource="files/476/Sabek and Mokbel - 2017 - On Spatial Joins in MapReduce.pdf"/>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://delivery.acm.org/10.1145/3140000/3139967/a21-Sabek.pdf?ip=169.235.25.87&amp;id=3139967&amp;acc=ACTIVE%20SERVICE&amp;key=CA367851C7E3CE77%2E07CD0F60A1F839E0%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35&amp;__acm__=1559750470_a0837ca38503be4c1c3603c51110e0d0</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dcterms:dateSubmitted>2019-06-05 15:54:15</dcterms:dateSubmitted>
+        <dc:title>Sabek and Mokbel - 2017 - On Spatial Joins in MapReduce.pdf</dc:title>
+        <z:linkMode>1</z:linkMode>
+        <link:type>application/pdf</link:type>
+    </z:Attachment>
+    <rdf:Description rdf:about="http://dx.doi.org/10.1109/IPDPSW.2013.174">
+        <z:itemType>conferencePaper</z:itemType>
+        <dcterms:isPartOf>
+            <bib:Journal>
+                <dcterms:isPartOf>
+                   <bib:Series><dc:title>IPDPSW '13</dc:title></bib:Series>
+                </dcterms:isPartOf>
+                <dc:identifier>ISBN 978-0-7695-4979-8</dc:identifier>
+                <dc:identifier>DOI 10.1109/IPDPSW.2013.174</dc:identifier>
+                <dc:title>Proceedings of the 2013 IEEE 27th International Symposium on Parallel and Distributed Processing Workshops and PhD Forum</dc:title>
+            </bib:Journal>
+        </dcterms:isPartOf>
+        <dc:publisher>
+            <foaf:Organization>
+                <vcard:adr>
+                    <vcard:Address>
+                       <vcard:locality>Washington, DC, USA</vcard:locality>
+                    </vcard:Address>
+                </vcard:adr>
+                <foaf:name>IEEE Computer Society</foaf:name>
+            </foaf:Organization>
+        </dc:publisher>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Puri</foaf:surname>
+                        <foaf:givenname>Satish</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:surname>Prasad</foaf:surname>
+                        <foaf:givenname>Sushil K.</foaf:givenname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <dcterms:isReferencedBy rdf:resource="#item_480"/>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>distributed</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>MapReduce</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>parallel</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>polygon overlay</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:subject>
+           <z:AutomaticTag><rdf:value>PRAM</rdf:value></z:AutomaticTag>
+        </dc:subject>
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://dx.doi.org/10.1109/IPDPSW.2013.174</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <bib:pages>2238–2241</bib:pages>
+        <dc:date>2013</dc:date>
+        <dcterms:dateSubmitted>2019-06-05 16:26:06</dcterms:dateSubmitted>
+        <z:libraryCatalog>ACM Digital Library</z:libraryCatalog>
+        <dcterms:abstract>Polygon overlay is one of the complex operations in Geographic Information Systems (GIS). In GIS, a typical polygon tends to be large in size often consisting of thousands of vertices. Sequential algorithms for this problem are in abundance in literature and most of the parallel algorithms concentrate on parallelizing edge intersection phase only. Our research aims to develop parallel algorithms to find overlay for two input polygons which can be extended to handle multiple polygons and implement it on General Purpose Graphics Processing Units (GPGPU) which offers massive parallelism at relatively low cost. Moreover, spatial data files tend to be large in size (in GBs) and the underlying overlay computation is highly irregular and compute intensive. MapReduce paradigm is now standard in industry and academia for processing large-scale data. Motivated by MapReduce programming model, we propose to develop and implement scalable distributed algorithms to solve large-scale overlay processing in this dissertation.</dcterms:abstract>
+        <dc:title>Efficient Parallel and Distributed Algorithms for GIS Polygonal Overlay Processing</dc:title>
+    </rdf:Description>
+    <bib:Memo rdf:about="#item_480">
+        <rdf:value>&lt;ul&gt;
+&lt;li&gt;Most of the parallel algorithms concentrate on parallelizing edge intersection phase only.&lt;/li&gt;
+&lt;li&gt;Develop parallel algorithms to find overlay for two input polygons which can be extended to handle multiple polygons and implement it on General Purpose Graphics Processing Units&lt;br /&gt;(GPGPU).&lt;/li&gt;
+&lt;li&gt;&quot;In our research, we focus to develop array based parallel overlay algorithm which can be easily implemented on GPUs using prefix sum and sorting and thus can potentially speedup overlay computation&quot;&lt;/li&gt;
+&lt;li&gt;The study provides:
+&lt;ul&gt;
+&lt;li&gt;parallel algorithms for polygon overlay, improved lower bound in PRAM model and GPU implementation.&lt;/li&gt;
+&lt;li&gt;multi-layer overlay algorithm.&lt;/li&gt;
+&lt;li&gt;distributed R-tree construction using top-down approach.&lt;/li&gt;
+&lt;li&gt;load-balanced overlay processing system using MapReduce framework.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Parallel algorithm uses a similar idea of DCEL with the representation of a new set of polygons by the merge of edges from the initial layers and their intersections.  Then, use scanlines to partition the set of edges and process them concurrently. In this case, the vertices are labeled as left of right to determine its relative position in the overlaid polygon.&lt;/li&gt;
+&lt;/ul&gt;</rdf:value>
+    </bib:Memo>
+</rdf:RDF>
