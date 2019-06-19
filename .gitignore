@@ -2,3 +2,8 @@ Code/Areal/target/*
 Code/Areal/project/*
 Code/Areal/.ensime
 Code/Areal/.ensime_cache/*
+
+Code/dyn4j/target/*
+Code/dyn4j/project/*
+Code/dyn4j/.ensime
+Code/dyn4j/.ensime_cache/*
