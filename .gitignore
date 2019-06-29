@@ -3,6 +3,11 @@ Code/Areal/project/*
 Code/Areal/.ensime
 Code/Areal/.ensime_cache/*
 
+Code/DCEL/target/*
+Code/DCEL/project/*
+Code/DCEL/.ensime
+Code/DCEL/.ensime_cache/*
+
 Code/dyn4j/target/*
 Code/dyn4j/project/*
 Code/dyn4j/.ensime
