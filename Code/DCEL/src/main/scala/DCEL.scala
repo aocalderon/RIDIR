@@ -1,6 +1,6 @@
 import org.slf4j.{LoggerFactory, Logger}
 import org.rogach.scallop._
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SparkSession, Dataset}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.storage.StorageLevel
@@ -11,7 +11,7 @@ import org.datasyslab.geospark.spatialRDD.{SpatialRDD, PolygonRDD, LineStringRDD
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
 import com.vividsolutions.jts.geom.GeometryFactory
-import com.vividsolutions.jts.geom.{Geometry, Envelope, Polygon, LineString}
+import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LineString}
 import com.vividsolutions.jts.io.WKTReader
 //import org.locationtech.jts.geom.GeometryFactory
 //import org.locationtech.jts.geom.{Geometry, Envelope, Polygon}
@@ -25,18 +25,33 @@ object DCEL{
   private val precision: Double = 0.001
   private val startTime: Long = 0L
 
+  case class Segment(id: Long, x1: Double, y1: Double, x2: Double, y2: Double, face_id: Long){
+    def toWKT: String = s"${id}\tLINESTRING ($x1 $y1 , $x2 $y2)\t${face_id}"
+  }
+
+  def LineString2Segment(line: LineString, id: Long, face_id: Long): Segment = {
+    val start = line.getStartPoint
+    val end = line.getEndPoint
+    Segment(id, start.getX, start.getY, end.getX, end.getY, face_id)
+  }
+
+  def Segment2LineString(segment: Segment): LineString = {
+    val start = new Coordinate(segment.x1, segment.y1)
+    val end = new Coordinate(segment.x2, segment.y2)
+    val linestring = geofactory.createLineString(List(start, end).toArray)
+    linestring.setUserData(s"${segment.id}\t${segment.face_id}")
+    linestring
+  }
+
   def clocktime = System.currentTimeMillis()
 
   def log(msg: String, timer: Long, n: Long, status: String): Unit ={
     logger.info("DCEL|%6.2f|%-50s|%6.2f|%6d|%s".format((clocktime-startTime)/1000.0, msg, (clocktime-timer)/1000.0, n, status))
   }
 
-  def saveLineString(lines: RDD[LineString], filename: String): Unit = {
+  def saveLineString(segments: Dataset[Segment], filename: String): Unit = {
     val f = new java.io.PrintWriter(filename)
-    val wkt = lines.map{ line =>
-      val id = line.getUserData.toString()
-      s"${id}\t${line.toText()}\n"
-    }.collect.mkString("")
+    val wkt = segments.rdd.map(_.toWKT).collect.mkString("\n")
     f.write(wkt)
     f.close()
   }
@@ -50,6 +65,7 @@ object DCEL{
     val executors = params.executors()
     val input = params.input()
     val partitions = params.partitions()
+    val debug = params.debug()
     val master = params.local() match {
       case true  => s"local[${cores}]"
       case false => s"spark://${params.host()}:${params.port()}"
@@ -93,26 +109,32 @@ object DCEL{
 
     // Getting segments...
     timer = clocktime
-    stage = "Segments gotten"
+    stage = "Getting segments"
     log(stage, timer, 0, "START")
     polygonRDD.analyze()
     polygonRDD.spatialPartitioning(GridType.EQUALGRID, partitions)
     val segmentsRDD = new SpatialRDD[LineString]()
     val segments = polygonRDD.spatialPartitionedRDD.rdd.flatMap{ polygon =>
-      val id = polygon.getUserData.toString()
+      val face_id = polygon.getUserData.toString().toLong
       val coords = polygon.getExteriorRing.getCoordinateSequence.toCoordinateArray().toList
       coords.zip(coords.tail ++ List(coords.head)).map{ pair =>
-        val edges = List(pair._1, pair._2).toArray
-        val segment = geofactory.createLineString(edges)
-        segment.setUserData(s"${id}")
-        segment
+        (pair._1.x, pair._1.y, pair._2.x, pair._2.y, face_id)
       }
-    }
-    segmentsRDD.setRawSpatialRDD(segments)
+    }.distinct().zipWithUniqueId.map{ s =>
+      Segment(s._2, s._1._1, s._1._2, s._1._3, s._1._4, s._1._5)
+    }.toDS()
+    segmentsRDD.setRawSpatialRDD(segments.rdd.map(Segment2LineString))
     val nSegments = segments.count()
     log(stage, timer, nSegments, "END")
 
-    saveLineString(segments, "/tmp/segments.wkt")
+    if(debug) { saveLineString(segments, "/tmp/segments.wkt") }
+
+    // Getting pointers...
+    timer = clocktime
+    stage = "Getting pointers"
+    log(stage, timer, 0, "START")
+    segments.select($"id", $"face_id").groupBy($"face_id").agg(collect_list($"id")).toDF().show
+    log(stage, timer, 0, "END")
 
     // Closing session...
     timer = System.currentTimeMillis()
