@@ -19,12 +19,30 @@ import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
-object DCEL{
+object DCEL2{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val geofactory: GeometryFactory = new GeometryFactory();
   private val reader = new WKTReader(geofactory)
   private val precision: Double = 0.001
   private val startTime: Long = 0L
+
+  case class Segment(face_id: Long, segment_id: Int, x1: Double, y1: Double, x2: Double, y2: Double){
+    def toWKT: String = s"${segment_id}\tLINESTRING ($x1 $y1 , $x2 $y2)\t${face_id}"
+  }
+
+  def LineString2Segment(line: LineString, segment_id: Int, face_id: Long): Segment = {
+    val start = line.getStartPoint
+    val end = line.getEndPoint
+    Segment(face_id, segment_id, start.getX, start.getY, end.getX, end.getY)
+  }
+
+  def Segment2LineString(segment: Segment): LineString = {
+    val start = new Coordinate(segment.x1, segment.y1)
+    val end = new Coordinate(segment.x2, segment.y2)
+    val linestring = geofactory.createLineString(List(start, end).toArray)
+    linestring.setUserData(s"${segment.face_id}\t${segment.segment_id}")
+    linestring
+  }
 
   def clocktime = System.currentTimeMillis()
 
@@ -32,9 +50,9 @@ object DCEL{
     logger.info("DCEL|%6.2f|%-50s|%6.2f|%6d|%s".format((clocktime-startTime)/1000.0, msg, (clocktime-timer)/1000.0, n, status))
   }
 
-  def saveWKT(edges: RDD[Half_edge], filename: String): Unit = {
+  def saveLineString(segments: Dataset[Segment], filename: String): Unit = {
     val f = new java.io.PrintWriter(filename)
-    val wkt = edges.map(_.toWKT).collect.mkString("\n")
+    val wkt = segments.rdd.map(_.toWKT).collect.mkString("\n")
     f.write(wkt)
     f.close()
   }
@@ -108,86 +126,63 @@ object DCEL{
     val nPolygons = polygons.count()
     log(stage, timer, nPolygons, "END")
 
-    // Partitioning data...
+    // Getting segments...
     timer = clocktime
-    stage = "Partitioning data"
+    stage = "Getting segments"
     log(stage, timer, 0, "START")
     polygonRDD.analyze()
     polygonRDD.spatialPartitioning(gridType, partitions)
     val segmentsRDD = new SpatialRDD[LineString]()
     val grids = polygonRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
-    if(debug) { grids.map(g => s"${g._1}\t${envelope2Polygon(g._2).toText()}").foreach(println) }
-    log(stage, timer, grids.size, "END")
 
-    // Computing DCEL...
-    timer = clocktime
-    stage = "Computing DCEL"
-    log(stage, timer, 0, "START")
-    val dcel = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
-      var edges = List.empty[Half_edge]
+    grids.map(g => s"${g._1}\t${envelope2Polygon(g._2).toText()}").foreach(println)
+
+    logger.info("Polygons")
+    val segments = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
+      var results = List.empty[(Segment, Int)]
       if(index < grids.size){
         val clipper = new GeometryClipper(grids(index))
-        edges = polygons.flatMap{ to_clip =>
+        results = polygons.flatMap{ to_clip =>
           // If false there is no guarantee the polygons returned will be valid according to JTS rules
           // (but should still be good enough to be used for pure rendering).
           val face_id = to_clip.getUserData.toString().toLong
           val geoms = clipper.clip(to_clip, true)
-          var vertices = new ListBuffer[Vertex]()
-          var edges = new ListBuffer[Half_edge]()
-          var faces = new ListBuffer[Face]()
-          val face = new Face()
-          face.setId(face_id)
-          faces += face
+          var polys = new ListBuffer[(Segment, Int)]()
           for(i <- 0 until geoms.getNumGeometries){
             val geom = geoms.getGeometryN(i)
             if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
-              var prevLeft: Half_edge = null
-              var prevRight: Half_edge = null
-              val coords = geom.asInstanceOf[Polygon].getExteriorRing.getCoordinateSequence.toCoordinateArray().toList
-              for(coord <- coords){
-                val vertex = new Vertex(coord.x, coord.y)
-                val left = new Half_edge()
-                val right = new Half_edge()
-
-                left.face = face
-                left.next = null
-                left.origen = vertex
-                left.twin = right
-
-                right.face = null
-                right.next = prevRight
-                right.origen = null
-                right.twin = left
-
-                edges += left
-                edges += right
-
-                vertex.edge = left
-
-                vertices += vertex
-
-                if(prevLeft != null){ prevLeft.next = left }
-                if(prevRight != null){ prevRight.origen = vertex }
-
-                prevLeft = left
-                prevRight = right
+              val coords = geom.asInstanceOf[Polygon].getExteriorRing.getCoordinateSequence.toCoordinateArray().toList.zipWithIndex
+              coords.zip(coords.tail).map{ pair =>
+                val segment_id = pair._1._2
+                polys += ((Segment(face_id, segment_id, pair._1._1.x, pair._1._1.y, pair._2._1.x, pair._2._1.y), i))
               }
-              prevLeft.next = edges.head
-              edges.tail.head.next = prevRight
-              prevRight.origen = vertices.head
-              face.outerComponent = edges.head
             }
           }
-          edges.toList
+          polys.toList
         }.toList
       }
-      edges.toIterator
-    }.cache()
-    val nDcel = dcel.count()
-    log(stage, timer, nDcel, "END")
+      results.toIterator
+    }
 
-    dcel.map(_.toWKT).toDF().show(false)
-    saveWKT(dcel, "/tmp/dcel.wkt")
+    segmentsRDD.setRawSpatialRDD(segments.map(s => Segment2LineString(s._1)))
+    val nSegments = segments.count()
+    log(stage, timer, nSegments, "END")
+
+    //if(debug) { saveLineString(segments, "/tmp/segments.wkt") }
+
+    // Getting pointers...
+    timer = clocktime
+    stage = "Getting pointers"
+    log(stage, timer, 0, "START")
+    segments.toDF("segment", "id").groupBy($"id").agg(collect_set($"segment")).rdd.map{ row =>
+      val segments = row.getList[Segment](1).asScala
+      val first = segments.head
+      val coords = List(new Coordinate(first.x1, first.y1)) ++ segments.map(s => new Coordinate(s.x1, s.y1))
+      val poly = geofactory.createPolygon(coords.toArray)
+
+      s"${first.face_id}|${poly.toText()}"
+    }.collect.foreach(println)
+    log(stage, timer, 0, "END")
 
     // Closing session...
     timer = System.currentTimeMillis()
@@ -197,19 +192,3 @@ object DCEL{
     log(stage, timer, 0, "END")
   }  
 }
-
-class DCELConf(args: Seq[String]) extends ScallopConf(args) {
-  val input:      ScallopOption[String]  = opt[String]  (required = true)
-  val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
-  val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
-  val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
-  val executors:  ScallopOption[Int]     = opt[Int]     (default = Some(3))
-  val grid:       ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
-  val index:      ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
-  val partitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
-  val local:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-  val debug:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-
-  verify()
-}
-
