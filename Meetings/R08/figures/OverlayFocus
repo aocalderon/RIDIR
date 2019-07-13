@@ -1,0 +1,13 @@
+\documentclass[border=0.5cm]{standalone}
+\usepackage{tikz}
+
+\begin{document}
+\begin{tikzpicture}
+    \node at (0,0)    {\includegraphics[scale=0.6]{PolygonA}};
+    \node at (0,-5.5) {\includegraphics[scale=0.6]{PolygonB}};
+    \node[rotate=-45, scale=2.5] at (7,-1.5)    {$\Longrightarrow$};
+    \node[rotate=45,  scale=2.5] at (7,-5)    {$\Longrightarrow$};
+    \node at (11,-3) {\includegraphics[scale=0.75]{FinalDCEL}};
+    \draw[red, very thick] (-6.25, -2.75) rectangle (6.25, -8.25);
+\end{tikzpicture}
+\end{document}
