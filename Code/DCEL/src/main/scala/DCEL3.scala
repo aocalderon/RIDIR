@@ -119,9 +119,9 @@ object DCEL3{
     if(debug) { grids.map(g => s"${g._1}\t${envelope2Polygon(g._2).toText()}").foreach(println) }
     log(stage, timer, grids.size, "END")
 
-    // Computing DCEL...
+    // Building DCEL...
     timer = clocktime
-    stage = "Computing DCEL"
+    stage = "Building DCEL"
     log(stage, timer, 0, "START")
     val dcel = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
       //var edges = List.empty[Half_edge]

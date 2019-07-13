@@ -126,72 +126,71 @@ object DCEL{
     if(debug) { grids.map(g => s"${g._1}\t${envelope2Polygon(g._2).toText()}").foreach(println) }
     log(stage, timer, grids.size, "END")
 
-    // Computing DCEL...
+    // Extracting clipped polygons...
     timer = clocktime
-    stage = "Computing DCEL"
+    stage = "Extracting clipped polygons"
     log(stage, timer, 0, "START")
-    case class Data(vs: Set[Vertex], es: List[Edge2], index: Int)
-    val verticesRDD = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
-      var a = Set.empty[Vertex]
-      var b = List.empty[Edge2]
+    val clippedPolygonsRDD = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
+      var polys = List.empty[Polygon]
       if(index < grids.size){
         val clipper = new GeometryClipper(grids(index))
         // If false there is no guarantee the polygons returned will be valid according to JTS rules
-        // (but should still be good enough to be used for pure rendering).          
-        var vertices = new TreeSet[Vertex]()
-        var edges = new ListBuffer[Edge2]()
-        polygons.flatMap{ to_clip =>
+        // (but should still be good enough to be used for pure rendering).
+        var ps = new ListBuffer[Polygon]()
+        polygons.foreach { to_clip =>
           val geoms = clipper.clip(to_clip, true)
           for(i <- 0 until geoms.getNumGeometries){
             val geom = geoms.getGeometryN(i)
             if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
-              val coordinates = geom.asInstanceOf[Polygon].getExteriorRing.getCoordinateSequence.toCoordinateArray().toList
-              for(coordinate <- coordinates){
-                vertices += Vertex(coordinate.x, coordinate.y)
-              }
+              ps += geom.asInstanceOf[Polygon]
             }
           }
-          val vs = vertices.toList.zipWithIndex.toMap
-          for(i <- 0 until geoms.getNumGeometries){
-            val geom = geoms.getGeometryN(i)
-            if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
-              val coordinates = geom.asInstanceOf[Polygon].getExteriorRing.getCoordinateSequence.toCoordinateArray().toList
-              val segments = coordinates.zip(coordinates.tail)
-              for(segment <- segments){
-                val v1 = Vertex(segment._1.x, segment._1.y)
-                val v2 = Vertex(segment._2.x, segment._2.y)
-                edges += Edge2(v1, v2)
-              }
-            }
-          }
-          vertices.toList
-        }.toSet
-        a = vertices.toSet
-        b = edges.toList
+        }
+        polys = ps.toList
       }
-      List(Data(a, b, index)).toIterator
+      polys.toIterator
     }.cache()
-    val nVerticesRDD = verticesRDD.count()
-    log(stage, timer, nVerticesRDD, "END")
+    val nClippedPolygonsRDD = clippedPolygonsRDD.count()
+    log(stage, timer, nClippedPolygonsRDD, "END")
 
-    logger.info(verticesRDD.collect().mkString(" "))
+    val verticesRDD = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
+      var vertices = new scala.collection.mutable.HashSet[Vertex]()
+      val edges    = polygons.flatMap{ p =>
+        val coords = p.getExteriorRing.getCoordinateSequence.toCoordinateArray().toList
+        val segments = coords.zip(coords.tail)
+        segments.map{ segment =>
+          val v1 = Vertex(segment._1.x, segment._1.y)
+          val v2 = Vertex(segment._2.x, segment._2.y)
+          vertices += v1
+          vertices += v2
+          Edge2(v1, v2)
+        }
+      }.toSet
+      List((i, vertices.toList, edges.toList)).toIterator
+    }
 
-    verticesRDD.mapPartitions{ data =>
-      val d = data.toList.head
-      val vertices = d.vs.toList
+    if(debug){
+      val clippedWKT = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
+        polygons.map(p => s"${p.toText()}\t${i}\n")
+      }.collect().mkString("")
+      var f = new java.io.PrintWriter("/tmp/clipped.wkt")
+      f.write(clippedWKT)
+      f.close()
 
-      vertices.map(v => s"${v.toWKT}").toIterator
-    }.collect().foreach(println)
+      val verticesWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
+        params.flatMap(data => data._2.map(v => s"${v.toWKT}\t${i}\n"))
+      }.collect().mkString("")
+      f = new java.io.PrintWriter("/tmp/vertices.wkt")
+      f.write(verticesWKT)
+      f.close()
 
-    verticesRDD.mapPartitions{ data =>
-      val d = data.toList.head
-      val vertices = d.vs.toList
-      val edges = d.es.toList.distinct
-
-      edges.map(e => s"LINESTRING (${e.v1.x} ${e.v1.y}, ${e.v2.x} ${e.v2.y})").toIterator
-    }.collect().foreach(println)
-
-    //saveVertices(verticesRDD, "/tmp/vertices.wkt")
+      val edgesWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
+        params.flatMap(data => data._3.map(e => s"${e.toWKT}\t${i}\n"))
+      }.collect().mkString("")
+      f = new java.io.PrintWriter("/tmp/edges.wkt")
+      f.write(edgesWKT)
+      f.close()
+    }
 
     // Closing session...
     timer = System.currentTimeMillis()
@@ -208,7 +207,7 @@ class DCELConf(args: Seq[String]) extends ScallopConf(args) {
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
   val executors:  ScallopOption[Int]     = opt[Int]     (default = Some(3))
-  val grid:       ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
+  val grid:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val index:      ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
   val local:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
