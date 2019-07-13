@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{Overlay operation}{2}{0}{1}
+\beamer@sectionintoc {2}{Parallel DCEL construction}{5}{0}{2}
+\beamer@sectionintoc {3}{Example}{8}{0}{3}
+\beamer@sectionintoc {4}{What is next}{15}{0}{4}
