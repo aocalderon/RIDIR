@@ -57,4 +57,7 @@ case class Edge(v1: Int, v2: Int) extends Ordered[Edge] {
     else v1 compare that.v1
   }
 }
-case class Edge2(v1: Vertex, v2: Vertex) 
+
+case class Edge2(v1: Vertex, v2: Vertex) {
+  def toWKT: String = s"LINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})"
+}
