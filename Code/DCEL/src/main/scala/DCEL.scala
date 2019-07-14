@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ListBuffer, TreeSet}
+import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer}
 
 object DCEL{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -58,6 +58,26 @@ object DCEL{
     val coordArraySeq = new CoordinateArraySequence( Array(p1,p2,p3,p4,p1), 2)
     val ring = new LinearRing(coordArraySeq, geofactory)
     new Polygon(ring, null, geofactory)
+  }
+
+  def buildLocalDCEL(vertices: List[Vertex], edges: List[Edge2]): List[String] = {
+    val vertexList = vertices.toVector
+    var half_edgeList = new ArrayBuffer[Half_edge]()
+
+    edges.foreach{ edge =>
+      val h1 = Half_edge(edge.v1, edge.v2)
+      val h2 = Half_edge(edge.v2, edge.v1)
+
+      h1.twin = h2
+      h2.twin = h1
+
+      vertexList.find(_.equals(edge.v2)).get.half_edges += h1
+      vertexList.find(_.equals(edge.v1)).get.half_edges += h2
+
+      half_edgeList += h2
+      half_edgeList += h1
+    }
+    vertexList.flatMap(v => v.half_edges.map(h => s"${v.toWKT}\t${h.toWKT}")).toList
   }
 
   /***
@@ -166,7 +186,8 @@ object DCEL{
           Edge2(v1, v2)
         }
       }.toSet
-      List((i, vertices.toList, edges.toList)).toIterator
+      val test = buildLocalDCEL(vertices.toList, edges.toList)
+      List((i, vertices.toList, edges.toList, test)).toIterator
     }
 
     if(debug){
@@ -190,6 +211,38 @@ object DCEL{
       f = new java.io.PrintWriter("/tmp/edges.wkt")
       f.write(edgesWKT)
       f.close()
+
+      val incidentsWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
+        params.flatMap(data => data._4.map(j => s"${j}\t${i}\n"))
+      }.collect().mkString("")
+      f = new java.io.PrintWriter("/tmp/incidents.wkt")
+      f.write(incidentsWKT)
+      f.close()
+
+      val incidents = verticesRDD.flatMap(_._4).mapPartitionsWithIndex{ (i,line) =>
+        line.map{ l =>
+          val arr = l.split("\t")
+          val vertex = arr(1)
+          val incident = arr(2)
+
+          (vertex, incident, i)
+        }
+      }.toDF("vertex", "incident", "part")
+
+      incidents.show(false)
+
+      logger.info(s"Count of incidents: ${incidents.count()}")
+
+      val uniqueVertices = incidents.select($"part", $"vertex").distinct()
+
+      logger.info(s"Count of unique vertices: ${uniqueVertices.count()}")
+
+      val countIncidents = incidents.groupBy($"incident").count()
+
+      logger.info(s"Count of incidents: ${countIncidents.count()}")
+
+      countIncidents.orderBy($"count").show(countIncidents.count().toInt, truncate = false)
+      
     }
 
     // Closing session...
