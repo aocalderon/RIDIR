@@ -133,23 +133,23 @@ object DCEL3{
           // (but should still be good enough to be used for pure rendering).
           val face_id = to_clip.getUserData.toString().toLong
           val geoms = clipper.clip(to_clip, true)
-          var vertices = new ListBuffer[Vertex]()
-          var edges = new ListBuffer[Half_edge]()
-          var faces = new ListBuffer[Face]()
+          var vertices = new ListBuffer[Vertex3]()
+          var edges = new ListBuffer[Half_edge3]()
+          var faces = new ListBuffer[Face3]()
           var polys = new ListBuffer[String]()
-          val face = new Face(face_id)
+          val face = new Face3(face_id)
           faces += face
           for(i <- 0 until geoms.getNumGeometries){
             val geom = geoms.getGeometryN(i)
             if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
               polys += geom.toText()
-              var prevLeft: Half_edge = null
-              var prevRight: Half_edge = null
+              var prevLeft: Half_edge3 = null
+              var prevRight: Half_edge3 = null
               val coords = geom.asInstanceOf[Polygon].getExteriorRing.getCoordinateSequence.toCoordinateArray().toList
               for(coord <- coords){
-                val vertex = new Vertex(coord.x, coord.y)
-                val left = new Half_edge()
-                val right = new Half_edge()
+                val vertex = new Vertex3(coord.x, coord.y)
+                val left = new Half_edge3()
+                val right = new Half_edge3()
 
                 left.face = face
                 left.next = null

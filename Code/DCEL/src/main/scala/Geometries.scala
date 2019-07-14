@@ -1,18 +1,29 @@
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, HashSet}
 
-case class Half_edge() extends Ordered[Half_edge] {
+case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   private var _id: Long = -1L
-  var origen: Vertex = null
-  var v2: Vertex = null
+  var origen: Vertex = v2
+  var twin: Half_edge = null
   var next: Half_edge = null
   var prev: Half_edge = null
-  var twin: Half_edge = null
   var face: Face = null
+
+  val angle  = hangle(v2.x - v1.x, v2.y - v1.y)
+  val length = math.sqrt(math.pow(v2.x - v1.x, 2) + math.pow(v2.y - v1.y, 2))
 
   def getId = _id
 
   def setId(id: Long): Unit = {
     _id = id
+  }
+
+  def hangle(dx: Double, dy: Double): Double = {
+    val length = math.sqrt( (dx * dx) + (dy * dy) )
+    if(dy > 0){
+      math.acos(dx / length)
+    } else {
+      2 * math.Pi - math.acos(dx / length)
+    }
   }
 
   override def compare(that: Half_edge): Int = {
@@ -26,7 +37,7 @@ case class Half_edge() extends Ordered[Half_edge] {
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   private var _id: Double = -1
   var edge: Half_edge = null
-  var half_edges: ListBuffer[Half_edge] = new ListBuffer[Half_edge]()
+  var half_edges: HashSet[Half_edge] = new HashSet[Half_edge]()
 
   def getId = _id
 
@@ -42,6 +53,16 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
     if (x == that.x) y compare that.y
     else x compare that.x
   }
+
+  def canEqual(a: Any) = a.isInstanceOf[Vertex]
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Vertex => {
+        that.canEqual(this) && this.x == that.x && this.y == that.y
+      }
+      case _ => false
+    }
 
   def toWKT: String = s"${getId}\tPOINT ($x $y)"
 }
@@ -59,5 +80,65 @@ case class Edge(v1: Int, v2: Int) extends Ordered[Edge] {
 }
 
 case class Edge2(v1: Vertex, v2: Vertex) {
+
+  def canEqual(a: Any) = a.isInstanceOf[Edge2]
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Edge2 => {
+        that.canEqual(this) && this.v1.equals(that.v1) && this.v2.equals(that.v2)
+      }
+      case _ => false
+    }
+
+
   def toWKT: String = s"LINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})"
+}
+
+
+/////////////////////////////
+
+case class Half_edge3() extends Ordered[Half_edge3] {
+  private var _id: Long = -1L
+  var origen: Vertex3 = null
+  var next: Half_edge3 = null
+  var prev: Half_edge3 = null
+  var twin: Half_edge3 = null
+  var face: Face3 = null
+
+  def getId = _id
+
+  def setId(id: Long): Unit = {
+    _id = id
+  }
+
+  override def compare(that: Half_edge3): Int = {
+    if (origen.x == that.origen.x) origen.y compare that.origen.y
+    else origen.x compare that.origen.x
+  }
+
+  def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})"
+}
+
+case class Vertex3(x: Double, y: Double) extends Ordered[Vertex3] {
+  private var _id: Double = -1
+  var edge: Half_edge3 = null
+
+  def getId = _id
+
+  def setId(id: Long): Unit = {
+    _id = id
+  }
+
+  override def compare(that: Vertex3): Int = {
+    if (x == that.x) y compare that.y
+    else x compare that.x
+  }
+
+  def toWKT: String = s"${getId}\tPOINT ($x $y)"
+}
+
+case class Face3(var id: Long){
+  var outerComponent: Half_edge3 = null
+  var innerComponent: Half_edge3 = null
 }
