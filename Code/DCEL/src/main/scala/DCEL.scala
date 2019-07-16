@@ -66,6 +66,7 @@ object DCEL{
 
   def buildLocalDCEL(vertices: List[Vertex], edges: List[Edge2]): List[String] = {
     var half_edgeList = new ArrayBuffer[Half_edge]()
+    var faceList = new ArrayBuffer[Face]()
 
     // Step 1. Vertex list creation
     var vertexList = vertices.toVector
@@ -120,11 +121,31 @@ object DCEL{
       vertex
     }
 
+    // Step 4. Face assignment
+    var nf = 0
+    var temp_half_edgeList = new ArrayBuffer[Half_edge]()
+    temp_half_edgeList ++= half_edgeList
+    for(temp_hedge <- temp_half_edgeList){
+      val hedge = half_edgeList.find(_.equals(temp_hedge)).get
+      if(hedge.face == null){
+        val f = Face(nf)
+        nf = nf + 1
+        f.outerComponent = hedge
+        f.outerComponent.face = f
+        var h = hedge.next
+        while(h != f.outerComponent){
+          half_edgeList.find(_.equals(h)).get.face = f
+          h = h.next
+        }
+        faceList += f
+      }
+    }
+
     vertexList.flatMap(v => v.half_edges.map{ h =>
       val n = h.next
       val p = h.prev
       val triplet = s"LINESTRING ( ${p.v2.x} ${p.v2.y}, ${h.v2.x} ${h.v2.y}, ${n.v2.x} ${n.v2.y} )"
-      s"${v.toWKT}\t${h.toWKT}\t${h.angle}\t${triplet}"
+      s"${v.toWKT}\t${h.toWKT}\t${h.face.toWKT()}"
     }).toList
   }
 
@@ -231,7 +252,11 @@ object DCEL{
           val v2 = Vertex(segment._2.x, segment._2.y)
           vertices += v1
           vertices += v2
-          Edge2(v1, v2)
+          if(v1 < v2){
+            Edge2(v1, v2)
+          } else {
+            Edge2(v2, v1)
+          }
         }
       }.toSet
       val test = buildLocalDCEL(vertices.toList, edges.toList)
@@ -248,24 +273,27 @@ object DCEL{
 
       val verticesWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
         params.flatMap(data => data._2.map(v => s"${v.toWKT}\t${i}\n"))
-      }.collect().mkString("")
+      }.collect()
       f = new java.io.PrintWriter("/tmp/vertices.wkt")
-      f.write(verticesWKT)
+      f.write(verticesWKT.mkString(""))
       f.close()
+      logger.info(s"Saved vertices.wkt [${verticesWKT.size} records]")
 
       val edgesWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
         params.flatMap(data => data._3.map(e => s"${e.toWKT}\t${i}\n"))
-      }.collect().mkString("")
+      }.collect()
       f = new java.io.PrintWriter("/tmp/edges.wkt")
-      f.write(edgesWKT)
+      f.write(edgesWKT.mkString(""))
       f.close()
+      logger.info(s"Saved edges.wkt [${edgesWKT.size} records]")
 
       val incidentsWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
         params.flatMap(data => data._4.map(j => s"${j}\t${i}\n"))
-      }.collect().mkString("")
+      }.collect()
       f = new java.io.PrintWriter("/tmp/incidents.wkt")
-      f.write(incidentsWKT)
+      f.write(incidentsWKT.mkString(""))
       f.close()
+      logger.info(s"Saved incidents.wkt [${incidentsWKT.size} records]")
 
       val incidents = verticesRDD.flatMap(_._4).mapPartitionsWithIndex{ (i,line) =>
         line.map{ l =>

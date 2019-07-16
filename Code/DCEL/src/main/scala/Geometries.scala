@@ -1,4 +1,4 @@
-import scala.collection.mutable.{ListBuffer, HashSet}
+import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 
 case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   private var _id: Long = -1L
@@ -81,6 +81,19 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 case class Face(var id: Long){
   var outerComponent: Half_edge = null
   var innerComponent: Half_edge = null
+
+  def toWKT(): String = {
+    var hedge = outerComponent
+    var wkt = new ArrayBuffer[String]()
+    wkt += s"${hedge.v1.x} ${hedge.v1.y}"
+    while(hedge.next != outerComponent){
+      wkt += s"${hedge.v2.x} ${hedge.v2.y}"
+      hedge = hedge.next
+    }
+    wkt += s"${hedge.v2.x} ${hedge.v2.y}"
+    
+    s"POLYGON (( ${wkt.mkString(" , ")} ))\t${id}"
+  }
 }
 
 case class Edge(v1: Int, v2: Int) extends Ordered[Edge] {
@@ -97,7 +110,9 @@ case class Edge2(v1: Vertex, v2: Vertex) {
   override def equals(that: Any): Boolean =
     that match {
       case that: Edge2 => {
-        that.canEqual(this) && this.v1.equals(that.v1) && this.v2.equals(that.v2)
+        that.canEqual(this) &&
+          ( (this.v1.equals(that.v1) && this.v2.equals(that.v2)) ||
+            (this.v1.equals(that.v2) && this.v2.equals(that.v1)) )
       }
       case _ => false
     }
