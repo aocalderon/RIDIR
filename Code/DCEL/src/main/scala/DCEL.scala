@@ -1,3 +1,7 @@
+/***
+ * Implementation based on https://github.com/anglyan/dcel/blob/master/dcel/dcel.py 
+ ***/
+
 import org.slf4j.{LoggerFactory, Logger}
 import org.rogach.scallop._
 import org.apache.spark.sql.{SparkSession, Dataset}
@@ -17,7 +21,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer}
+import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer, HashSet}
 
 object DCEL{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -61,9 +65,12 @@ object DCEL{
   }
 
   def buildLocalDCEL(vertices: List[Vertex], edges: List[Edge2]): List[String] = {
-    val vertexList = vertices.toVector
     var half_edgeList = new ArrayBuffer[Half_edge]()
 
+    // Step 1. Vertex list creation
+    var vertexList = vertices.toVector
+
+    // Step 2. Half-edge list creation.  Assignment of twins and vertices
     edges.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
       val h2 = Half_edge(edge.v2, edge.v1)
@@ -77,7 +84,48 @@ object DCEL{
       half_edgeList += h2
       half_edgeList += h1
     }
-    vertexList.flatMap(v => v.half_edges.map(h => s"${v.toWKT}\t${h.toWKT}")).toList
+
+    // Step 3. Identification of next and prev half-edges
+    vertexList = vertexList.map{ vertex =>
+      val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)
+      val size = sortedIncidents.size
+
+      if(size < 2){
+        logger.error("Badly formed dcel: less than two hedges in vertex")
+      }
+      
+      for(i <- 0 until (size - 1)){
+        var current = sortedIncidents(i)
+        var next = sortedIncidents(i + 1)
+        current = half_edgeList.find(_.equals(current)).get
+        next = half_edgeList.find(_.equals(next)).get
+        current.next   = next.twin
+        next.twin.prev = current
+      }
+      var current = sortedIncidents(size - 1)
+      var next = sortedIncidents(0)
+      current = half_edgeList.find(_.equals(current)).get
+      next = half_edgeList.find(_.equals(next)).get
+      current.next   = next.twin
+      next.twin.prev = current
+
+      // sortedIncidents(size - 1).next = sortedIncidents(0).twin
+      // sortedIncidents(0).twin.prev = sortedIncidents(size - 1)      
+
+      val sorted = new HashSet[Half_edge]()
+      sorted ++= sortedIncidents
+      vertex.half_edges = sorted
+      vertex.hedges_size = size
+      
+      vertex
+    }
+
+    vertexList.flatMap(v => v.half_edges.map{ h =>
+      val n = h.next
+      val p = h.prev
+      val triplet = s"LINESTRING ( ${p.v2.x} ${p.v2.y}, ${h.v2.x} ${h.v2.y}, ${n.v2.x} ${n.v2.y} )"
+      s"${v.toWKT}\t${h.toWKT}\t${h.angle}\t${triplet}"
+    }).toList
   }
 
   /***

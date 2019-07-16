@@ -31,6 +31,16 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     else origen.x compare that.origen.x
   }
 
+  def canEqual(a: Any) = a.isInstanceOf[Half_edge]
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Half_edge => {
+        that.canEqual(this) && this.v1.equals(that.v1) && this.v2.equals(that.v2)
+      }
+      case _ => false
+    }
+
   def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})"
 }
 
@@ -38,6 +48,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   private var _id: Double = -1
   var edge: Half_edge = null
   var half_edges: HashSet[Half_edge] = new HashSet[Half_edge]()
+  var hedges_size: Int = 0
 
   def getId = _id
 
