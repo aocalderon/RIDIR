@@ -81,18 +81,60 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 case class Face(var id: Long){
   var outerComponent: Half_edge = null
   var innerComponent: Half_edge = null
+  var data: String = null
+
+  def area(): Double = {
+    var a: Double = 0.0
+    var h = outerComponent
+    while(h.next != outerComponent){
+      val p1 = h.v2
+      val p2 = h.next.v2
+      a += (p1.x * p2.y) - (p2.x * p1.y)
+      h = h.next
+    }
+    val p1 = h.v2
+    val p2 = outerComponent.v2
+
+    (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
+  }
+
+  def perimeter(): Double = {
+    var p: Double = 0.0
+    var h = outerComponent
+    while(h.next != outerComponent){
+      p += h.length
+      h = h.next
+    }
+    p += h.length
+    p
+  }
+
+  def perimeterTest(): String = {
+    var p = new ArrayBuffer[Double]()
+    var h = outerComponent
+    while(h.next != outerComponent){
+      p += h.length
+      h = h.next
+    }
+    p += h.length
+    p.mkString(" ")
+  }
 
   def toWKT(): String = {
-    var hedge = outerComponent
-    var wkt = new ArrayBuffer[String]()
-    wkt += s"${hedge.v1.x} ${hedge.v1.y}"
-    while(hedge.next != outerComponent){
+    if(area() <= 0){
+      s"POLYGON EMPTY\t-1"
+    } else {
+      var hedge = outerComponent
+      var wkt = new ArrayBuffer[String]()
+      wkt += s"${hedge.v1.x} ${hedge.v1.y}"
+      while(hedge.next != outerComponent){
+        wkt += s"${hedge.v2.x} ${hedge.v2.y}"
+        hedge = hedge.next
+      }
       wkt += s"${hedge.v2.x} ${hedge.v2.y}"
-      hedge = hedge.next
-    }
-    wkt += s"${hedge.v2.x} ${hedge.v2.y}"
     
-    s"POLYGON (( ${wkt.mkString(" , ")} ))\t${id}"
+      s"POLYGON (( ${wkt.mkString(" , ")} ))\t${id}"
+    }
   }
 }
 
@@ -104,6 +146,8 @@ case class Edge(v1: Int, v2: Int) extends Ordered[Edge] {
 }
 
 case class Edge2(v1: Vertex, v2: Vertex) {
+  var left  = ""
+  var right = ""
 
   def canEqual(a: Any) = a.isInstanceOf[Edge2]
 

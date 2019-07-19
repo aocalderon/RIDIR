@@ -18,6 +18,7 @@ import com.vividsolutions.jts.operation.buffer.BufferParameters
 import com.vividsolutions.jts.geom.GeometryFactory
 import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
+import com.vividsolutions.jts.algorithm.RobustCGAlgorithms
 import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
@@ -88,7 +89,7 @@ object DCEL{
 
     // Step 3. Identification of next and prev half-edges
     vertexList = vertexList.map{ vertex =>
-      val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)
+      val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
       val size = sortedIncidents.size
 
       if(size < 2){
@@ -142,11 +143,11 @@ object DCEL{
     }
 
     vertexList.flatMap(v => v.half_edges.map{ h =>
-      val n = h.next
-      val p = h.prev
-      val triplet = s"LINESTRING ( ${p.v2.x} ${p.v2.y}, ${h.v2.x} ${h.v2.y}, ${n.v2.x} ${n.v2.y} )"
-      s"${v.toWKT}\t${h.toWKT}\t${h.face.toWKT()}"
+      s"${v.toWKT}\t${h.toWKT}"
     }).toList
+    /*vertexList.flatMap(v => v.half_edges.map{ h =>
+      s"${h.face.toWKT()}\t${h.face.area()}\t${h.face.perimeter()}"
+    }).toList.distinct*/
   }
 
   /***
@@ -227,11 +228,14 @@ object DCEL{
         // (but should still be good enough to be used for pure rendering).
         var ps = new ListBuffer[Polygon]()
         polygons.foreach { to_clip =>
+          val label = to_clip.getUserData
           val geoms = clipper.clip(to_clip, true)
           for(i <- 0 until geoms.getNumGeometries){
             val geom = geoms.getGeometryN(i)
             if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
-              ps += geom.asInstanceOf[Polygon]
+              val p = geom.asInstanceOf[Polygon]
+              p.setUserData(label)
+              ps += p
             }
           }
         }
