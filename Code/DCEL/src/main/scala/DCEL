@@ -1,1 +1,18 @@
+case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
+  override def compare(that: Vertex): Int = {
+    if (x == that.x) y compare that.y
+    else x compare that.x
+  }
 
+  def canEqual(a: Any) = a.isInstanceOf[Vertex]
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Vertex => {
+        that.canEqual(this) && this.x == that.x && this.y == that.y
+      }
+      case _ => false
+    }
+
+  def toWKT: String = s"POINT ($x $y)"
+}
