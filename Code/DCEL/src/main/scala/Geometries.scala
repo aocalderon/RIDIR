@@ -42,7 +42,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
       case _ => false
     }
 
-  def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})"
+  def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})\t${label}"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
