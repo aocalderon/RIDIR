@@ -73,18 +73,15 @@ object DCEL{
     var vertexList = edges.flatMap(e => List(e.v1, e.v2)).distinct
 
     // Step 2. Half-edge list creation.  Assignment of twins and vertices
-    val edges1 = edges.map(e => e -> e.label).toMap
+    val edges1 = edges.map(e => Edge(e.v1, e.v2) -> e.label).toMap
     val edges2 = edges.map(e => Edge(e.v2, e.v1) -> e.label).toMap
-    val keys = edges1.keySet ++ edges2.keySet
-    val edgesSet = keys.map{ e =>
-      (e, s"${edges1.getOrElse(e, "*")}|${edges2.getOrElse(e, "*")}")
-    }.filter{ e =>
-      e._1.v1 < e._1.v2
-    }.map{ x =>
-      val edge = x._1
-      edge.label = x._2
-      edge
-    }
+    val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 > e.v2)
+    val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "*")}<br>${edges2.getOrElse(e, "*")}") }
+      .map{ x =>
+        val edge = x._1
+        edge.label = x._2
+        edge
+      }
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
       h1.label = edge.left
@@ -280,8 +277,8 @@ object DCEL{
           Edge(v1, v2, p.getUserData.toString())
         }
       }
-      //val test = buildLocalDCEL(vertices.toList, edges.toList)
-      val test = List.empty[String]
+      val test = buildLocalDCEL(vertices.toList, edges.toList)
+      //val test = List.empty[String]
       List((i, vertices.toList, edges.toList, test)).toIterator
     }
 
