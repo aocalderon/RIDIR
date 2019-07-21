@@ -7,6 +7,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   var next: Half_edge = null
   var prev: Half_edge = null
   var face: Face = null
+  var label: String = null
 
   val angle  = hangle(v2.x - v1.x, v2.y - v1.y)
   val length = math.sqrt(math.pow(v2.x - v1.x, 2) + math.pow(v2.y - v1.y, 2))
@@ -81,7 +82,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 case class Face(var id: Long){
   var outerComponent: Half_edge = null
   var innerComponent: Half_edge = null
-  var data: String = null
+  var label: String = null
 
   def area(): Double = {
     var a: Double = 0.0
@@ -109,17 +110,6 @@ case class Face(var id: Long){
     p
   }
 
-  def perimeterTest(): String = {
-    var p = new ArrayBuffer[Double]()
-    var h = outerComponent
-    while(h.next != outerComponent){
-      p += h.length
-      h = h.next
-    }
-    p += h.length
-    p.mkString(" ")
-  }
-
   def toWKT(): String = {
     if(area() <= 0){
       s"POLYGON EMPTY\t-1"
@@ -133,27 +123,18 @@ case class Face(var id: Long){
       }
       wkt += s"${hedge.v2.x} ${hedge.v2.y}"
     
-      s"POLYGON (( ${wkt.mkString(" , ")} ))\t${id}"
+      s"POLYGON (( ${wkt.mkString(" , ")} ))\t${label}"
     }
   }
 }
 
-case class Edge(v1: Int, v2: Int) extends Ordered[Edge] {
-  override def compare(that: Edge): Int = {
-    if (v1 == that.v1) v2 compare that.v2
-    else v1 compare that.v1
-  }
-}
+case class Edge(v1: Vertex, v2: Vertex, var label: String = "") {
 
-case class Edge2(v1: Vertex, v2: Vertex) {
-  var left  = ""
-  var right = ""
-
-  def canEqual(a: Any) = a.isInstanceOf[Edge2]
+  def canEqual(a: Any) = a.isInstanceOf[Edge]
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: Edge2 => {
+      case that: Edge => {
         that.canEqual(this) &&
           ( (this.v1.equals(that.v1) && this.v2.equals(that.v2)) ||
             (this.v1.equals(that.v2) && this.v2.equals(that.v1)) )
@@ -161,8 +142,11 @@ case class Edge2(v1: Vertex, v2: Vertex) {
       case _ => false
     }
 
+  def left: String = label.split("|")(0)
 
-  def toWKT: String = s"LINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})"
+  def right: String = label.split("|")(1)
+
+  def toWKT: String = s"LINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})\t${label}"
 }
 
 
