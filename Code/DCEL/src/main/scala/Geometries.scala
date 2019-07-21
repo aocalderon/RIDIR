@@ -128,23 +128,25 @@ case class Face(var id: Long){
   }
 }
 
-case class Edge(v1: Vertex, v2: Vertex, var label: String = "") {
+case class Edge(v1: Vertex, v2: Vertex, var label: String = "") extends Ordered[Edge] {
+  override def compare(that: Edge): Int = {
+    if (v2.x == that.v2.x) v2.y compare that.v2.y
+    else v2.x compare that.v2.x
+  }
 
   def canEqual(a: Any) = a.isInstanceOf[Edge]
 
   override def equals(that: Any): Boolean =
     that match {
       case that: Edge => {
-        that.canEqual(this) &&
-          ( (this.v1.equals(that.v1) && this.v2.equals(that.v2)) ||
-            (this.v1.equals(that.v2) && this.v2.equals(that.v1)) )
+        that.canEqual(this) && ( this.v1.equals(that.v1) && this.v2.equals(that.v2) )
       }
       case _ => false
     }
 
-  def left: String = label.split("|")(0)
+  def left: String = label.split("<br>")(0)
 
-  def right: String = label.split("|")(1)
+  def right: String = label.split("<br>")(1)
 
   def toWKT: String = s"LINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})\t${label}"
 }
