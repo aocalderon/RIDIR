@@ -18,7 +18,7 @@ import com.vividsolutions.jts.operation.buffer.BufferParameters
 import com.vividsolutions.jts.geom.GeometryFactory
 import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
-import com.vividsolutions.jts.algorithm.RobustCGAlgorithms
+import com.vividsolutions.jts.algorithm.{RobustCGAlgorithms, CGAlgorithms}
 import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
@@ -65,17 +65,31 @@ object DCEL{
     new Polygon(ring, null, geofactory)
   }
 
-  def buildLocalDCEL(vertices: List[Vertex], edges: List[Edge2]): List[String] = {
+  def buildLocalDCEL(vertices: List[Vertex], edges: List[Edge]): List[String] = {
     var half_edgeList = new ArrayBuffer[Half_edge]()
     var faceList = new ArrayBuffer[Face]()
 
     // Step 1. Vertex list creation
-    var vertexList = vertices.toVector
+    var vertexList = edges.flatMap(e => List(e.v1, e.v2)).distinct
 
     // Step 2. Half-edge list creation.  Assignment of twins and vertices
-    edges.foreach{ edge =>
+    val edges1 = edges.map(e => e -> e.label).toMap
+    val edges2 = edges.map(e => Edge(e.v2, e.v1) -> e.label).toMap
+    val keys = edges1.keySet ++ edges2.keySet
+    val edgesSet = keys.map{ e =>
+      (e, s"${edges1.getOrElse(e, "*")}|${edges2.getOrElse(e, "*")}")
+    }.filter{ e =>
+      e._1.v1 < e._1.v2
+    }.map{ x =>
+      val edge = x._1
+      edge.label = x._2
+      edge
+    }
+    edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
+      h1.label = edge.left
       val h2 = Half_edge(edge.v2, edge.v1)
+      h2.label = edge.right
 
       h1.twin = h2
       h2.twin = h1
@@ -111,9 +125,6 @@ object DCEL{
       current.next   = next.twin
       next.twin.prev = current
 
-      // sortedIncidents(size - 1).next = sortedIncidents(0).twin
-      // sortedIncidents(0).twin.prev = sortedIncidents(size - 1)      
-
       val sorted = new HashSet[Half_edge]()
       sorted ++= sortedIncidents
       vertex.half_edges = sorted
@@ -131,6 +142,7 @@ object DCEL{
       if(hedge.face == null){
         val f = Face(nf)
         nf = nf + 1
+        f.label = hedge.label
         f.outerComponent = hedge
         f.outerComponent.face = f
         var h = hedge.next
@@ -141,13 +153,15 @@ object DCEL{
         faceList += f
       }
     }
-
+    /*
     vertexList.flatMap(v => v.half_edges.map{ h =>
       s"${v.toWKT}\t${h.toWKT}"
     }).toList
-    /*vertexList.flatMap(v => v.half_edges.map{ h =>
+     */
+    vertexList.flatMap(v => v.half_edges.map{ h =>
       s"${h.face.toWKT()}\t${h.face.area()}\t${h.face.perimeter()}"
-    }).toList.distinct*/
+    }).toList.distinct
+     
   }
 
   /***
@@ -249,21 +263,25 @@ object DCEL{
     val verticesRDD = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
       var vertices = new scala.collection.mutable.HashSet[Vertex]()
       val edges    = polygons.flatMap{ p =>
-        val coords = p.getExteriorRing.getCoordinateSequence.toCoordinateArray().toList
+        val ring = p.getExteriorRing.getCoordinateSequence.toCoordinateArray()
+        val orientation = CGAlgorithms.isCCW(ring)
+        var coords = List.empty[Coordinate]
+        if(orientation){
+          coords = ring.toList
+        } else {
+          coords = ring.reverse.toList
+        }
         val segments = coords.zip(coords.tail)
         segments.map{ segment =>
           val v1 = Vertex(segment._1.x, segment._1.y)
           val v2 = Vertex(segment._2.x, segment._2.y)
           vertices += v1
           vertices += v2
-          if(v1 < v2){
-            Edge2(v1, v2)
-          } else {
-            Edge2(v2, v1)
-          }
+          Edge(v1, v2, p.getUserData.toString())
         }
-      }.toSet
-      val test = buildLocalDCEL(vertices.toList, edges.toList)
+      }
+      //val test = buildLocalDCEL(vertices.toList, edges.toList)
+      val test = List.empty[String]
       List((i, vertices.toList, edges.toList, test)).toIterator
     }
 
