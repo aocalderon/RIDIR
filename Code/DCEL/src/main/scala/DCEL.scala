@@ -73,9 +73,10 @@ object DCEL{
     var vertexList = edges.flatMap(e => List(e.v1, e.v2)).distinct
 
     // Step 2. Half-edge list creation.  Assignment of twins and vertices
+    
     val edges1 = edges.map(e => Edge(e.v1, e.v2) -> e.label).toMap
     val edges2 = edges.map(e => Edge(e.v2, e.v1) -> e.label).toMap
-    val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 > e.v2)
+    val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
     val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "*")}<br>${edges2.getOrElse(e, "*")}") }
       .map{ x =>
         val edge = x._1
@@ -84,9 +85,9 @@ object DCEL{
       }
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
-      h1.label = edge.left
+      h1.label = edge.right
       val h2 = Half_edge(edge.v2, edge.v1)
-      h2.label = edge.right
+      h2.label = edge.left
 
       h1.twin = h2
       h2.twin = h1
@@ -155,10 +156,12 @@ object DCEL{
       s"${v.toWKT}\t${h.toWKT}"
     }).toList
      */
+    /*
     vertexList.flatMap(v => v.half_edges.map{ h =>
-      s"${h.face.toWKT()}\t${h.face.area()}\t${h.face.perimeter()}"
+      s"${h.toWKT}\t${h.face.toWKT()}"
     }).toList.distinct
-     
+     */
+    faceList.map(f => s"${f.toWKT}\t${f.outerComponent.label}").toList
   }
 
   /***
@@ -209,7 +212,7 @@ object DCEL{
     val polygons = spark.read.option("header", "false").option("delimiter", "\t")
       .csv(input).rdd.zipWithUniqueId().map{ row =>
         val polygon = reader.read(row._1.getString(0)).asInstanceOf[Polygon]
-        polygon.setUserData(s"${row._2}")
+        polygon.setUserData(s"${row._1.getString(1)}")
         polygon
       }
     polygonRDD.setRawSpatialRDD(polygons)
@@ -222,7 +225,6 @@ object DCEL{
     log(stage, timer, 0, "START")
     polygonRDD.analyze()
     polygonRDD.spatialPartitioning(gridType, partitions)
-    //val segmentsRDD = new SpatialRDD[LineString]()
     val grids = polygonRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
     if(debug) { grids.map(g => s"${g._1}\t${envelope2Polygon(g._2).toText()}").foreach(println) }
     log(stage, timer, grids.size, "END")
@@ -239,7 +241,7 @@ object DCEL{
         // (but should still be good enough to be used for pure rendering).
         var ps = new ListBuffer[Polygon]()
         polygons.foreach { to_clip =>
-          val label = to_clip.getUserData
+          val label = to_clip.getUserData.toString
           val geoms = clipper.clip(to_clip, true)
           for(i <- 0 until geoms.getNumGeometries){
             val geom = geoms.getGeometryN(i)
