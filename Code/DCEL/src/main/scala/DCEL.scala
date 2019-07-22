@@ -65,7 +65,7 @@ object DCEL{
     new Polygon(ring, null, geofactory)
   }
 
-  def buildLocalDCEL(vertices: List[Vertex], edges: List[Edge]): List[String] = {
+  def buildLocalDCEL(edges: List[Edge]): List[String] = {
     var half_edgeList = new ArrayBuffer[Half_edge]()
     var faceList = new ArrayBuffer[Face]()
 
@@ -143,16 +143,6 @@ object DCEL{
       }
     }
 
-    /*
-    vertexList.flatMap(v => v.half_edges.map{ h =>
-      s"${v.toWKT}\t${h.toWKT}"
-    }).toList
-     */
-    /*
-    vertexList.flatMap(v => v.half_edges.map{ h =>
-      s"${h.toWKT}\t${h.face.toWKT()}"
-    }).toList.distinct
-     */
     faceList.map(f => s"${f.toWKT}\t${f.area()}\t${f.perimeter()}").toList
   }
 
@@ -164,6 +154,7 @@ object DCEL{
     val cores = params.cores()
     val executors = params.executors()
     val input = params.input()
+    val offset = params.offset()
     val partitions = params.partitions()
     val debug = params.debug()
     val master = params.local() match {
@@ -203,8 +194,9 @@ object DCEL{
     val polygonRDD = new SpatialRDD[Polygon]()
     val polygons = spark.read.option("header", "false").option("delimiter", "\t")
       .csv(input).rdd.zipWithUniqueId().map{ row =>
-        val polygon = reader.read(row._1.getString(0)).asInstanceOf[Polygon]
-        polygon.setUserData(s"${row._1.getString(1)}")
+        val polygon = reader.read(row._1.getString(offset)).asInstanceOf[Polygon]
+        val userData = (0 until row._1.size).filter(_ != offset).map(i => row._1.getString(i)).mkString("\t")
+        polygon.setUserData(userData)
         polygon
       }
     polygonRDD.setRawSpatialRDD(polygons)
@@ -218,8 +210,14 @@ object DCEL{
     polygonRDD.analyze()
     polygonRDD.spatialPartitioning(gridType, partitions)
     val grids = polygonRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
-    if(debug) { grids.map(g => s"${g._1}\t${envelope2Polygon(g._2).toText()}").foreach(println) }
     log(stage, timer, grids.size, "END")
+
+    if(debug) {
+      val gridsWKT = grids.values.map(g => s"${envelope2Polygon(g).toText()}\n")
+      val f = new java.io.PrintWriter("/tmp/dcelGrid.wkt")
+      f.write(gridsWKT.mkString(""))
+      f.close()
+    }
 
     // Extracting clipped polygons...
     timer = clocktime
@@ -251,9 +249,12 @@ object DCEL{
     val nClippedPolygonsRDD = clippedPolygonsRDD.count()
     log(stage, timer, nClippedPolygonsRDD, "END")
 
-    val verticesRDD = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
-      var vertices = new scala.collection.mutable.HashSet[Vertex]()
-      val edges    = polygons.flatMap{ p =>
+    // Building Local DCEL...
+    timer = clocktime
+    stage = "Building local DCEL"
+    log(stage, timer, 0, "START")
+    val dcelRDD = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
+      val edges = polygons.flatMap{ p =>
         val ring = p.getExteriorRing.getCoordinateSequence.toCoordinateArray()
         val orientation = CGAlgorithms.isCCW(ring)
         var coords = List.empty[Coordinate]
@@ -266,15 +267,13 @@ object DCEL{
         segments.map{ segment =>
           val v1 = Vertex(segment._1.x, segment._1.y)
           val v2 = Vertex(segment._2.x, segment._2.y)
-          vertices += v1
-          vertices += v2
           Edge(v1, v2, p.getUserData.toString())
         }
       }
-      val test = buildLocalDCEL(vertices.toList, edges.toList)
-      //val test = List.empty[String]
-      List((i, vertices.toList, edges.toList, test)).toIterator
+      val dcel = buildLocalDCEL(edges.toList)
+      List((i, dcel)).toIterator
     }
+    log(stage, timer, 0, "END")
 
     if(debug){
       val clippedWKT = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
@@ -284,54 +283,13 @@ object DCEL{
       f.write(clippedWKT)
       f.close()
 
-      val verticesWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
-        params.flatMap(data => data._2.map(v => s"${v.toWKT}\t${i}\n"))
+      val dcelWKT = dcelRDD.mapPartitionsWithIndex{ (i, params) =>
+        params.flatMap(data => data._2.map(j => s"${j}\t${i}\n"))
       }.collect()
-      f = new java.io.PrintWriter("/tmp/vertices.wkt")
-      f.write(verticesWKT.mkString(""))
+      f = new java.io.PrintWriter("/tmp/dcel.wkt")
+      f.write(dcelWKT.mkString(""))
       f.close()
-      logger.info(s"Saved vertices.wkt [${verticesWKT.size} records]")
-
-      val edgesWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
-        params.flatMap(data => data._3.map(e => s"${e.toWKT}\t${i}\n"))
-      }.collect()
-      f = new java.io.PrintWriter("/tmp/edges.wkt")
-      f.write(edgesWKT.mkString(""))
-      f.close()
-      logger.info(s"Saved edges.wkt [${edgesWKT.size} records]")
-
-      val incidentsWKT = verticesRDD.mapPartitionsWithIndex{ (i, params) =>
-        params.flatMap(data => data._4.map(j => s"${j}\t${i}\n"))
-      }.collect()
-      f = new java.io.PrintWriter("/tmp/incidents.wkt")
-      f.write(incidentsWKT.mkString(""))
-      f.close()
-      logger.info(s"Saved incidents.wkt [${incidentsWKT.size} records]")
-
-      val incidents = verticesRDD.flatMap(_._4).mapPartitionsWithIndex{ (i,line) =>
-        line.map{ l =>
-          val arr = l.split("\t")
-          val vertex = arr(1)
-          val incident = arr(2)
-
-          (vertex, incident, i)
-        }
-      }.toDF("vertex", "incident", "part")
-
-      incidents.show(false)
-
-      logger.info(s"Count of incidents: ${incidents.count()}")
-
-      val uniqueVertices = incidents.select($"part", $"vertex").distinct()
-
-      logger.info(s"Count of unique vertices: ${uniqueVertices.count()}")
-
-      val countIncidents = incidents.groupBy($"incident").count()
-
-      logger.info(s"Count of incidents: ${countIncidents.count()}")
-
-      countIncidents.orderBy($"count").show(countIncidents.count().toInt, truncate = false)
-      
+      logger.info(s"Saved dcel.wkt [${dcelWKT.size} records]")
     }
 
     // Closing session...
@@ -345,6 +303,7 @@ object DCEL{
 
 class DCELConf(args: Seq[String]) extends ScallopConf(args) {
   val input:      ScallopOption[String]  = opt[String]  (required = true)
+  val offset:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
