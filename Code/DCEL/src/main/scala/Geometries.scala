@@ -112,7 +112,7 @@ case class Face(label: String){
 
   def toWKT(): String = {
     if(area() <= 0){
-      s"POLYGON EMPTY\t-1"
+      s"POLYGON EMPTY\t${label}"
     } else {
       var hedge = outerComponent
       var wkt = new ArrayBuffer[String]()
