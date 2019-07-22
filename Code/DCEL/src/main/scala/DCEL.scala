@@ -69,11 +69,10 @@ object DCEL{
     var half_edgeList = new ArrayBuffer[Half_edge]()
     var faceList = new ArrayBuffer[Face]()
 
-    // Step 1. Vertex list creation
-    var vertexList = edges.flatMap(e => List(e.v1, e.v2)).distinct
+    // Step 1. Vertex set creation...
+    var vertexList = edges.flatMap(e => List(e.v1, e.v2)).toSet
 
-    // Step 2. Half-edge list creation.  Assignment of twins and vertices
-    
+    // Step 2.  Edge set creation with left and right labels...
     val edges1 = edges.map(e => Edge(e.v1, e.v2) -> e.label).toMap
     val edges2 = edges.map(e => Edge(e.v2, e.v1) -> e.label).toMap
     val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
@@ -83,11 +82,12 @@ object DCEL{
         edge.label = x._2
         edge
       }
+    // Step 3. Half-edge list creation with twins and vertices assignments...
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
-      h1.label = edge.right
+      h1.label = edge.left
       val h2 = Half_edge(edge.v2, edge.v1)
-      h2.label = edge.left
+      h2.label = edge.right
 
       h1.twin = h2
       h2.twin = h1
@@ -99,8 +99,8 @@ object DCEL{
       half_edgeList += h1
     }
 
-    // Step 3. Identification of next and prev half-edges
-    vertexList = vertexList.map{ vertex =>
+    // Step 4. Identification of next and prev half-edges...
+    vertexList.map{ vertex =>
       val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
       val size = sortedIncidents.size
 
@@ -122,25 +122,15 @@ object DCEL{
       next = half_edgeList.find(_.equals(next)).get
       current.next   = next.twin
       next.twin.prev = current
-
-      val sorted = new HashSet[Half_edge]()
-      sorted ++= sortedIncidents
-      vertex.half_edges = sorted
-      vertex.hedges_size = size
-      
-      vertex
     }
 
-    // Step 4. Face assignment
-    var nf = 0
+    // Step 5. Face assignment...
     var temp_half_edgeList = new ArrayBuffer[Half_edge]()
     temp_half_edgeList ++= half_edgeList
     for(temp_hedge <- temp_half_edgeList){
       val hedge = half_edgeList.find(_.equals(temp_hedge)).get
       if(hedge.face == null){
-        val f = Face(nf)
-        nf = nf + 1
-        f.label = hedge.label
+        val f = Face(hedge.label)
         f.outerComponent = hedge
         f.outerComponent.face = f
         var h = hedge.next
@@ -148,9 +138,11 @@ object DCEL{
           half_edgeList.find(_.equals(h)).get.face = f
           h = h.next
         }
+        if(f.area() < 0) { f.exterior = true }
         faceList += f
       }
     }
+
     /*
     vertexList.flatMap(v => v.half_edges.map{ h =>
       s"${v.toWKT}\t${h.toWKT}"
@@ -161,7 +153,7 @@ object DCEL{
       s"${h.toWKT}\t${h.face.toWKT()}"
     }).toList.distinct
      */
-    faceList.map(f => s"${f.toWKT}\t${f.outerComponent.label}").toList
+    faceList.map(f => s"${f.toWKT}\t${f.area()}\t${f.perimeter()}").toList
   }
 
   /***

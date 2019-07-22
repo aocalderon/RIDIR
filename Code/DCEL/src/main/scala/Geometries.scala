@@ -79,10 +79,10 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   def toWKT: String = s"${getId}\tPOINT ($x $y)"
 }
 
-case class Face(var id: Long){
+case class Face(label: String){
   var outerComponent: Half_edge = null
   var innerComponent: Half_edge = null
-  var label: String = null
+  var exterior: Boolean = false
 
   def area(): Double = {
     var a: Double = 0.0
