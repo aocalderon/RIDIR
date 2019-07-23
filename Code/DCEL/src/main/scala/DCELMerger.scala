@@ -14,7 +14,7 @@ import org.apache.spark.sql.functions._
 import org.datasyslab.geospark.enums.{FileDataSplitter, GridType, IndexType}
 import org.datasyslab.geospark.spatialRDD.{SpatialRDD, PolygonRDD, LineStringRDD}
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
-import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
+import org.datasyslab.geospark.spatialPartitioning.quadtree.{QuadTreePartitioner, StandardQuadTree, QuadRectangle}
 import com.vividsolutions.jts.operation.buffer.BufferParameters
 import com.vividsolutions.jts.geom.GeometryFactory
 import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString}
@@ -66,7 +66,7 @@ object DCELMerger{
     new Polygon(ring, null, geofactory)
   }
 
-  def buildLocalDCEL(edges: List[Edge]): LocalDCEL = {
+  def buildLocalDCEL(edges: List[Edge], tag: String = ""): LocalDCEL = {
     var half_edgeList = new ArrayBuffer[Half_edge]()
     var faceList = new ArrayBuffer[Face]()
 
@@ -132,6 +132,7 @@ object DCELMerger{
       val hedge = half_edgeList.find(_.equals(temp_hedge)).get
       if(hedge.face == null){
         val f = Face(hedge.label)
+        f.tag = tag
         f.outerComponent = hedge
         f.outerComponent.face = f
         var h = hedge.next
@@ -185,6 +186,32 @@ object DCELMerger{
       polys.toIterator
     }.cache()
     clippedPolygonsRDD
+  }
+
+  def buildDCEL(clippedPolygons: RDD[Polygon], tag: String = ""): RDD[LocalDCEL]= {
+    val dcel = clippedPolygons.mapPartitionsWithIndex{ (i, polygons) =>
+      val edges = polygons.flatMap{ p =>
+        val ring = p.getExteriorRing.getCoordinateSequence.toCoordinateArray()
+        val orientation = CGAlgorithms.isCCW(ring)
+        var coords = List.empty[Coordinate]
+        if(orientation){
+          coords = ring.toList
+        } else {
+          coords = ring.reverse.toList
+        }
+        val segments = coords.zip(coords.tail)
+        segments.map{ segment =>
+          val v1 = Vertex(segment._1.x, segment._1.y)
+          val v2 = Vertex(segment._2.x, segment._2.y)
+          Edge(v1, v2, p.getUserData.toString())
+        }
+      }
+      val dcel = buildLocalDCEL(edges.toList, tag)
+      dcel.id = i
+      dcel.tag = tag
+      List(dcel).toIterator
+    }
+    dcel
   }
 
   /***
@@ -251,9 +278,26 @@ object DCELMerger{
     log(stage, timer, 0, "START")
     polygonsA.analyze()
     polygonsB.analyze()
-    polygonsA.spatialPartitioning(gridType, partitions)
+    val boundary1 = polygonsA.boundaryEnvelope
+    val boundary2 = polygonsB.boundaryEnvelope
+    val fullBoundary = envelope2Polygon(boundary1).union(envelope2Polygon(boundary2)).getEnvelopeInternal
+    val samplesA = polygonsA.rawSpatialRDD.rdd.sample(false, params.fraction(), 42).map(_.getEnvelopeInternal)
+    val samplesB = polygonsB.rawSpatialRDD.rdd.sample(false, params.fraction(), 42).map(_.getEnvelopeInternal)
+    val samples = samplesA.union(samplesB)
+    val boundary = new QuadRectangle(fullBoundary)
+    val maxLevels = params.levels()
+    val maxEntriesPerNode = params.entries()
+    val quadtree = new StandardQuadTree[Geometry](boundary, 0, maxEntriesPerNode, maxLevels)
+    if(debug){ logger.info(s"Size of sample: ${samples.count()}") }
+    for(sample <- samples.collect()){
+      quadtree.insert(new QuadRectangle(sample), null)
+    }
+    quadtree.assignPartitionIds()
+    val QTPartitioner = new QuadTreePartitioner(quadtree)
+    polygonsA.spatialPartitioning(QTPartitioner)
     polygonsB.spatialPartitioning(polygonsA.getPartitioner)
-    val grids = polygonsA.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
+    val grids = quadtree.getAllZones.asScala.filter(_.partitionId != null)
+      .map(r => r.partitionId.toInt -> r.getEnvelope).toMap
     log(stage, timer, grids.size, "END")
 
     if(debug) {
@@ -279,32 +323,29 @@ object DCELMerger{
     val nClippedPolygonsB = clippedPolygonsB.count()
     log(stage, timer, nClippedPolygonsB, "END")
 
-    // Building Local DCEL...
+    // Building Local DCEL in A...
     timer = clocktime
     stage = "Building local DCEL in A"
     log(stage, timer, 0, "START")
-    val dcelA = clippedPolygonsA.mapPartitionsWithIndex{ (i, polygons) =>
-      val edges = polygons.flatMap{ p =>
-        val ring = p.getExteriorRing.getCoordinateSequence.toCoordinateArray()
-        val orientation = CGAlgorithms.isCCW(ring)
-        var coords = List.empty[Coordinate]
-        if(orientation){
-          coords = ring.toList
-        } else {
-          coords = ring.reverse.toList
-        }
-        val segments = coords.zip(coords.tail)
-        segments.map{ segment =>
-          val v1 = Vertex(segment._1.x, segment._1.y)
-          val v2 = Vertex(segment._2.x, segment._2.y)
-          Edge(v1, v2, p.getUserData.toString())
-        }
-      }
-      val dcel = buildLocalDCEL(edges.toList)
-      dcel.id = i
-      List(dcel).toIterator
-    }
-    log(stage, timer, 0, "END")
+    val dcelA = buildDCEL(clippedPolygonsA, "A").cache()
+    val nDcelA = dcelA.count()
+    log(stage, timer, nDcelA, "END")
+
+    // Building Local DCEL in B...
+    timer = clocktime
+    stage = "Building local DCEL in B"
+    log(stage, timer, 0, "START")
+    val dcelB = buildDCEL(clippedPolygonsB, "B").cache()
+    val nDcelB = dcelB.count()
+    log(stage, timer, nDcelB, "END")
+
+    // Merging DCEL A and B...
+    val mergedDCEL = dcelA.zipPartitions(dcelB, true)((iterA, iterB) => iterA ++ iterB).cache()
+    mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+      dcels.flatMap(_.faces)
+        .filter(_.area() > 0)
+        .map(f => s"${f.toWKT()}\t$i")
+    }.foreach(println)
 
     if(debug){
       val clippedWKT = clippedPolygonsA.mapPartitionsWithIndex{ (i, polygons) =>
@@ -314,13 +355,22 @@ object DCELMerger{
       f.write(clippedWKT)
       f.close()
 
-      val facesWKT = dcelA.mapPartitionsWithIndex{ (i, dcel) =>
+      val facesA = dcelA.mapPartitionsWithIndex{ (i, dcel) =>
         dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${i}\n"))
       }.collect()
-      f = new java.io.PrintWriter("/tmp/faces.wkt")
-      f.write(facesWKT.mkString(""))
+      f = new java.io.PrintWriter("/tmp/facesA.wkt")
+      f.write(facesA.mkString(""))
       f.close()
-      logger.info(s"Saved faces.wkt [${facesWKT.size} records]")
+      logger.info(s"Saved facesA.wkt [${facesA.size} records]")
+
+      val facesB = dcelB.mapPartitionsWithIndex{ (i, dcel) =>
+        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${i}\n"))
+      }.collect()
+      f = new java.io.PrintWriter("/tmp/facesB.wkt")
+      f.write(facesB.mkString(""))
+      f.close()
+      logger.info(s"Saved facesB.wkt [${facesB.size} records]")
+
     }
 
     // Closing session...
@@ -344,6 +394,9 @@ class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
   val grid:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val index:      ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
+  val levels:     ScallopOption[Int]     = opt[Int]     (default = Some(16))
+  val entries:    ScallopOption[Int]     = opt[Int]     (default = Some(64))
+  val fraction:   ScallopOption[Double]  = opt[Double]  (default = Some(0.1))
   val local:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
