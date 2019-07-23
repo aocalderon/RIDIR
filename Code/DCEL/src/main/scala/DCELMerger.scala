@@ -25,7 +25,7 @@ import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer, HashSet}
 
-object DCEL{
+object DCELMerger{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val geofactory: GeometryFactory = new GeometryFactory();
   private val reader = new WKTReader(geofactory)
@@ -147,15 +147,57 @@ object DCEL{
     LocalDCEL(half_edgeList.toList, faceList.toList, vertexList.toList)
   }
 
+  def readPolygons(spark: SparkSession, input: String, offset: Int): SpatialRDD[Polygon] = {
+    val polygonRDD = new SpatialRDD[Polygon]()
+    val polygons = spark.read.option("header", "false").option("delimiter", "\t")
+      .csv(input).rdd.zipWithUniqueId().map{ row =>
+        val polygon = reader.read(row._1.getString(offset)).asInstanceOf[Polygon]
+        val userData = (0 until row._1.size).filter(_ != offset).map(i => row._1.getString(i)).mkString("\t")
+        polygon.setUserData(userData)
+        polygon
+      }
+    polygonRDD.setRawSpatialRDD(polygons)
+    polygonRDD
+  }
+
+  def clipPolygons(polygons: SpatialRDD[Polygon], grids: Map[Int, Envelope]): RDD[Polygon] = {
+    val clippedPolygonsRDD = polygons.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
+      var polys = List.empty[Polygon]
+      if(index < grids.size){
+        val clipper = new GeometryClipper(grids(index))
+        // If false there is no guarantee the polygons returned will be valid according to JTS rules
+        // (but should still be good enough to be used for pure rendering).
+        var ps = new ListBuffer[Polygon]()
+        polygons.foreach { to_clip =>
+          val label = to_clip.getUserData.toString
+          val geoms = clipper.clip(to_clip, true)
+          for(i <- 0 until geoms.getNumGeometries){
+            val geom = geoms.getGeometryN(i)
+            if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
+              val p = geom.asInstanceOf[Polygon]
+              p.setUserData(label)
+              ps += p
+            }
+          }
+        }
+        polys = ps.toList
+      }
+      polys.toIterator
+    }.cache()
+    clippedPolygonsRDD
+  }
+
   /***
    * The main function...
    **/
   def main(args: Array[String]) = {
-    val params: DCELConf = new DCELConf(args)
+    val params = new DCELMergerConf(args)
     val cores = params.cores()
     val executors = params.executors()
-    val input = params.input()
-    val offset = params.offset()
+    val input1 = params.input1()
+    val offset1 = params.offset1()
+    val input2 = params.input2()
+    val offset2 = params.offset2()
     val partitions = params.partitions()
     val debug = params.debug()
     val master = params.local() match {
@@ -190,27 +232,28 @@ object DCEL{
 
     // Reading data...
     timer = System.currentTimeMillis()
-    stage = "Data read"
+    stage = "Polygons A read"
     log(stage, timer, 0, "START")
-    val polygonRDD = new SpatialRDD[Polygon]()
-    val polygons = spark.read.option("header", "false").option("delimiter", "\t")
-      .csv(input).rdd.zipWithUniqueId().map{ row =>
-        val polygon = reader.read(row._1.getString(offset)).asInstanceOf[Polygon]
-        val userData = (0 until row._1.size).filter(_ != offset).map(i => row._1.getString(i)).mkString("\t")
-        polygon.setUserData(userData)
-        polygon
-      }
-    polygonRDD.setRawSpatialRDD(polygons)
-    val nPolygons = polygons.count()
-    log(stage, timer, nPolygons, "END")
+    val polygonsA = readPolygons(spark, input1, offset1)
+    val nPolygonsA = polygonsA.rawSpatialRDD.rdd.count()
+    log(stage, timer, nPolygonsA, "END")
+
+    timer = System.currentTimeMillis()
+    stage = "Polygons B read"
+    log(stage, timer, 0, "START")
+    val polygonsB = readPolygons(spark, input2, offset2)
+    val nPolygonsB = polygonsB.rawSpatialRDD.rdd.count()
+    log(stage, timer, nPolygonsB, "END")
 
     // Partitioning data...
     timer = clocktime
-    stage = "Partitioning data"
+    stage = "Partitioning polygons"
     log(stage, timer, 0, "START")
-    polygonRDD.analyze()
-    polygonRDD.spatialPartitioning(gridType, partitions)
-    val grids = polygonRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
+    polygonsA.analyze()
+    polygonsB.analyze()
+    polygonsA.spatialPartitioning(gridType, partitions)
+    polygonsB.spatialPartitioning(polygonsA.getPartitioner)
+    val grids = polygonsA.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
     log(stage, timer, grids.size, "END")
 
     if(debug) {
@@ -220,41 +263,27 @@ object DCEL{
       f.close()
     }
 
-    // Extracting clipped polygons...
+    // Extracting clipped polygons A...
     timer = clocktime
-    stage = "Extracting clipped polygons"
+    stage = "Extracting clipped polygons A"
     log(stage, timer, 0, "START")
-    val clippedPolygonsRDD = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
-      var polys = List.empty[Polygon]
-      if(index < grids.size){
-        val clipper = new GeometryClipper(grids(index))
-        // If false there is no guarantee the polygons returned will be valid according to JTS rules
-        // (but should still be good enough to be used for pure rendering).
-        var ps = new ListBuffer[Polygon]()
-        polygons.foreach { to_clip =>
-          val label = to_clip.getUserData.toString
-          val geoms = clipper.clip(to_clip, true)
-          for(i <- 0 until geoms.getNumGeometries){
-            val geom = geoms.getGeometryN(i)
-            if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
-              val p = geom.asInstanceOf[Polygon]
-              p.setUserData(label)
-              ps += p
-            }
-          }
-        }
-        polys = ps.toList
-      }
-      polys.toIterator
-    }.cache()
-    val nClippedPolygonsRDD = clippedPolygonsRDD.count()
-    log(stage, timer, nClippedPolygonsRDD, "END")
+    val clippedPolygonsA  = clipPolygons(polygonsA, grids)
+    val nClippedPolygonsA = clippedPolygonsA.count()
+    log(stage, timer, nClippedPolygonsA, "END")
+
+    // Extracting clipped polygons B...
+    timer = clocktime
+    stage = "Extracting clipped polygons B"
+    log(stage, timer, 0, "START")
+    val clippedPolygonsB  = clipPolygons(polygonsB, grids)
+    val nClippedPolygonsB = clippedPolygonsB.count()
+    log(stage, timer, nClippedPolygonsB, "END")
 
     // Building Local DCEL...
     timer = clocktime
-    stage = "Building local DCEL"
+    stage = "Building local DCEL in A"
     log(stage, timer, 0, "START")
-    val dcelRDD = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
+    val dcelA = clippedPolygonsA.mapPartitionsWithIndex{ (i, polygons) =>
       val edges = polygons.flatMap{ p =>
         val ring = p.getExteriorRing.getCoordinateSequence.toCoordinateArray()
         val orientation = CGAlgorithms.isCCW(ring)
@@ -278,14 +307,14 @@ object DCEL{
     log(stage, timer, 0, "END")
 
     if(debug){
-      val clippedWKT = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
+      val clippedWKT = clippedPolygonsA.mapPartitionsWithIndex{ (i, polygons) =>
         polygons.map(p => s"${p.toText()}\t${i}\n")
       }.collect().mkString("")
       var f = new java.io.PrintWriter("/tmp/clipped.wkt")
       f.write(clippedWKT)
       f.close()
 
-      val facesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
+      val facesWKT = dcelA.mapPartitionsWithIndex{ (i, dcel) =>
         dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${i}\n"))
       }.collect()
       f = new java.io.PrintWriter("/tmp/faces.wkt")
@@ -303,9 +332,11 @@ object DCEL{
   }  
 }
 
-class DCELConf(args: Seq[String]) extends ScallopConf(args) {
-  val input:      ScallopOption[String]  = opt[String]  (required = true)
-  val offset:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
+class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
+  val input1:     ScallopOption[String]  = opt[String]  (required = true)
+  val offset1:    ScallopOption[Int]     = opt[Int]     (default = Some(0))
+  val input2:     ScallopOption[String]  = opt[String]  (required = true)
+  val offset2:    ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
