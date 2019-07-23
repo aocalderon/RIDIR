@@ -1,7 +1,8 @@
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 
 case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex]) {
-  var id: Int = -1
+  var id: Long = -1L
+  var tag: String = ""
 }
 
 case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
@@ -87,6 +88,7 @@ case class Face(label: String){
   var outerComponent: Half_edge = null
   var innerComponent: Half_edge = null
   var exterior: Boolean = false
+  var tag: String = ""
 
   def area(): Double = {
     var a: Double = 0.0
@@ -116,7 +118,7 @@ case class Face(label: String){
 
   def toWKT(): String = {
     if(area() <= 0){
-      s"POLYGON EMPTY\t${label}"
+      s"POLYGON EMPTY\t${tag}${label}"
     } else {
       var hedge = outerComponent
       var wkt = new ArrayBuffer[String]()
@@ -127,7 +129,7 @@ case class Face(label: String){
       }
       wkt += s"${hedge.v2.x} ${hedge.v2.y}"
     
-      s"POLYGON (( ${wkt.mkString(" , ")} ))\t${label}"
+      s"POLYGON (( ${wkt.mkString(" , ")} ))\t${tag}${label}"
     }
   }
 }
