@@ -1,5 +1,9 @@
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 
+case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex]) {
+  var id: Int = -1
+}
+
 case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   private var _id: Long = -1L
   var origen: Vertex = v2
