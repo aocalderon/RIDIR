@@ -286,7 +286,7 @@ object DCEL{
       f.close()
 
       val facesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
-        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${i}\n"))
+        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
       }.collect()
       f = new java.io.PrintWriter("/tmp/faces.wkt")
       f.write(facesWKT.mkString(""))
