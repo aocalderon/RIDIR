@@ -87,8 +87,10 @@ object DCELMerger{
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
       h1.label = edge.left
+      h1.tag = tag
       val h2 = Half_edge(edge.v2, edge.v1)
       h2.label = edge.right
+      h2.tag = tag
 
       h1.twin = h2
       h2.twin = h1
@@ -341,11 +343,9 @@ object DCELMerger{
 
     // Merging DCEL A and B...
     val mergedDCEL = dcelA.zipPartitions(dcelB, true)((iterA, iterB) => iterA ++ iterB).cache()
-    mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
-      dcels.flatMap(_.faces)
-        .filter(_.area() > 0)
-        .map(f => s"${f.toWKT()}\t$i")
-    }.foreach(println)
+    val mergedHalf_edges = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+      dcels.flatMap(_.half_edges)
+    }
 
     if(debug){
       val clippedWKT = clippedPolygonsA.mapPartitionsWithIndex{ (i, polygons) =>
@@ -370,6 +370,14 @@ object DCELMerger{
       f.write(facesB.mkString(""))
       f.close()
       logger.info(s"Saved facesB.wkt [${facesB.size} records]")
+
+      val hedges = mergedHalf_edges.mapPartitionsWithIndex{ (i, hedges) =>
+        hedges.map(hedge => s"${hedge.toWKT}\t${i}\n")
+      }.collect()
+      f = new java.io.PrintWriter("/tmp/hedges.wkt")
+      f.write(hedges.mkString(""))
+      f.close()
+      logger.info(s"Saved hedges.wkt [${hedges.size} records]")
 
     }
 
