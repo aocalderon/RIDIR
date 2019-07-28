@@ -1,4 +1,5 @@
-\documentclass[border=0cm]{standalone}
+\documentclass[border=0.25cm]{standalone}
+\usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows, arrows.meta}
 \tikzset{    
@@ -15,7 +16,7 @@
     }
 }
 \definecolor{light-gray}{gray}{0.975}
-\definecolor{partition-color}{gray}{0.5}
+\definecolor{pcolor}{rgb}{0.21, 0.27, 0.31}
 \begin{document}
 \begin{tabular}{c c c c c}
 \begin{tikzpicture}
@@ -28,6 +29,7 @@
     \node[node1] (K) at (4,2) {};
     \node[node1] (M) at (4,6) {};
     \node[node1] (R) at (6,4) {};
+    \node[scale=1.5] at (0.5,3.5) {A};
     \node[scale=1.5] at (0.5,3.5) {A};
     
     \draw[reds]
@@ -45,7 +47,12 @@
     \tikzstyle{node2}=[draw,scale=0.4,shape=circle,color=red,fill=red]
     \tikzstyle{text}=[draw,scale=0.5,color=black]
     \draw[color=light-gray, style=dashed] (0,0) grid (8,8);
-    \draw[color=partition-color, style=dashed, step=4] (0,0) grid (8,8);
+    \draw[color=pcolor, style=dashed, step=4] (0,0) grid (8,8);
+    \node[scale=0.85, color = pcolor] at (0.25, 7.75) {$1$};
+    \node[scale=0.85, color = pcolor] at (7.75, 7.75) {$2$};
+    \node[scale=0.85, color = pcolor] at (0.25, 0.25) {$3$};
+    \node[scale=0.85, color = pcolor] at (7.75, 0.25) {$4$};
+    
     \node[above, scale=1.25, thick] at (4,8) {Clipped Polygons A};
     \node[node1] (A) at (0,2) {};
     \node[node1] (C) at (2,0) {};
@@ -80,7 +87,12 @@
     \tikzstyle{node2}=[draw,scale=0.4,shape=circle,color=red,fill=red]
     \tikzstyle{text}=[draw,scale=0.5,color=black]
     \draw[color=light-gray, style=dashed] (0,0) grid (8,8);
-    \draw[color=partition-color, style=dashed, step=4] (0,0) grid (8,8);
+    \draw[color=pcolor, style=dashed, step=4] (0,0) grid (8,8);
+    \node[scale=0.85, color = pcolor] at (0.25, 7.75) {$1$};
+    \node[scale=0.85, color = pcolor] at (7.75, 7.75) {$2$};
+    \node[scale=0.85, color = pcolor] at (0.25, 0.25) {$3$};
+    \node[scale=0.85, color = pcolor] at (7.75, 0.25) {$4$};
+
     \node[above, scale=1.25, thick] at (4,8) {Partitioned DCEL for A};
     \node[node1] (A) at (0,2) {};
     \node[node1] (C) at (2,0) {};
