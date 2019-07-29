@@ -102,10 +102,33 @@ object SweepLineTester{
     }.filter(_._3 != "*")
     val data1 = data.filter(x => x._1 == part & x._2 == 'A')
     val data2 = data.filter(x => x._1 == part & x._2 == 'B')
-    logger.info("Part A")
-    data1.foreach(println)
-    logger.info("Part B")
-    data2.foreach(println)
+
+    logger.info("Segments")
+    data1.map(_._4).foreach(println)
+    data2.map(_._4).foreach(println)
+
+    val gedges1 = data1.map{ hedge =>
+      val coords = hedge._4.getCoordinates
+      val half_edge = Half_edge(Vertex(coords(0).x, coords(0).y), Vertex(coords(1).x, coords(1).y))
+      half_edge.tag = s"${hedge._2}"
+      half_edge.label = hedge._3
+      new GraphEdge(coords, half_edge)
+    }.toList.asJava
+    val gedges2 = data2.map{ hedge =>
+      val coords = hedge._4.getCoordinates
+      val half_edge = Half_edge(Vertex(coords(0).x, coords(0).y), Vertex(coords(1).x, coords(1).y))
+      half_edge.tag = s"${hedge._2}"
+      half_edge.label = hedge._3
+      new GraphEdge(coords, half_edge)
+    }.toList.asJava
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+    sweepline.computeIntersections(gedges1, gedges2, segmentIntersector)
+
+    logger.info("Intersections")
+    gedges1.asScala.map(e => e.getHalf_edges.map(h => (h, s"${h.tag}${h.label}"))).foreach(println)
+    gedges2.asScala.map(e => e.getHalf_edges.map(h => (h, s"${h.tag}${h.label}"))).foreach(println)
 
     log(stage, timer, 0, "END")
 

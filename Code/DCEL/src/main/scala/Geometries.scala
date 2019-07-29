@@ -1,4 +1,45 @@
+import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
+import com.vividsolutions.jts.geom.Coordinate
+
+class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
+  def getVertices: List[Vertex] = {
+    var vertices = new ArrayBuffer[Vertex]()
+    vertices += hedge.v1
+    super.getEdgeIntersectionList().iterator().asScala.toList.foreach{ n =>
+      val inter = n.asInstanceOf[com.vividsolutions.jts.geomgraph.EdgeIntersection]
+      val coord = inter.getCoordinate
+      val index = inter.getSegmentIndex
+      vertices += Vertex(coord.x, coord.y)
+    }
+    vertices += hedge.v2
+    vertices.toList.distinct
+  }
+
+  def getHalf_edges: List[Half_edge] = {
+    var half_edges = new ArrayBuffer[Half_edge]()
+    val vertices = this.getVertices
+    val segments = vertices.zip(vertices.tail)
+    for(segment <- segments){
+      val he = Half_edge(segment._1, segment._2)
+      he.tag = this.hedge.tag
+      he.label = this.hedge.label
+      half_edges += he
+    }
+    half_edges.toList
+  }
+
+  def toWKT: String = {
+    val intersections = super.getEdgeIntersectionList()
+    intersections.iterator().asScala.toList.map{ n =>
+      val inter = n.asInstanceOf[com.vividsolutions.jts.geomgraph.EdgeIntersection]
+      val coord = inter.getCoordinate
+      val seg = inter.getSegmentIndex
+      val dist = inter.getDistance
+      s"POINT(${coord.x} ${coord.y})\t$seg\t$dist\t${hedge.tag}${hedge.label}"
+    }.mkString("\n")
+  }
+}
 
 case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex]) {
   var id: Long = -1L
@@ -49,6 +90,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     }
 
   def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})\t${tag}${label}"
+  def toWKT2: String = s"LINESTRING (${v1.x} ${v1.y} , ${v1.x} ${v2.y})\t${tag}${label}"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
