@@ -3,7 +3,7 @@ import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 import com.vividsolutions.jts.geom.Coordinate
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
-  def getVertices: List[Vertex] = {
+  def getVerticesSet: List[Vertex] = {
     var vertices = new ArrayBuffer[Vertex]()
     vertices += hedge.v1
     super.getEdgeIntersectionList().iterator().asScala.toList.foreach{ n =>
@@ -18,7 +18,7 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
 
   def getHalf_edges: List[Half_edge] = {
     var half_edges = new ArrayBuffer[Half_edge]()
-    val vertices = this.getVertices
+    val vertices = this.getVerticesSet
     val segments = vertices.zip(vertices.tail)
     for(segment <- segments){
       val he = Half_edge(segment._1, segment._2)
@@ -26,7 +26,11 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
       he.label = this.hedge.label
       half_edges += he
     }
-    half_edges.toList
+    half_edges.toList.distinct
+  }
+
+  def getVerticesAndIncidents: List[(Half_edge, Vertex)] = {
+    this.getHalf_edges.map(hedge => (hedge, hedge.v1)).toList
   }
 
   def toWKT: String = {
@@ -90,7 +94,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     }
 
   def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})\t${tag}${label}"
-  def toWKT2: String = s"LINESTRING (${v1.x} ${v1.y} , ${v1.x} ${v2.y})\t${tag}${label}"
+  def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t${tag}${label}"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
