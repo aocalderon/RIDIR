@@ -99,7 +99,7 @@ object SweepLineTester{
       val id = arr(0).tail
       val part = arr(1).toInt
       (part, tag, id, hedge)
-    }.filter(_._3 != "*")
+    }//.filter(_._3 != "*")
     val data1 = data.filter(x => x._1 == part & x._2 == 'A')
     val data2 = data.filter(x => x._1 == part & x._2 == 'B')
 
@@ -127,8 +127,39 @@ object SweepLineTester{
     sweepline.computeIntersections(gedges1, gedges2, segmentIntersector)
 
     logger.info("Intersections")
-    gedges1.asScala.map(e => e.getHalf_edges.map(h => (h, s"${h.tag}${h.label}"))).foreach(println)
-    gedges2.asScala.map(e => e.getHalf_edges.map(h => (h, s"${h.tag}${h.label}"))).foreach(println)
+    val g1 = gedges1.asScala.flatMap{ e =>
+      e.getVerticesAndIncidents
+    }
+    val g2 = gedges2.asScala.flatMap{ e =>
+      e.getVerticesAndIncidents
+    }
+    val g = g1.union(g2)
+
+    g.map(g => s"${g._1.toWKT2}\t${g._2.toWKT}").foreach(println)
+    
+    val h = g.map(g => (g._2, List(g._1))).groupBy(_._1).mapValues{ seq =>
+      seq.reduce{ (a, b) => (a._1, a._2 ++ b._2) }._2
+    }.toList
+
+    h.map(m => s"${m._1.toWKT}\t${m._2.map(a => a.toWKT2).mkString(", ")}").foreach(println)
+
+    val j = h.map{ row =>
+      val hedges = row._2
+      val edges = hedges.map(h => (h, s"${h.tag}${h.label}")).groupBy(_._1).mapValues{ seq =>
+        seq.reduce{ (a, b) => (a._1, a._2 ++ b._2) }._2
+      }
+      (row._1, edges)
+    }.toList.map{ j =>
+      val vertex = j._1
+      val half_edges = j._2.map{ e =>
+        val hedge = e._1
+        hedge.label = e._2
+        hedge
+      }.toList
+      (vertex, half_edges)
+    }
+
+    j.map(j => s"${j._1.toWKT}\t${j._2.map(_.toWKT2).mkString("| ")}").foreach(println)
 
     log(stage, timer, 0, "END")
 
