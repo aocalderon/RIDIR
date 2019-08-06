@@ -26,11 +26,96 @@ object SweepLineTester{
   private val precision: Double = 0.001
   private val startTime: Long = 0L
 
+  case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex])
+
   def clocktime = System.currentTimeMillis()
 
   def log(msg: String, timer: Long, n: Long, status: String): Unit ={
     logger.info("DCEL|%6.2f|%-50s|%6.2f|%6d|%s".format((clocktime-startTime)/1000.0, msg, (clocktime-timer)/1000.0, n, status))
   }
+
+  def buildMergedDCEL(hedges: List[Half_edge]): MergedDCEL = {
+    var half_edgeList = new ArrayBuffer[Half_edge]()
+    var faceList = new ArrayBuffer[Face]()
+
+    // Step 1. Vertex set creation...
+    var vertexList = hedges.flatMap(e => List(e.v1, e.v2)).toSet
+
+    // Step 2.  Edge set creation with left and right labels...
+    val edges1 = hedges.map(e => Edge(e.v1, e.v2) -> s"${e.tag}${e.label}").toMap
+    val edges2 = hedges.map(e => Edge(e.v2, e.v1) -> s"${e.tag}${e.label}").toMap
+    val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
+    val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "*")}<br>${edges2.getOrElse(e, "*")}") }
+      .map{ x =>
+        val edge = x._1
+        edge.label = x._2
+        edge
+      }
+
+    // Step 3. Half-edge list creation with twins and vertices assignments...
+    edgesSet.foreach{ edge =>
+      val h1 = Half_edge(edge.v1, edge.v2)
+      h1.label = edge.left
+      val h2 = Half_edge(edge.v2, edge.v1)
+      h2.label = edge.right
+
+      h1.twin = h2
+      h2.twin = h1
+
+      vertexList.find(_.equals(edge.v2)).get.half_edges += h1
+      vertexList.find(_.equals(edge.v1)).get.half_edges += h2
+
+      half_edgeList += h2
+      half_edgeList += h1
+    }
+
+    // Step 4. Identification of next and prev half-edges...
+    vertexList.map{ vertex =>
+      val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
+      val size = sortedIncidents.size
+
+      if(size < 2){
+        logger.error("Badly formed dcel: less than two hedges in vertex")
+      }
+      
+      for(i <- 0 until (size - 1)){
+        var current = sortedIncidents(i)
+        var next = sortedIncidents(i + 1)
+        current = half_edgeList.find(_.equals(current)).get
+        next = half_edgeList.find(_.equals(next)).get
+        current.next   = next.twin
+        next.twin.prev = current
+      }
+      var current = sortedIncidents(size - 1)
+      var next = sortedIncidents(0)
+      current = half_edgeList.find(_.equals(current)).get
+      next = half_edgeList.find(_.equals(next)).get
+      current.next   = next.twin
+      next.twin.prev = current
+    }
+
+    // Step 5. Face assignment...
+    var temp_half_edgeList = new ArrayBuffer[Half_edge]()
+    temp_half_edgeList ++= half_edgeList
+    for(temp_hedge <- temp_half_edgeList){
+      val hedge = half_edgeList.find(_.equals(temp_hedge)).get
+      if(hedge.face == null){
+        val f = Face(hedge.label)
+        f.outerComponent = hedge
+        f.outerComponent.face = f
+        var h = hedge.next
+        while(h != f.outerComponent){
+          half_edgeList.find(_.equals(h)).get.face = f
+          h = h.next
+        }
+        if(f.area() < 0) { f.exterior = true }
+        faceList += f
+      }
+    }
+
+    MergedDCEL(half_edgeList.toList, faceList.toList, vertexList.toList)
+  }
+
 
   def main(args: Array[String]) = {
     val params = new SweepLineTesterConf(args)
@@ -128,38 +213,23 @@ object SweepLineTester{
 
     logger.info("Intersections")
     val g1 = gedges1.asScala.flatMap{ e =>
-      e.getVerticesAndIncidents
+      e.getHalf_edges
     }
     val g2 = gedges2.asScala.flatMap{ e =>
-      e.getVerticesAndIncidents
+      e.getHalf_edges
     }
-    val g = g1.union(g2)
+    val g = g1.union(g2).toList
 
-    g.map(g => s"${g._1.toWKT2}\t${g._2.toWKT}").foreach(println)
-    
-    val h = g.map(g => (g._2, List(g._1))).groupBy(_._1).mapValues{ seq =>
-      seq.reduce{ (a, b) => (a._1, a._2 ++ b._2) }._2
-    }.toList
-
-    h.map(m => s"${m._1.toWKT}\t${m._2.map(a => a.toWKT2).mkString(", ")}").foreach(println)
-
-    val j = h.map{ row =>
-      val hedges = row._2
-      val edges = hedges.map(h => (h, s"${h.tag}${h.label}")).groupBy(_._1).mapValues{ seq =>
-        seq.reduce{ (a, b) => (a._1, a._2 ++ b._2) }._2
-      }
-      (row._1, edges)
-    }.toList.map{ j =>
-      val vertex = j._1
-      val half_edges = j._2.map{ e =>
-        val hedge = e._1
-        hedge.label = e._2
-        hedge
-      }.toList
-      (vertex, half_edges)
-    }
-
-    j.map(j => s"${j._1.toWKT}\t${j._2.map(_.toWKT2).mkString("| ")}").foreach(println)
+    logger.info("Merged DCEL")
+    val dcel = buildMergedDCEL(g)
+    val verticesWKT = dcel.vertices.map(v => s"${v.toWKT}\n").mkString("")
+    var f = new java.io.PrintWriter("/tmp/vertices.wkt")
+    f.write(verticesWKT)
+    f.close()
+    val half_edgesWKT = dcel.half_edges.map(h => s"${h.toWKT}\t${h.label}\n").mkString("")
+    f = new java.io.PrintWriter("/tmp/half_edges.wkt")
+    f.write(half_edgesWKT)
+    f.close
 
     log(stage, timer, 0, "END")
 
