@@ -83,6 +83,7 @@ object DCEL{
         edge.label = x._2
         edge
       }
+
     // Step 3. Half-edge list creation with twins and vertices assignments...
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
