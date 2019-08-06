@@ -21,7 +21,6 @@
 \begin{tikzpicture}
     \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
     \draw[color=light-gray, style=dashed] (0,0) grid (8,8);
-    \node[above, scale=1.25] at (4,8) {Set of polygons A};
     \node[node1] (A) at (0,2) {};
     \node[node1] (C) at (2,0) {};
     \node[node1] (E) at (2,4) {};
@@ -44,7 +43,6 @@
     \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
     \tikzstyle{text}=[draw,scale=0.5,color=black]
     \draw[color=light-gray, style=dashed] (0,0) grid (8,8);
-    \node[above, scale=1.25, thick] at (4,8) {DCEL for A};
     \node[node1] (A) at (0,2) {};
     \node[node1] (C) at (2,0) {};
     \node[node1] (E) at (2,4) {};

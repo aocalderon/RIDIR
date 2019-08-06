@@ -1,0 +1,18 @@
+\documentclass[border=0cm]{standalone}
+\usepackage{tikz}
+\tikzset{    
+    node1/.style={
+        above right
+    }
+}
+\begin{document}
+\begin{tabular}{@{}c@{}}
+\begin{tikzpicture}
+    \node[node1] at (0,0) {\includegraphics[scale=0.5]{PolygonA}};
+    \node[node1] at (0,4.5) {\includegraphics[scale=0.5]{PolygonB}};
+    \node[rotate=-45, scale=1.5] at (10.25,6)    {$\Longrightarrow$};
+    \node[rotate=45,  scale=1.5] at (10.25,3)    {$\Longrightarrow$};
+    \node[node1, scale=0.75] at (11,1.25) {\includegraphics{MergedDCEL}};
+\end{tikzpicture}
+\end{tabular}
+\end{document}
