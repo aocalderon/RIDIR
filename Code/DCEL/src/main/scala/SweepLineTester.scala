@@ -185,8 +185,8 @@ object SweepLineTester{
       val part = arr(1).toInt
       (part, tag, id, hedge)
     }//.filter(_._3 != "*")
-    val data1 = data.filter(x => x._1 == part & x._2 == 'A')
-    val data2 = data.filter(x => x._1 == part & x._2 == 'B')
+    val data1 = data.filter(x => /*x._1 == part & */x._2 == 'A')
+    val data2 = data.filter(x => /*x._1 == part & */x._2 == 'B')
 
     logger.info("Segments")
     data1.map(_._4).foreach(println)
