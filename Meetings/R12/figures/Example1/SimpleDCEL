@@ -1,18 +1,29 @@
 \documentclass[border=0cm]{standalone}
 \usepackage{tikz}
+\usetikzlibrary{positioning}
 \tikzset{    
     node1/.style={
         above right
+    },
+    arrow/.style={
+        above right,
+        scale = 3
     }
 }
 \begin{document}
 \begin{tabular}{@{}c@{}}
 \begin{tikzpicture}
-    \node[node1] at (0,0) {\includegraphics[scale=0.5]{PolygonA}};
-    \node[node1] at (0,4.5) {\includegraphics[scale=0.5]{PolygonB}};
-    \node[rotate=-45, scale=1.5] at (10.25,6)    {$\Longrightarrow$};
-    \node[rotate=45,  scale=1.5] at (10.25,3)    {$\Longrightarrow$};
-    \node[node1, scale=0.75] at (11,1.25) {\includegraphics{MergedDCEL}};
+    \node[node1, label={\Large Polygons A}] (A) at (0,0) {\includegraphics[scale=1]{PolygonA}};
+    \node[arrow] (arrow1) [right = 0 of A] {$\Longrightarrow$};
+    \node[node1, label={\Large DCEL A}] (Adcel) [right = 0 of arrow1] {\includegraphics[scale=1]{PolygonAClip}};
+
+    \node[node1, label={\Large Polygons B}] (B) [above = of A] {\includegraphics[scale=1]{PolygonB}};
+    \node[arrow] (arrow2) [right = 0 of B] {$\Longrightarrow$};
+    \node[node1, label={\Large DCEL B}] (Bdcel) [right = 0 of arrow2] {\includegraphics[scale=1]{PolygonBClip}};
+    
+    \node[arrow, rotate=45]  (arrow3) [right = of Adcel] {$\Longrightarrow$};
+    \node[arrow, rotate=-45] (arrow4) [right = of Bdcel] {$\Longrightarrow$};
+    \node[node1, label={\Large Merged DCEL}, scale=1.5] (M) [below right = -3.5 and 1 of arrow4] {\includegraphics{MergedDCEL}};
 \end{tikzpicture}
 \end{tabular}
 \end{document}

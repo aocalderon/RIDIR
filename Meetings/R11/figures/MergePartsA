@@ -46,7 +46,7 @@
     \draw[barbarrow, color=red] (A.65) -- (E.155); \draw[barbarrow, color=red] (E.-155) -- (A.25); 
     \draw[barbarrow, color=red] (C.65) -- (K.-155); \draw[barbarrow, color=red] (K.-115) -- (C.25); 
     \draw[barbarrow, color=red] (E.-25) -- (K.115); \draw[barbarrow, color=red] (K.155) -- (E.-65); 
-    \draw[barbarrow, color=red] (E) -- (M); 
+    \draw[barbarrow, color=red] (E) -- (M); \draw[barbarrow, color=red] (E) -- (M); 
     \draw[barbarrow, color=red] (K) -- (R); 
     \draw[barbarrow, color=red] (M) -- (R);
     \draw[barbarrow, color=red] (Z.-160) -- (E.-20); \draw[barbarrow, color=red] (E.20) -- (Z.160);
