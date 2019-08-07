@@ -20,20 +20,21 @@
 \begin{tabular}{@{}c@{}}
 \begin{tikzpicture}
     \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
+    \tikzstyle{text}=[draw,scale=0.5,color=black]
     \draw[color=light-gray, style=dashed] (0,0) grid (8,8);
-    \node[node1] (D) at (2,2) {};
-    \node[node1] (F) at (2,6) {};
-    \node[node1] (J) at (4,0) {};
-    \node[node1] (L) at (4,4) {};
-    \node[node1] (N) at (4,8) {};
-    \node[node1] (Q) at (6,2) {};
-    \node[node1] (S) at (6,6) {};
-    \node[node1] (T) at (8,4) {};
-    \node[scale=1.5] at (2.5,3.55) {B};    
+    \node[node1] (A) at (0,2) {};
+    \node[node1] (C) at (2,0) {};
+    \node[node1] (E) at (2,4) {};
+    \node[node1] (K) at (4,2) {};
+    \node[node1] (M) at (4,6) {};
+    \node[node1] (R) at (6,4) {};
+    \node[scale=1.5] at (2,2) {$A_1$};
+    \node[scale=1.5] at (4,4) {$A_2$};
     
-    \draw[blues] 
-        (D) -- (J) (D) -- (L) (F) -- (N) (F) -- (L) (J) -- (Q) 
-        (L) -- (Q) (L) -- (S) (N) -- (S) (Q) -- (T) (S) -- (T);
-\end{tikzpicture} 
+    \draw[barbarrow](A) -- (C);\draw[barbarrow](A) -- (E); 
+    \draw[barbarrow](C) -- (K);\draw[barbarrow](E) -- (K); 
+    \draw[barbarrow](E) -- (M);\draw[barbarrow](K) -- (R); 
+    \draw[barbarrow](M) -- (R);
+\end{tikzpicture}
 \end{tabular}
 \end{document}

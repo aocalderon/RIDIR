@@ -6,7 +6,7 @@
     barbarrow/.style={ % style that just defines the arrow tip
         >={Straight Barb[left,length=5pt,width=5pt]},
         thick,
-        ->
+        <->
     },
     blues/.style={
         color=blue
@@ -16,7 +16,7 @@
     }
 }
 \definecolor{light-gray}{gray}{0.975}
-\definecolor{pcolor}{rgb}{0.81, 0.81, 0.81}
+\definecolor{pcolor}{rgb}{0.21, 0.27, 0.31}
 \begin{document}
 \begin{tikzpicture}
     \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
@@ -42,16 +42,16 @@
     \node at (3.5,3.5) {$A_2$};
     \node at (4.5,3.5) {$A_2$};
     
-    \draw[barbarrow, color=red] (A.-25) -- (C.115); \draw[barbarrow, color=red] (C.155) -- (A.-65);
-    \draw[barbarrow, color=red] (A.65) -- (E.155); \draw[barbarrow, color=red] (E.-155) -- (A.25); 
-    \draw[barbarrow, color=red] (C.65) -- (K.-155); \draw[barbarrow, color=red] (K.-115) -- (C.25); 
-    \draw[barbarrow, color=red] (E.-25) -- (K.115); \draw[barbarrow, color=red] (K.155) -- (E.-65); 
-    \draw[barbarrow, color=red] (E) -- (M); 
+    \draw[barbarrow, color=red] (A) -- (C);
+    \draw[barbarrow, color=red] (A) -- (E); 
+    \draw[barbarrow, color=red] (C) -- (K); 
+    \draw[barbarrow, color=red] (E) -- (K); 
+    \draw[barbarrow, color=red] (E) -- (M);
     \draw[barbarrow, color=red] (K) -- (R); 
     \draw[barbarrow, color=red] (M) -- (R);
-    \draw[barbarrow, color=red] (Z.-160) -- (E.-20); \draw[barbarrow, color=red] (E.20) -- (Z.160);
-    \draw[barbarrow, color=red] (Z.20) -- (R.160); \draw[barbarrow, color=red] (R.200) -- (Z.-20);
-    \draw[barbarrow, color=red] (Z.110) -- (M.-110); \draw[barbarrow, color=red] (M.-70) -- (Z.70);
-    \draw[barbarrow, color=red] (Z.-70) -- (K.70); \draw[barbarrow, color=red] (K.110) -- (Z.-110);
+    \draw[barbarrow, color=red] (Z) -- (E); 
+    \draw[barbarrow, color=red] (Z) -- (R); 
+    \draw[barbarrow, color=red] (Z) -- (M); 
+    \draw[barbarrow, color=red] (Z) -- (K); 
 \end{tikzpicture}
 \end{document}
