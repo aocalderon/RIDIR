@@ -54,16 +54,16 @@ object SweepLineTester{
 
     // Step 3. Half-edge list creation with twins and vertices assignments...
     edgesSet.foreach{ edge =>
-      val h1 = Half_edge(edge.v1, edge.v2)
+      val h1 = Half_edge(edge.v2, edge.v1)
       h1.label = edge.left
-      val h2 = Half_edge(edge.v2, edge.v1)
+      val h2 = Half_edge(edge.v1, edge.v2)
       h2.label = edge.right
 
       h1.twin = h2
       h2.twin = h1
 
-      vertexList.find(_.equals(edge.v2)).get.half_edges += h1
-      vertexList.find(_.equals(edge.v1)).get.half_edges += h2
+      vertexList.find(_.equals(edge.v1)).get.half_edges += h1
+      vertexList.find(_.equals(edge.v2)).get.half_edges += h2
 
       half_edgeList += h2
       half_edgeList += h1
@@ -99,23 +99,32 @@ object SweepLineTester{
     temp_half_edgeList ++= half_edgeList
     for(temp_hedge <- temp_half_edgeList){
       val hedge = half_edgeList.find(_.equals(temp_hedge)).get
-      if(hedge.face == null){
+      val tag = new ArrayBuffer[String]()
+      if(!hedge.label.contains("*")){
+        tag += hedge.label
+      }
+      if(!hedge.visited){
         val f = Face(hedge.label)
         f.outerComponent = hedge
         f.outerComponent.face = f
-        var h = hedge.next
-        while(h != f.outerComponent){
-          half_edgeList.find(_.equals(h)).get.face = f
-          h = h.next
+        var h1 = hedge.next
+        while(h1 != f.outerComponent){
+          val h2 = half_edgeList.find(_.equals(h1)).get
+          h2.face = f
+          h2.visited = true
+          if(!h2.label.contains("*")){
+            tag += h2.label
+          }
+          h1 = h1.next
         }
         if(f.area() < 0) { f.exterior = true }
+        f.tag = tag.toList.distinct.sorted.mkString(" ")
         faceList += f
       }
     }
 
     MergedDCEL(half_edgeList.toList, faceList.toList, vertexList.toList)
   }
-
 
   def main(args: Array[String]) = {
     val params = new SweepLineTesterConf(args)
@@ -229,6 +238,10 @@ object SweepLineTester{
     val half_edgesWKT = dcel.half_edges.map(h => s"${h.toWKT}\t${h.label}\n").mkString("")
     f = new java.io.PrintWriter("/tmp/half_edges.wkt")
     f.write(half_edgesWKT)
+    f.close
+    val facesWKT = dcel.faces.map(f => s"${f.toWKT}\t${f.tag}\t${f.area()}\n").mkString("")
+    f = new java.io.PrintWriter("/tmp/faces.wkt")
+    f.write(facesWKT)
     f.close
 
     log(stage, timer, 0, "END")
