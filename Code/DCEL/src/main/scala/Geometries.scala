@@ -59,6 +59,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   var face: Face = null
   var label: String = null
   var tag: String = ""
+  var visited: Boolean = false
 
   val angle  = hangle(v2.x - v1.x, v2.y - v1.y)
   val length = math.sqrt(math.pow(v2.x - v1.x, 2) + math.pow(v2.y - v1.y, 2))
