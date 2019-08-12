@@ -265,32 +265,41 @@ object DCELMerger{
     log(stage, timer, 0, "START")
     val polygonsA = readPolygons(spark, input1, offset1)
     val nPolygonsA = polygonsA.rawSpatialRDD.rdd.count()
+    polygonsA.analyze()
     log(stage, timer, nPolygonsA, "END")
+
+    polygonsA.rawSpatialRDD.rdd.map(p => p.toText()).foreach(println)
 
     timer = System.currentTimeMillis()
     stage = "Polygons B read"
     log(stage, timer, 0, "START")
     val polygonsB = readPolygons(spark, input2, offset2)
     val nPolygonsB = polygonsB.rawSpatialRDD.rdd.count()
+    polygonsB.analyze()
     log(stage, timer, nPolygonsB, "END")
+
+    polygonsB.rawSpatialRDD.rdd.map(p => p.toText()).foreach(println)
 
     // Partitioning data...
     timer = clocktime
     stage = "Partitioning polygons"
     log(stage, timer, 0, "START")
-    polygonsA.analyze()
-    polygonsB.analyze()
     val boundary1 = polygonsA.boundaryEnvelope
     val boundary2 = polygonsB.boundaryEnvelope
+    if(debug){ logger.info(s"Testing...") }
     val fullBoundary = envelope2Polygon(boundary1).union(envelope2Polygon(boundary2)).getEnvelopeInternal
     val samplesA = polygonsA.rawSpatialRDD.rdd.sample(false, params.fraction(), 42).map(_.getEnvelopeInternal)
     val samplesB = polygonsB.rawSpatialRDD.rdd.sample(false, params.fraction(), 42).map(_.getEnvelopeInternal)
     val samples = samplesA.union(samplesB)
+
+    samples.collect().map(p => envelope2Polygon(p).toText()).foreach(println)
+    if(debug){ logger.info(s"Sample' size: ${samples.count()}") }
+
     val boundary = new QuadRectangle(fullBoundary)
     val maxLevels = params.levels()
     val maxEntriesPerNode = params.entries()
     val quadtree = new StandardQuadTree[Geometry](boundary, 0, maxEntriesPerNode, maxLevels)
-    if(debug){ logger.info(s"Size of sample: ${samples.count()}") }
+    if(debug){ logger.info(s"Sample' size: ${samples.count()}") }
     for(sample <- samples.collect()){
       quadtree.insert(new QuadRectangle(sample), null)
     }
@@ -342,43 +351,40 @@ object DCELMerger{
     log(stage, timer, nDcelB, "END")
 
     // Merging DCEL A and B...
-    val mergedDCEL = dcelA.zipPartitions(dcelB, true)((iterA, iterB) => iterA ++ iterB).cache()
-    val mergedHalf_edges = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
-      dcels.flatMap(_.half_edges)
-    }
-
+    val mergedHalf_edges = dcelA.zipPartitions(dcelB, true)((iterA, iterB) => iterA ++ iterB)
+      .mapPartitionsWithIndex{ (i, dcels) =>
+        dcels.flatMap(_.half_edges)
+      }
     if(debug){
-      val clippedWKT = clippedPolygonsA.mapPartitionsWithIndex{ (i, polygons) =>
-        polygons.map(p => s"${p.toText()}\t${i}\n")
-      }.collect().mkString("")
-      var f = new java.io.PrintWriter("/tmp/clipped.wkt")
-      f.write(clippedWKT)
-      f.close()
-
-      val facesA = dcelA.mapPartitionsWithIndex{ (i, dcel) =>
-        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${i}\n"))
-      }.collect()
-      f = new java.io.PrintWriter("/tmp/facesA.wkt")
-      f.write(facesA.mkString(""))
-      f.close()
-      logger.info(s"Saved facesA.wkt [${facesA.size} records]")
-
-      val facesB = dcelB.mapPartitionsWithIndex{ (i, dcel) =>
-        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${i}\n"))
-      }.collect()
-      f = new java.io.PrintWriter("/tmp/facesB.wkt")
-      f.write(facesB.mkString(""))
-      f.close()
-      logger.info(s"Saved facesB.wkt [${facesB.size} records]")
-
       val hedges = mergedHalf_edges.mapPartitionsWithIndex{ (i, hedges) =>
         hedges.map(hedge => s"${hedge.toWKT}\t${i}\n")
       }.collect()
-      f = new java.io.PrintWriter("/tmp/hedges.wkt")
+      val f = new java.io.PrintWriter("/tmp/hedges.wkt")
       f.write(hedges.mkString(""))
       f.close()
       logger.info(s"Saved hedges.wkt [${hedges.size} records]")
 
+    }
+
+
+    val mergedDCEL = dcelA.zipPartitions(dcelB, true)((iterA, iterB) => iterA ++ iterB)
+      .mapPartitionsWithIndex{ (i, dcels) =>
+        val hedges = dcels.toList.flatMap(_.half_edges)
+        val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges)
+        List((i, dcel)).toIterator
+      }
+
+    if(debug){
+      val facesRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+        val part = dcels.toList.head
+        val id = part._1
+        val dcel = part._2
+        dcel.faces.map(f => s"${i}\t${id}\t${f.toWKT()}\t${f.tag}\n").toIterator
+      }.collect()
+      val f = new java.io.PrintWriter("/tmp/faces.wkt")
+      f.write(facesRDD.mkString(""))
+      f.close()
+      logger.info(s"Saved faces.wkt [${facesRDD.size} records]")
     }
 
     // Closing session...
@@ -410,4 +416,3 @@ class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
 
   verify()
 }
-
