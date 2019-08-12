@@ -19,7 +19,7 @@ import com.vividsolutions.jts.io.WKTReader
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
-object SweepLineTester{
+object SweepLine{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val geofactory: GeometryFactory = new GeometryFactory();
   private val reader = new WKTReader(geofactory)
@@ -127,7 +127,7 @@ object SweepLineTester{
   }
 
   def main(args: Array[String]) = {
-    val params = new SweepLineTesterConf(args)
+    val params = new SweepLineConf(args)
     val cores = params.cores()
     val executors = params.executors()
     val input = params.input()
@@ -255,7 +255,7 @@ object SweepLineTester{
   }
 }
 
-class SweepLineTesterConf(args: Seq[String]) extends ScallopConf(args) {
+class SweepLineConf(args: Seq[String]) extends ScallopConf(args) {
   val input:      ScallopOption[String]  = opt[String]  (required = true)
   val offset:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
