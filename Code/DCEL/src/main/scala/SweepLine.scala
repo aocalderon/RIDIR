@@ -26,7 +26,7 @@ object SweepLine{
   private val precision: Double = 0.001
   private val startTime: Long = 0L
 
-  case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex])
+  //case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex])
 
   def clocktime = System.currentTimeMillis()
 
