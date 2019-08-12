@@ -50,6 +50,8 @@ case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: L
   var tag: String = ""
 }
 
+case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex])
+
 case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   private var _id: Long = -1L
   var origen: Vertex = v2
