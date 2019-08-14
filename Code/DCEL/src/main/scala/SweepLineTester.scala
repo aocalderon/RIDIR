@@ -26,8 +26,6 @@ object SweepLineTester{
   private val precision: Double = 0.001
   private val startTime: Long = 0L
 
-  case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex])
-
   def clocktime = System.currentTimeMillis()
 
   def log(msg: String, timer: Long, n: Long, status: String): Unit ={
@@ -215,6 +213,15 @@ object SweepLineTester{
       half_edge.label = hedge._3
       new GraphEdge(coords, half_edge)
     }.toList.asJava
+
+    if(debug){
+      val g = gedges1.asScala.union(gedges2.asScala).map(_.getHalf_edges.head).map{ e =>
+        s"${e.toWKT2}\t${e.tag}\t${e.label}"
+      }
+      g.foreach(println)
+      logger.info(s"G's size: ${g.size}")
+    }
+
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
@@ -228,6 +235,11 @@ object SweepLineTester{
       e.getHalf_edges
     }
     val g = g1.union(g2).toList
+
+    if(debug){
+      g.map(_.toWKT2).foreach(println)
+      logger.info(s"G's size: ${g.size}")
+    }
 
     logger.info("Merged DCEL")
     val dcel = buildMergedDCEL(g)
