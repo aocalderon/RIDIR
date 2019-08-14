@@ -1,2 +1,0 @@
-\beamer@sectionintoc {1}{DCEL construction test}{2}{0}{1}
-\beamer@sectionintoc {2}{DCEL Merger}{8}{0}{2}
