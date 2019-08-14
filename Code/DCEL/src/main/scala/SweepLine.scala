@@ -26,12 +26,69 @@ object SweepLine{
   private val precision: Double = 0.001
   private val startTime: Long = 0L
 
-  //case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex])
-
   def clocktime = System.currentTimeMillis()
 
   def log(msg: String, timer: Long, n: Long, status: String): Unit ={
     logger.info("DCEL|%6.2f|%-50s|%6.2f|%6d|%s".format((clocktime-startTime)/1000.0, msg, (clocktime-timer)/1000.0, n, status))
+  }
+
+  def computeIntersections(edgesA: List[GraphEdge], edgesB: List[GraphEdge]): List[Half_edge] = {
+    val gedges1 = edgesA.asJava
+    val gedges2 = edgesB.asJava
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+    sweepline.computeIntersections(gedges1, gedges2, segmentIntersector)
+
+    val g1 = gedges1.asScala.flatMap(_.getHalf_edges)
+    val g2 = gedges2.asScala.flatMap(_.getHalf_edges)
+    
+    g1.union(g2).toList
+  }
+
+  def prepareEdges(hedges: Array[LineString]): List[Half_edge] = {
+    hedges.map(hedge => s"${hedge.toText()}\t${hedge.getUserData.toString()}").foreach(println)
+    val data = hedges.map{ hedge =>
+      val arr = hedge.getUserData.toString().split("\t")
+      val tag = arr(0).head
+      val id = arr(0).tail
+      val part = arr(1).toInt
+      (part, tag, id, hedge)
+    }//.filter(_._3 != "*")
+    val data1 = data.filter(x => /*x._1 == part & */x._2 == 'A')
+    val data2 = data.filter(x => /*x._1 == part & */x._2 == 'B')
+
+    logger.info("Segments")
+    data1.map(_._4).foreach(println)
+    data2.map(_._4).foreach(println)
+
+    val gedges1 = data1.map{ hedge =>
+      val coords = hedge._4.getCoordinates
+      val half_edge = Half_edge(Vertex(coords(0).x, coords(0).y), Vertex(coords(1).x, coords(1).y))
+      half_edge.tag = s"${hedge._2}"
+      half_edge.label = hedge._3
+      new GraphEdge(coords, half_edge)
+    }.toList.asJava
+    val gedges2 = data2.map{ hedge =>
+      val coords = hedge._4.getCoordinates
+      val half_edge = Half_edge(Vertex(coords(0).x, coords(0).y), Vertex(coords(1).x, coords(1).y))
+      half_edge.tag = s"${hedge._2}"
+      half_edge.label = hedge._3
+      new GraphEdge(coords, half_edge)
+    }.toList.asJava
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+    sweepline.computeIntersections(gedges1, gedges2, segmentIntersector)
+
+    logger.info("Intersections")
+    val g1 = gedges1.asScala.flatMap{ e =>
+      e.getHalf_edges
+    }
+    val g2 = gedges2.asScala.flatMap{ e =>
+      e.getHalf_edges
+    }
+    g1.union(g2).toList
   }
 
   def buildMergedDCEL(hedges: List[Half_edge]): MergedDCEL = {
@@ -54,16 +111,16 @@ object SweepLine{
 
     // Step 3. Half-edge list creation with twins and vertices assignments...
     edgesSet.foreach{ edge =>
-      val h1 = Half_edge(edge.v2, edge.v1)
+      val h1 = Half_edge(edge.v1, edge.v2)
       h1.label = edge.left
-      val h2 = Half_edge(edge.v1, edge.v2)
+      val h2 = Half_edge(edge.v2, edge.v1)
       h2.label = edge.right
 
       h1.twin = h2
       h2.twin = h1
 
-      vertexList.find(_.equals(edge.v1)).get.half_edges += h1
-      vertexList.find(_.equals(edge.v2)).get.half_edges += h2
+      vertexList.find(_.equals(edge.v1)).get.half_edges += h2
+      vertexList.find(_.equals(edge.v2)).get.half_edges += h1
 
       half_edgeList += h2
       half_edgeList += h1
@@ -186,48 +243,8 @@ object SweepLine{
     log(stage, timer, 0, "START")
     val part = params.part()
     val hedges = half_edges.collect()
-    hedges.map(hedge => s"${hedge.toText()}\t${hedge.getUserData.toString()}").foreach(println)
-    val data = hedges.map{ hedge =>
-      val arr = hedge.getUserData.toString().split("\t")
-      val tag = arr(0).head
-      val id = arr(0).tail
-      val part = arr(1).toInt
-      (part, tag, id, hedge)
-    }//.filter(_._3 != "*")
-    val data1 = data.filter(x => /*x._1 == part & */x._2 == 'A')
-    val data2 = data.filter(x => /*x._1 == part & */x._2 == 'B')
 
-    logger.info("Segments")
-    data1.map(_._4).foreach(println)
-    data2.map(_._4).foreach(println)
-
-    val gedges1 = data1.map{ hedge =>
-      val coords = hedge._4.getCoordinates
-      val half_edge = Half_edge(Vertex(coords(0).x, coords(0).y), Vertex(coords(1).x, coords(1).y))
-      half_edge.tag = s"${hedge._2}"
-      half_edge.label = hedge._3
-      new GraphEdge(coords, half_edge)
-    }.toList.asJava
-    val gedges2 = data2.map{ hedge =>
-      val coords = hedge._4.getCoordinates
-      val half_edge = Half_edge(Vertex(coords(0).x, coords(0).y), Vertex(coords(1).x, coords(1).y))
-      half_edge.tag = s"${hedge._2}"
-      half_edge.label = hedge._3
-      new GraphEdge(coords, half_edge)
-    }.toList.asJava
-    val sweepline = new SimpleMCSweepLineIntersector()
-    val lineIntersector = new RobustLineIntersector()
-    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
-    sweepline.computeIntersections(gedges1, gedges2, segmentIntersector)
-
-    logger.info("Intersections")
-    val g1 = gedges1.asScala.flatMap{ e =>
-      e.getHalf_edges
-    }
-    val g2 = gedges2.asScala.flatMap{ e =>
-      e.getHalf_edges
-    }
-    val g = g1.union(g2).toList
+    val g = prepareEdges(hedges)
 
     logger.info("Merged DCEL")
     val dcel = buildMergedDCEL(g)
