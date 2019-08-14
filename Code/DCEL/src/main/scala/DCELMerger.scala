@@ -160,6 +160,7 @@ object DCELMerger{
         polygon
       }
     polygonRDD.setRawSpatialRDD(polygons)
+    polygonRDD.rawSpatialRDD.cache()
     polygonRDD
   }
 
@@ -366,22 +367,34 @@ object DCELMerger{
 
     }
 
-
-    val mergedDCEL = dcelA.zipPartitions(dcelB, true)((iterA, iterB) => iterA ++ iterB)
-      .mapPartitionsWithIndex{ (i, dcels) =>
-        val hedges = dcels.toList.flatMap(_.half_edges)
-        val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges)
-        List((i, dcel)).toIterator
+    val mergedDCEL = dcelA.zipPartitions(dcelB, true){ (iterA, iterB) =>
+      val gedgesA = iterA.flatMap(_.half_edges).map{ a =>
+        val coord1 = new Coordinate(a.v1.x, a.v1.y)
+        val coord2 = new Coordinate(a.v2.x, a.v2.y)
+        new GraphEdge(Array(coord1, coord2), a)
       }
+      val gedgesB = iterB.flatMap(_.half_edges).map{ b =>
+        val coord1 = new Coordinate(b.v1.x, b.v1.y)
+        val coord2 = new Coordinate(b.v2.x, b.v2.y)
+        new GraphEdge(Array(coord1, coord2), b)
+      }
+      SweepLine.computeIntersections(gedgesA.toList, gedgesB.toList).toIterator
+      //gedgesA ++ gedgesB
+    }.mapPartitionsWithIndex{ (i, hedges) =>
+      //val dcel: MergedDCEL = SweepLineTester.buildMergedDCEL(hedges.toList)
+      //dcel.faces.toIterator
+      hedges
+    }
 
     if(debug){
       val facesRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
-        val part = dcels.toList.head
-        val id = part._1
-        val dcel = part._2
-        dcel.faces.map(f => s"${i}\t${id}\t${f.toWKT()}\t${f.tag}\n").toIterator
+        //val part = dcels.toList.head
+        //val id = part._1
+        //val dcel = part._2
+        //dcel.faces.map(f => s"${i}\t${id}\t${f.toWKT()}\t${f.tag}\n").toIterator
+        dcels.map(h => s"${h.toWKT2}\n")
       }.collect()
-      val f = new java.io.PrintWriter("/tmp/faces.wkt")
+      val f = new java.io.PrintWriter("/tmp/test1.wkt")
       f.write(facesRDD.mkString(""))
       f.close()
       logger.info(s"Saved faces.wkt [${facesRDD.size} records]")
