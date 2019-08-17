@@ -381,9 +381,8 @@ object DCELMerger{
       SweepLine.computeIntersections(gedgesA.toList, gedgesB.toList).toIterator
       //gedgesA ++ gedgesB
     }.mapPartitionsWithIndex{ (i, hedges) =>
-      //val dcel: MergedDCEL = SweepLineTester.buildMergedDCEL(hedges.toList)
-      //dcel.faces.toIterator
-      hedges
+      val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges.toList)
+      dcel.edges.toIterator
     }
 
     if(debug){
@@ -392,7 +391,8 @@ object DCELMerger{
         //val id = part._1
         //val dcel = part._2
         //dcel.faces.map(f => s"${i}\t${id}\t${f.toWKT()}\t${f.tag}\n").toIterator
-        dcels.map(h => s"${h.toWKT2}\n")
+        //dcels.flatMap(x => x.half_edges.map(h => s"${x.toWKT}\t${h.toWKT2}\t${h.label}\n"))
+        dcels.map(e => s"${e.toWKT}\n")
       }.collect()
       val f = new java.io.PrintWriter("/tmp/test1.wkt")
       f.write(facesRDD.mkString(""))

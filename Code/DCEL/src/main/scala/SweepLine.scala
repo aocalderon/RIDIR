@@ -125,7 +125,7 @@ object SweepLine{
       half_edgeList += h2
       half_edgeList += h1
     }
-
+    
     // Step 4. Identification of next and prev half-edges...
     vertexList.map{ vertex =>
       val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
@@ -134,6 +134,8 @@ object SweepLine{
       if(size < 2){
         logger.error("Badly formed dcel: less than two hedges in vertex")
       }
+
+      logger.info(s"Vertex: ${vertex} Size: $size Incidents: ${sortedIncidents.mkString(" ")}")
       
       for(i <- 0 until (size - 1)){
         var current = sortedIncidents(i)
@@ -149,8 +151,9 @@ object SweepLine{
       next = half_edgeList.find(_.equals(next)).get
       current.next   = next.twin
       next.twin.prev = current
+      
     }
-
+/*
     // Step 5. Face assignment...
     var temp_half_edgeList = new ArrayBuffer[Half_edge]()
     temp_half_edgeList ++= half_edgeList
@@ -179,8 +182,8 @@ object SweepLine{
         faceList += f
       }
     }
-
-    MergedDCEL(half_edgeList.toList, faceList.toList, vertexList.toList)
+     */
+    MergedDCEL(half_edgeList.toList, faceList.toList, vertexList.toList, edgesSet)
   }
 
   def main(args: Array[String]) = {
