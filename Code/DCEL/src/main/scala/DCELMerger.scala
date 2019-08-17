@@ -379,25 +379,24 @@ object DCELMerger{
         new GraphEdge(Array(coord1, coord2), b)
       }
       SweepLine.computeIntersections(gedgesA.toList, gedgesB.toList).toIterator
-      //gedgesA ++ gedgesB
     }.mapPartitionsWithIndex{ (i, hedges) =>
-      //val dcel: MergedDCEL = SweepLineTester.buildMergedDCEL(hedges.toList)
-      //dcel.faces.toIterator
-      hedges
+      val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges.toList)
+      List(dcel).toIterator
+      //hedges
     }
 
     if(debug){
-      val facesRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+      val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
         //val part = dcels.toList.head
         //val id = part._1
         //val dcel = part._2
         //dcel.faces.map(f => s"${i}\t${id}\t${f.toWKT()}\t${f.tag}\n").toIterator
-        dcels.map(h => s"${h.toWKT2}\n")
-      }.collect()
+        dcels.toList.head.faces.map(h => s"${h.toWKT}\t${i}\n").toIterator
+      }.collect().sorted
       val f = new java.io.PrintWriter("/tmp/test1.wkt")
-      f.write(facesRDD.mkString(""))
+      f.write(anRDD.mkString(""))
       f.close()
-      logger.info(s"Saved faces.wkt [${facesRDD.size} records]")
+      logger.info(s"Saved faces.wkt [${anRDD.size} records]")
     }
 
     // Closing session...

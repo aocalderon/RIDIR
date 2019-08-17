@@ -119,8 +119,8 @@ object SweepLine{
       h1.twin = h2
       h2.twin = h1
 
-      vertexList.find(_.equals(edge.v1)).get.half_edges += h2
       vertexList.find(_.equals(edge.v2)).get.half_edges += h1
+      vertexList.find(_.equals(edge.v1)).get.half_edges += h2
 
       half_edgeList += h2
       half_edgeList += h1
