@@ -97,7 +97,10 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     }
 
   def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})\t${tag}${label}"
+
   def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t${tag}${label}"
+
+  def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
@@ -131,7 +134,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
       case _ => false
     }
 
-  def toWKT: String = s"${getId}\tPOINT ($x $y)"
+  def toWKT: String = s"POINT ($x $y)"
 }
 
 case class Face(label: String){
