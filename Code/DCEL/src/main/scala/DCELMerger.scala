@@ -382,17 +382,46 @@ object DCELMerger{
     }.mapPartitionsWithIndex{ (i, hedges) =>
       val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges.toList)
       List(dcel).toIterator
-    }
+    }.cache()
 
     if(debug){
       val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
-        //val part = dcels.toList.head
-        //val id = part._1
-        //val dcel = part._2
-        //dcel.faces.map(f => s"${i}\t${id}\t${f.toWKT()}\t${f.tag}\n").toIterator
-        dcels.toList.head.faces.map(h => s"${h.toWKT}\t${i}\n").toIterator
-      }.collect().sorted
-      val f = new java.io.PrintWriter("/tmp/test1.wkt")
+        dcels.toList.head.edges.map(e => s"${e.toWKT}\n").toIterator
+      }.collect()
+      val f = new java.io.PrintWriter("/tmp/edges.wkt")
+      f.write(anRDD.mkString(""))
+      f.close()
+      logger.info(s"Saved edges.wkt [${anRDD.size} records]")
+    }
+    if(debug){
+      val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+        dcels.toList.head.vertices.flatMap{ v =>
+          v.half_edges.map(h => s"${v.toWKT}\t${v.toWKT}\t${h.angle}\t${h.toWKT2}\n")
+        }.toIterator
+      }.collect()
+      val f = new java.io.PrintWriter("/tmp/vertices.wkt")
+      f.write(anRDD.mkString(""))
+      f.close()
+      logger.info(s"Saved vertices.wkt [${anRDD.size} records]")
+    }
+    if(debug){
+      val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+        dcels.toList.head.half_edges.map{ h =>
+          s"${h.v2.toWKT}\t${h.toWKT2}\t${h.angle}\n"
+        }.toIterator
+      }.collect()
+      val f = new java.io.PrintWriter("/tmp/hedges.wkt")
+      f.write(anRDD.mkString(""))
+      f.close()
+      logger.info(s"Saved hedges.wkt [${anRDD.size} records]")
+    }
+    if(debug){
+      val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+        dcels.toList.head.faces.map{ f =>
+          s"${f.toWKT}\t${f.tag}\t${f.area}\n"
+        }.toIterator
+      }.collect()
+      val f = new java.io.PrintWriter("/tmp/faces.wkt")
       f.write(anRDD.mkString(""))
       f.close()
       logger.info(s"Saved faces.wkt [${anRDD.size} records]")
