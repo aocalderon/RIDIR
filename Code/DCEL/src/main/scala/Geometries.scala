@@ -52,8 +52,25 @@ case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: L
 }
 
 case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: Set[Edge] = null) {
+  def union(): List[Face] = {
+    faces.filter(_.area() > 0)
+  }
+
   def intersection(): List[Face] = {
     faces.filter(_.tag.split(" ").size == 2)
+  }
+
+  def symmetricDifference(): List[Face] = {
+    faces.filter(_.tag.split(" ").size == 1)
+    .filter(_.area() > 0)
+  }
+
+  def differenceA(): List[Face] = {
+    symmetricDifference().filter(_.tag.substring(0, 1) == "A")
+  }
+
+  def differenceB(): List[Face] = {
+    symmetricDifference().filter(_.tag.substring(0, 1) == "B")
   }
 }
 

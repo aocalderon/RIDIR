@@ -352,21 +352,9 @@ object DCELMerger{
     log(stage, timer, nDcelB, "END")
 
     // Merging DCEL A and B...
-    val mergedHalf_edges = dcelA.zipPartitions(dcelB, true)((iterA, iterB) => iterA ++ iterB)
-      .mapPartitionsWithIndex{ (i, dcels) =>
-        dcels.flatMap(_.half_edges)
-      }
-    if(debug){
-      val hedges = mergedHalf_edges.mapPartitionsWithIndex{ (i, hedges) =>
-        hedges.map(hedge => s"${hedge.toWKT}\t${i}\n")
-      }.collect()
-      val f = new java.io.PrintWriter("/tmp/hedges.wkt")
-      f.write(hedges.mkString(""))
-      f.close()
-      logger.info(s"Saved hedges.wkt [${hedges.size} records]")
-
-    }
-
+    timer = clocktime
+    stage = "Merging DCEL A and B"
+    log(stage, timer, 0, "START")
     val mergedDCEL = dcelA.zipPartitions(dcelB, true){ (iterA, iterB) =>
       val gedgesA = iterA.flatMap(_.half_edges).map{ a =>
         val coord1 = new Coordinate(a.v1.x, a.v1.y)
@@ -383,13 +371,54 @@ object DCELMerger{
       val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges.toList)
       List(dcel).toIterator
     }.cache()
+    val nMergedDCEL = mergedDCEL.count()
+    log(stage, timer, nMergedDCEL, "END")
 
+    // Running overlay operations...
+    timer = clocktime
+    stage = "Running overlay operations"
+    log(stage, timer, 0, "START")
+
+    logger.info("Union")
+    val union = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().union()
+        .map(f => (f.tag, f.toPolygon()))
+        .toIterator
+    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
+      .map(f => s"${f._1}\t${f._2}").foreach(println)
+
+    logger.info("Intersection")
     val intersections = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().intersection()
         .map(f => (f.tag, f.toPolygon()))
         .toIterator
     }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
       .map(f => s"${f._1}\t${f._2}").foreach(println)
+
+    logger.info("Symmetric difference")
+    val difference = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().symmetricDifference()
+        .map(f => (f.tag, f.toPolygon()))
+        .toIterator
+    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
+      .map(f => s"${f._1}\t${f._2}").foreach(println)
+
+    logger.info("A difference")
+    val differenceA = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().differenceA()
+        .map(f => (f.tag, f.toPolygon()))
+        .toIterator
+    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
+      .map(f => s"${f._1}\t${f._2}").foreach(println)
+
+    logger.info("B difference")
+    val differenceB = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().differenceB()
+        .map(f => (f.tag, f.toPolygon()))
+        .toIterator
+    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
+      .map(f => s"${f._1}\t${f._2}").foreach(println)
+    log(stage, timer, 0, "END")
 
     if(debug){
       val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
