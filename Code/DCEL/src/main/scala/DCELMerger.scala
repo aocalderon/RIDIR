@@ -384,6 +384,13 @@ object DCELMerger{
       List(dcel).toIterator
     }.cache()
 
+    val intersections = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().intersection()
+        .map(f => (f.tag, f.toPolygon()))
+        .toIterator
+    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
+      .map(f => s"${f._1}\t${f._2}").foreach(println)
+
     if(debug){
       val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
         dcels.toList.head.edges.map(e => s"${e.toWKT}\n").toIterator
