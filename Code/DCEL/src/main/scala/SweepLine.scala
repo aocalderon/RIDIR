@@ -91,8 +91,7 @@ object SweepLine{
     g1.union(g2).toList
   }
 
-  def buildMergedDCEL(hedges: List[Half_edge]): MergedDCEL = {
-    val debug = true
+  def buildMergedDCEL(hedges: List[Half_edge], debug: Boolean = false): MergedDCEL = {
     var half_edgeList = new ArrayBuffer[Half_edge]()
     var faceList = new ArrayBuffer[Face]()
 
