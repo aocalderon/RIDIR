@@ -1,6 +1,7 @@
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
-import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.GeometryFactory
+import com.vividsolutions.jts.geom.{Coordinate, LinearRing, Polygon}
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
   def getVerticesSet: List[Vertex] = {
@@ -50,7 +51,11 @@ case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: L
   var tag: String = ""
 }
 
-case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: Set[Edge] = null)
+case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: Set[Edge] = null) {
+  def intersection(): List[Face] = {
+    faces.filter(_.tag.split(" ").size == 2)
+  }
+}
 
 case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   private var _id: Long = -1L
@@ -138,6 +143,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 }
 
 case class Face(label: String){
+  private val geofactory: GeometryFactory = new GeometryFactory();
   var outerComponent: Half_edge = null
   var innerComponent: Half_edge = null
   var exterior: Boolean = false
@@ -184,6 +190,21 @@ case class Face(label: String){
     
       s"POLYGON (( ${wkt.mkString(" , ")} ))\t${tag}${label}"
     }
+  }
+
+  def toPolygon(): Polygon = {
+    var coords = ArrayBuffer.empty[Coordinate]
+    if(area() > 0){
+      var hedge = outerComponent
+      coords += new Coordinate(hedge.v1.x, hedge.v1.y)
+      while(hedge.next != outerComponent){
+        coords += new Coordinate(hedge.v2.x, hedge.v2.y)
+        hedge = hedge.next
+      }
+      coords += new Coordinate(hedge.v2.x, hedge.v2.y)
+    }
+    val ring = geofactory.createLinearRing(coords.toArray)
+    geofactory.createPolygon(ring)
   }
 }
 
