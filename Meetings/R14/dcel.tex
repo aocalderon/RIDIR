@@ -1,0 +1,181 @@
+\documentclass{beamer}
+
+\usefonttheme{professionalfonts} % using non standard fonts for beamer
+\usefonttheme{serif} % default family is serif
+
+\usepackage{hyperref}
+
+%\usepackage{minted}
+
+\usepackage{animate}
+
+\usepackage{graphicx}
+
+\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+
+\usepackage{color}
+
+\usepackage{tikz}
+
+\usepackage{amssymb}
+
+\usepackage{enumerate}
+
+
+\newcommand\blfootnote[1]{%
+
+  \begingroup
+
+  \renewcommand\thefootnote{}\footnote{#1}%
+
+  \addtocounter{footnote}{-1}%
+
+  \endgroup
+
+}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+
+ % this default might be overridden by plain title style
+
+ \newcommand\makebeamertitle{\frame{\maketitle}}%
+
+ % (ERT) argument for the TOC
+
+ \AtBeginDocument{%
+
+   \let\origtableofcontents=\tableofcontents
+
+   \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+
+   \def\gobbletableofcontents#1{\origtableofcontents}
+
+ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+\usetheme{Malmoe}
+
+% or ...
+
+\useoutertheme{infolines}
+
+\addtobeamertemplate{headline}{}{\vskip2pt}
+
+
+
+\setbeamercovered{transparent}
+
+% or whatever (possibly just delete it)
+
+\makeatother
+
+\begin{document}
+\title[DCEL report]{Parallel DCEL Construction Report}
+\author[AC]{Andres Calderon}
+\institute[Summer'19]{University of California, Riverside}
+\makebeamertitle
+\newif\iflattersubsect
+
+\AtBeginSection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsection]  
+    \end{frame}
+    \lattersubsectfalse
+}
+
+\AtBeginSubsection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsubsection]  
+    \end{frame}
+}
+
+\begin{frame}{Parallel DCEL construction}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/OverlayParted1} 
+\end{frame}
+
+\begin{frame}{Parallel DCEL operations}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/OverlayParted2} 
+\end{frame}
+
+\begin{frame}{Demo example}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/Demo01} 
+\end{frame}
+
+\begin{frame}{Demo example}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/Demo02} 
+\end{frame}
+
+\begin{frame}{Demo example}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/Demo03} 
+\end{frame}
+
+\begin{frame}{Demo example}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/Demo04} 
+\end{frame}
+
+\begin{frame}{Demo example}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/Demo05} 
+\end{frame}
+
+\begin{frame}{Demo example}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/Demo06} 
+\end{frame}
+
+\begin{frame}{Demo example}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/Demo07} 
+\end{frame}
+
+\begin{frame}{Phili test}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/phili01} 
+\end{frame}
+
+\begin{frame}{Phili test}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/phili02} 
+\end{frame}
+
+\begin{frame}{Phili test}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/phili03} 
+\end{frame}
+
+\begin{frame}{Phili test}
+    \begin{itemize}
+        \item Merged DCEL construction is working fine but currently I am tracking a bug in the label assignation...
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Phili test}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/phili04} 
+\end{frame}
+
+\begin{frame}{Phili test}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/phili05} 
+\end{frame}
+
+\begin{frame}{What is next...}
+    \begin{itemize}
+        \item Fix bug in label assignation.
+        \item Work on holes and multipolygon strategy.
+        \item Perform experiments with larger datasets.
+    \end{itemize}
+\end{frame}
+
+\end{document}
