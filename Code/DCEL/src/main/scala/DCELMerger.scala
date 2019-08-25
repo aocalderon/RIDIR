@@ -38,9 +38,9 @@ object DCELMerger{
     logger.info("DCEL|%6.2f|%-50s|%6.2f|%6d|%s".format((clocktime-startTime)/1000.0, msg, (clocktime-timer)/1000.0, n, status))
   }
 
-  def saveWKT(edges: RDD[Half_edge], filename: String): Unit = {
+  def saveWKT(rdd: RDD[String], filename: String): Unit = {
     val f = new java.io.PrintWriter(filename)
-    val wkt = edges.map(_.toWKT).collect.mkString("\n")
+    val wkt = rdd.collect.mkString("")
     f.write(wkt)
     f.close()
   }
@@ -269,8 +269,6 @@ object DCELMerger{
     polygonsA.analyze()
     log(stage, timer, nPolygonsA, "END")
 
-    polygonsA.rawSpatialRDD.rdd.map(p => p.toText()).foreach(println)
-
     timer = System.currentTimeMillis()
     stage = "Polygons B read"
     log(stage, timer, 0, "START")
@@ -278,8 +276,6 @@ object DCELMerger{
     val nPolygonsB = polygonsB.rawSpatialRDD.rdd.count()
     polygonsB.analyze()
     log(stage, timer, nPolygonsB, "END")
-
-    polygonsB.rawSpatialRDD.rdd.map(p => p.toText()).foreach(println)
 
     // Partitioning data...
     timer = clocktime
@@ -374,52 +370,6 @@ object DCELMerger{
     val nMergedDCEL = mergedDCEL.count()
     log(stage, timer, nMergedDCEL, "END")
 
-    // Running overlay operations...
-    timer = clocktime
-    stage = "Running overlay operations"
-    log(stage, timer, 0, "START")
-
-    logger.info("Union")
-    val union = mergedDCEL.mapPartitions{ dcels =>
-      dcels.next().union()
-        .map(f => (f.tag, f.toPolygon()))
-        .toIterator
-    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
-      .map(f => s"${f._1}\t${f._2}").foreach(println)
-
-    logger.info("Intersection")
-    val intersections = mergedDCEL.mapPartitions{ dcels =>
-      dcels.next().intersection()
-        .map(f => (f.tag, f.toPolygon()))
-        .toIterator
-    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
-      .map(f => s"${f._1}\t${f._2}").foreach(println)
-
-    logger.info("Symmetric difference")
-    val difference = mergedDCEL.mapPartitions{ dcels =>
-      dcels.next().symmetricDifference()
-        .map(f => (f.tag, f.toPolygon()))
-        .toIterator
-    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
-      .map(f => s"${f._1}\t${f._2}").foreach(println)
-
-    logger.info("A difference")
-    val differenceA = mergedDCEL.mapPartitions{ dcels =>
-      dcels.next().differenceA()
-        .map(f => (f.tag, f.toPolygon()))
-        .toIterator
-    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
-      .map(f => s"${f._1}\t${f._2}").foreach(println)
-
-    logger.info("B difference")
-    val differenceB = mergedDCEL.mapPartitions{ dcels =>
-      dcels.next().differenceB()
-        .map(f => (f.tag, f.toPolygon()))
-        .toIterator
-    }.reduceByKey( (a: Polygon, b:Polygon) => a.union(b).asInstanceOf[Polygon])
-      .map(f => s"${f._1}\t${f._2}").foreach(println)
-    log(stage, timer, 0, "END")
-
     if(debug){
       val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
         dcels.toList.head.edges.map(e => s"${e.toWKT}\n").toIterator
@@ -462,6 +412,60 @@ object DCELMerger{
       f.close()
       logger.info(s"Saved faces.wkt [${anRDD.size} records]")
     }
+
+    def mergePolygons(a: String, b:String): String = {
+      val reader = new WKTReader(geofactory)
+      val pa = reader.read(a)
+      val pb = reader.read(b)
+      pa.union(pb).toText()
+    }
+
+    // Running overlay operations...
+    timer = clocktime
+    stage = "Running overlay operations"
+    log(stage, timer, 0, "START")
+
+    logger.info("Union")
+    val union = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().union()
+        .map(f => (f.tag, f.toWKT))
+        .toIterator
+    }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    saveWKT(union, "/tmp/union.wkt")
+
+    logger.info("Intersection")
+    val intersection = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().intersection()
+        .map(f => (f.tag, f.toWKT()))
+        .toIterator
+    }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    saveWKT(intersection, "/tmp/intersection.wkt")
+
+    logger.info("Symmetric difference")
+    val symmetric = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().symmetricDifference()
+        .map(f => (f.tag, f.toWKT()))
+        .toIterator
+    }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    saveWKT(symmetric, "/tmp/symmetric.wkt")
+
+    logger.info("A difference")
+    val differenceA = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().differenceA()
+        .map(f => (f.tag, f.toWKT()))
+        .toIterator
+    }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    saveWKT(differenceA, "/tmp/differenceA.wkt")
+
+    logger.info("B difference")
+    val differenceB = mergedDCEL.mapPartitions{ dcels =>
+      dcels.next().differenceB()
+        .map(f => (f.tag, f.toWKT()))
+        .toIterator
+    }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    saveWKT(differenceB, "/tmp/differenceB.wkt")
+
+    log(stage, timer, 0, "END")
 
     // Closing session...
     timer = System.currentTimeMillis()
