@@ -43,7 +43,111 @@ object SweepLine{
     val g1 = gedges1.asScala.flatMap(_.getHalf_edges)
     val g2 = gedges2.asScala.flatMap(_.getHalf_edges)
     
-    g1.union(g2).toList
+    g1.union(g2).toList.groupBy(g => g).map{ case (k, v) =>
+      val label = v.map(x => s"${x.tag}${x.label}").mkString(" ")
+      k.label = label
+      k
+    }.toList
+  }
+
+  def buildMergedDCEL(hedges: List[Half_edge], p: Int = -1, debug: Boolean = false): MergedDCEL = {
+    var half_edgeList = new ArrayBuffer[Half_edge]()
+    var faceList = new ArrayBuffer[Face]()
+
+    // Step 1. Vertex set creation...
+    val vertexList = hedges.map(h => Vertex(h.v2.x, h.v2.y) ).distinct
+
+    if(debug){
+      logger.info(s"VertexList size: ${vertexList.size}")
+      logger.info(s"\n${vertexList.map(v => s"${v.toWKT}\n").mkString("")}")
+    }
+    // Step 2.  Edge set creation with left and right labels...
+    val edges1 = hedges.map(e => Edge(e.v1, e.v2) -> s"${e.label}").toMap
+    val edges2 = hedges.map(e => Edge(e.v2, e.v1) -> s"${e.label}").toMap
+    val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
+    val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "*")}<br>${edges2.getOrElse(e, "*")}") }
+      .map{ x =>
+        val edge = x._1
+        edge.label = x._2
+        edge
+      }
+
+    // Step 3. Half-edge list creation with twins and vertices assignments...
+    edgesSet.foreach{ edge =>
+      val h1 = Half_edge(edge.v1, edge.v2)
+      h1.label = edge.left
+      val h2 = Half_edge(edge.v2, edge.v1)
+      h2.label = edge.right
+
+      h1.twin = h2
+      h2.twin = h1
+
+      vertexList.find(_.equals(edge.v2)).get.half_edges += h1
+      vertexList.find(_.equals(edge.v1)).get.half_edges += h2
+
+      half_edgeList += h2
+      half_edgeList += h1
+    }
+    
+    // Step 4. Identification of next and prev half-edges...
+    val vtest = Vertex(2694179.9939951915, 264715.9088478392)
+    vertexList.map{ vertex =>
+      val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
+      val size = sortedIncidents.size
+
+      if(size < 2){
+        logger.error("Badly formed dcel: less than two hedges in vertex")
+      }
+
+      for(i <- 0 until (size - 1)){
+        val current = sortedIncidents(i)
+        val next    = sortedIncidents(i + 1)
+        val current2 = half_edgeList.find{ h => h.equals(current) }.get
+        val next2    = half_edgeList.find{ h => h.equals(next) }.get
+        current2.next   = next2.twin
+        next2.twin.prev = current2
+      }
+      val current = sortedIncidents(size - 1)
+      val next    = sortedIncidents(0)
+      val current2 = half_edgeList.find{ h => h.equals(current) }.get
+      val next2    = half_edgeList.find{ h => h.equals(next) }.get
+      current2.next   = next2.twin
+      next2.twin.prev = current2
+    }
+
+    // Step 5. Face assignment...
+    var temp_half_edgeList = new ArrayBuffer[Half_edge]()
+    temp_half_edgeList ++= half_edgeList
+    for(temp_hedge <- temp_half_edgeList){
+      val hedge = half_edgeList.find(_.equals(temp_hedge)).get
+      val tag = new ArrayBuffer[String]()
+      var count = 0
+      if(!hedge.label.contains("*")){
+        tag += hedge.label
+        count = 1
+      }
+      if(!hedge.visited){
+        val f = Face(hedge.label)
+        f.outerComponent = hedge
+        f.outerComponent.face = f
+        var h1 = hedge.next
+        while(h1 != f.outerComponent){
+          val h2 = half_edgeList.find(_.equals(h1)).get
+          h2.face = f
+          h2.visited = true
+          if(!h2.label.contains("*")){
+            tag += h2.label
+            count += 1
+          }
+          h1 = h1.next
+        }
+        if(f.area() < 0) { f.exterior = true }
+        f.tag = tag.toList.distinct.mkString(" ").split(" ").distinct.sorted.mkString(" ")
+        f.nHalf_edges = count
+        faceList += f
+      }
+    }
+    MergedDCEL(half_edgeList.toList, faceList.toList, vertexList.toList, p, edgesSet, hedges)
   }
 
   def prepareEdges(hedges: Array[LineString]): List[Half_edge] = {
@@ -89,125 +193,6 @@ object SweepLine{
       e.getHalf_edges
     }
     g1.union(g2).toList
-  }
-
-  def buildMergedDCEL(hedges: List[Half_edge], debug: Boolean = false): MergedDCEL = {
-    var half_edgeList = new ArrayBuffer[Half_edge]()
-    var faceList = new ArrayBuffer[Face]()
-
-    // Step 1. Vertex set creation...
-    val vertexList = hedges.map(h => Vertex(h.v2.x, h.v2.y)).distinct
-
-    if(debug){
-      logger.info(s"VertexList size: ${vertexList.size}")
-      logger.info(s"\n${vertexList.map(v => s"${v.toWKT}\n").mkString("")}")
-    }
-    // Step 2.  Edge set creation with left and right labels...
-    val edges1 = hedges.map(e => Edge(e.v1, e.v2) -> s"${e.tag}${e.label}").toMap
-    val edges2 = hedges.map(e => Edge(e.v2, e.v1) -> s"${e.tag}${e.label}").toMap
-    val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
-    val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "*")}<br>${edges2.getOrElse(e, "*")}") }
-      .map{ x =>
-        val edge = x._1
-        edge.label = x._2
-        edge
-      }
-
-    if(debug){
-      logger.info(s"EdgesSet size: ${edgesSet.size}")
-      logger.info(s"\n${edgesSet.map(e => s"${e.toWKT}\n").mkString("")}")
-    }
-    if(debug){
-      logger.info(s"Before\n${vertexList.map{ vertex =>
-        vertex.half_edges.map{ i =>
-          s"${vertex.toWKT}\t${i.toWKT3}\t${i.tag}${i.label}\n"
-        }
-      }.mkString("")}")
-    }
-
-    // Step 3. Half-edge list creation with twins and vertices assignments...
-    edgesSet.foreach{ edge =>
-      val h1 = Half_edge(edge.v1, edge.v2)
-      h1.label = edge.left
-      val h2 = Half_edge(edge.v2, edge.v1)
-      h2.label = edge.right
-
-      h1.twin = h2
-      h2.twin = h1
-
-      vertexList.find(_.equals(h1.origen)).get.half_edges += h1
-      vertexList.find(_.equals(h2.origen)).get.half_edges += h2
-
-      half_edgeList += h2
-      half_edgeList += h1
-    }
-
-    if(debug){
-      logger.info(s"After\n${vertexList.map{ vertex =>
-        vertex.half_edges.map{ i =>
-          s"${vertex.toWKT}\t${i.toWKT3}\t${i.tag}${i.label}\n"
-        }
-      }.mkString("")}")
-    }
-    if(debug){
-      logger.info(s"Half_edgesList size: ${half_edgeList.size}")
-      logger.info(s"\n${half_edgeList.sorted.map(h => s"${h.toWKT3}\t${h.label}\n").mkString("")}")
-    }
-
-    // Step 4. Identification of next and prev half-edges...
-    vertexList.map{ vertex =>
-      val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
-      val size = sortedIncidents.size
-
-      if(size < 2){
-        logger.error("Badly formed dcel: less than two hedges in vertex")
-      }
-
-      for(i <- 0 until (size - 1)){
-        var current = sortedIncidents(i)
-        var next = sortedIncidents(i + 1)
-        current = half_edgeList.find(_.equals(current)).get
-        next = half_edgeList.find(_.equals(next)).get
-        current.next   = next.twin
-        next.twin.prev = current
-      }
-      var current = sortedIncidents(size - 1)
-      var next = sortedIncidents(0)
-      current = half_edgeList.find(_.equals(current)).get
-      next = half_edgeList.find(_.equals(next)).get
-      current.next   = next.twin
-      next.twin.prev = current
-    }
-
-    // Step 5. Face assignment...
-    var temp_half_edgeList = new ArrayBuffer[Half_edge]()
-    temp_half_edgeList ++= half_edgeList
-    for(temp_hedge <- temp_half_edgeList){
-      val hedge = half_edgeList.find(_.equals(temp_hedge)).get
-      val tag = new ArrayBuffer[String]()
-      if(!hedge.label.contains("*")){
-        tag += hedge.label
-      }
-      if(!hedge.visited){
-        val f = Face(hedge.label)
-        f.outerComponent = hedge
-        f.outerComponent.face = f
-        var h1 = hedge.next
-        while(h1 != f.outerComponent){
-          val h2 = half_edgeList.find(_.equals(h1)).get
-          h2.face = f
-          h2.visited = true
-          if(!h2.label.contains("*")){
-            tag += h2.label
-          }
-          h1 = h1.next
-        }
-        if(f.area() < 0) { f.exterior = true }
-        f.tag = tag.toList.distinct.sorted.mkString(" ")
-        faceList += f
-      }
-    }
-    MergedDCEL(half_edgeList.toList, faceList.toList, vertexList.toList, edgesSet)
   }
 
   def main(args: Array[String]) = {
