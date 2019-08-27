@@ -364,7 +364,7 @@ object DCELMerger{
       }
       SweepLine.computeIntersections(gedgesA.toList, gedgesB.toList).toIterator
     }.mapPartitionsWithIndex{ (i, hedges) =>
-      val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges.toList)
+      val dcel: MergedDCEL = SweepLine.buildMergedDCEL(hedges.toList, i)
       List(dcel).toIterator
     }.cache()
     val nMergedDCEL = mergedDCEL.count()
@@ -381,8 +381,17 @@ object DCELMerger{
     }
     if(debug){
       val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
+        dcels.toList.head.source.map(e => s"${e.toWKT3}\t${e.tag}${e.label}\n").toIterator
+      }.collect()
+      val f = new java.io.PrintWriter("/tmp/source.wkt")
+      f.write(anRDD.mkString(""))
+      f.close()
+      logger.info(s"Saved source.wkt [${anRDD.size} records]")
+    }
+    if(debug){
+      val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
         dcels.toList.head.vertices.flatMap{ v =>
-          v.half_edges.map(h => s"${v.toWKT}\t${v.toWKT}\t${h.angle}\t${h.toWKT2}\n")
+          v.half_edges.map(h => s"${v.toWKT}\t${h.angle}\t${h.toWKT}\n")
         }.toIterator
       }.collect()
       val f = new java.io.PrintWriter("/tmp/vertices.wkt")
@@ -392,8 +401,9 @@ object DCELMerger{
     }
     if(debug){
       val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
-        dcels.toList.head.half_edges.map{ h =>
-          s"${h.v2.toWKT}\t${h.toWKT2}\t${h.angle}\n"
+        val dcel = dcels.toList.head
+        dcel.half_edges.map{ h =>
+          s"${h.v2.toWKT}\t${h.toWKT2}\t${h.angle}\t${dcel.partition}\t${i}\n"
         }.toIterator
       }.collect()
       val f = new java.io.PrintWriter("/tmp/hedges.wkt")
@@ -404,7 +414,7 @@ object DCELMerger{
     if(debug){
       val anRDD = mergedDCEL.mapPartitionsWithIndex{ (i, dcels) =>
         dcels.toList.head.faces.map{ f =>
-          s"${f.toWKT}\t${f.tag}\t${f.area}\n"
+          s"${f.toWKT}\t${f.tag}\t${f.nHalf_edges}\n"
         }.toIterator
       }.collect()
       val f = new java.io.PrintWriter("/tmp/faces.wkt")

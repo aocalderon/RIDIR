@@ -51,7 +51,8 @@ case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: L
   var tag: String = ""
 }
 
-case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: Set[Edge] = null) {
+case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], partition: Int = -1, edges: Set[Edge] = null, source: List[Half_edge] = null) {
+  
   def union(): List[Face] = {
     faces.filter(_.area() > 0)
   }
@@ -118,6 +119,10 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
       case _ => false
     }
 
+  def equalsWithLabel(that: Half_edge): Boolean = {
+    this.equals(that) && this.label == that.label
+  }
+
   def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})\t${tag}${label}"
 
   def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t${tag}${label}"
@@ -128,7 +133,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   private var _id: Double = -1
   var edge: Half_edge = null
-  var half_edges: HashSet[Half_edge] = new HashSet[Half_edge]()
+  var half_edges: ArrayBuffer[Half_edge] = new ArrayBuffer[Half_edge]()
   var hedges_size: Int = 0
 
   def getId = _id
@@ -165,6 +170,7 @@ case class Face(label: String){
   var innerComponent: Half_edge = null
   var exterior: Boolean = false
   var tag: String = ""
+  var nHalf_edges = 0
 
   def area(): Double = {
     var a: Double = 0.0
