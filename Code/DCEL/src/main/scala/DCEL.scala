@@ -17,7 +17,7 @@ import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
 import com.vividsolutions.jts.operation.buffer.BufferParameters
 import com.vividsolutions.jts.geom.GeometryFactory
-import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString}
+import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString, MultiPolygon}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.algorithm.{RobustCGAlgorithms, CGAlgorithms}
 import com.vividsolutions.jts.io.WKTReader
@@ -193,10 +193,10 @@ object DCEL{
     timer = System.currentTimeMillis()
     stage = "Data read"
     log(stage, timer, 0, "START")
-    val polygonRDD = new SpatialRDD[Polygon]()
+    val polygonRDD = new SpatialRDD[Geometry]()
     val polygons = spark.read.option("header", "false").option("delimiter", "\t")
       .csv(input).rdd.zipWithUniqueId().map{ row =>
-        val polygon = reader.read(row._1.getString(offset)).asInstanceOf[Polygon]
+        val polygon = reader.read(row._1.getString(offset))//.asInstanceOf[MultiPolygon]
         val userData = (0 until row._1.size).filter(_ != offset).map(i => row._1.getString(i)).mkString("\t")
         polygon.setUserData(userData)
         polygon
@@ -204,6 +204,10 @@ object DCEL{
     polygonRDD.setRawSpatialRDD(polygons)
     val nPolygons = polygons.count()
     log(stage, timer, nPolygons, "END")
+
+    if(debug){
+      polygonRDD.rawSpatialRDD.rdd.foreach(println)
+    }
 
     // Partitioning data...
     timer = clocktime
@@ -281,11 +285,26 @@ object DCEL{
     if(debug){
       val clippedWKT = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
         polygons.map(p => s"${p.toText()}\t${i}\n")
-      }.collect().mkString("")
+      }.collect()
       var f = new java.io.PrintWriter("/tmp/clipped.wkt")
-      f.write(clippedWKT)
+      f.write(clippedWKT.mkString(""))
       f.close()
+      logger.info(s"Saved clipped.wkt [${clippedWKT.size} records]")
 
+      val verticesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
+        dcel.flatMap(d => d.vertices.map(f => s"${f.toWKT}\t${i}\n"))
+      }.collect()
+      f = new java.io.PrintWriter("/tmp/vertices.wkt")
+      f.write(verticesWKT.mkString(""))
+      f.close()
+      logger.info(s"Saved vertices.wkt [${verticesWKT.size} records]")
+      val hedgesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
+        dcel.flatMap(d => d.half_edges.map(f => s"${f.toWKT}\t${f.origen.toWKT}\t${f.angle}\t${i}\n"))
+      }.collect()
+      f = new java.io.PrintWriter("/tmp/hedges.wkt")
+      f.write(hedgesWKT.mkString(""))
+      f.close()
+      logger.info(s"Saved hedges.wkt [${hedgesWKT.size} records]")
       val facesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
         dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
       }.collect()
