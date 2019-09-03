@@ -432,50 +432,59 @@ object DCELMerger{
 
     // Running overlay operations...
     timer = clocktime
-    stage = "Running overlay operations"
+    stage = "Union"
     log(stage, timer, 0, "START")
-
-    logger.info("Union")
     val union = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().union()
         .map(f => (f.tag, f.toWKT))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    log(stage, timer, union.count(), "END")
     saveWKT(union, "/tmp/union.wkt")
 
-    logger.info("Intersection")
+    timer = clocktime
+    stage = "Intersection"
+    log(stage, timer, 0, "START")
     val intersection = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().intersection()
         .map(f => (f.tag, f.toWKT()))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    log(stage, timer, intersection.count(), "END")
     saveWKT(intersection, "/tmp/intersection.wkt")
 
-    logger.info("Symmetric difference")
+    timer = clocktime
+    stage = "Symmetric difference"
+    log(stage, timer, 0, "START")
     val symmetric = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().symmetricDifference()
         .map(f => (f.tag, f.toWKT()))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    log(stage, timer, symmetric.count(), "END")
     saveWKT(symmetric, "/tmp/symmetric.wkt")
 
-    logger.info("A difference")
+    timer = clocktime
+    stage = "Difference A"
+    log(stage, timer, 0, "START")
     val differenceA = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().differenceA()
         .map(f => (f.tag, f.toWKT()))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    log(stage, timer, differenceA.count(), "END")
     saveWKT(differenceA, "/tmp/differenceA.wkt")
 
-    logger.info("B difference")
+    timer = clocktime
+    stage = "Difference B"
+    log(stage, timer, 0, "START")
     val differenceB = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().differenceB()
         .map(f => (f.tag, f.toWKT()))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n")
+    log(stage, timer, differenceB.count(), "END")
     saveWKT(differenceB, "/tmp/differenceB.wkt")
-
-    log(stage, timer, 0, "END")
 
     // Closing session...
     timer = System.currentTimeMillis()
