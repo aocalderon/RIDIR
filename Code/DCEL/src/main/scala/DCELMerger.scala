@@ -150,11 +150,11 @@ object DCELMerger{
     LocalDCEL(half_edgeList.toList, faceList.toList, vertexList.toList)
   }
 
-  def readPolygons(spark: SparkSession, input: String, offset: Int): SpatialRDD[Polygon] = {
-    val polygonRDD = new SpatialRDD[Polygon]()
+  def readPolygons(spark: SparkSession, input: String, offset: Int): SpatialRDD[Geometry] = {
+    val polygonRDD = new SpatialRDD[Geometry]()
     val polygons = spark.read.option("header", "false").option("delimiter", "\t")
       .csv(input).rdd.zipWithUniqueId().map{ row =>
-        val polygon = reader.read(row._1.getString(offset)).asInstanceOf[Polygon]
+        val polygon = reader.read(row._1.getString(offset))//.asInstanceOf[Polygon]
         val userData = (0 until row._1.size).filter(_ != offset).map(i => row._1.getString(i)).mkString("\t")
         polygon.setUserData(userData)
         polygon
@@ -164,7 +164,7 @@ object DCELMerger{
     polygonRDD
   }
 
-  def clipPolygons(polygons: SpatialRDD[Polygon], grids: Map[Int, Envelope]): RDD[Polygon] = {
+  def clipPolygons(polygons: SpatialRDD[Geometry], grids: Map[Int, Envelope]): RDD[Polygon] = {
     val clippedPolygonsRDD = polygons.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, polygons) =>
       var polys = List.empty[Polygon]
       if(index < grids.size){
@@ -289,7 +289,7 @@ object DCELMerger{
     val samplesB = polygonsB.rawSpatialRDD.rdd.sample(false, params.fraction(), 42).map(_.getEnvelopeInternal)
     val samples = samplesA.union(samplesB)
 
-    samples.collect().map(p => envelope2Polygon(p).toText()).foreach(println)
+    //samples.collect().map(p => envelope2Polygon(p).toText()).foreach(println)
     if(debug){ logger.info(s"Sample' size: ${samples.count()}") }
 
     val boundary = new QuadRectangle(fullBoundary)
