@@ -167,7 +167,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 case class Face(label: String){
   private val geofactory: GeometryFactory = new GeometryFactory();
   var outerComponent: Half_edge = null
-  var innerComponent: Half_edge = null
+  var innerComponent: List[Face] = null
   var exterior: Boolean = false
   var tag: String = ""
   var nHalf_edges = 0
@@ -184,7 +184,15 @@ case class Face(label: String){
     val p1 = h.v2
     val p2 = outerComponent.v2
 
-    (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
+    val area = (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
+
+    var internalArea = 0.0
+    if(innerComponent != null){
+      innerComponent.foreach{ f => 
+        internalArea += f.area()
+      }
+    }
+    area + internalArea
   }
 
   def perimeter(): Double = {
