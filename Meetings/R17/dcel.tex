@@ -1,0 +1,124 @@
+\documentclass{beamer}
+
+\usefonttheme{professionalfonts} % using non standard fonts for beamer
+\usefonttheme{serif} % default family is serif
+
+\usepackage{hyperref}
+
+%\usepackage{minted}
+
+\usepackage{animate}
+
+\usepackage{graphicx}
+
+\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+
+\usepackage{color}
+
+\usepackage{tikz}
+
+\usepackage{amssymb}
+
+\usepackage{enumerate}
+
+
+\newcommand\blfootnote[1]{%
+
+  \begingroup
+
+  \renewcommand\thefootnote{}\footnote{#1}%
+
+  \addtocounter{footnote}{-1}%
+
+  \endgroup
+
+}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+
+ % this default might be overridden by plain title style
+
+ \newcommand\makebeamertitle{\frame{\maketitle}}%
+
+ % (ERT) argument for the TOC
+
+ \AtBeginDocument{%
+
+   \let\origtableofcontents=\tableofcontents
+
+   \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+
+   \def\gobbletableofcontents#1{\origtableofcontents}
+
+ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+\usetheme{Malmoe}
+
+% or ...
+
+\useoutertheme{infolines}
+
+\addtobeamertemplate{headline}{}{\vskip2pt}
+
+
+
+\setbeamercovered{transparent}
+
+% or whatever (possibly just delete it)
+
+\makeatother
+
+\begin{document}
+\title[DCEL report]{RIDIR Report}
+\author[AC]{Andres Calderon}
+\institute[Summer'19]{University of California, Riverside}
+\makebeamertitle
+\newif\iflattersubsect
+
+\AtBeginSection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsection]  
+    \end{frame}
+    \lattersubsectfalse
+}
+
+\AtBeginSubsection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsubsection]  
+    \end{frame}
+}
+
+\begin{frame}{Dealing with holes}
+    \centering 
+    \includegraphics[width=0.7\linewidth]{figures/Demo01} 
+    \blfootnote{\tiny{Computational Geometry: Algorithms and Applications (de Berg, 1997)}}
+\end{frame}
+
+\begin{frame}{Dealing with holes}
+    \centering 
+    \includegraphics[width=0.7\linewidth]{figures/Demo02} 
+\end{frame}
+
+\begin{frame}{Dealing with holes (already implemented)}
+    \centering 
+    \includegraphics[width=0.7\linewidth]{figures/Demo03} 
+\end{frame}
+
+\begin{frame}{The problem: it does not work with internal islands. }
+    \centering 
+    \includegraphics[width=0.7\linewidth]{figures/Demo04} 
+\end{frame}
+
+\begin{frame}{An alternative using \textit{contains} operation}
+    \centering 
+    \includegraphics[width=0.7\linewidth]{figures/Alternative} 
+\end{frame}
+
+
+\end{document}

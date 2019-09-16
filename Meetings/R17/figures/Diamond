@@ -1,0 +1,16 @@
+\documentclass[border=0.0cm]{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{shapes, shapes.geometric}
+
+\definecolor{light-gray}{gray}{0.9}
+\definecolor{light-blue}{rgb}{0.5,0.5,0.8}
+
+\begin{document}
+    \begin{tikzpicture}
+        %F11
+        \draw [thick, fill=white] (1.0,4.0) -- (4.0, 1.0) -- (7.0, 4.0) -- (4.0, 7.0) -- cycle;
+        \node[above, color=black] at (4.0, 7.0){$f_{1,1}$};
+
+    \end{tikzpicture}
+\end{document}
