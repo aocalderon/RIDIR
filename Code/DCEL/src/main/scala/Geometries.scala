@@ -167,7 +167,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 case class Face(label: String){
   private val geofactory: GeometryFactory = new GeometryFactory();
   var outerComponent: Half_edge = null
-  var innerComponent: List[Face] = null
+  var innerComponent: Face = null
   var exterior: Boolean = false
   var tag: String = ""
   var nHalf_edges = 0
@@ -187,11 +187,12 @@ case class Face(label: String){
     val area = (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
 
     var internalArea = 0.0
-    if(innerComponent != null){
-      innerComponent.foreach{ f => 
-        internalArea += f.area()
-      }
+    var inner = innerComponent
+    while(inner != null){
+      internalArea += inner.area()
+      inner = inner.innerComponent
     }
+    
     area + internalArea
   }
 
@@ -204,6 +205,21 @@ case class Face(label: String){
     }
     p += h.length
     p
+  }
+
+  def getLeftmostVertex(): Vertex = {
+    var vertex = Vertex(Double.MaxValue, Double.MaxValue)
+    var h = outerComponent
+    do{
+      if(h.v1.x < vertex.x){
+        vertex = h.v1
+      }
+      if(h.v2.x < vertex.x){
+        vertex = h.v2
+      }
+      h = h.next
+    }while(h.next != outerComponent)
+    vertex
   }
 
   def toWKT(): String = {
