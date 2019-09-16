@@ -306,12 +306,24 @@ object DCEL{
       f.close()
       logger.info(s"Saved hedges.wkt [${hedgesWKT.size} records]")
       val facesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
-        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
+        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${f.getLeftmostVertex.toWKT}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
       }.collect()
       f = new java.io.PrintWriter("/tmp/faces.wkt")
       f.write(facesWKT.mkString(""))
       f.close()
       logger.info(s"Saved faces.wkt [${facesWKT.size} records]")
+
+      dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
+        val hedges = dcel.flatMap(d => d.half_edges)
+        val tree = new java.util.TreeMap[Half_edge, Half_edge]()
+        hedges.foreach { h => 
+          tree.put(h, h)
+        }
+        val lower = tree.lowerKey(tree.lastKey())
+        val higher = tree.higherKey(tree.firstKey())
+        List(lower, higher).toIterator
+      }.collect().foreach(println)
+
     }
 
     // Closing session...
