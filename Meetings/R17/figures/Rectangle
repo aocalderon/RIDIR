@@ -1,0 +1,16 @@
+\documentclass[border=0.0cm]{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{shapes, shapes.geometric}
+
+\definecolor{light-gray}{gray}{0.9}
+\definecolor{light-blue}{rgb}{0.5,0.5,0.8}
+
+\begin{document}
+    \begin{tikzpicture}
+        % F1
+        \draw [thick, fill=light-blue] (0.0, 0.0) rectangle (14.0, 8.0);
+        \node[above, color=black] at (0.0, 8.0){$f_1$};
+
+    \end{tikzpicture}
+\end{document}

@@ -1,0 +1,31 @@
+\documentclass[border=0.0cm]{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{shapes, shapes.geometric}
+
+\definecolor{light-gray}{gray}{0.9}
+\definecolor{light-blue}{rgb}{0.5,0.5,0.8}
+
+\begin{document}
+    \begin{tikzpicture}
+        % F1
+        \draw [thick, fill=light-blue] (0.0, 0.0) rectangle (14.0, 8.0);
+        \node[above, color=black] at (0.0, 8.0){$f_1$};
+
+        %F11
+        \draw [thick, fill=white] (1.0,4.0) -- (4.0, 1.0) -- (7.0, 4.0) -- (4.0, 7.0) -- cycle;
+        \node[above, color=black] at (4.0, 7.0){$f_{1,1}$};
+        \draw[thick, dotted] (1.0, 4.0) -- (0.0, 4.0);
+        
+        %F12
+        \draw [thick, fill=white] (9.0,2.0) -- (13.0, 2.0) -- (13.0, 6.0) -- (9.0, 6.0) -- cycle;
+        \node[above, color=black] at (9.0, 6.0){$f_{1,2}$};
+        \draw[thick, dotted] (9.0, 2.0) -- (5.0, 2.0);
+        
+        %F111
+        \draw [thick, fill=light-blue] (3.0,3.0) -- (5.0, 3.0) -- (4.0, 5.0) -- cycle;
+        \node[above, color=black] at (4.0, 5.0){$f_{1,1,1}$};
+        \draw[thick, dotted] (3.0, 3.0) -- (2.0, 3.0);
+
+    \end{tikzpicture}
+\end{document}

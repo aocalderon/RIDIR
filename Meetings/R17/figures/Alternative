@@ -1,0 +1,21 @@
+\documentclass[border=0.0cm]{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{shapes,arrows,arrows.meta,fit,positioning}
+
+\definecolor{light-gray}{gray}{0.9}
+\definecolor{light-blue}{rgb}{0.5,0.5,0.8}
+
+\begin{document}
+    \begin{tikzpicture}
+        \node (rectangle) at (0,0) {\includegraphics{Rectangle}};
+        \node (diamond) [below left  = of rectangle] {\includegraphics{Diamond}};
+        \node (square)  [below right = of rectangle] {\includegraphics{Square}};
+        \node (triangle)[below = of diamond] {\includegraphics{Triangle}};
+        
+        \draw[->, thick] (rectangle) -- (diamond);
+        \draw[->, thick] (rectangle) -- (square);
+        \draw[->, thick] (diamond) -- (triangle);
+
+    \end{tikzpicture}
+\end{document}
