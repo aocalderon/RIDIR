@@ -76,7 +76,7 @@ case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: 
 }
 
 case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
-  private var _id: Long = -1L
+  var id: String = ""
   var origen: Vertex = v2
   var twin: Half_edge = null
   var next: Half_edge = null
@@ -88,12 +88,6 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
 
   val angle  = hangle(v2.x - v1.x, v2.y - v1.y)
   val length = math.sqrt(math.pow(v2.x - v1.x, 2) + math.pow(v2.y - v1.y, 2))
-
-  def getId = _id
-
-  def setId(id: Long): Unit = {
-    _id = id
-  }
 
   def hangle(dx: Double, dy: Double): Double = {
     val length = math.sqrt( (dx * dx) + (dy * dy) )
@@ -166,6 +160,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 
 case class Face(label: String){
   private val geofactory: GeometryFactory = new GeometryFactory();
+  var id: String = ""
   var outerComponent: Half_edge = null
   var innerComponent: Face = null
   var exterior: Boolean = false
@@ -224,7 +219,7 @@ case class Face(label: String){
 
   def toWKT(): String = {
     if(area() <= 0){
-      s"POLYGON EMPTY\t${tag}${label}"
+      s"${id}\tPOLYGON EMPTY\t${tag}${label}"
     } else {
       var hedge = outerComponent
       var wkt = new ArrayBuffer[String]()
@@ -235,7 +230,7 @@ case class Face(label: String){
       }
       wkt += s"${hedge.v2.x} ${hedge.v2.y}"
     
-      s"POLYGON (( ${wkt.mkString(" , ")} ))\t${tag}${label}"
+      s"${id}\tPOLYGON (( ${wkt.mkString(" , ")} ))\t${tag}${label}"
     }
   }
 
@@ -255,7 +250,7 @@ case class Face(label: String){
   }
 }
 
-case class Edge(v1: Vertex, v2: Vertex, var label: String = "") extends Ordered[Edge] {
+case class Edge(v1: Vertex, v2: Vertex, var label: String = "", id: String = "") extends Ordered[Edge] {
   override def compare(that: Edge): Int = {
     if (v2.x == that.v2.x) v2.y compare that.v2.y
     else v2.x compare that.v2.x
