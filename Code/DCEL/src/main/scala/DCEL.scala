@@ -66,6 +66,11 @@ object DCEL{
     new Polygon(ring, null, geofactory)
   }
 
+  def getRings(polygon: Polygon): List[LineString] = {
+    val nInteriorRings = polygon.getNumInteriorRing
+    List(polygon.getExteriorRing) ++ (0 until nInteriorRings).map( i => polygon.getInteriorRingN(i)).toList
+  }
+
   def buildLocalDCEL(edges: List[Edge]): LocalDCEL = {
     var half_edgeList = new ArrayBuffer[Half_edge]()
     var faceList = new ArrayBuffer[Face]()
@@ -74,10 +79,10 @@ object DCEL{
     var vertexList = edges.flatMap(e => List(e.v1, e.v2)).toSet
 
     // Step 2.  Edge set creation with left and right labels...
-    val edges1 = edges.map(e => Edge(e.v1, e.v2) -> e.label).toMap
-    val edges2 = edges.map(e => Edge(e.v2, e.v1) -> e.label).toMap
+    val edges1 = edges.map(e => Edge(e.v1, e.v2, "", e.id) -> s"${e.label} ${e.id}").toMap
+    val edges2 = edges.map(e => Edge(e.v2, e.v1, "", e.id) -> s"${e.label} ${e.id}").toMap
     val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
-    val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "*")}<br>${edges2.getOrElse(e, "*")}") }
+    val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "* #")}<br>${edges2.getOrElse(e, "* #")}") }
       .map{ x =>
         val edge = x._1
         edge.label = x._2
@@ -87,9 +92,11 @@ object DCEL{
     // Step 3. Half-edge list creation with twins and vertices assignments...
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
-      h1.label = edge.left
+      h1.label = edge.left.split(" ")(0)
+      h1.id = edge.left.split(" ")(1)
       val h2 = Half_edge(edge.v2, edge.v1)
-      h2.label = edge.right
+      h2.label = edge.right.split(" ")(0)
+      h2.id = edge.right.split(" ")(1)
 
       h1.twin = h2
       h2.twin = h1
@@ -135,7 +142,12 @@ object DCEL{
         val f = Face(hedge.label)
         f.outerComponent = hedge
         f.outerComponent.face = f
-        var h = hedge.next
+        var h = hedge
+        do{
+          f.id += h.id
+          h = h.next
+        }while(h != f.outerComponent)
+        h = hedge.next
         while(h != f.outerComponent){
           half_edgeList.find(_.equals(h)).get.face = f
           h = h.next
@@ -261,20 +273,19 @@ object DCEL{
     log(stage, timer, 0, "START")
     val dcelRDD = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
       val edges = polygons.flatMap{ p =>
-        val ring = p.getExteriorRing.getCoordinateSequence.toCoordinateArray()
-        val orientation = CGAlgorithms.isCCW(ring)
-        var coords = List.empty[Coordinate]
-        if(orientation){
-          coords = ring.toList
-        } else {
-          coords = ring.reverse.toList
+        var edges = ListBuffer[Edge]()
+        for(ring <- getRings(p)){
+          val coords = ring.getCoordinateSequence.toCoordinateArray().toList
+          val segments = coords.zip(coords.tail)
+          segments.foreach{ segment =>
+            // Assuming id value in in first position...
+            val id = p.getUserData.toString().split("\t")(0)
+            val v1 = Vertex(segment._1.x, segment._1.y)
+            val v2 = Vertex(segment._2.x, segment._2.y)
+            edges += Edge(v1, v2, p.getUserData.toString(), id)
+          }
         }
-        val segments = coords.zip(coords.tail)
-        segments.map{ segment =>
-          val v1 = Vertex(segment._1.x, segment._1.y)
-          val v2 = Vertex(segment._2.x, segment._2.y)
-          Edge(v1, v2, p.getUserData.toString())
-        }
+        edges.toList
       }
       val dcel = buildLocalDCEL(edges.toList)
       dcel.id = i
