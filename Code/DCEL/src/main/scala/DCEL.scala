@@ -1,8 +1,3 @@
-/***
- * Implementation based on https://github.com/anglyan/dcel/blob/master/dcel/dcel.py 
- * with some updates and additions...
- ***/
-
 import org.slf4j.{LoggerFactory, Logger}
 import org.rogach.scallop._
 import org.apache.spark.sql.{SparkSession, Dataset}
@@ -83,17 +78,6 @@ object DCEL{
     var vertexList = edges.flatMap(e => List(e.v1, e.v2)).toSet
 
     // Step 2.  Edge set creation with left and right labels...
-    /*
-    val edges1 = edges.map(e => Edge(e.v1, e.v2, "", e.id) -> s"${e.label} ${e.id}").toMap
-    val edges2 = edges.map(e => Edge(e.v2, e.v1, "", e.id) -> s"${e.label} ${e.id}").toMap
-    val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
-    val edgesSet = keys.map{ e => (e, s"${edges1.getOrElse(e, "* #")}<br>${edges2.getOrElse(e, "* #")}") }
-      .map{ x =>
-        val edge = x._1
-        edge.label = x._2
-        edge
-      }
-     */
     val r = edges.cross(edges.map(e => Edge(e.v2, e.v1, "", e.id)))
       .filter(e => e._1.id < e._2.id)
       .filter(e => e._1.v1 == e._2.v1 && e._1.v2 == e._2.v2)
@@ -163,13 +147,13 @@ object DCEL{
           half_edgeList.find(_.equals(h)).get.face = f
           h = h.next
         }while(h != f.outerComponent)
-        if(f.area() < 0) { f.exterior = true }
+        //if(f.area() < 0) { f.exterior = true }
         faceList += f
       }
     }
 
     val faces = faceList.groupBy(_.id).map{ case (id, faces) =>
-      val f = faces.toList.sortBy(_.area())
+      val f = faces.toList.sortBy(_.faceArea()).reverse
       val head = f.head
       val tail = f.tail
       head.innerComponent = tail

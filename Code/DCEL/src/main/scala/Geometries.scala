@@ -169,7 +169,7 @@ case class Face(label: String){
   var tag: String = ""
   var nHalf_edges = 0
 
-  def area(): Double = {
+  def faceArea(): Double = {
     var a: Double = 0.0
     var h = outerComponent
     while(h.next != outerComponent){
@@ -181,11 +181,13 @@ case class Face(label: String){
     val p1 = h.v2
     val p2 = outerComponent.v2
 
-    val area = (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
+    (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
+  }
 
-    var internalArea = 0.0
-
-    area + internalArea
+  def area(): Double = {
+    val boundary = faceArea()
+    val holes = innerComponent.map(_.faceArea()).sum
+    boundary + holes
   }
 
   def perimeter(): Double = {
@@ -231,7 +233,7 @@ case class Face(label: String){
     }
   }
 
-  private def toLine(): String = {
+  private def toLine(reverse: Boolean = false): String = {
     var hedge = outerComponent
     var wkt = new ArrayBuffer[String]()
     wkt += s"${hedge.v1.x} ${hedge.v1.y}"
@@ -240,15 +242,19 @@ case class Face(label: String){
       hedge = hedge.next
     }
     wkt += s"${hedge.v2.x} ${hedge.v2.y}"
-    s"(${wkt.mkString(",")})"
+    if(reverse){
+      s"(${wkt.reverse.mkString(",")})"
+    } else {
+      s"(${wkt.mkString(",")})"
+    }
   }
 
   def toWKT2: String = {
     if(id == "*"){
-      s"POLYGON EMPTY"
+      s"${id}\tPOLYGON EMPTY"
     } else {
       val exterior = toLine() 
-      val interior = innerComponent.map(inner => inner.toLine).mkString(" , ")
+      val interior = innerComponent.map(inner => inner.toLine(true)).mkString(" , ")
 
       s"${id}\tPOLYGON ( $exterior , $interior )"
     }
