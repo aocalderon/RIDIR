@@ -32,6 +32,10 @@ object DCEL{
   private val precision: Double = 0.001
   private val startTime: Long = 0L
 
+  implicit class Crossable[X](xs: Traversable[X]) {
+    def cross[Y](ys: Traversable[Y]) = for { x <- xs; y <- ys } yield (x, y)
+  }
+  
   def clocktime = System.currentTimeMillis()
 
   def log(msg: String, timer: Long, n: Long, status: String): Unit ={
@@ -79,6 +83,7 @@ object DCEL{
     var vertexList = edges.flatMap(e => List(e.v1, e.v2)).toSet
 
     // Step 2.  Edge set creation with left and right labels...
+    /*
     val edges1 = edges.map(e => Edge(e.v1, e.v2, "", e.id) -> s"${e.label} ${e.id}").toMap
     val edges2 = edges.map(e => Edge(e.v2, e.v1, "", e.id) -> s"${e.label} ${e.id}").toMap
     val keys = (edges1.keySet ++ edges2.keySet).filter(e => e.v1 < e.v2)
@@ -88,15 +93,25 @@ object DCEL{
         edge.label = x._2
         edge
       }
+     */
+    val r = edges.cross(edges.map(e => Edge(e.v2, e.v1, "", e.id)))
+      .filter(e => e._1.id < e._2.id)
+      .filter(e => e._1.v1 == e._2.v1 && e._1.v2 == e._2.v2)
+    val toUpdate = r.map{ p =>
+      p._1.r = p._2.id
+      p._1
+    }
+    val toDelete = r.map(_._1) ++ r.map(e => Edge(e._2.v2, e._2.v1, "", e._2.id))
+    val edgesSet = edges.filterNot(toDelete.toSet).union(toUpdate.toList)
 
     // Step 3. Half-edge list creation with twins and vertices assignments...
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
-      h1.label = edge.left.split(" ")(0)
-      h1.id = edge.left.split(" ")(1)
+      h1.label = edge.l
+      h1.id = edge.l
       val h2 = Half_edge(edge.v2, edge.v1)
-      h2.label = edge.right.split(" ")(0)
-      h2.id = edge.right.split(" ")(1)
+      h2.label = edge.r
+      h2.id = edge.r
 
       h1.twin = h2
       h2.twin = h1
@@ -142,22 +157,27 @@ object DCEL{
         val f = Face(hedge.label)
         f.outerComponent = hedge
         f.outerComponent.face = f
+        f.id = hedge.id
         var h = hedge
         do{
-          f.id += h.id
-          h = h.next
-        }while(h != f.outerComponent)
-        h = hedge.next
-        while(h != f.outerComponent){
           half_edgeList.find(_.equals(h)).get.face = f
           h = h.next
-        }
+        }while(h != f.outerComponent)
         if(f.area() < 0) { f.exterior = true }
         faceList += f
       }
     }
 
-    LocalDCEL(half_edgeList.toList, faceList.toList, vertexList.toList)
+    val faces = faceList.groupBy(_.id).map{ case (id, faces) =>
+      val f = faces.toList.sortBy(_.area())
+      val head = f.head
+      val tail = f.tail
+      head.innerComponent = tail
+
+      head
+    }
+
+    LocalDCEL(half_edgeList.toList, faces.toList, vertexList.toList, edgesSet)
   }
 
   /***
@@ -317,23 +337,19 @@ object DCEL{
       f.close()
       logger.info(s"Saved hedges.wkt [${hedgesWKT.size} records]")
       val facesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
-        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT()}\t${f.getLeftmostVertex.toWKT}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
+        dcel.flatMap(d => d.faces.map(f => s"${f.toWKT2}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
       }.collect()
       f = new java.io.PrintWriter("/tmp/faces.wkt")
       f.write(facesWKT.mkString(""))
       f.close()
       logger.info(s"Saved faces.wkt [${facesWKT.size} records]")
-
-      dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
-        val hedges = dcel.flatMap(d => d.half_edges)
-        val tree = new java.util.TreeMap[Half_edge, Half_edge]()
-        hedges.foreach { h => 
-          tree.put(h, h)
-        }
-        val lower = tree.lowerKey(tree.lastKey())
-        val higher = tree.higherKey(tree.firstKey())
-        List(lower, higher).toIterator
-      }.collect().foreach(println)
+      val edgesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
+        dcel.flatMap(d => d.edges.map(f => s"${f.toWKT}\t${f.toString}\t${i}\n"))
+      }.collect()
+      f = new java.io.PrintWriter("/tmp/edges.wkt")
+      f.write(edgesWKT.mkString(""))
+      f.close()
+      logger.info(s"Saved edges.wkt [${edgesWKT.size} records]")
 
     }
 
