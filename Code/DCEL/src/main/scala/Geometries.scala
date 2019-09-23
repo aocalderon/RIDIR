@@ -46,7 +46,7 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
   }
 }
 
-case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex]) {
+case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: List[Edge] = null) {
   var id: Long = -1L
   var tag: String = ""
 }
@@ -117,7 +117,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     this.equals(that) && this.label == that.label
   }
 
-  def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})\t${tag}${label}"
+  def toWKT: String = s"LINESTRING (${twin.origen.x} ${twin.origen.y} , ${origen.x} ${origen.y})\t${tag}${label}"
 
   def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t${tag}${label}"
 
@@ -155,6 +155,8 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
       case _ => false
     }
 
+  override def toString = s"($x, $y)"
+
   def toWKT: String = s"POINT ($x $y)"
 }
 
@@ -162,7 +164,7 @@ case class Face(label: String){
   private val geofactory: GeometryFactory = new GeometryFactory();
   var id: String = ""
   var outerComponent: Half_edge = null
-  var innerComponent: Face = null
+  var innerComponent: List[Face] = List.empty[Face]
   var exterior: Boolean = false
   var tag: String = ""
   var nHalf_edges = 0
@@ -182,12 +184,7 @@ case class Face(label: String){
     val area = (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
 
     var internalArea = 0.0
-    var inner = innerComponent
-    while(inner != null){
-      internalArea += inner.area()
-      inner = inner.innerComponent
-    }
-    
+
     area + internalArea
   }
 
@@ -234,6 +231,29 @@ case class Face(label: String){
     }
   }
 
+  private def toLine(): String = {
+    var hedge = outerComponent
+    var wkt = new ArrayBuffer[String]()
+    wkt += s"${hedge.v1.x} ${hedge.v1.y}"
+    while(hedge.next != outerComponent){
+      wkt += s"${hedge.v2.x} ${hedge.v2.y}"
+      hedge = hedge.next
+    }
+    wkt += s"${hedge.v2.x} ${hedge.v2.y}"
+    s"(${wkt.mkString(",")})"
+  }
+
+  def toWKT2: String = {
+    if(id == "*"){
+      s"POLYGON EMPTY"
+    } else {
+      val exterior = toLine() 
+      val interior = innerComponent.map(inner => inner.toLine).mkString(" , ")
+
+      s"${id}\tPOLYGON ( $exterior , $interior )"
+    }
+  }
+
   def toPolygon(): Polygon = {
     var coords = ArrayBuffer.empty[Coordinate]
     if(area() > 0){
@@ -251,6 +271,9 @@ case class Face(label: String){
 }
 
 case class Edge(v1: Vertex, v2: Vertex, var label: String = "", id: String = "") extends Ordered[Edge] {
+  var l = id
+  var r = "*"
+
   override def compare(that: Edge): Int = {
     if (v2.x == that.v2.x) v2.y compare that.v2.y
     else v2.x compare that.v2.x
@@ -261,16 +284,30 @@ case class Edge(v1: Vertex, v2: Vertex, var label: String = "", id: String = "")
   override def equals(that: Any): Boolean =
     that match {
       case that: Edge => {
-        that.canEqual(this) && ( this.v1.equals(that.v1) && this.v2.equals(that.v2) )
+        that.canEqual(this) &&
+        this.v1.equals(that.v1) && 
+        this.v2.equals(that.v2) &&
+        this.id.equals(that.id)
       }
       case _ => false
     }
+
+  override def hashCode: Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + v1.x.toInt
+    result = prime * result + v2.y.toInt
+    result = prime * result + (if (id == null) 0 else id.hashCode)
+    result
+  }
 
   def left: String = label.split("<br>")(0)
 
   def right: String = label.split("<br>")(1)
 
-  def toWKT: String = s"LINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})\t${label}"
+  override def toString = s"${id} ${v1.toString} ${v2.toString}\t${l}\t${r}"
+
+  def toWKT: String = s"${id}\tLINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})\t${label}"
 }
 
 
