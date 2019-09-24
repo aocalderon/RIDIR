@@ -251,12 +251,12 @@ case class Face(label: String){
 
   def toWKT2: String = {
     if(id == "*"){
-      s"${id}\tPOLYGON EMPTY"
+      s"${id}\tPOLYGON EMPTY\t${tag}${label}"
     } else {
       val exterior = toLine() 
       val interior = innerComponent.map(inner => inner.toLine(true)).mkString(" , ")
 
-      s"${id}\tPOLYGON ( $exterior , $interior )"
+      s"${id}\tPOLYGON ( $exterior , $interior )\t${tag}${label}"
     }
   }
 
@@ -311,7 +311,7 @@ case class Edge(v1: Vertex, v2: Vertex, var label: String = "", id: String = "")
 
   def right: String = label.split("<br>")(1)
 
-  override def toString = s"${id} ${v1.toString} ${v2.toString}\t${l}\t${r}"
+  override def toString = s"${id} ${v1.toString} ${v2.toString}\t${l} ${r}"
 
   def toWKT: String = s"${id}\tLINESTRING(${v1.x} ${v1.y}, ${v2.x} ${v2.y})\t${label}"
 }
