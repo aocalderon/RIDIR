@@ -147,13 +147,12 @@ object DCEL{
           half_edgeList.find(_.equals(h)).get.face = f
           h = h.next
         }while(h != f.outerComponent)
-        //if(f.area() < 0) { f.exterior = true }
         faceList += f
       }
     }
 
     val faces = faceList.groupBy(_.id).map{ case (id, faces) =>
-      val f = faces.toList.sortBy(_.faceArea()).reverse
+      val f = faces.toList.sortBy(_.faceArea())(Ordering[Double].reverse)
       val head = f.head
       val tail = f.tail
       head.innerComponent = tail
