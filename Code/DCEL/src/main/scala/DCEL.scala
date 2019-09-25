@@ -65,9 +65,19 @@ object DCEL{
     new Polygon(ring, null, geofactory)
   }
 
-  def getRings(polygon: Polygon): List[LineString] = {
+  def getRings(polygon: Polygon): List[Array[Coordinate]] = {
+    var exteriorCoords = polygon.getExteriorRing.getCoordinateSequence.toCoordinateArray()
+    if(!CGAlgorithms.isCCW(exteriorCoords)) { exteriorCoords = exteriorCoords.reverse }
+    val outerRing = List(exteriorCoords)
+
     val nInteriorRings = polygon.getNumInteriorRing
-    List(polygon.getExteriorRing) ++ (0 until nInteriorRings).map( i => polygon.getInteriorRingN(i)).toList
+    val innerRings = (0 until nInteriorRings).map{ i => 
+      var interiorCoords = polygon.getInteriorRingN(i).getCoordinateSequence.toCoordinateArray()
+      if(CGAlgorithms.isCCW(interiorCoords)) { interiorCoords = interiorCoords.reverse }
+      interiorCoords
+    }.toList
+
+    outerRing ++ innerRings
   }
 
   def buildLocalDCEL(edges: List[Edge]): LocalDCEL = {
@@ -209,19 +219,31 @@ object DCEL{
     stage = "Data read"
     log(stage, timer, 0, "START")
     val polygonRDD = new SpatialRDD[Geometry]()
-    val polygons = spark.read.option("header", "false").option("delimiter", "\t")
-      .csv(input).rdd.zipWithUniqueId().map{ row =>
-        val polygon = reader.read(row._1.getString(offset))//.asInstanceOf[MultiPolygon]
-        val userData = (0 until row._1.size).filter(_ != offset).map(i => row._1.getString(i)).mkString("\t")
-        polygon.setUserData(userData)
+    val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
+      val arr = line.split("\t")
+      val userData = (0 until arr.size).filter(_ != offset).map(i => arr(i))
+      logger.info(s"Parsing ${userData(0)}")
+      val wkt = arr(offset)
+      val coords = Array(new Coordinate(30, 10), new Coordinate(40, 40), new Coordinate(20, 40), new Coordinate(10, 20), new Coordinate(30, 10))
+      var polygon = geofactory.createPolygon(geofactory.createLinearRing(coords)).asInstanceOf[Geometry]
+      try{
+        polygon = reader.read(wkt)
+        polygon.setUserData(userData.mkString("\t"))
         polygon
+      } catch {
+        case e: com.vividsolutions.jts.io.ParseException =>
+          logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
+        case e: java.lang.NullPointerException =>
+          logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
       }
+      polygon
+    }
     polygonRDD.setRawSpatialRDD(polygons)
     val nPolygons = polygons.count()
     log(stage, timer, nPolygons, "END")
 
     if(debug){
-      polygonRDD.rawSpatialRDD.rdd.foreach(println)
+      //polygonRDD.rawSpatialRDD.rdd.foreach(println)
     }
 
     // Partitioning data...
@@ -248,12 +270,12 @@ object DCEL{
       var polys = List.empty[Polygon]
       if(index < grids.size){
         val clipper = new GeometryClipper(grids(index))
-        // If false there is no guarantee the polygons returned will be valid according to JTS rules
-        // (but should still be good enough to be used for pure rendering).
         var ps = new ListBuffer[Polygon]()
         polygons.foreach { to_clip =>
           val label = to_clip.getUserData.toString
-          val geoms = clipper.clip(to_clip, true)
+          // If false there is no guarantee the polygons returned will be valid according to JTS rules
+          // (but should still be good enough to be used for pure rendering).
+          val geoms = clipper.clipSafe(to_clip, true, 0.001)
           for(i <- 0 until geoms.getNumGeometries){
             val geom = geoms.getGeometryN(i)
             if(geom.getGeometryType == "Polygon" && !geom.isEmpty()){
@@ -278,7 +300,7 @@ object DCEL{
       val edges = polygons.flatMap{ p =>
         var edges = ListBuffer[Edge]()
         for(ring <- getRings(p)){
-          val coords = ring.getCoordinateSequence.toCoordinateArray().toList
+          val coords = ring.toList
           val segments = coords.zip(coords.tail)
           segments.foreach{ segment =>
             // Assuming id value in in first position...
@@ -293,10 +315,12 @@ object DCEL{
       val dcel = buildLocalDCEL(edges.toList)
       dcel.id = i
       List(dcel).toIterator
-    }
-    log(stage, timer, 0, "END")
+    }.cache()
+    val nDcelRDD = dcelRDD.count()
+    log(stage, timer, nDcelRDD, "END")
 
     if(debug){
+/*
       val clippedWKT = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
         polygons.map(p => s"${p.toText()}\t${i}\n")
       }.collect()
@@ -318,14 +342,17 @@ object DCEL{
       f = new java.io.PrintWriter("/tmp/hedges.wkt")
       f.write(hedgesWKT.mkString(""))
       f.close()
+ 
       logger.info(s"Saved hedges.wkt [${hedgesWKT.size} records]")
+ */
       val facesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
         dcel.flatMap(d => d.faces.map(f => s"${f.toWKT2}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
       }.collect()
-      f = new java.io.PrintWriter("/tmp/faces.wkt")
+      val f = new java.io.PrintWriter("/tmp/faces.wkt")
       f.write(facesWKT.mkString(""))
       f.close()
       logger.info(s"Saved faces.wkt [${facesWKT.size} records]")
+/*
       val edgesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
         dcel.flatMap(d => d.edges.map(f => s"${f.toWKT}\t${f.toString}\t${i}\n"))
       }.collect()
@@ -333,7 +360,7 @@ object DCEL{
       f.write(edgesWKT.mkString(""))
       f.close()
       logger.info(s"Saved edges.wkt [${edgesWKT.size} records]")
-
+*/
     }
 
     // Closing session...
