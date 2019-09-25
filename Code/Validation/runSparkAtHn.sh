@@ -1,0 +1,1 @@
+/usr/bin/spark-submit --num-executors 10 --executor-cores 12 --class DCEL /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input ~/Datasets/cali.wkt --offset 1 --partitions 512 --debug
