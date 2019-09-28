@@ -223,19 +223,18 @@ object DCEL{
       val arr = line.split("\t")
       val userData = (0 until arr.size).filter(_ != offset).map(i => arr(i))
       logger.info(s"Parsing ${userData(0)}")
-      val wkt = arr(offset)
-      val coords = Array(new Coordinate(30, 10), new Coordinate(40, 40), new Coordinate(20, 40), new Coordinate(10, 20), new Coordinate(30, 10))
-      var polygon = geofactory.createPolygon(geofactory.createLinearRing(coords)).asInstanceOf[Geometry]
-      try{
-        polygon = reader.read(wkt)
+
+      //try{
+        val wkt = arr(offset)
+        val polygon = new WKTReader(geofactory).read(wkt)
         polygon.setUserData(userData.mkString("\t"))
-        polygon
-      } catch {
-        case e: com.vividsolutions.jts.io.ParseException =>
-          logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
-        case e: java.lang.NullPointerException =>
-          logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
-      }
+      //  polygon
+      //} catch {
+      //  case e: com.vividsolutions.jts.io.ParseException =>
+      //    logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
+      //  case e: java.lang.NullPointerException =>
+      //    logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
+      //}
       polygon
     }
     polygonRDD.setRawSpatialRDD(polygons)
