@@ -189,7 +189,7 @@ object DCEL{
       case false => s"spark://${params.host()}:${params.port()}"
     }
     val gridType = params.grid() match {
-      case "EQUALTREE" => GridType.EQUALGRID
+      case "EQUALGRID" => GridType.EQUALGRID
       case "QUADTREE"  => GridType.QUADTREE
       case "KDBTREE"   => GridType.KDBTREE
     }
@@ -199,7 +199,7 @@ object DCEL{
     var stage = "Session started"
     log(stage, timer, 0, "START")
     val spark = SparkSession.builder()
-      .config("spark.default.parallelism", 3 * cores * executors)
+      .config("spark.default.parallelism", 3 * 120)
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .config("spark.scheduler.mode", "FAIR")
@@ -222,7 +222,7 @@ object DCEL{
     val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
       val arr = line.split("\t")
       val userData = (0 until arr.size).filter(_ != offset).map(i => arr(i))
-      logger.info(s"Parsing ${userData(0)}")
+      //logger.info(s"Parsing ${userData(0)}")
 
       //try{
         val wkt = arr(offset)
@@ -255,7 +255,7 @@ object DCEL{
     log(stage, timer, grids.size, "END")
 
     if(debug) {
-      val gridsWKT = grids.values.map(g => s"${envelope2Polygon(g).toText()}\n")
+      val gridsWKT =  polygonRDD.partitionTree.getAllZones().asScala.map(z => s"${z.partitionId}\t${envelope2Polygon(z.getEnvelope).toText()}\n")
       val f = new java.io.PrintWriter("/tmp/dcelGrid.wkt")
       f.write(gridsWKT.mkString(""))
       f.close()
@@ -295,14 +295,14 @@ object DCEL{
     timer = clocktime
     stage = "Building local DCEL"
     log(stage, timer, 0, "START")
-    val dcelRDD = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
+    val dcelRDD = clippedPolygonsRDD.sample(false, 0.6).mapPartitionsWithIndex{ (i, polygons) =>
       val edges = polygons.flatMap{ p =>
         var edges = ListBuffer[Edge]()
         for(ring <- getRings(p)){
           val coords = ring.toList
           val segments = coords.zip(coords.tail)
           segments.foreach{ segment =>
-            // Assuming id value in in first position...
+            // Assuming id value is in first position...
             val id = p.getUserData.toString().split("\t")(0)
             val v1 = Vertex(segment._1.x, segment._1.y)
             val v2 = Vertex(segment._2.x, segment._2.y)
@@ -311,14 +311,26 @@ object DCEL{
         }
         edges.toList
       }
+      val start = clocktime
       val dcel = buildLocalDCEL(edges.toList)
+      val end = clocktime
       dcel.id = i
+      dcel.nEdges = dcel.edges.size
+      dcel.executionTime = end - start
       List(dcel).toIterator
     }.cache()
     val nDcelRDD = dcelRDD.count()
     log(stage, timer, nDcelRDD, "END")
 
     if(debug){
+      val report = dcelRDD.map{d => (d.id, d.nEdges, d.executionTime)}.toDF("id", "edges", "time")
+        .orderBy(desc("time"))
+        .map(r => s"${r.getLong(0)}\t${r.getInt(1)}\t${r.getLong(2)}\n")
+        .collect()
+      val r = new java.io.PrintWriter("/tmp/report.tsv")
+      r.write(report.mkString(""))
+      r.close()
+      logger.info(s"Saved report.tsv [${report.size} records]")
 /*
       val clippedWKT = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
         polygons.map(p => s"${p.toText()}\t${i}\n")
@@ -378,7 +390,7 @@ class DCELConf(args: Seq[String]) extends ScallopConf(args) {
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
   val executors:  ScallopOption[Int]     = opt[Int]     (default = Some(3))
-  val grid:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
+  val grid:       ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
   val index:      ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
   val local:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))

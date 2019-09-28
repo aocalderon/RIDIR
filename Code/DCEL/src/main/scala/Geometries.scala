@@ -49,6 +49,8 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
 case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: List[Edge] = null) {
   var id: Long = -1L
   var tag: String = ""
+  var nEdges: Int = 0
+  var executionTime: Long = 0L
 }
 
 case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], partition: Int = -1, edges: Set[Edge] = null, source: List[Half_edge] = null) {
