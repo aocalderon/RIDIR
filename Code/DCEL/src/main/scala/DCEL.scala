@@ -12,7 +12,7 @@ import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
 import com.vividsolutions.jts.operation.buffer.BufferParameters
 import com.vividsolutions.jts.geom.GeometryFactory
-import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString, MultiPolygon}
+import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString, MultiPolygon, Point}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.algorithm.{RobustCGAlgorithms, CGAlgorithms}
 import com.vividsolutions.jts.io.WKTReader
@@ -85,9 +85,12 @@ object DCEL{
     var faceList = new ArrayBuffer[Face]()
 
     // Step 1. Vertex set creation...
+    var timer = clocktime
     var vertexList = edges.flatMap(e => List(e.v1, e.v2)).toSet
+    logger.info(s"Vertex set... ${(clocktime - timer) / 1000.0}")
 
     // Step 2.  Edge set creation with left and right labels...
+    timer = clocktime
     val r = edges.cross(edges.map(e => Edge(e.v2, e.v1, "", e.id)))
       .filter(e => e._1.id < e._2.id)
       .filter(e => e._1.v1 == e._2.v1 && e._1.v2 == e._2.v2)
@@ -97,8 +100,10 @@ object DCEL{
     }
     val toDelete = r.map(_._1) ++ r.map(e => Edge(e._2.v2, e._2.v1, "", e._2.id))
     val edgesSet = edges.filterNot(toDelete.toSet).union(toUpdate.toList)
+    logger.info(s"Edge set... ${(clocktime - timer) / 1000.0}")
 
     // Step 3. Half-edge list creation with twins and vertices assignments...
+    timer = clocktime
     edgesSet.foreach{ edge =>
       val h1 = Half_edge(edge.v1, edge.v2)
       h1.label = edge.l
@@ -116,8 +121,10 @@ object DCEL{
       half_edgeList += h2
       half_edgeList += h1
     }
+    logger.info(s"Half-edge set... ${(clocktime - timer) / 1000.0}")
 
     // Step 4. Identification of next and prev half-edges...
+    timer = clocktime
     vertexList.map{ vertex =>
       val sortedIncidents = vertex.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
       val size = sortedIncidents.size
@@ -141,8 +148,10 @@ object DCEL{
       current.next   = next.twin
       next.twin.prev = current
     }
+    logger.info(s"Next and prev set... ${(clocktime - timer) / 1000.0}")
 
     // Step 5. Face assignment...
+    timer = clocktime
     var temp_half_edgeList = new ArrayBuffer[Half_edge]()
     temp_half_edgeList ++= half_edgeList
     for(temp_hedge <- temp_half_edgeList){
@@ -169,6 +178,7 @@ object DCEL{
 
       head
     }
+    logger.info(s"Face set... ${(clocktime - timer) / 1000.0}")
 
     LocalDCEL(half_edgeList.toList, faces.toList, vertexList.toList, edgesSet)
   }
@@ -222,40 +232,31 @@ object DCEL{
     val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
       val arr = line.split("\t")
       val userData = (0 until arr.size).filter(_ != offset).map(i => arr(i))
-      //logger.info(s"Parsing ${userData(0)}")
-
-      //try{
-        val wkt = arr(offset)
-        val polygon = new WKTReader(geofactory).read(wkt)
-        polygon.setUserData(userData.mkString("\t"))
-      //  polygon
-      //} catch {
-      //  case e: com.vividsolutions.jts.io.ParseException =>
-      //    logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
-      //  case e: java.lang.NullPointerException =>
-      //    logger.info(s"Error in ${userData(0)} ${e.getMessage()} ${wkt}")
-      //}
+      val wkt = arr(offset)
+      val polygon = new WKTReader(geofactory).read(wkt)
+      polygon.setUserData(userData.mkString("\t"))
       polygon
     }
     polygonRDD.setRawSpatialRDD(polygons)
     val nPolygons = polygons.count()
     log(stage, timer, nPolygons, "END")
 
-    if(debug){
-      //polygonRDD.rawSpatialRDD.rdd.foreach(println)
-    }
-
     // Partitioning data...
     timer = clocktime
     stage = "Partitioning data"
     log(stage, timer, 0, "START")
     polygonRDD.analyze()
-    polygonRDD.spatialPartitioning(gridType, partitions)
+    val points = polygonRDD.rawSpatialRDD.rdd.flatMap(p => p.getCoordinates.map(geofactory.createPoint))
+    val pointsRDD = new SpatialRDD[Point]()
+    pointsRDD.setRawSpatialRDD(points)
+    pointsRDD.analyze()
+    pointsRDD.spatialPartitioning(gridType, partitions)
+    polygonRDD.spatialPartitioning(pointsRDD.getPartitioner)
     val grids = polygonRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
     log(stage, timer, grids.size, "END")
 
     if(debug) {
-      val gridsWKT =  polygonRDD.partitionTree.getAllZones().asScala.map(z => s"${z.partitionId}\t${envelope2Polygon(z.getEnvelope).toText()}\n")
+      val gridsWKT =  pointsRDD.partitionTree.getAllZones().asScala.filter(_.partitionId != null).map(z => s"${z.partitionId}\t${envelope2Polygon(z.getEnvelope).toText()}\n")
       val f = new java.io.PrintWriter("/tmp/dcelGrid.wkt")
       f.write(gridsWKT.mkString(""))
       f.close()
@@ -295,7 +296,7 @@ object DCEL{
     timer = clocktime
     stage = "Building local DCEL"
     log(stage, timer, 0, "START")
-    val dcelRDD = clippedPolygonsRDD.sample(false, 0.6).mapPartitionsWithIndex{ (i, polygons) =>
+    val dcelRDD = clippedPolygonsRDD.sample(false, params.sample()).mapPartitionsWithIndex{ (i, polygons) =>
       val edges = polygons.flatMap{ p =>
         var edges = ListBuffer[Edge]()
         for(ring <- getRings(p)){
@@ -331,7 +332,7 @@ object DCEL{
       r.write(report.mkString(""))
       r.close()
       logger.info(s"Saved report.tsv [${report.size} records]")
-/*
+
       val clippedWKT = clippedPolygonsRDD.mapPartitionsWithIndex{ (i, polygons) =>
         polygons.map(p => s"${p.toText()}\t${i}\n")
       }.collect()
@@ -339,7 +340,7 @@ object DCEL{
       f.write(clippedWKT.mkString(""))
       f.close()
       logger.info(s"Saved clipped.wkt [${clippedWKT.size} records]")
-
+/*
       val verticesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
         dcel.flatMap(d => d.vertices.map(f => s"${f.toWKT}\t${i}\n"))
       }.collect()
@@ -359,7 +360,7 @@ object DCEL{
       val facesWKT = dcelRDD.mapPartitionsWithIndex{ (i, dcel) =>
         dcel.flatMap(d => d.faces.map(f => s"${f.toWKT2}\t${f.area()}\t${f.perimeter()}\t${i}\n"))
       }.collect()
-      val f = new java.io.PrintWriter("/tmp/faces.wkt")
+      f = new java.io.PrintWriter("/tmp/faces.wkt")
       f.write(facesWKT.mkString(""))
       f.close()
       logger.info(s"Saved faces.wkt [${facesWKT.size} records]")
@@ -393,6 +394,7 @@ class DCELConf(args: Seq[String]) extends ScallopConf(args) {
   val grid:       ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
   val index:      ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
+  val sample:     ScallopOption[Double]  = opt[Double]  (default = Some(1.0))
   val local:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
