@@ -6,6 +6,8 @@ Code/Areal/.ensime_cache/*
 Code/DCEL/target/*
 Code/DCEL/project/*
 Code/DCEL/.ensime
+Code/DCEL/.metals/*
+Code/DCEL/.bloop/*
 Code/DCEL/.ensime_cache/*
 
 Code/dyn4j/target/*
