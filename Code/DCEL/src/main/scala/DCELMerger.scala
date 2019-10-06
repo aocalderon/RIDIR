@@ -12,6 +12,8 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.datasyslab.geospark.spatialPartitioning.quadtree.{QuadTreePartitioner, StandardQuadTree, QuadRectangle}
+import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
 import org.geotools.geometry.jts.GeometryClipper
 import org.rogach.scallop._
 import org.slf4j.{Logger, LoggerFactory}
@@ -318,6 +320,41 @@ object DCELMerger{
     val boundary1 = polygonsA.boundaryEnvelope
     val boundary2 = polygonsB.boundaryEnvelope
     val fullBoundary = envelope2Polygon(boundary1).union(envelope2Polygon(boundary2)).getEnvelopeInternal
+
+    /*
+    val boundary = new QuadRectangle(fullBoundary)
+    val maxLevels = params.levels()
+    val maxItemsPerNode = params.entries()
+    val quadtree = new StandardQuadTree[Geometry](boundary, 0, maxItemsPerNode, maxLevels)
+    val samples = polygonsA.rawSpatialRDD.rdd
+      .sample(false, params.fraction(), 42)
+      .map(_.getEnvelopeInternal)
+    for(sample <- samples.collect()){
+      quadtree.insert(new QuadRectangle(sample), null)
+    }
+    quadtree.assignPartitionIds()
+    val QTPartitioner = new QuadTreePartitioner(quadtree)
+    polygonsA.spatialPartitioning(QTPartitioner)
+    polygonsB.spatialPartitioning(QTPartitioner)
+    val grids = QTPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
+     */
+
+    val maxLevels = params.levels()
+    val maxItemsPerNode = params.entries()
+    val tree = new KDBTree(maxItemsPerNode, maxLevels, fullBoundary)
+    val samples = polygonsA.rawSpatialRDD.rdd
+      .sample(false, params.fraction(), 42)
+      .map(_.getEnvelopeInternal)
+    for(sample <- samples.collect()){
+      tree.insert(sample)
+    }
+    tree.assignLeafIds()
+    val partitioner = new KDBTreePartitioner(tree)
+    polygonsA.spatialPartitioning(partitioner)
+    polygonsB.spatialPartitioning(partitioner)
+    val grids = partitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
+
+    /*
     val points = polygonsB.rawSpatialRDD.rdd.flatMap(p => p.getCoordinates.map(geofactory.createPoint))
     val pointsRDD = new SpatialRDD[Point]()
     pointsRDD.setRawSpatialRDD(points)
@@ -327,11 +364,12 @@ object DCELMerger{
     polygonsA.spatialPartitioning(pointsRDD.getPartitioner)
     polygonsB.spatialPartitioning(pointsRDD.getPartitioner)
     val grids = pointsRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
+     */
+
     log(stage, timer, grids.size, "END")
 
     if(debug) {
-      val gridsWKT =  pointsRDD.partitionTree.getAllZones().asScala.filter(_.partitionId != null)
-        .map(z => s"${z.partitionId}\t${envelope2Polygon(z.getEnvelope).toText()}\n")
+      val gridsWKT = partitioner.getGrids().asScala.map(e => s"${envelope2Polygon(e).toText()}\n")
       val f = new java.io.PrintWriter("/tmp/dcelGrid.wkt")
       f.write(gridsWKT.mkString(""))
       f.close()
