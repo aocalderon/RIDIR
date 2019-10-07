@@ -70,7 +70,6 @@ object DCELMerger{
     // Step 1. Vertex set creation...
     var timer = clocktime
     var vertexList = edges.flatMap(e => List(e.v1, e.v2)).toSet
-    logger.info(s"Vertex set... ${(clocktime - timer) / 1000.0}")
 
     // Step 2.  Edge set creation with left and right labels...
     timer = clocktime
@@ -83,7 +82,6 @@ object DCELMerger{
     }
     val toDelete = r.map(_._1) ++ r.map(e => Edge(e._2.v2, e._2.v1, "", e._2.id))
     val edgesSet = edges.filterNot(toDelete.toSet).union(toUpdate.toList)
-    logger.info(s"Edge set... ${(clocktime - timer) / 1000.0}")
 
     // Step 3. Half-edge list creation with twins and vertices assignments...
     timer = clocktime
@@ -106,7 +104,6 @@ object DCELMerger{
       half_edgeList += h2
       half_edgeList += h1
     }
-    logger.info(s"Half-edge set... ${(clocktime - timer) / 1000.0}")
 
     // Step 4. Identification of next and prev half-edges...
     timer = clocktime
@@ -133,7 +130,6 @@ object DCELMerger{
       current.next   = next.twin
       next.twin.prev = current
     }
-    logger.info(s"Next and prev set... ${(clocktime - timer) / 1000.0}")
 
     // Step 5. Face assignment...
     timer = clocktime
@@ -163,7 +159,6 @@ object DCELMerger{
 
       head
     }
-    logger.info(s"Face set... ${(clocktime - timer) / 1000.0}")
 
     LocalDCEL(half_edgeList.toList, faces.toList, vertexList.toList, edgesSet)
   }
@@ -339,6 +334,7 @@ object DCELMerger{
     val grids = QTPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
      */
 
+    /*
     val maxLevels = params.levels()
     val maxItemsPerNode = params.entries()
     val tree = new KDBTree(maxItemsPerNode, maxLevels, fullBoundary)
@@ -353,8 +349,9 @@ object DCELMerger{
     polygonsA.spatialPartitioning(partitioner)
     polygonsB.spatialPartitioning(partitioner)
     val grids = partitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
+     */
 
-    /*
+
     val points = polygonsB.rawSpatialRDD.rdd.flatMap(p => p.getCoordinates.map(geofactory.createPoint))
     val pointsRDD = new SpatialRDD[Point]()
     pointsRDD.setRawSpatialRDD(points)
@@ -364,12 +361,12 @@ object DCELMerger{
     polygonsA.spatialPartitioning(pointsRDD.getPartitioner)
     polygonsB.spatialPartitioning(pointsRDD.getPartitioner)
     val grids = pointsRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
-     */
+    
 
     log(stage, timer, grids.size, "END")
 
     if(debug) {
-      val gridsWKT = partitioner.getGrids().asScala.map(e => s"${envelope2Polygon(e).toText()}\n")
+      val gridsWKT = pointsRDD.partitionTree.getAllZones.asScala.map(z =>  s"${z.partitionId}\t${envelope2Polygon(z.getEnvelope).toText()}\n")
       val f = new java.io.PrintWriter("/tmp/dcelGrid.wkt")
       f.write(gridsWKT.mkString(""))
       f.close()
@@ -484,9 +481,12 @@ object DCELMerger{
     }
 
     def mergePolygons(a: String, b:String): String = {
+      val precision = 0.0001
       val reader = new WKTReader(geofactory)
-      val pa = reader.read(a)
-      val pb = reader.read(b)
+      //logger.info(s"A: $a")
+      val pa = reader.read(a)//.buffer(precision)
+      //logger.info(s"B: $b")
+      val pb = reader.read(b)//.buffer(precision)
       pa.union(pb).toText()
     }
 
@@ -496,7 +496,7 @@ object DCELMerger{
     log(stage, timer, 0, "START")
     val union = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().union()
-        .map(f => (f.tag, f.toWKT))
+        .map(f => (f.tag, f.toWKT2))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n").cache()
     log(stage, timer, union.count(), "END")
@@ -507,7 +507,7 @@ object DCELMerger{
     log(stage, timer, 0, "START")
     val intersection = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().intersection()
-        .map(f => (f.tag, f.toWKT))
+        .map(f => (f.tag, f.toWKT2))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n").cache()
     log(stage, timer, intersection.count(), "END")
@@ -518,7 +518,7 @@ object DCELMerger{
     log(stage, timer, 0, "START")
     val symmetric = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().symmetricDifference()
-        .map(f => (f.tag, f.toWKT()))
+        .map(f => (f.tag, f.toWKT2))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n").cache()
     log(stage, timer, symmetric.count(), "END")
@@ -529,7 +529,7 @@ object DCELMerger{
     log(stage, timer, 0, "START")
     val differenceA = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().differenceA()
-        .map(f => (f.tag, f.toWKT()))
+        .map(f => (f.tag, f.toWKT2))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n").cache()
     log(stage, timer, differenceA.count(), "END")
@@ -540,7 +540,7 @@ object DCELMerger{
     log(stage, timer, 0, "START")
     val differenceB = mergedDCEL.mapPartitions{ dcels =>
       dcels.next().differenceB()
-        .map(f => (f.tag, f.toWKT()))
+        .map(f => (f.tag, f.toWKT2))
         .toIterator
     }.reduceByKey{ mergePolygons }.map(f => s"${f._1}\t${f._2}\n").cache()
     log(stage, timer, differenceB.count(), "END")
