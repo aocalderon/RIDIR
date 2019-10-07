@@ -65,15 +65,15 @@ case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: 
 
   def symmetricDifference(): List[Face] = {
     faces.filter(_.tag.split(" ").size == 1)
-    .filter(_.area() > 0)
+      .filter(_.area() > 0)
   }
 
   def differenceA(): List[Face] = {
-    symmetricDifference().filter(_.tag.substring(0, 1) == "A")
+    symmetricDifference().filter(_.tag.size > 1).filter(_.tag.substring(0, 1) == "A")
   }
 
   def differenceB(): List[Face] = {
-    symmetricDifference().filter(_.tag.substring(0, 1) == "B")
+    symmetricDifference().filter(_.tag.size > 1).filter(_.tag.substring(0, 1) == "B")
   }
 }
 
@@ -235,15 +235,17 @@ case class Face(label: String){
     }
   }
 
+  private def round(n: Double): Double = { val s = math.pow(10.0, 9) ; (math round n * s) / s }
+
   private def toLine(reverse: Boolean = false): String = {
     var hedge = outerComponent
     var wkt = new ArrayBuffer[String]()
-    wkt += s"${hedge.v1.x} ${hedge.v1.y}"
+    wkt += s"${round(hedge.v1.x)} ${round(hedge.v1.y)}"
     while(hedge.next != outerComponent){
-      wkt += s"${hedge.v2.x} ${hedge.v2.y}"
+      wkt += s"${round(hedge.v2.x)} ${round(hedge.v2.y)}"
       hedge = hedge.next
     }
-    wkt += s"${hedge.v2.x} ${hedge.v2.y}"
+    wkt += s"${round(hedge.v2.x)} ${round(hedge.v2.y)}"
     if(reverse){
       s"(${wkt.reverse.mkString(",")})"
     } else {
@@ -256,9 +258,10 @@ case class Face(label: String){
       s"${id}\tPOLYGON EMPTY\t${tag}${label}"
     } else {
       val exterior = toLine() 
-      val interior = innerComponent.map(inner => inner.toLine(true)).mkString(" , ")
+      val interior = innerComponent.map(inner => inner.toLine(true))
+      val wkt = List(exterior) ++ interior
 
-      s"${id}\tPOLYGON ( $exterior , $interior )\t${tag}${label}"
+      s"${id}\tPOLYGON ( ${wkt.mkString(", ")} )\t${tag}${label}"
     }
   }
 
