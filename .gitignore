@@ -10,6 +10,13 @@ Code/DCEL/.metals/*
 Code/DCEL/.bloop/*
 Code/DCEL/.ensime_cache/*
 
+Code/StarkTester/target/*
+Code/StarkTester/project/*
+Code/StarkTester/.ensime
+Code/StarkTester/.metals/*
+Code/StarkTester/.bloop/*
+Code/StarkTester/.ensime_cache/*
+
 Code/dyn4j/target/*
 Code/dyn4j/project/*
 Code/dyn4j/.ensime
