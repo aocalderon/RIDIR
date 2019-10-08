@@ -280,9 +280,9 @@ object DCELMerger{
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .config("spark.scheduler.mode", "FAIR")
-      //.config("spark.cores.max", cores * executors)
-      //.config("spark.executor.cores", cores)
-      //.master(master)
+      .config("spark.cores.max", cores * executors)
+      .config("spark.executor.cores", cores)
+      .master(master)
       .appName("DCEL")
       .getOrCreate()
     import spark.implicits._
@@ -361,7 +361,6 @@ object DCELMerger{
     polygonsA.spatialPartitioning(pointsRDD.getPartitioner)
     polygonsB.spatialPartitioning(pointsRDD.getPartitioner)
     val grids = pointsRDD.getPartitioner.getGrids.asScala.zipWithIndex.map(g => g._2 -> g._1).toMap
-    
 
     log(stage, timer, grids.size, "END")
 
