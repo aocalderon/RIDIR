@@ -241,6 +241,39 @@ object DCEL{
     val nPolygons = polygons.count()
     log(stage, timer, nPolygons, "END")
 
+    polygonRDD.analyze()
+    polygonRDD.spatialPartitioning(GridType.QUADTREE, partitions)
+    val tree = polygonRDD.partitionTree
+    val envelopes = tree.getLeafZones().asScala.map(l => l.partitionId -> l.getEnvelope()).toMap
+    val cells = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, items) =>
+      val envelope = envelopes.get(index).get 
+      List( (index, items.toList.size, envelope) ).toIterator
+    }.flatMap { case(index, load, cell) =>
+        if(load > 0){
+          val p1 = new Coordinate(cell.getMinX, cell.getMinY)
+          val p2 = new Coordinate(cell.getMinX, cell.getMaxY)
+          val p3 = new Coordinate(cell.getMaxX, cell.getMinY)
+          val p4 = new Coordinate(cell.getMaxX, cell.getMaxY)
+          val c  = new Coordinate(cell.getMinX + cell.getWidth / 2, cell.getMinY + cell.getHeight / 2)
+          List(
+            (new Envelope(p1, c), load),
+            (new Envelope(p2, c), load),
+            (new Envelope(p3, c), load),
+            (new Envelope(c, p4), load)
+          )
+        } else {
+          List((cell, load))
+        }
+    }
+
+
+    if(debug) {
+      val gridsWKT = cells.map(cell => s"${envelope2Polygon(cell._1).toText()}\t${cell._2}\n").collect()
+      val f = new java.io.PrintWriter("/tmp/cells.wkt")
+      f.write(gridsWKT.mkString(""))
+      f.close()
+    }
+
     // Partitioning data...
     timer = clocktime
     stage = "Partitioning data"
