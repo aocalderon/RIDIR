@@ -280,9 +280,9 @@ object DCELMerger{
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .config("spark.scheduler.mode", "FAIR")
-      .config("spark.cores.max", cores * executors)
-      .config("spark.executor.cores", cores)
-      .master(master)
+      //.config("spark.cores.max", cores * executors)
+      //.config("spark.executor.cores", cores)
+      //.master(master)
       .appName("DCEL")
       .getOrCreate()
     import spark.implicits._
