@@ -1,7 +1,7 @@
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 import com.vividsolutions.jts.geom.GeometryFactory
-import com.vividsolutions.jts.geom.{Coordinate, LinearRing, Polygon}
+import com.vividsolutions.jts.geom.{CoordinateSequence, Coordinate, LinearRing, Polygon, LineString}
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
   def getVerticesSet: List[Vertex] = {
@@ -78,7 +78,9 @@ case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: 
 }
 
 case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
-  var id: String = ""
+  var id:    String = ""
+  var ring:  Int    = -1
+  var order: Int    = -1
   var origen: Vertex = v2
   var twin: Half_edge = null
   var next: Half_edge = null
