@@ -84,6 +84,32 @@ object EdgePartitioner{
     }
   }
 
+  def edge2graphedge(edge: LineString ): GraphEdge = {
+    val pts = edge.getCoordinates
+    val hedge = Half_edge(Vertex(pts(0).x, pts(0).y), Vertex(pts(1).x, pts(1).y))
+    val arr = edge.getUserData.toString().split("\t")
+    hedge.id = arr(0)
+    hedge.ring = arr(1).toInt
+    hedge.order = arr(2).toInt
+
+    new GraphEdge(pts, hedge)
+  }
+
+  def linestring2paircoord(line: LineString): List[(Coordinate, Coordinate)] = {
+    val coords = line.getCoordinates
+    coords.zip(coords.tail).toList
+  }
+
+  def linestring2graphedge(line: LineString): List[GraphEdge] = {
+    linestring2paircoord(line).map{ pair =>
+      val pts = Array(pair._1, pair._2)
+      val hedge = Half_edge(Vertex(pts(0).x, pts(0).y), Vertex(pts(1).x, pts(1).y))
+      hedge.id = "*"
+
+      new GraphEdge(pts, hedge)
+    }
+  }
+
   /***
    * The main function...
    **/
@@ -159,7 +185,7 @@ object EdgePartitioner{
     val nEdges = edges.count()
     log(stage, timer, nEdges, "END")
 
-    timer = System.currentTimeMillis()
+    timer = clocktime
     stage = "Partitioning edges"
     log(stage, timer, 0, "START")
     val edgesRDD = new SpatialRDD[LineString]()
@@ -174,8 +200,22 @@ object EdgePartitioner{
     quadtree.assignPartitionIds()
     val EdgePartitioner = new QuadTreePartitioner(quadtree)
     edgesRDD.spatialPartitioning(EdgePartitioner)
+    edgesRDD.spatialPartitionedRDD.rdd.cache
+    val cells = quadtree.getLeafZones.asScala.map(c => c.partitionId -> c.getEnvelope).toMap
     val nEpartitions = edgesRDD.spatialPartitionedRDD.rdd.getNumPartitions
     log(stage, timer, nEpartitions, "END")
+
+    timer = clocktime
+    stage = "Getting intersections"
+    log(stage, timer, 0, "START")
+    edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
+      val g1 = edges.map(edge2graphedge).toList
+      val cell = envelope2Polygon(cells.get(index).get).getExteriorRing
+      val g2 = linestring2graphedge(cell)
+
+      SweepLine.getGraphEdgeIntersections(g1, g2).toIterator
+    }
+    log(stage, timer, 0, "END")
 
     if(debug){
       var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (i, edges) =>
