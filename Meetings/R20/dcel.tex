@@ -106,17 +106,35 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Test - CA dataset}
+\begin{frame}{Test - CA\_districts 2010 dataset}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/CA_ForceGrowUp} 
+\end{frame}
+
+\begin{frame}{Focus on bug during integration and additional tests}
+    \begin{itemize}
+        \item It is related to the precision of Polygon's coordinates.  Some polygon's sections are not touching by a very small margin.  
+        \item Fixed on Phili datasets by truncating to 6 decimal places.
+        \item Run experiments with CA\_districts datasets 2000 and 2010. Merged DCEL is done but the overlay operations still fails for errors during the merging stage.
+        \item Checking the correct coordinate system and precision.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Test - CA\_districs dataset - 2000 vs 2010}
     \centering 
     \includegraphics[width=\linewidth]{figures/CA_DCELMerged} 
 \end{frame}
 
+\begin{frame}{Output -CA\_districs dataset - 2000 vs 2010}
+    \centering 
+    \includegraphics[width=\linewidth]{figures/CA_Test_Output} 
+\end{frame}
 
 \begin{frame}{What is next?}
     \begin{itemize}
-        \item Fix bug during integration.
+        \item Decide and integrate the partition strategy.
+        \item Work on CA\_districts datasets 2000 vs 2010 issues.
         \item Check support for multipolygons.
-        \item Test merged DCEL with CA\_district datasets.
     \end{itemize}
 \end{frame}
 
