@@ -28,6 +28,30 @@ df['geoid'] = df.index
 df['state'] = df['geoid'].str[0:2]
 
 #%%
+year = 1990
+state = '06'
+variables = ['geoid', 'n_total_pop']
+
+df_cali_1990 = df[(df['year'] == year) & (df.geoid.str[0:2] == state)][variables]
+
+#%%
+aux = census.tracts_1990()
+aux['geometry'] = aux.wkb.apply(lambda x: loads(x, hex=True))
+aux = aux.drop(['wkb'], axis = 1)
+gdf_1990 = gpd.GeoDataFrame(aux)
+gdf_1990['year'] = '2000'
+gdf_1990.head()
+
+#%%
+cali_2000 = gdf_2000[gdf_2000.geoid.str[0:2] == state]
+ax = cali_2000.plot(figsize = (10,10), alpha = 0.5, edgecolor = 'black')
+ax.set_title("California in 2000", fontsize = 20)
+plt.axis('off')
+
+#%%
+cali_2000.to_csv("/tmp/cali2000.wkt", sep="\t", header=False, index=False)
+
+#%%
 year = 2000
 state = '06'
 variables = ['geoid', 'n_total_pop']
