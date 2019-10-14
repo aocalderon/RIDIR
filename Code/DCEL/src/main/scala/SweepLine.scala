@@ -50,6 +50,20 @@ object SweepLine{
     }.toList
   }
 
+  def getGraphEdgeIntersections(edgesA: List[GraphEdge], edgesB: List[GraphEdge]): List[GraphEdge] = {
+    val gedges1 = edgesA.asJava
+    val gedges2 = edgesB.asJava
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+    sweepline.computeIntersections(gedges1, gedges2, segmentIntersector)
+
+    val g1 = gedges1.asScala
+    val g2 = gedges2.asScala
+    
+    g1.union(g2).toList
+  }
+
   def buildMergedDCEL(hedges: List[Half_edge], p: Int = -1, debug: Boolean = false): MergedDCEL = {
     var half_edgeList = new ArrayBuffer[Half_edge]()
     var faceList = new ArrayBuffer[Face]()
