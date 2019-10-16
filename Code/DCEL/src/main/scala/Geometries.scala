@@ -1,20 +1,38 @@
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
-import com.vividsolutions.jts.geom.GeometryFactory
-import com.vividsolutions.jts.geom.{CoordinateSequence, Coordinate, LinearRing, Polygon, LineString}
+import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
+import com.vividsolutions.jts.geom.{Coordinate, LinearRing, Polygon, LineString, Point}
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
+  private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
   def getVerticesSet: List[Vertex] = {
     var vertices = new ArrayBuffer[Vertex]()
     vertices += hedge.v1
     super.getEdgeIntersectionList().iterator().asScala.toList.foreach{ n =>
       val inter = n.asInstanceOf[com.vividsolutions.jts.geomgraph.EdgeIntersection]
       val coord = inter.getCoordinate
-      val index = inter.getSegmentIndex
       vertices += Vertex(coord.x, coord.y)
     }
     vertices += hedge.v2
     vertices.toList.distinct
+  }
+
+  def getLineStrings: List[LineString] = {
+    var lines = new ArrayBuffer[LineString]()
+    val vertices = this.getVerticesSet.map(v => new Coordinate(v.x, v.y))
+    val segments = vertices.zip(vertices.tail)
+    for(segment <- segments){
+      val arr = Array(segment._1, segment._2)
+      val line = geofactory.createLineString(arr)
+      val tag = this.hedge.tag
+      val label = this.hedge.label
+      val id = this.hedge.id
+      val ring = this.hedge.ring
+      val order = this.hedge.order
+      line.setUserData(s"$id\t$ring\t$order\t$tag$label")
+      lines += line
+    }
+    lines.toList
   }
 
   def getHalf_edges: List[Half_edge] = {
@@ -25,6 +43,9 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
       val he = Half_edge(segment._1, segment._2)
       he.tag = this.hedge.tag
       he.label = this.hedge.label
+      he.id = this.hedge.id
+      he.ring = this.hedge.ring
+      he.order = this.hedge.order
       half_edges += he
     }
     half_edges.toList.distinct
@@ -34,6 +55,20 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
     this.getHalf_edges.map(hedge => (hedge, hedge.v1)).toList
   }
 
+  def getIntersectionPoints: List[(Point, Half_edge)] = {
+    val intersections = super.getEdgeIntersectionList()
+    intersections.iterator().asScala.toList.map{ n =>
+      val inter = n.asInstanceOf[com.vividsolutions.jts.geomgraph.EdgeIntersection]
+      val coord = inter.getCoordinate
+      val seg = inter.getSegmentIndex
+      val dist = inter.getDistance
+      val point = geofactory.createPoint(coord)
+      point.setUserData(s"$seg\t$dist")
+      (point, hedge)
+    }
+
+  }
+
   def toWKT: String = {
     val intersections = super.getEdgeIntersectionList()
     intersections.iterator().asScala.toList.map{ n =>
@@ -41,7 +76,7 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
       val coord = inter.getCoordinate
       val seg = inter.getSegmentIndex
       val dist = inter.getDistance
-      s"POINT(${coord.x} ${coord.y})\t$seg\t$dist\t${hedge.tag}${hedge.label}"
+      s"POINT(${coord.x} ${coord.y})\t$seg\t$dist\t${hedge.id}"
     }.mkString("\n")
   }
 }
@@ -123,9 +158,9 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
 
   def toWKT: String = s"LINESTRING (${twin.origen.x} ${twin.origen.y} , ${origen.x} ${origen.y})\t${tag}${label}"
 
-  def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t${tag}${label}"
+  def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t$id\t$ring\t${tag}${label}"
 
-  def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})"
+  def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})\t$id\t$ring\t${tag}${label}"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
@@ -165,7 +200,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 }
 
 case class Face(label: String){
-  private val geofactory: GeometryFactory = new GeometryFactory();
+  private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
   var id: String = ""
   var outerComponent: Half_edge = null
   var innerComponent: List[Face] = List.empty[Face]
