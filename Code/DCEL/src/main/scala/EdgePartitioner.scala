@@ -10,7 +10,7 @@ import org.datasyslab.geospark.enums.{FileDataSplitter, GridType, IndexType}
 import org.datasyslab.geospark.spatialPartitioning.quadtree._
 import org.datasyslab.geospark.spatialRDD.{SpatialRDD, PolygonRDD, LineStringRDD}
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
-import com.vividsolutions.jts.geom.GeometryFactory
+import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate,  Polygon, LinearRing, LineString, MultiPolygon, Point}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.algorithm.{RobustCGAlgorithms, CGAlgorithms}
@@ -21,10 +21,10 @@ import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer, HashSet}
 
 object EdgePartitioner{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
-  private val geofactory: GeometryFactory = new GeometryFactory();
-  private val reader = new WKTReader(geofactory)
-  private val precision: Double = 0.001
   private val startTime: Long = 0L
+  private var precisionModel: PrecisionModel = null
+  private var geofactory: GeometryFactory = null
+  private var precision: Double = 0.0001
 
   implicit class Crossable[X](xs: Traversable[X]) {
     def cross[Y](ys: Traversable[Y]) = for { x <- xs; y <- ys } yield (x, y)
@@ -45,9 +45,8 @@ object EdgePartitioner{
     val p2 = new Coordinate(maxX, minY)
     val p3 = new Coordinate(maxX, maxY)
     val p4 = new Coordinate(minX, maxY)
-    val coordArraySeq = new CoordinateArraySequence( Array(p1,p2,p3,p4,p1), 2)
-    val ring = new LinearRing(coordArraySeq, geofactory)
-    new Polygon(ring, null, geofactory)
+    val ring = geofactory.createLinearRing(Array(p1,p2,p3,p4,p1))
+    geofactory.createPolygon(ring)
   }
 
   def getRings(polygon: Polygon): List[Array[Coordinate]] = {
@@ -63,6 +62,27 @@ object EdgePartitioner{
     }.toList
 
     outerRing ++ innerRings
+  }
+
+  def roundAt(p: Int)(n : Double): Double = { val s = math pow (10, p); (math round n * s) / s }
+
+  def roundCoordinatesAt(p: Int)(polygon: Polygon): Polygon = {
+    val shellCoords = polygon.getExteriorRing.getCoordinates.map{ coord =>
+      new Coordinate(roundAt(p)(coord.x), roundAt(p)(coord.y))
+    }
+    val shell = new LinearRing(new CoordinateArraySequence(shellCoords), geofactory)
+
+    var holesCoords = new ArrayBuffer[Array[Coordinate]]()
+    (0 until polygon.getNumInteriorRing).map{ i =>
+      holesCoords += polygon.getInteriorRingN(i).getCoordinates.map{ coord =>
+        new Coordinate(roundAt(p)(coord.x), roundAt(p)(coord.y))
+      }
+    }
+    val holes = holesCoords.toArray.map{ arr =>
+      new LinearRing(new CoordinateArraySequence(arr), geofactory)
+    }
+    
+    new Polygon(shell, holes, geofactory)
   }
 
   def getHalf_edges(polygon: Polygon): List[LineString] = {
@@ -110,6 +130,18 @@ object EdgePartitioner{
     }
   }
 
+  def clipLines(lines: List[LineString], clipper: GeometryClipper): List[LineString] = {
+    // If false there is no guarantee the polygons returned will be valid according to JTS rules
+    // (but should still be good enough to be used for pure rendering).
+    lines.map{ line =>
+      val l = clipper.clipSafe(line, true, 0.0001).asInstanceOf[LineString]
+      if(l != null){
+        l.setUserData(line.getUserData.toString())
+      }
+      l
+    }.filter(l => l.isInstanceOf[LineString])
+  }
+
   /***
    * The main function...
    **/
@@ -122,6 +154,9 @@ object EdgePartitioner{
     val ppartitions = params.ppartitions()
     val epartitions = params.epartitions()
     val debug = params.debug()
+    precisionModel = new PrecisionModel(math.pow(10, params.decimals()))
+    geofactory = new GeometryFactory(precisionModel)
+    precision = 1 / precisionModel.getScale
     val master = params.local() match {
       case true  => s"local[${cores}]"
       case false => s"spark://${params.host()}:${params.port()}"
@@ -130,6 +165,10 @@ object EdgePartitioner{
       case "EQUALGRID" => GridType.EQUALGRID
       case "QUADTREE"  => GridType.QUADTREE
       case "KDBTREE"   => GridType.KDBTREE
+    }
+
+    if(debug){
+      logger.info(s"Using Scale=${precisionModel.getScale} and Precision=${precision}")
     }
 
     // Starting session...
@@ -155,12 +194,12 @@ object EdgePartitioner{
     timer = System.currentTimeMillis()
     stage = "Reading data"
     log(stage, timer, 0, "START")
-    val polygonRDD = new SpatialRDD[Geometry]()
+    val polygonRDD = new SpatialRDD[Polygon]()
     val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
       val arr = line.split("\t")
       val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i)) 
       val wkt = arr(offset)
-      val polygon = new WKTReader(geofactory).read(wkt)
+      val polygon = new WKTReader(geofactory).read(wkt).asInstanceOf[Polygon]
       polygon.setUserData(userData.mkString("\t"))
       polygon
     }.cache
@@ -208,14 +247,41 @@ object EdgePartitioner{
     timer = clocktime
     stage = "Getting intersections"
     log(stage, timer, 0, "START")
-    edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
+    val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
+      val cell = envelope2Polygon(cells.get(index).get)
       val g1 = edges.map(edge2graphedge).toList
-      val cell = envelope2Polygon(cells.get(index).get).getExteriorRing
-      val g2 = linestring2graphedge(cell)
+      val g2 = linestring2graphedge(cell.getExteriorRing)
 
-      SweepLine.getGraphEdgeIntersections(g1, g2).toIterator
+      SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
+        gedge.getLineStrings
+      }.filter(line => line.coveredBy(cell)).toIterator
+    }.cache
+    val nSegments = segments.count()
+    log(stage, timer, nSegments, "END")
+
+    val vertices = segments.mapPartitionsWithIndex{ case (index, segments) =>
+      val hedges = segments.flatMap{ segment =>
+        val arr = segment.getUserData.toString().split("\t")
+        val coords = segment.getCoordinates
+        val v1 = Vertex(coords(0).x, coords(0).y)
+        val v2 = Vertex(coords(1).x, coords(1).y)
+        val h1 = Half_edge(v1, v2)
+        h1.id = arr(0); h1.ring = arr(1).toInt; h1.order = arr(2).toInt
+        h1.label = arr(3)
+        val h2 = Half_edge(v2, v1)
+        h2.id = "*"
+        List(h1, h2)
+      }
+
+      val vertices = hedges.map(hedge => (hedge.v1, hedge)).toList
+        .groupBy(_._1).toList.map{ v =>
+          val vertex = v._1
+          vertex.half_edges ++=  v._2.map(_._2)
+          vertex
+        }
+
+      vertices.toIterator
     }
-    log(stage, timer, 0, "END")
 
     if(debug){
       var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (i, edges) =>
@@ -231,6 +297,26 @@ object EdgePartitioner{
 
       WKT = quadtree.getLeafZones.asScala.toArray.map(z => s"${z.partitionId}\t${envelope2Polygon(z.getEnvelope)}\n")
       filename = "/tmp/edgesCells.wkt"
+      f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+
+      WKT = segments.map{ segment =>
+        s"${segment.toText()}\t${segment.getUserData.toString()}\n"
+      }.collect()
+      filename = "/tmp/edgesSegments.wkt"
+      f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+
+      WKT = vertices.flatMap{ vertex =>
+        vertex.getHalf_edges.map{ hedge =>
+          s"${vertex.toWKT}\t${hedge.toWKT3}\n"
+        }
+      }.collect()
+      filename = "/tmp/edgesVertices.wkt"
       f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
@@ -254,6 +340,7 @@ class EdgePartitionerConf(args: Seq[String]) extends ScallopConf(args) {
   val executors:   ScallopOption[Int]     = opt[Int]     (default = Some(3))
   val grid:        ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
   val index:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
+  val decimals:    ScallopOption[Int]     = opt[Int]     (default = Some(6))
   val ppartitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
   val epartitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
   val esample:     ScallopOption[Double]  = opt[Double]  (default = Some(0.25))
