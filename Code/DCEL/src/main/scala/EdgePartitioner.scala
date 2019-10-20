@@ -66,25 +66,6 @@ object EdgePartitioner{
 
   def roundAt(p: Int)(n : Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
-  def roundCoordinatesAt(p: Int)(polygon: Polygon): Polygon = {
-    val shellCoords = polygon.getExteriorRing.getCoordinates.map{ coord =>
-      new Coordinate(roundAt(p)(coord.x), roundAt(p)(coord.y))
-    }
-    val shell = new LinearRing(new CoordinateArraySequence(shellCoords), geofactory)
-
-    var holesCoords = new ArrayBuffer[Array[Coordinate]]()
-    (0 until polygon.getNumInteriorRing).map{ i =>
-      holesCoords += polygon.getInteriorRingN(i).getCoordinates.map{ coord =>
-        new Coordinate(roundAt(p)(coord.x), roundAt(p)(coord.y))
-      }
-    }
-    val holes = holesCoords.toArray.map{ arr =>
-      new LinearRing(new CoordinateArraySequence(arr), geofactory)
-    }
-    
-    new Polygon(shell, holes, geofactory)
-  }
-
   def getHalf_edges(polygon: Polygon): List[LineString] = {
     val polygon_id = polygon.getUserData.toString().split("\t")(0)
     val rings = getRings(polygon).zipWithIndex
@@ -261,6 +242,7 @@ object EdgePartitioner{
 
     val dcel = segments.mapPartitionsWithIndex{ case (index, segments) =>
       var half_edges = new ArrayBuffer[Half_edge]()
+
       val hedges = segments.flatMap{ segment =>
         val arr = segment.getUserData.toString().split("\t")
         val coords = segment.getCoordinates
@@ -278,16 +260,21 @@ object EdgePartitioner{
         List(h1, h2)
       }
 
-      val vertices = hedges.map(hedge => (hedge.v2, hedge)).toList
-        .groupBy(_._1).toList.map{ v =>
-          val vertex = v._1
+      var vertices = half_edges.flatMap(h => List(h.v1, h.v2)).distinct.sorted
+
+      vertices.foreach{println}
+
+      hedges.map(hedge => (hedge.v2, hedge)).toList
+        .groupBy(_._1).toList.foreach{ v =>
+          val vertex = vertices.find(_.equals(v._1)).get
           vertex.setHalf_edges(v._2.map(_._2))
-          vertex
         }
 
       vertices.foreach{ vertex =>
         val sortedIncidents = vertex.getHalf_edges()
         val size = sortedIncidents.size
+
+        //logger.info(s"Sorted incidents: ${sortedIncidents.map(h => s"Hedge: ${h.id}\t${h.ring}\t${h.order}\t${h.angle} Twin: ${h.twin.id}\t${h.twin.ring}\t${h.twin.order}").mkString("\n")}")
 
         for(i <- 0 until (size - 1)){
           var current = sortedIncidents(i)
@@ -296,6 +283,8 @@ object EdgePartitioner{
           next    = half_edges.find(_.equals(next)).get
           current.next   = next.twin
           next.twin.prev = current
+          if(current.id != "*")
+            logger.info(s"${current.toWKT} ${current.next.toWKT}")
         }
         var current = sortedIncidents(size - 1)
         var next    = sortedIncidents(0)
@@ -303,6 +292,13 @@ object EdgePartitioner{
         next    = half_edges.find(_.equals(next)).get
         current.next   = next.twin
         next.twin.prev = current
+        if(current.id != "*")
+          logger.info(s"${current.toWKT} ${current.next.toWKT}")
+      }
+
+      logger.info("Half edges")
+      half_edges.map{ hedge =>
+        s"${hedge.id} ${hedge.ring} ${hedge.order}\t${hedge.next.id} ${hedge.next.ring} ${hedge.next.order}"
       }
 
       logger.info("Faces")

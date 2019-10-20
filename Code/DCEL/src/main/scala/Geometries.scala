@@ -188,11 +188,10 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
           hedge._2
         }
       }
-    this.half_edges.sortBy(_.angle)(Ordering[Double].reverse)
   }
 
   def getHalf_edges(): List[Half_edge] = {
-    this.half_edges.toList
+    this.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
   }
 
   override def compare(that: Vertex): Int = {
