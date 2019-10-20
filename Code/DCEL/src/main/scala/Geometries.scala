@@ -125,7 +125,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   var tag: String = ""
   var visited: Boolean = false
 
-  val angle  = hangle(v2.x - v1.x, v2.y - v1.y)
+  val angle  = math.toDegrees(hangle(v2.x - v1.x, v2.y - v1.y))
   val length = math.sqrt(math.pow(v2.x - v1.x, 2) + math.pow(v2.y - v1.y, 2))
 
   def hangle(dx: Double, dy: Double): Double = {
@@ -156,11 +156,11 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     this.equals(that) && this.label == that.label
   }
 
-  def toWKT: String = s"LINESTRING (${twin.origen.x} ${twin.origen.y} , ${origen.x} ${origen.y})\t${tag}${label}"
+  def toWKT: String = s"LINESTRING (${twin.origen.x} ${twin.origen.y} , ${origen.x} ${origen.y})\t$id\t$ring\t$order"
 
-  def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t$id\t$ring\t${tag}${label}"
+  def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t$id\t$ring\t$order"
 
-  def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})\t$id\t$ring\t${tag}${label}"
+  def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})\t$id\t$ring\t$order"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
@@ -173,6 +173,22 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 
   def setId(id: Long): Unit = {
     _id = id
+  }
+
+  def setHalf_edges(hedges: List[Half_edge]): Unit = {
+    this.half_edges.clear()
+    this.half_edges ++= hedges.groupBy(_.angle)
+      .flatMap{ hedge =>
+        if(hedge._2.size > 1){ // Removing duplicate half edge and setting new twins...
+          val h1 = hedge._2.filter(_.id != "*").head
+          val h2 = hedge._2.filter(_.id == "*").head
+          h1.twin = h2.twin
+          List(h1)
+        } else {
+          hedge._2
+        }
+      }
+    this.half_edges.sortBy(_.angle)(Ordering[Double].reverse)
   }
 
   def getHalf_edges(): List[Half_edge] = {
