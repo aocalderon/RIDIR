@@ -156,7 +156,7 @@ object EdgePartitioner{
     val debug = params.debug()
     precisionModel = new PrecisionModel(math.pow(10, params.decimals()))
     geofactory = new GeometryFactory(precisionModel)
-    precision = 1 / precisionModel.getScale
+    //precision = 1 / precisionModel.getScale
     val master = params.local() match {
       case true  => s"local[${cores}]"
       case false => s"spark://${params.host()}:${params.port()}"
@@ -259,7 +259,8 @@ object EdgePartitioner{
     val nSegments = segments.count()
     log(stage, timer, nSegments, "END")
 
-    val vertices = segments.mapPartitionsWithIndex{ case (index, segments) =>
+    val dcel = segments.mapPartitionsWithIndex{ case (index, segments) =>
+      var half_edges = new ArrayBuffer[Half_edge]()
       val hedges = segments.flatMap{ segment =>
         val arr = segment.getUserData.toString().split("\t")
         val coords = segment.getCoordinates
@@ -270,17 +271,66 @@ object EdgePartitioner{
         h1.label = arr(3)
         val h2 = Half_edge(v2, v1)
         h2.id = "*"
+        h1.twin = h2
+        h2.twin = h1
+        half_edges += h1
+        half_edges += h2
         List(h1, h2)
       }
 
-      val vertices = hedges.map(hedge => (hedge.v1, hedge)).toList
+      val vertices = hedges.map(hedge => (hedge.v2, hedge)).toList
         .groupBy(_._1).toList.map{ v =>
           val vertex = v._1
-          vertex.half_edges ++=  v._2.map(_._2)
+          vertex.setHalf_edges(v._2.map(_._2))
           vertex
         }
 
-      vertices.toIterator
+      vertices.foreach{ vertex =>
+        val sortedIncidents = vertex.getHalf_edges()
+        val size = sortedIncidents.size
+
+        for(i <- 0 until (size - 1)){
+          var current = sortedIncidents(i)
+          var next    = sortedIncidents(i + 1)
+          current = half_edges.find(_.equals(current)).get
+          next    = half_edges.find(_.equals(next)).get
+          current.next   = next.twin
+          next.twin.prev = current
+        }
+        var current = sortedIncidents(size - 1)
+        var next    = sortedIncidents(0)
+        current = half_edges.find(_.equals(current)).get
+        next    = half_edges.find(_.equals(next)).get
+        current.next   = next.twin
+        next.twin.prev = current
+      }
+
+      logger.info("Faces")
+      var faces = new ArrayBuffer[Face]()
+      var temp_half_edges = new ArrayBuffer[Half_edge]()
+      temp_half_edges ++= half_edges
+      
+      for(temp_hedge <- temp_half_edges){
+        val hedge = half_edges.find(_.equals(temp_hedge)).get
+
+        logger.info(s"${hedge.id}: ${hedge.face}")
+        if(hedge.face == null){
+          logger.info(s"For: ${hedge.id}\t${hedge.toWKT}")
+          val face = Face(hedge.id)
+          face.outerComponent = hedge
+          face.outerComponent.face = face
+          face.id = hedge.id
+          var h = hedge
+          do{
+            logger.info(s"Do: ${h.id}\t${h.ring}\t${h.order}\t${h.toWKT}")
+            h.face = face
+            h = h.next
+          }while(h != face.outerComponent)
+          faces += face
+        }
+      }
+      
+      List( (vertices, faces.toList) ).toIterator
     }
 
     if(debug){
@@ -311,12 +361,27 @@ object EdgePartitioner{
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
 
-      WKT = vertices.flatMap{ vertex =>
-        vertex.getHalf_edges.map{ hedge =>
-          s"${vertex.toWKT}\t${hedge.toWKT3}\n"
+      WKT = dcel.flatMap{ dcel =>
+        val vertices = dcel._1
+        vertices.flatMap{ vertex =>
+          vertex.getHalf_edges.map{ hedge =>
+            s"${vertex.toWKT}\t${hedge.toWKT}\t${hedge.id}\t${hedge.angle}\n"
+          }
         }
       }.collect()
       filename = "/tmp/edgesVertices.wkt"
+      f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+
+      WKT = dcel.flatMap{ dcel =>
+        val faces = dcel._2
+        faces.map{ face =>
+            s"${face.toWKT}\t${face.id}\n"
+        }
+      }.collect()
+      filename = "/tmp/edgesFaces.wkt"
       f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
