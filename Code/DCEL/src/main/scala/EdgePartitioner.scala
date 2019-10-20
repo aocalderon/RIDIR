@@ -226,7 +226,7 @@ object EdgePartitioner{
     log(stage, timer, nEpartitions, "END")
 
     timer = clocktime
-    stage = "Getting intersections"
+    stage = "Getting segments"
     log(stage, timer, 0, "START")
     val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
       val cell = envelope2Polygon(cells.get(index).get)
@@ -240,10 +240,11 @@ object EdgePartitioner{
     val nSegments = segments.count()
     log(stage, timer, nSegments, "END")
 
-    val dcel = segments.mapPartitionsWithIndex{ case (index, segments) =>
-      var half_edges = new ArrayBuffer[Half_edge]()
-
-      val hedges = segments.flatMap{ segment =>
+    timer = clocktime
+    stage = "Getting half edges"
+    log(stage, timer, 0, "START")
+    val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
+      segments.flatMap{ segment =>
         val arr = segment.getUserData.toString().split("\t")
         val coords = segment.getCoordinates
         val v1 = Vertex(coords(0).x, coords(0).y)
@@ -255,32 +256,37 @@ object EdgePartitioner{
         h2.id = "*"
         h1.twin = h2
         h2.twin = h1
-        half_edges += h1
-        half_edges += h2
         List(h1, h2)
       }
+    }.cache
+    val nHalf_edges = half_edges.count()
+    log(stage, timer, nHalf_edges, "END")
 
-      var vertices = half_edges.flatMap(h => List(h.v1, h.v2)).distinct.sorted
+    half_edges.foreach(println)
 
-      vertices.foreach{println}
-
-      hedges.map(hedge => (hedge.v2, hedge)).toList
-        .groupBy(_._1).toList.foreach{ v =>
-          val vertex = vertices.find(_.equals(v._1)).get
+    timer = clocktime
+    stage = "Getting local DCEL's"
+    log(stage, timer, 0, "START")
+    val dcel = half_edges.mapPartitionsWithIndex{ case (index, hedges) =>
+      logger.info("Vertices")
+      val vertices = hedges.map(hedge => (hedge.v2, hedge)).toList
+        .groupBy(_._1).toList.map{ v =>
+          val vertex = v._1
           vertex.setHalf_edges(v._2.map(_._2))
+          vertex
         }
+
+      vertices.map(v => v.half_edges.map(h => s"${v}\t${h.toWKT}")).foreach{println}
 
       vertices.foreach{ vertex =>
         val sortedIncidents = vertex.getHalf_edges()
         val size = sortedIncidents.size
 
-        //logger.info(s"Sorted incidents: ${sortedIncidents.map(h => s"Hedge: ${h.id}\t${h.ring}\t${h.order}\t${h.angle} Twin: ${h.twin.id}\t${h.twin.ring}\t${h.twin.order}").mkString("\n")}")
-
         for(i <- 0 until (size - 1)){
           var current = sortedIncidents(i)
           var next    = sortedIncidents(i + 1)
-          current = half_edges.find(_.equals(current)).get
-          next    = half_edges.find(_.equals(next)).get
+          //current = half_edges.find(_.equals(current)).get
+          //next    = half_edges.find(_.equals(next)).get
           current.next   = next.twin
           next.twin.prev = current
           if(current.id != "*")
@@ -288,8 +294,8 @@ object EdgePartitioner{
         }
         var current = sortedIncidents(size - 1)
         var next    = sortedIncidents(0)
-        current = half_edges.find(_.equals(current)).get
-        next    = half_edges.find(_.equals(next)).get
+        //current = half_edges.find(_.equals(current)).get
+        //next    = half_edges.find(_.equals(next)).get
         current.next   = next.twin
         next.twin.prev = current
         if(current.id != "*")
@@ -297,12 +303,19 @@ object EdgePartitioner{
       }
 
       logger.info("Half edges")
-      half_edges.map{ hedge =>
-        s"${hedge.id} ${hedge.ring} ${hedge.order}\t${hedge.next.id} ${hedge.next.ring} ${hedge.next.order}"
-      }
+      vertices.flatMap(v => v.getHalf_edges.map(h => (v, h))).flatMap{ case (vertex, hedge) =>
+        var l = new ArrayBuffer[String]()
+        var h = hedge
+        do{
+          l += s"${vertex}\t${h.toWKT}"
+          h = h.next
+        }while(h != hedge)
+        l
+      }.filter(l => !l.contains("*")).foreach(println)
 
       logger.info("Faces")
       var faces = new ArrayBuffer[Face]()
+      /*
       var temp_half_edges = new ArrayBuffer[Half_edge]()
       temp_half_edges ++= half_edges
       
@@ -325,9 +338,12 @@ object EdgePartitioner{
           faces += face
         }
       }
-      
+       */
+
       List( (vertices, faces.toList) ).toIterator
-    }
+    }.cache
+    val nDcel = dcel.count()
+    log(stage, timer, nDcel, "END")
 
     if(debug){
       var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (i, edges) =>
