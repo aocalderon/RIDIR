@@ -214,7 +214,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   def toWKT: String = s"POINT ($x $y)"
 }
 
-case class Face(label: String){
+case class Face(label: String) extends Ordered[Face]{
   private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
   var id: String = ""
   var outerComponent: Half_edge = null
@@ -283,7 +283,7 @@ case class Face(label: String){
       }
       wkt += s"${hedge.v2.x} ${hedge.v2.y}"
     
-      s"${id}\tPOLYGON (( ${wkt.mkString(" , ")} ))\t${tag}${label}"
+      s"${id}\tPOLYGON (( ${wkt.mkString(", ")} ))\t${tag}${label}"
     }
   }
 
@@ -330,6 +330,29 @@ case class Face(label: String){
     }
     val ring = geofactory.createLinearRing(coords.toArray)
     geofactory.createPolygon(ring)
+  }
+
+  override def compare(that: Face): Int = {
+    id compare that.id
+  }
+
+  def canEqual(a: Any) = a.isInstanceOf[Face]
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Face => {
+        that.canEqual(this) && this.id == that.id 
+      }
+      case _ => false
+    }
+
+  override def hashCode: Int = {
+    val prime = 31
+    var result = 1
+    val x = this.id.toInt
+    result = prime * x
+    result = prime * result + (if (id == null) 0 else id.hashCode)
+    result
   }
 }
 
