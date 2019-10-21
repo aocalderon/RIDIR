@@ -1,0 +1,15 @@
+\documentclass[border=0cm]{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{shapes,arrows,arrows.meta,fit,positioning}
+
+\begin{document}
+\begin{tikzpicture}
+    \node (A) at (0,0)    {\includegraphics[scale=0.5]{PolygonB}};
+    \node (B) [below = 0.1cm of A]    {\includegraphics[scale=0.5]{PolygonA}};
+    \node (arrow1) [below right = -0.15cm and 0.5cm of A] {\Large $\Rightarrow$};
+    \node (DCEL) [right = 0.5cm of arrow1] {\includegraphics{FinalDCEL}};
+    \node (arrow2) [right = 0.5cm of DCEL] {\Large $\Rightarrow$};
+    \node (result) [right = 0.5cm of arrow2] {\includegraphics{PartitionedOperationResult}};
+\end{tikzpicture}
+\end{document}
