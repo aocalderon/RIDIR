@@ -262,21 +262,16 @@ object EdgePartitioner{
     val nHalf_edges = half_edges.count()
     log(stage, timer, nHalf_edges, "END")
 
-    half_edges.foreach(println)
-
     timer = clocktime
     stage = "Getting local DCEL's"
     log(stage, timer, 0, "START")
-    val dcel = half_edges.mapPartitionsWithIndex{ case (index, hedges) =>
-      logger.info("Vertices")
-      val vertices = hedges.map(hedge => (hedge.v2, hedge)).toList
+    val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
+      val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
         .groupBy(_._1).toList.map{ v =>
           val vertex = v._1
           vertex.setHalf_edges(v._2.map(_._2))
           vertex
         }
-
-      vertices.map(v => v.half_edges.map(h => s"${v}\t${h.toWKT}")).foreach{println}
 
       vertices.foreach{ vertex =>
         val sortedIncidents = vertex.getHalf_edges()
@@ -285,62 +280,44 @@ object EdgePartitioner{
         for(i <- 0 until (size - 1)){
           var current = sortedIncidents(i)
           var next    = sortedIncidents(i + 1)
-          //current = half_edges.find(_.equals(current)).get
-          //next    = half_edges.find(_.equals(next)).get
           current.next   = next.twin
           next.twin.prev = current
-          if(current.id != "*")
-            logger.info(s"${current.toWKT} ${current.next.toWKT}")
         }
         var current = sortedIncidents(size - 1)
         var next    = sortedIncidents(0)
-        //current = half_edges.find(_.equals(current)).get
-        //next    = half_edges.find(_.equals(next)).get
         current.next   = next.twin
         next.twin.prev = current
-        if(current.id != "*")
-          logger.info(s"${current.toWKT} ${current.next.toWKT}")
       }
 
-      logger.info("Half edges")
-      vertices.flatMap(v => v.getHalf_edges.map(h => (v, h))).flatMap{ case (vertex, hedge) =>
-        var l = new ArrayBuffer[String]()
+      val hedges = vertices.flatMap(v => v.getHalf_edges)
+      var faces = new HashSet[Face]()
+      hedges.flatMap{ hedge =>
+        var hedges = new ArrayBuffer[Half_edge]()
         var h = hedge
         do{
-          l += s"${vertex}\t${h.toWKT}"
+          hedges += h
           h = h.next
         }while(h != hedge)
-        l
-      }.filter(l => !l.contains("*")).foreach(println)
-
-      logger.info("Faces")
-      var faces = new ArrayBuffer[Face]()
-      /*
-      var temp_half_edges = new ArrayBuffer[Half_edge]()
-      temp_half_edges ++= half_edges
-      
-      for(temp_hedge <- temp_half_edges){
-        val hedge = half_edges.find(_.equals(temp_hedge)).get
-
-        logger.info(s"${hedge.id}: ${hedge.face}")
-        if(hedge.face == null){
-          logger.info(s"For: ${hedge.id}\t${hedge.toWKT}")
-          val face = Face(hedge.id)
-          face.outerComponent = hedge
-          face.outerComponent.face = face
-          face.id = hedge.id
-          var h = hedge
-          do{
-            logger.info(s"Do: ${h.id}\t${h.ring}\t${h.order}\t${h.toWKT}")
-            h.face = face
-            h = h.next
-          }while(h != face.outerComponent)
-          faces += face
+        val id = hedges.map(_.id).distinct.filter(_ != "*")
+        List((id, hedges)).toIterator
+      }.filter(!_._1.isEmpty).flatMap{ f =>
+        val id = f._1.head
+        val face = Face(id)
+        val hedges = f._2.zipWithIndex.map{ case(h, i) =>
+          val hedge = h
+          hedge.id = id
+          hedge.ring = 0
+          hedge.order = i
+          hedge.face = face
+          hedge
         }
+        face.outerComponent = hedges.head
+        face.id = id
+        faces += face
+        hedges
       }
-       */
 
-      List( (vertices, faces.toList) ).toIterator
+      List( (vertices, hedges, faces) ).toIterator
     }.cache
     val nDcel = dcel.count()
     log(stage, timer, nDcel, "END")
@@ -351,7 +328,7 @@ object EdgePartitioner{
           s"${edge.toText()}\t${edge.getUserData}\t${i}\n"
         }
       }.collect()
-      var filename = "/tmp/edgesRDD.wkt"
+      var filename = "/tmp/edges.wkt"
       var f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
@@ -388,9 +365,21 @@ object EdgePartitioner{
       logger.info(s"${filename} saved [${WKT.size}] records")
 
       WKT = dcel.flatMap{ dcel =>
-        val faces = dcel._2
+        val hedges = dcel._2
+        hedges.map{ hedge =>
+            s"${hedge.toWKT}\n"
+        }
+      }.collect()
+      filename = "/tmp/edgesHedges.wkt"
+      f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+
+      WKT = dcel.flatMap{ dcel =>
+        val faces = dcel._3
         faces.map{ face =>
-            s"${face.toWKT}\t${face.id}\n"
+            s"${face.toWKT2}\t${face.id}\n"
         }
       }.collect()
       filename = "/tmp/edgesFaces.wkt"
