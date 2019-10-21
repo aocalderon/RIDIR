@@ -1,0 +1,62 @@
+\documentclass[border=0cm]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows, arrows.meta}
+\tikzset{    
+    barbarrow/.style={ % style that just defines the arrow tip
+        >={Straight Barb[left,length=5pt,width=5pt]},
+        thick,
+        <->
+    },
+    blues/.style={
+        color=blue
+    },
+    reds/.style={
+        color=red
+    }
+}
+\definecolor{light-gray}{gray}{0.9}
+
+\begin{document}
+\begin{tabular}{@{}c@{}}
+\begin{tikzpicture}
+    \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
+    \draw[color=light-gray, style=dashed] (0,0) grid (8,8);
+%    \node[above, scale=1.25] at (4,8) {Set of polygons A};
+    \node[node1] (A) at (0,2) {};
+    \node[node1] (C) at (2,0) {};
+    \node[node1] (E) at (2,4) {};
+    \node[node1] (K) at (4,2) {};
+    \node[node1] (M) at (4,6) {};
+    \node[node1] (R) at (6,4) {};
+    \node[scale=1.5] at (0.5,3.5) {A};
+    
+    \draw[reds]
+        (A) -- (C) (A) -- (E) (C) -- (K) (E) -- (K) 
+        (E) -- (M) (K) -- (R) (M) -- (R);
+\end{tikzpicture} 
+% \\
+% \begin{tikzpicture}
+%     \node[scale=5] at (0,0) {$\Downarrow$};
+% \end{tikzpicture} 
+% \\
+% \begin{tikzpicture}
+%     \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
+%     \tikzstyle{text}=[draw,scale=0.5,color=black]
+%     \draw[color=light-gray, style=dashed] (0,0) grid (8,8);
+%     \node[above, scale=1.25, thick] at (4,8) {DCEL for A};
+%     \node[node1] (A) at (0,2) {};
+%     \node[node1] (C) at (2,0) {};
+%     \node[node1] (E) at (2,4) {};
+%     \node[node1] (K) at (4,2) {};
+%     \node[node1] (M) at (4,6) {};
+%     \node[node1] (R) at (6,4) {};
+%     \node at (2,2) {$A_1$};
+%     \node at (4,4) {$A_2$};
+%     
+%     \draw[barbarrow](A) -- (C);\draw[barbarrow](A) -- (E); 
+%     \draw[barbarrow](C) -- (K);\draw[barbarrow](E) -- (K); 
+%     \draw[barbarrow](E) -- (M);\draw[barbarrow](K) -- (R); 
+%     \draw[barbarrow](M) -- (R);
+% \end{tikzpicture}
+\end{tabular}
+\end{document}
