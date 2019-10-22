@@ -270,7 +270,19 @@ case class Face(label: String) extends Ordered[Face]{
     vertex
   }
 
-exit  def toWKT(): String = {
+  def lowerleft: Vertex = {
+    var h = outerComponent
+    var vertex = h.v1
+    do{
+      if(h.v2 < vertex){
+        vertex = h.v2
+      }
+      h = h.next
+    }while(h.next != outerComponent)
+    vertex
+  }
+
+  def toWKT(): String = {
     if(area() <= 0){
       s"${id}\tPOLYGON EMPTY\t${tag}${label}"
     } else {
@@ -334,7 +346,7 @@ exit  def toWKT(): String = {
 
   override def compare(that: Face): Int = {
     if(id.compare(that.id) == 0){
-      getLeftmostVertex.compare(that.getLeftmostVertex)
+      lowerleft.compare(that.lowerleft)
     } else {
       id.compare(that.id)
     }
@@ -347,7 +359,7 @@ exit  def toWKT(): String = {
       case that: Face => {
         that.canEqual(this) &&
         this.id == that.id &&
-        this.getLeftmostVertex.equals(that.getLeftmostVertex)
+        this.lowerleft.equals(that.lowerleft)
        }
       case _ => false
     }

@@ -282,8 +282,6 @@ object EdgePartitioner{
       val hedges = vertices.flatMap(v => v.getHalf_edges)
       var faces = new HashSet[Face]()
       hedges.flatMap{ hedge =>
-        if(index == 1 && hedge.id == "203")
-          logger.info(s"WATCH")
         var hedges = new ArrayBuffer[Half_edge]()
         var h = hedge
         do{
@@ -293,8 +291,6 @@ object EdgePartitioner{
         val id = hedges.map(_.id).distinct.filter(_ != "*")
         List((id, hedges)).toIterator
       }.filter(!_._1.isEmpty).flatMap{ f =>
-        if(f._1.size > 1)
-          logger.info(s"Watch: ${f._1.mkString(" ")}")
         val id = f._1.head
         val face = Face(id)
         val hedges = f._2.zipWithIndex.map{ case(h, i) =>
