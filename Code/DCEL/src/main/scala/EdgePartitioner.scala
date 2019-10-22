@@ -189,19 +189,9 @@ object EdgePartitioner{
     log(stage, timer, nPolygons, "END")
 
     timer = clocktime
-    stage = "Partitioning polygons"
-    log(stage, timer, 0, "START")
-    polygonRDD.analyze()
-    polygonRDD.spatialPartitioning(GridType.QUADTREE, ppartitions)
-    val nPpartitions = polygonRDD.spatialPartitionedRDD.rdd.getNumPartitions
-    log(stage, timer, nPpartitions, "END")
-
-    timer = clocktime
     stage = "Extracting edges"
     log(stage, timer, 0, "START")
-    val edges = polygonRDD.spatialPartitionedRDD.rdd
-      .map(_.asInstanceOf[Polygon])
-      .flatMap(getHalf_edges).cache
+    val edges = polygons.flatMap(getHalf_edges).cache
     val nEdges = edges.count()
     log(stage, timer, nEdges, "END")
 
@@ -292,6 +282,8 @@ object EdgePartitioner{
       val hedges = vertices.flatMap(v => v.getHalf_edges)
       var faces = new HashSet[Face]()
       hedges.flatMap{ hedge =>
+        if(index == 1 && hedge.id == "203")
+          logger.info(s"WATCH")
         var hedges = new ArrayBuffer[Half_edge]()
         var h = hedge
         do{
@@ -301,6 +293,8 @@ object EdgePartitioner{
         val id = hedges.map(_.id).distinct.filter(_ != "*")
         List((id, hedges)).toIterator
       }.filter(!_._1.isEmpty).flatMap{ f =>
+        if(f._1.size > 1)
+          logger.info(s"Watch: ${f._1.mkString(" ")}")
         val id = f._1.head
         val face = Face(id)
         val hedges = f._2.zipWithIndex.map{ case(h, i) =>
