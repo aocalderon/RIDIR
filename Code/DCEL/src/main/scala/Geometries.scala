@@ -270,7 +270,7 @@ case class Face(label: String) extends Ordered[Face]{
     vertex
   }
 
-  def toWKT(): String = {
+exit  def toWKT(): String = {
     if(area() <= 0){
       s"${id}\tPOLYGON EMPTY\t${tag}${label}"
     } else {
@@ -307,13 +307,13 @@ case class Face(label: String) extends Ordered[Face]{
 
   def toWKT2: String = {
     if(id == "*"){
-      s"${id}\tPOLYGON EMPTY\t${tag}${label}"
+      s"${id}\tPOLYGON EMPTY"
     } else {
       val exterior = toLine() 
       val interior = innerComponent.map(inner => inner.toLine(true))
       val wkt = List(exterior) ++ interior
 
-      s"${id}\tPOLYGON ( ${wkt.mkString(", ")} )\t${tag}${label}"
+      s"${id}\tPOLYGON ( ${wkt.mkString(", ")} )"
     }
   }
 
@@ -333,7 +333,11 @@ case class Face(label: String) extends Ordered[Face]{
   }
 
   override def compare(that: Face): Int = {
-    id compare that.id
+    if(id.compare(that.id) == 0){
+      getLeftmostVertex.compare(that.getLeftmostVertex)
+    } else {
+      id.compare(that.id)
+    }
   }
 
   def canEqual(a: Any) = a.isInstanceOf[Face]
@@ -341,8 +345,10 @@ case class Face(label: String) extends Ordered[Face]{
   override def equals(that: Any): Boolean =
     that match {
       case that: Face => {
-        that.canEqual(this) && this.id == that.id 
-      }
+        that.canEqual(this) &&
+        this.id == that.id &&
+        this.getLeftmostVertex.equals(that.getLeftmostVertex)
+       }
       case _ => false
     }
 
