@@ -345,8 +345,8 @@ case class Face(label: String) extends Ordered[Face]{
   }
 
   override def compare(that: Face): Int = {
-    if(id.compare(that.id) == 0){
-      lowerleft.compare(that.lowerleft)
+    if(id == that.id){
+      getLeftmostVertex.compare(that.getLeftmostVertex)
     } else {
       id.compare(that.id)
     }
@@ -358,8 +358,8 @@ case class Face(label: String) extends Ordered[Face]{
     that match {
       case that: Face => {
         that.canEqual(this) &&
-        this.id == that.id &&
-        this.lowerleft.equals(that.lowerleft)
+        this.id == that.id //&&
+        //this.getLeftmostVertex.equals(that.getLeftmostVertex)
        }
       case _ => false
     }

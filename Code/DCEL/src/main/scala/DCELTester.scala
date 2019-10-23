@@ -193,6 +193,7 @@ object DCELTester{
     val input = params.input()
     val offset = params.offset()
     val partitions = params.partitions()
+    val quote = params.quote()
     val debug = params.debug()
     val master = params.local() match {
       case true  => s"local[${cores}]"
@@ -232,7 +233,10 @@ object DCELTester{
     val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
       val arr = line.split("\t")
       val userData = (0 until arr.size).filter(_ != offset).map(i => arr(i))
-      val wkt = arr(offset)
+      var wkt = arr(offset)
+      if(quote){
+        wkt = wkt.replaceAll("\"", "")
+      }
       val polygon = new WKTReader(geofactory).read(wkt)
       polygon.setUserData(userData.mkString("\t"))
       polygon
@@ -243,6 +247,7 @@ object DCELTester{
 
     polygonRDD.analyze()
     polygonRDD.spatialPartitioning(GridType.QUADTREE, partitions)
+    /*
     val tree = polygonRDD.partitionTree
     
     val envelopes = tree.getLeafZones().asScala.map(l => l.partitionId -> l.getEnvelope()).toMap
@@ -254,6 +259,7 @@ object DCELTester{
       q.assignPartitionIds()
       q.getLeafZones().asScala.map(l => s"${l.partitionId}\t${envelope2Polygon(l.getEnvelope()).toText}")
     }.foreach(println)
+     */
 
     /*
     val cells = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, items) =>
@@ -283,7 +289,7 @@ object DCELTester{
       f.write(gridsWKT.mkString(""))
       f.close()
     }
-     */
+    */
 
     // Partitioning data...
     timer = clocktime
@@ -435,10 +441,11 @@ class DCELTesterConf(args: Seq[String]) extends ScallopConf(args) {
   val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
   val executors:  ScallopOption[Int]     = opt[Int]     (default = Some(3))
-  val grid:       ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
+  val grid:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val index:      ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
   val sample:     ScallopOption[Double]  = opt[Double]  (default = Some(1.0))
+  val quote:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val local:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
