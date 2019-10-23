@@ -22,8 +22,8 @@ import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer, HashSet}
 object EdgePartitioner{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val startTime: Long = 0L
-  private var precisionModel: PrecisionModel = null
-  private var geofactory: GeometryFactory = null
+  private var precisionModel: PrecisionModel = new PrecisionModel(1000)
+  private var geofactory: GeometryFactory = new GeometryFactory(precisionModel)
   private var precision: Double = 0.0001
 
   implicit class Crossable[X](xs: Traversable[X]) {
@@ -132,6 +132,7 @@ object EdgePartitioner{
     val executors = params.executors()
     val input = params.input()
     val offset = params.offset()
+    val decimals = params.decimals()
     val ppartitions = params.ppartitions()
     val epartitions = params.epartitions()
     val debug = params.debug()
