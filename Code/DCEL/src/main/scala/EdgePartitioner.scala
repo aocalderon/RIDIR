@@ -135,6 +135,7 @@ object EdgePartitioner{
     val decimals = params.decimals()
     val ppartitions = params.ppartitions()
     val epartitions = params.epartitions()
+    val quote = params.quote()
     val debug = params.debug()
     precisionModel = new PrecisionModel(math.pow(10, params.decimals()))
     geofactory = new GeometryFactory(precisionModel)
@@ -176,12 +177,17 @@ object EdgePartitioner{
     timer = System.currentTimeMillis()
     stage = "Reading data"
     log(stage, timer, 0, "START")
-    val polygonRDD = new SpatialRDD[Polygon]()
+    val polygonRDD = new SpatialRDD[Geometry]()
     val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
+      //val precisionModel: PrecisionModel = new PrecisionModel(1000)
+      //val geofactory: GeometryFactory = new GeometryFactory(precisionModel)
       val arr = line.split("\t")
-      val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i)) 
-      val wkt = arr(offset)
-      val polygon = new WKTReader(geofactory).read(wkt).asInstanceOf[Polygon]
+      val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i))
+      var wkt = arr(offset)
+      if(quote){
+        wkt = wkt.replaceAll("\"", "")
+      }
+      val polygon = new WKTReader(geofactory).read(wkt)//.asInstanceOf[Polygon]
       polygon.setUserData(userData.mkString("\t"))
       polygon
     }.cache
@@ -192,7 +198,7 @@ object EdgePartitioner{
     timer = clocktime
     stage = "Extracting edges"
     log(stage, timer, 0, "START")
-    val edges = polygons.flatMap(getHalf_edges).cache
+    val edges = polygons.map(_.asInstanceOf[Polygon]).flatMap(getHalf_edges).cache
     val nEdges = edges.count()
     log(stage, timer, nEdges, "END")
 
@@ -221,8 +227,11 @@ object EdgePartitioner{
     log(stage, timer, 0, "START")
     val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
       val cell = envelope2Polygon(cells.get(index).get)
-      val g1 = edges.map(edge2graphedge).toList
+      var g1 = edges.map(edge2graphedge).toList
       val g2 = linestring2graphedge(cell.getExteriorRing)
+      if(g1.isEmpty){
+        g2.flatMap(_.getLineStrings) // WE HAVE TO FIGURE OUT HOW TO RELATE TO THE POLYGON ID...
+      }
 
       SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
         gedge.getLineStrings
@@ -281,8 +290,8 @@ object EdgePartitioner{
       }
 
       val hedges = vertices.flatMap(v => v.getHalf_edges)
-      var faces = new HashSet[Face]()
-      hedges.flatMap{ hedge =>
+      var faces = new ArrayBuffer[Face]()
+      val half_edgeList = hedges.flatMap{ hedge =>
         var hedges = new ArrayBuffer[Half_edge]()
         var h = hedge
         do{
@@ -290,22 +299,29 @@ object EdgePartitioner{
           h = h.next
         }while(h != hedge)
         val id = hedges.map(_.id).distinct.filter(_ != "*")
-        List((id, hedges)).toIterator
-      }.filter(!_._1.isEmpty).flatMap{ f =>
-        val id = f._1.head
-        val face = Face(id)
-        val hedges = f._2.zipWithIndex.map{ case(h, i) =>
-          val hedge = h
-          hedge.id = id
-          hedge.ring = 0
-          hedge.order = i
-          hedge.face = face
-          hedge
+        List((id, hedge)).toIterator
+      }.filter(!_._1.isEmpty).map{ h =>
+        val id = h._1.head
+        val hedge = h._2
+        hedge.id = id
+        hedge
+      }
+      var temp_half_edgeList = new ArrayBuffer[Half_edge]()
+      temp_half_edgeList ++= half_edgeList
+      for(temp_hedge <- temp_half_edgeList){
+        val hedge = half_edgeList.find(_.equals(temp_hedge)).get
+        if(hedge.face == null){
+          val f = Face(hedge.id)
+          f.outerComponent = hedge
+          f.outerComponent.face = f
+          f.id = hedge.id
+          var h = hedge
+          do{
+            half_edgeList.find(_.equals(h)).get.face = f
+            h = h.next
+          }while(h != f.outerComponent)
+          faces += f
         }
-        face.outerComponent = hedges.head
-        face.id = id
-        faces += face
-        hedges
       }
 
       List( (vertices, hedges, faces) ).toIterator
@@ -403,6 +419,7 @@ class EdgePartitionerConf(args: Seq[String]) extends ScallopConf(args) {
   val esample:     ScallopOption[Double]  = opt[Double]  (default = Some(0.25))
   val eentries:    ScallopOption[Int]     = opt[Int]     (default = Some(500))
   val elevels:     ScallopOption[Int]     = opt[Int]     (default = Some(6))
+  val quote:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
