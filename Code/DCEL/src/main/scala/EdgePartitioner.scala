@@ -18,6 +18,7 @@ import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer, HashSet}
+import util.control.Breaks._
 
 object EdgePartitioner{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -85,6 +86,20 @@ object EdgePartitioner{
     }
   }
 
+  def getPolygons(polygon: Polygon): List[Polygon] = {
+    getRings(polygon).map{ coords =>
+      val poly = geofactory.createPolygon(coords)
+      poly.setUserData(polygon.getUserData.toString())
+      poly
+    }
+  }
+
+  def getExteriorPolygon(polygon: Polygon): Polygon = {
+    val poly = geofactory.createPolygon(polygon.getExteriorRing.getCoordinateSequence)
+    poly.setUserData(polygon.getUserData.toString())
+    poly
+  }
+
   def edge2graphedge(edge: LineString ): GraphEdge = {
     val pts = edge.getCoordinates
     val hedge = Half_edge(Vertex(pts(0).x, pts(0).y), Vertex(pts(1).x, pts(1).y))
@@ -101,26 +116,14 @@ object EdgePartitioner{
     coords.zip(coords.tail).toList
   }
 
-  def linestring2graphedge(line: LineString): List[GraphEdge] = {
+  def linestring2graphedge(line: LineString, id: String = "*"): List[GraphEdge] = {
     linestring2paircoord(line).map{ pair =>
       val pts = Array(pair._1, pair._2)
       val hedge = Half_edge(Vertex(pts(0).x, pts(0).y), Vertex(pts(1).x, pts(1).y))
-      hedge.id = "*"
+      hedge.id = id
 
       new GraphEdge(pts, hedge)
     }
-  }
-
-  def clipLines(lines: List[LineString], clipper: GeometryClipper): List[LineString] = {
-    // If false there is no guarantee the polygons returned will be valid according to JTS rules
-    // (but should still be good enough to be used for pure rendering).
-    lines.map{ line =>
-      val l = clipper.clipSafe(line, true, 0.0001).asInstanceOf[LineString]
-      if(l != null){
-        l.setUserData(line.getUserData.toString())
-      }
-      l
-    }.filter(l => l.isInstanceOf[LineString])
   }
 
   /***
@@ -177,21 +180,20 @@ object EdgePartitioner{
     timer = System.currentTimeMillis()
     stage = "Reading data"
     log(stage, timer, 0, "START")
-    val polygonRDD = new SpatialRDD[Geometry]()
-    val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
-      //val precisionModel: PrecisionModel = new PrecisionModel(1000)
-      //val geofactory: GeometryFactory = new GeometryFactory(precisionModel)
+    val polygonRDD = new SpatialRDD[Polygon]()
+    val polygons = spark.read.textFile(input).repartition(200).rdd.zipWithUniqueId().map{ case (line, i) =>
       val arr = line.split("\t")
       val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i))
       var wkt = arr(offset)
       if(quote){
         wkt = wkt.replaceAll("\"", "")
       }
-      val polygon = new WKTReader(geofactory).read(wkt)//.asInstanceOf[Polygon]
+      val polygon = new WKTReader(geofactory).read(wkt)
       polygon.setUserData(userData.mkString("\t"))
-      polygon
+      polygon.asInstanceOf[Polygon]
     }.cache
     polygonRDD.setRawSpatialRDD(polygons)
+    polygonRDD.analyze()
     val nPolygons = polygons.count()
     log(stage, timer, nPolygons, "END")
 
@@ -215,22 +217,65 @@ object EdgePartitioner{
       quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
     }
     quadtree.assignPartitionIds()
+    quadtree.assignPartitionLineage()
     val EdgePartitioner = new QuadTreePartitioner(quadtree)
     edgesRDD.spatialPartitioning(EdgePartitioner)
     edgesRDD.spatialPartitionedRDD.rdd.cache
     val cells = quadtree.getLeafZones.asScala.map(c => c.partitionId -> c.getEnvelope).toMap
+    polygonRDD.spatialPartitioning(EdgePartitioner)
+    polygonRDD.spatialPartitionedRDD.cache
+    val emptyCells = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, polygons) =>
+      val cell = envelope2Polygon(cells.get(index).get)
+      var userData = "" 
+      polygons.map{ p =>
+        userData = p.getUserData.toString()
+        getExteriorPolygon(p)
+      }.filter(cell.coveredBy).map{ p =>
+        cell.setUserData(userData)
+        (index, cell)
+      }
+    }
+      .map(p => p._1 -> p._2)
+      .collect().toMap
+
     val nEpartitions = edgesRDD.spatialPartitionedRDD.rdd.getNumPartitions
     log(stage, timer, nEpartitions, "END")
+
+    if(debug){
+      var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
+        val cell = cells.get(index).get
+        List(s"${index}\t${envelope2Polygon(cell)}\t${partition.size}\n").toIterator
+      }.collect()
+      var filename = "/tmp/edgesCells.wkt"
+      var f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+
+      WKT = emptyCells.toArray.map{ e =>
+        s"${e._1}\t${e._2.toText()}\n"
+      }
+      filename = "/tmp/edgesEmptyCells.wkt"
+      f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+    }
 
     timer = clocktime
     stage = "Getting segments"
     log(stage, timer, 0, "START")
     val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
       val cell = envelope2Polygon(cells.get(index).get)
-      var g1 = edges.map(edge2graphedge).toList
-      val g2 = linestring2graphedge(cell.getExteriorRing)
-      if(g1.isEmpty){
-        g2.flatMap(_.getLineStrings) // WE HAVE TO FIGURE OUT HOW TO RELATE TO THE POLYGON ID...
+      val g1 = edges.map(edge2graphedge).toList
+      var g2 = g1
+
+      if(emptyCells.keySet.exists(_ == index)){
+        val poly = emptyCells.get(index).get
+        val id = poly.getUserData.toString().split("\t")(0)
+        g2 = linestring2graphedge(cell.getExteriorRing, id)
+      } else {
+        g2 = linestring2graphedge(cell.getExteriorRing)
       }
 
       SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
@@ -330,19 +375,25 @@ object EdgePartitioner{
     log(stage, timer, nDcel, "END")
 
     if(debug){
-      var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (i, edges) =>
-        edges.map{ edge =>
-          s"${edge.toText()}\t${edge.getUserData}\t${i}\n"
+      var WKT = dcel.flatMap{ dcel =>
+        val faces = dcel._3
+        faces.map{ face =>
+            s"${face.toWKT2}\t${face.id}\n"
         }
       }.collect()
-      var filename = "/tmp/edges.wkt"
+      var filename = "/tmp/edgesFaces.wkt"
       var f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
 
-      WKT = quadtree.getLeafZones.asScala.toArray.map(z => s"${z.partitionId}\t${envelope2Polygon(z.getEnvelope)}\n")
-      filename = "/tmp/edgesCells.wkt"
+      /*
+      WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (i, edges) =>
+        edges.map{ edge =>
+          s"${edge.toText()}\t${edge.getUserData}\t${i}\n"
+        }
+      }.collect()
+      filename = "/tmp/edges.wkt"
       f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
@@ -382,18 +433,7 @@ object EdgePartitioner{
       f.write(WKT.mkString(""))
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
-
-      WKT = dcel.flatMap{ dcel =>
-        val faces = dcel._3
-        faces.map{ face =>
-            s"${face.toWKT2}\t${face.id}\n"
-        }
-      }.collect()
-      filename = "/tmp/edgesFaces.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
+       */
     }
 
     timer = System.currentTimeMillis()
