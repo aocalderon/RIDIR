@@ -217,6 +217,7 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
 case class Face(label: String) extends Ordered[Face]{
   private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
   var id: String = ""
+  var ring: Int = -1
   var outerComponent: Half_edge = null
   var innerComponent: List[Face] = List.empty[Face]
   var exterior: Boolean = false
