@@ -360,6 +360,7 @@ object EdgePartitioner{
           f.outerComponent = hedge
           f.outerComponent.face = f
           f.id = hedge.id
+          f.ring = hedge.ring
           var h = hedge
           do{
             half_edgeList.find(_.equals(h)).get.face = f
@@ -368,8 +369,16 @@ object EdgePartitioner{
           faces += f
         }
       }
+      val facesList = faces.groupBy(_.id).map{ case (id, faces) =>
+        val f = faces.toList.sortBy(_.ring)
+        val head = f.head
+        val tail = f.tail
+        head.innerComponent = tail
 
-      List( (vertices, hedges, faces) ).toIterator
+        head
+      }.toList
+
+      List( (vertices, hedges, facesList) ).toIterator
     }.cache
     val nDcel = dcel.count()
     log(stage, timer, nDcel, "END")
