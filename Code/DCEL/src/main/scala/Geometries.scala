@@ -319,7 +319,7 @@ case class Face(label: String) extends Ordered[Face]{
   }
 
   def toWKT2: String = {
-    if(id == "*"){
+    if(id == ""){
       s"${id}\tPOLYGON EMPTY"
     } else {
       val exterior = toLine() 
