@@ -1,0 +1,41 @@
+\documentclass[border=0.5cm]{standalone}
+\usepackage{calculator}
+\usepackage[svgnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows, arrows.meta, positioning}
+
+\tikzset{    
+    disk/.style={ thick },
+    poly/.style={ line width=2mm, red },
+    point/.style={ color=black, circle, scale=0.3, fill },
+    partition/.style={ right, scale=0.75 },
+    label/.style={ scale=0.5, black, below = 0.5mm },
+    time/.style={ scale=0.75, above left }
+}
+
+\definecolor{light-gray}{gray}{0.8}
+
+\begin{document}
+    \begin{tikzpicture}
+        \draw[step=1, very thin, light-gray, dashed] (0,0) grid (32,32);
+        
+        \node (start) at (6.50,23.50) {};
+        \draw[poly] (start) -- ++(0.25,-0.5) -- ++(-0.25,-0.5) -- ++(-0.25,-0.5)  -- ++(0.25,-0.5)
+            -- ++(0,-1) -- ++(-1.75,-1) -- ++(-2.25,0) -- ++(0,-4) -- ++(2,-2)
+            -- ++(6,0) -- ++(2,-2) -- ++(12,0) -- ++(2,2) -- ++(0,10) -- ++(-2,2) -- ++(-10,0) -- ++(-1,1) -- ++(-6,0)
+            -- ++(-1,-1) -- ++(0,-2) -- (6.75, 23);
+        \draw[step=8, thick, black] (0,0)  grid (32,32);
+        \draw[step=4, thick, black] (0,16) grid (8,24);
+        \draw[step=4, thick, black] (0,8)  grid (8,16);
+        \draw[step=4, thick, black] (8,8)  grid (16,16);
+        \draw[step=4, thick, black] (8,24) grid (16,32);
+        \draw[step=2, thick, black] (4,16) grid (8,20);
+        \draw[step=2, thick, black] (4,20) grid (8,24);
+        \draw[step=1, thick, black] (6,20) grid (8,24);
+
+        \draw[orange, opacity=0.15, fill] (16,16) rectangle (24,24);
+                
+        \node (hole) at (21.50,19.50) {};
+        \draw[poly] (hole) -- ++(1,0) -- ++(0,-1) -- ++(-0.5,-0.5)  -- ++(-0.5,0.5) -- ++(0,1) -- ++(1,0);
+        \end{tikzpicture}
+\end{document} 
