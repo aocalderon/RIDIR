@@ -1,0 +1,142 @@
+\documentclass{beamer}
+
+\usefonttheme{professionalfonts} % using non standard fonts for beamer
+\usefonttheme{serif} % default family is serif
+
+\usepackage{hyperref}
+
+%\usepackage{minted}
+
+\usepackage{animate}
+
+\usepackage{graphicx}
+
+\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+
+\usepackage{color}
+
+\usepackage{tikz}
+
+\usepackage{amssymb}
+
+\usepackage{enumerate}
+
+
+\newcommand\blfootnote[1]{%
+
+  \begingroup
+
+  \renewcommand\thefootnote{}\footnote{#1}%
+
+  \addtocounter{footnote}{-1}%
+
+  \endgroup
+
+}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+
+ % this default might be overridden by plain title style
+
+ \newcommand\makebeamertitle{\frame{\maketitle}}%
+
+ % (ERT) argument for the TOC
+
+ \AtBeginDocument{%
+
+   \let\origtableofcontents=\tableofcontents
+
+   \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+
+   \def\gobbletableofcontents#1{\origtableofcontents}
+
+ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+\usetheme{Malmoe}
+
+% or ...
+
+\useoutertheme{infolines}
+
+\addtobeamertemplate{headline}{}{\vskip2pt}
+
+
+
+\setbeamercovered{transparent}
+
+% or whatever (possibly just delete it)
+
+\makeatother
+
+\begin{document}
+\title[DCEL report]{RIDIR Report}
+\author[AC]{Andres Calderon}
+\institute[Fall'19]{University of California, Riverside}
+\makebeamertitle
+\newif\iflattersubsect
+
+\AtBeginSection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsection]  
+    \end{frame}
+    \lattersubsectfalse
+}
+
+\AtBeginSubsection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsubsection]  
+    \end{frame}
+}
+
+\begin{frame}{Working on Edge Partitioner}
+{Fixing issue with empty cells}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{figures/E0}     
+\end{frame}
+\begin{frame}{Working on Edge Partitioner}
+{Fixing issue with empty cells}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{figures/E1}     
+\end{frame}
+\begin{frame}{Working on Edge Partitioner}
+{Fixing issue with empty cells}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{figures/E2}     
+\end{frame}
+\begin{frame}{Working on Edge Partitioner}
+{Fixing issue with empty cells}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{figures/E3}     
+\end{frame}
+\begin{frame}{Working on Edge Partitioner}
+{Fixing issue with empty cells}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{figures/E4}     
+\end{frame}
+\begin{frame}{Working on Edge Partitioner}
+{Fixing issue with empty cells}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{figures/E5}     
+\end{frame}
+
+\begin{frame}{What is next?}
+    \begin{itemize}
+        \item Finish some details in the implementation.
+        \item Deal with special case when the empty cell contains holes.
+        \item Run experiments in CA\_district datasets.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Working on Edge Partitioner}
+{Fixing issue with empty cells}
+    \centering 
+    \includegraphics[width=0.6\linewidth]{figures/hole}     
+\end{frame}
+
+\end{document}
