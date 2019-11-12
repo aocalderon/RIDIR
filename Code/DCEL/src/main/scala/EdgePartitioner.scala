@@ -27,7 +27,7 @@ object EdgePartitioner{
   private var geofactory: GeometryFactory = new GeometryFactory(precisionModel)
   private var precision: Double = 0.0001
 
-  case class Quad(id: Int, nedges: Int, wkt: String, siblings: List[Int])
+  case class Quad(id: Int, nedges: Int, lineage: String, region: Int, wkt: String, siblings: List[Int])
 
   implicit class Crossable[X](xs: Traversable[X]) {
     def cross[Y](ys: Traversable[Y]) = for { x <- xs; y <- ys } yield (x, y)
@@ -268,7 +268,8 @@ object EdgePartitioner{
     val quads = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
       val nedges = partition.size
       val zone = zones.get(index).get
-      val region = zone.lineage.takeRight(1).toInt
+      val lineage = zone.lineage
+      val region = lineage.takeRight(1).toInt
       val center = region match {
         case 0 => geofactory.createPoint(new Coordinate(zone.x + zone.width, zone.y))
         case 1 => geofactory.createPoint(new Coordinate(zone.x, zone.y))
@@ -278,10 +279,10 @@ object EdgePartitioner{
       val envelope = center.getEnvelopeInternal
       envelope.expandBy(precision)
       val siblings = quadtree.findZones(new QuadRectangle(envelope)).asScala.map{ quad =>
-        quad.partitionId.toInt
-      }.filterNot(_ == index).toList
+        (quad.partitionId.toInt, quad.lineage.size)
+      }.filterNot(_ == index).toList.sortBy(_._2)(Ordering[Int].reverse).map(_._1)
       val wkt = envelope2Polygon(zone.getEnvelope).toText()
-      List( Quad(index, nedges, wkt, siblings) ).toIterator
+      List( Quad(index, nedges, lineage, region, wkt, siblings) ).toIterator
     }.toDS().cache
 
     if(debug){
@@ -314,7 +315,7 @@ object EdgePartitioner{
       logger.info(s"${filename} saved [${WKT.size}] records")
 
       WKT = quads.map{ quad =>
-        s"${quad.id}\t${quad.wkt}\t${quad.nedges}\t${quad.siblings.mkString(" ")}\n"
+        s"${quad.id}\t${quad.wkt}\t${quad.nedges}\t${quad.lineage}\t${quad.region}\t${quad.siblings.mkString(" ")}\n"
       }.collect()
       filename = "/tmp/edgesSiblings.wkt"
       f = new java.io.PrintWriter(filename)
