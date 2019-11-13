@@ -1,41 +1,48 @@
 \documentclass{article}
+\usepackage{enumitem}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{caption}
 
-\newlength\myindent
-\setlength\myindent{2em}
-\newcommand\bindent{%
-  \begingroup
-  \setlength{\itemindent}{\myindent}
-  \addtolength{\algorithmicindent}{\myindent}
-}
-\newcommand\eindent{\endgroup}
-
-
+\pagestyle{empty}
+\setlist{nosep}
 \algnewcommand\algorithmicforeach{\textbf{for each}}
 \algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
 
 \begin{document}
-    \begin{algorithm} \caption{Iterative Policy Evaluation Algorithm}
+    \section*{Cell record}
+    Cell:
+    \begin{itemize}
+        \item id: Int
+        \item lineage: String
+        \item envelope: Polygon
+    \end{itemize}
+    
+    \section*{Examples}
+    
+    
+    \section*{Algorithms}
+    \begin{algorithm} \caption{\textsc{getNextCellWithEdges} algorithm}
+        \textbf{Require:} \\ Quadtree with cell envelopes $\mathcal Q$ and Map of cells and their edge count $\mathcal M$.
         \begin{algorithmic}[1]
-            \Require Map of cell and edge's count $\mathcal M$, list of empty cells  $\mathcal C$.
+        \Function{getNextCellWithEdges}{$\mathcal Q$, $\mathcal M$}
+            \State $\mathcal C \gets $ list of empty cells in $\mathcal M$
             \ForEach { $emptyCell$ in $\mathcal C $}
-                \State $cellList \gets \emptyset$ 
-                \State add $emptyCell$ to $cellList$
+                \State initialize $cellList$ with $emptyCell$ 
                 \State $done \gets false$
                 \Repeat
                     \State $c \gets $ last cell in $cellList$ 
-                    \State $siblings \gets $ the 3 cells which intersect the interior corner of $c$
-                    \If{ a $sibling$ in $siblings$ has edges}
-                        \State \textbf{output} $(cellList, sibling)$
+                    \State $cells \gets \textsc{getCellsInCorner}(\mathcal Q, c)$ \Comment{return 3 cells}
+                    \If{ a $cell$ in $cells$ has edges}
+                        \State \textbf{output} $(cellList, cell)$
                         \State $done \gets true$
                     \Else
-                        \State $nextCell \gets$ the $sibling$ with greater level in $siblings$
+                        \State $nextCell \gets$ the $cell$ with the greatest level in $cells$
                         \State add $nextCell$ to $cellList$
                     \EndIf
-                \Until {$done $}
+                \Until {$donex$}
             \EndFor
+        \EndFunction
         \end{algorithmic}
     \end{algorithm}
 \end{document}
