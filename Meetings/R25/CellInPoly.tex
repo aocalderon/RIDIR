@@ -4,6 +4,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{caption}
+\usepackage{amsthm}
 \usepackage[margin=2cm]{geometry}
 
 \pagestyle{empty}
@@ -16,6 +17,7 @@
 \algdef{SE}[CASE]{Case}{EndCase}[1]{\algorithmiccase\ #1}{\algorithmicend\ \algorithmiccase}%
 \algtext*{EndSwitch}%
 \algtext*{EndCase}%
+\newtheorem*{lemma}{Lemma}
 
 \begin{document}
     \section*{Cell record}
@@ -55,8 +57,8 @@
                         \EndIf
                     \EndFor
                     \If{ not $done$ }
-                        \State $nextCell \gets$ the deepest $cell$ in $cells$ \Comment{ using $cell.lineage$ }
-                        \State add $nextCell$ to $cellList$
+                        \State $cells \gets$ sort $cells$ on basis of their depth \Comment{ using $cell.lineage$ }
+                        \State add $cells$ to $cellList$
                     \EndIf
                 \Until{ $done$ }
             \EndFor
@@ -89,11 +91,26 @@
         \EndFunction
         \end{algorithmic}
     \end{algorithm}
-
+    
+    \begin{lemma}
+    Four cells at the same level can not be empty.  At least one of them must have edges in order to force the split.
+    \end{lemma}
+    
+    \begin{proof}
+    The $\textsc{getCellsInCorner}$ function will query the interior corner of a cell according to its position, that is the centroid of its cell parent.  The only cells which can intersect that point are cells at the same level of the current cell or their children.  If the 3 cells returned by $\textsc{getCellsInCorner}$ are empty, at least one of them must have a deeper level that the current cell.  Following that cell guarantees that the search space will be shrank at each iteration.  Eventually, the algorithm will reach the maximum level of the quadtree where at least one of the 3 cells returned by $\textsc{getCellsInCorner}$ must have edges.
+    \end{proof}
+    
     \section*{Algorithms example}
-    \begin{figure}[h!]
+    \begin{figure}[!ht]
         \centering
-        \includegraphics[page=1, width=0.475\linewidth]{Figures/Example}
-        \includegraphics[page=2, width=0.475\linewidth]{Figures/Example}
+        \includegraphics[page=1, width=0.55\linewidth]{Figures/Example}
+    \end{figure}
+    \begin{figure}[!ht]
+        \centering
+        \includegraphics[page=2, width=0.55\linewidth]{Figures/Example}
+    \end{figure}
+    \begin{figure}[!ht]
+        \centering
+        \includegraphics[page=3, width=0.55\linewidth]{Figures/Example}
     \end{figure}
 \end{document}
