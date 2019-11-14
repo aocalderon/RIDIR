@@ -97,7 +97,7 @@
     \end{lemma}
     
     \begin{proof}
-    The $\textsc{getCellsInCorner}$ function will query the interior corner of a cell according to its position, that is the centroid of its cell parent.  The only cells which can intersect that point are cells at the same level of the current cell or their children.  If the 3 cells returned by $\textsc{getCellsInCorner}$ are empty, at least one of them must have a deeper level that the current cell.  Following that cell guarantees that the search space will be shrank at each iteration.  Eventually, the algorithm will reach the maximum level of the quadtree where at least one of the 3 cells returned by $\textsc{getCellsInCorner}$ must have edges.
+    The $\textsc{getCellsInCorner}$ function will query the interior corner of a cell according to its position, that is the centroid of its cell parent.  The only cells which can intersect that point are cells at the same level of the current cell or their children.  If the 3 cells returned by $\textsc{getCellsInCorner}$ are empty, at least one of them must have a deeper level that the current cell.  Following that cell guarantees that the search space will be shrank at each iteration.  Eventually, the algorithm will reach the maximum level of the quadtree where all the involved cells will have the same level and, therefore, at least one of them must have edges.
     \end{proof}
     
     \section*{Algorithms example}
