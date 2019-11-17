@@ -28,6 +28,10 @@ object EdgePartitioner{
   private var precision: Double = 0.0001
 
   case class Quad(id: Int, nedges: Int, lineage: String, region: Int, wkt: String, siblings: List[Int])
+  case class EmptyCell(cell: QuadRectangle, var solve: Boolean){
+    var nextCellWithEdgesId: Int = -1
+    var referenceCorner: Point = null
+  }
 
   implicit class Crossable[X](xs: Traversable[X]) {
     def cross[Y](ys: Traversable[Y]) = for { x <- xs; y <- ys } yield (x, y)
@@ -227,32 +231,17 @@ object EdgePartitioner{
     val EdgePartitioner = new QuadTreePartitioner(quadtree)
     edgesRDD.spatialPartitioning(EdgePartitioner)
     edgesRDD.spatialPartitionedRDD.rdd.cache
-    val cells = quadtree.getLeafZones.asScala.map(c => c.partitionId -> c.getEnvelope).toMap
-
+    val quads = quadtree.getLeafZones.asScala.map(c => c.partitionId -> c.getEnvelope).toMap
     polygonRDD.spatialPartitioning(EdgePartitioner)
     polygonRDD.spatialPartitionedRDD.cache
-    val emptyCells = polygonRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, polygons) =>
-      val cell = envelope2Polygon(cells.get(index).get)
-      var userData = "" 
-      polygons.map{ p =>
-        userData = p.getUserData.toString()
-        getExteriorPolygon(p)
-      }.filter(cell.coveredBy).map{ p =>
-        cell.setUserData(userData)
-        (index, cell)
-      }
-    }
-      .map(p => p._1 -> p._2)
-      .collect().toMap
-
-    val nEpartitions = edgesRDD.spatialPartitionedRDD.rdd.getNumPartitions
-    log(stage, timer, nEpartitions, "END")
+    val nEdgesPartitions = edgesRDD.spatialPartitionedRDD.rdd.getNumPartitions
+    log(stage, timer, nEdgesPartitions, "END")
 
     timer = clocktime
     stage = "Getting empty polygon id"
     log(stage, timer, 0, "START")
     val empty = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
-      val cell = envelope2Polygon(cells.get(index).get)
+      val cell = envelope2Polygon(quads.get(index).get)
       val n = edges.filter{ edge =>
         val arr = edge.getUserData.toString().split("\t")
         val hasHoles = arr(3).toInt
@@ -264,8 +253,69 @@ object EdgePartitioner{
     val nEmpty = empty.count()
     log(stage, timer, nEmpty, "END")
 
+
+    //////////////////////////////////////////////////////////////////////////////
+    def getCellsAtCorner(quadtree: StandardQuadTree[LineString], c: QuadRectangle): (List[QuadRectangle], Point) = {
+      val region = c.lineage.takeRight(1).toInt
+      val corner = region match {
+        case 0 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMinY))
+        case 1 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMinY))
+        case 2 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMaxY))
+        case 3 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMaxY))
+      }
+      val envelope = corner.getEnvelopeInternal
+      envelope.expandBy(precision)
+      val cells = quadtree.findZones(new QuadRectangle(envelope)).asScala
+        .filterNot(_.partitionId == c.partitionId).toList
+        .sortBy(_.lineage.size)(Ordering[Int].reverse)
+      (cells, corner)
+    }
+
+    val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId -> cell)).toMap
+    val edgeCount = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (id, partition) =>
+      List( (id, partition.size) ).toIterator
+    }.collect().toMap
+    var emptyCells = edgeCount.filter(_._2 == 0).map(cell => cells.get(cell._1).get)
+      .map(c => c.partitionId -> EmptyCell(c, solve = false)).toMap
+    
+    for(emptyCellId <- emptyCells.keys){
+      val emptyCell = emptyCells.get(emptyCellId).get
+      if(!emptyCell.solve){
+        var done = false
+        var nextCellWithEdgesId: Int = -1
+        var referenceCorner: Point = null
+        var cellList = new ArrayBuffer[QuadRectangle]()
+        cellList += emptyCell.cell
+        while( !done ){
+          val c = cellList.takeRight(1).head
+          val (cells, corner) = getCellsAtCorner(quadtree, c)
+          for(cell <- cells){
+            if(edgeCount.get(cell.partitionId).get > 0){
+              done = true
+              nextCellWithEdgesId = cell.partitionId
+              referenceCorner = corner
+            } else {
+              cellList += cell
+            }
+          }
+        }
+        cellList.foreach{ cell =>
+          val empty = emptyCells.get(cell.partitionId).get
+          empty.solve = true
+          empty.nextCellWithEdgesId = nextCellWithEdgesId
+          empty.referenceCorner = referenceCorner
+          emptyCells += cell.partitionId -> empty
+        }
+      }
+    }
+    emptyCells.foreach { println }
+    //////////////////////////////////////////////////////////////////////////////
+
+
+
+    //////////////////////////////////////////////////////////////////////////////
     val zones = quadtree.getLeafZones.asScala.map(z => (z.partitionId -> z)).toMap
-    val quads = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
+    val quads2 = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
       val nedges = partition.size
       val zone = zones.get(index).get
       val lineage = zone.lineage
@@ -280,15 +330,16 @@ object EdgePartitioner{
       envelope.expandBy(precision)
       val siblings = quadtree.findZones(new QuadRectangle(envelope)).asScala.map{ quad =>
         (quad.partitionId.toInt, quad.lineage.size)
-      }.filterNot(_ == index).toList.sortBy(_._2)(Ordering[Int].reverse).map(_._1)
+      }.filterNot(_._1 == index).toList.sortBy(_._2)(Ordering[Int].reverse).map(_._1)
       val wkt = envelope2Polygon(zone.getEnvelope).toText()
       List( Quad(index, nedges, lineage, region, wkt, siblings) ).toIterator
     }.toDS().cache
+    //////////////////////////////////////////////////////////////////////////////
 
     if(debug){
       var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
         val cell = cells.get(index).get
-        List(s"${index}\t${envelope2Polygon(cell)}\t${partition.size}\n").toIterator
+        List(s"${index}\t${envelope2Polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
       }.collect()
       var filename = "/tmp/edgesCells.wkt"
       var f = new java.io.PrintWriter(filename)
@@ -297,7 +348,7 @@ object EdgePartitioner{
       logger.info(s"${filename} saved [${WKT.size}] records")
 
       WKT = emptyCells.toArray.map{ e =>
-        s"${e._1}\t${e._2.toText()}\n"
+        s"${e._1}\t${envelope2Polygon(e._2.cell.getEnvelope).toText()}\n"
       }
       filename = "/tmp/edgesEmptyCells.wkt"
       f = new java.io.PrintWriter(filename)
@@ -314,21 +365,13 @@ object EdgePartitioner{
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
 
-      WKT = quads.map{ quad =>
-        s"${quad.id}\t${quad.wkt}\t${quad.nedges}\t${quad.lineage}\t${quad.region}\t${quad.siblings.mkString(" ")}\n"
-      }.collect()
-      filename = "/tmp/edgesSiblings.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
     }
 
     timer = clocktime
     stage = "Getting segments"
     log(stage, timer, 0, "START")
     val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
-      val cell = envelope2Polygon(cells.get(index).get)
+      val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
       val g1 = edges.map(edge2graphedge).toList
       var g2 = g1
 
