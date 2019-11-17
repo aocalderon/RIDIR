@@ -45,28 +45,33 @@
             \State $\mathcal C \gets $ list of empty cells in $\mathcal M$
             \ForEach{ $emptyCell$ in $\mathcal C $ }
                 \State initialize $cellList$ with $emptyCell$ 
+                \State $nextCellWithEdges \gets null$
+                \State $referenceCorner \gets null$
                 \State $done \gets false$
-                \Repeat
+                \While{ not $done$ } 
                     \State $c \gets $ last cell in $cellList$ 
-                    \State $cells, corner \gets \textsc{getCellsInCorner}(\mathcal Q, c)$ \Comment{ return 3 cells and the reference corner }
+                    \State $cells, corner \gets \textsc{getCellsAtCorner}(\mathcal Q, c)$ \Comment{ return 3 cells and the reference corner }
                     \ForEach{$cell$ in $cells$}
-                        \State check $cell$ in $\mathcal M$ \Comment{ using $cell.id$ }
-                        \If{ $cell$ has edges }
-                            \State \textbf{output} ($cellList$, $cell$, $corner$)
+                        \State $nedges \gets$ get edge count of $cell$ in $\mathcal M$ 
+                        \If{ $nedges > 0$ }
+                            \State $nextCellWithEdges \gets cell$
+                            \State $referenceCorner \gets corner$
                             \State $done \gets true$
+                        \Else
+                            \State add $cell$ to $cellList$
                         \EndIf
                     \EndFor
-                    \If{ not $done$ }
-                        \State $cells \gets$ sort $cells$ on basis of their depth \Comment{ using $cell.lineage$ }
-                        \State add $cells$ to $cellList$
-                    \EndIf
-                \Until{ $done$ }
+                \EndWhile
+                \ForEach{ $cell$ in $cellList$ }
+                    \State \textbf{output}($cell$, $nextCellWithEdges$, $referenceCorner$)
+                    \State remove $cell$ from $\mathcal C$
+                \EndFor
             \EndFor
         \EndFunction
         \end{algorithmic}
     \end{algorithm}
     
-    \begin{algorithm} \caption{\textsc{getCellsInCorner} algorithm}
+    \begin{algorithm} \caption{\textsc{getCellsAtCorner} algorithm}
         \textbf{Require:} a quadtree with cell envelopes $\mathcal Q$ and a cell $c$.
         \begin{algorithmic}[1]
         \Function{ getCellsInCorner }{ $\mathcal Q$, $c$ }
@@ -87,6 +92,7 @@
             \EndSwitch
             \State $cells \gets$ cells which intersect $corner$ in $\mathcal Q$
             \State $cells \gets cells - c$ \Comment{ Remove the current cell from the intersected cells }
+            \State $cells \gets$ sort $cells$ on basis of their depth \Comment{ using $cell.lineage$ }
             \State \Return{ ($cells$, $corner$) }
         \EndFunction
         \end{algorithmic}
