@@ -18,7 +18,7 @@ import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer, HashSet}
-import util.control.Breaks._
+import scala.util.control.Breaks._
 
 object EdgePartitioner{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -31,6 +31,8 @@ object EdgePartitioner{
   case class EmptyCell(cell: QuadRectangle, var solve: Boolean){
     var nextCellWithEdgesId: Int = -1
     var referenceCorner: Point = null
+
+    override def toString: String = s"${cell.partitionId}\t${solve}\t${nextCellWithEdgesId}"
   }
 
   implicit class Crossable[X](xs: Traversable[X]) {
@@ -136,6 +138,22 @@ object EdgePartitioner{
     }
   }
 
+  def getCellsAtCorner(quadtree: StandardQuadTree[LineString], c: QuadRectangle): (List[QuadRectangle], Point) = {
+    val region = c.lineage.takeRight(1).toInt
+    val corner = region match {
+      case 0 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMinY))
+      case 1 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMinY))
+      case 2 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMaxY))
+      case 3 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMaxY))
+    }
+    val envelope = corner.getEnvelopeInternal
+    envelope.expandBy(precision)
+    val cells = quadtree.findZones(new QuadRectangle(envelope)).asScala
+      .filterNot(_.partitionId == c.partitionId).toList
+      .sortBy(_.lineage.size)
+    (cells, corner)
+  }
+
   /***
    * The main function...
    **/
@@ -234,64 +252,62 @@ object EdgePartitioner{
     val quads = quadtree.getLeafZones.asScala.map(c => c.partitionId -> c.getEnvelope).toMap
     polygonRDD.spatialPartitioning(EdgePartitioner)
     polygonRDD.spatialPartitionedRDD.cache
+    val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId -> cell)).toMap
     val nEdgesPartitions = edgesRDD.spatialPartitionedRDD.rdd.getNumPartitions
     log(stage, timer, nEdgesPartitions, "END")
 
-    timer = clocktime
-    stage = "Getting empty polygon id"
-    log(stage, timer, 0, "START")
-    val empty = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
-      val cell = envelope2Polygon(quads.get(index).get)
-      val n = edges.filter{ edge =>
-        val arr = edge.getUserData.toString().split("\t")
-        val hasHoles = arr(3).toInt
-        hasHoles == 0
-      }.size
+    if(debug){
+      var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
+        val cell = cells.get(index).get
+        List(s"${index}\t${envelope2Polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
+      }.collect()
+      var filename = "/tmp/edgesCells.wkt"
+      var f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
 
-      List((index, n, cell)).toIterator
+      /*
+      WKT = polygons.map{ p =>
+        val userData = p.getUserData.toString()
+        s"${p.toText()}\t${userData}\n"
+      }.collect()
+      filename = "/tmp/edgesPolygons.wkt"
+      f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+       */
     }
-    val nEmpty = empty.count()
-    log(stage, timer, nEmpty, "END")
-
 
     //////////////////////////////////////////////////////////////////////////////
-    def getCellsAtCorner(quadtree: StandardQuadTree[LineString], c: QuadRectangle): (List[QuadRectangle], Point) = {
-      val region = c.lineage.takeRight(1).toInt
-      val corner = region match {
-        case 0 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMinY))
-        case 1 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMinY))
-        case 2 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMaxY))
-        case 3 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMaxY))
-      }
-      val envelope = corner.getEnvelopeInternal
-      envelope.expandBy(precision)
-      val cells = quadtree.findZones(new QuadRectangle(envelope)).asScala
-        .filterNot(_.partitionId == c.partitionId).toList
-        .sortBy(_.lineage.size)(Ordering[Int].reverse)
-      (cells, corner)
-    }
-
-    val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId -> cell)).toMap
+    timer = clocktime
+    stage = "Solving empty cells"
+    log(stage, timer, 0, "START")
     val edgeCount = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (id, partition) =>
       List( (id, partition.size) ).toIterator
     }.collect().toMap
     var emptyCells = edgeCount.filter(_._2 == 0).map(cell => cells.get(cell._1).get)
       .map(c => c.partitionId -> EmptyCell(c, solve = false)).toMap
-    
+    if(debug){
+      logger.info(s"Number of empty cell: ${emptyCells.size}")
+    }
     for(emptyCellId <- emptyCells.keys){
       val emptyCell = emptyCells.get(emptyCellId).get
       if(!emptyCell.solve){
         var done = false
+        var counter = 0
         var nextCellWithEdgesId: Int = -1
         var referenceCorner: Point = null
         var cellList = new ArrayBuffer[QuadRectangle]()
         cellList += emptyCell.cell
         while( !done ){
           val c = cellList.takeRight(1).head
-          val (cells, corner) = getCellsAtCorner(quadtree, c)
-          for(cell <- cells){
+          val (cellsReturned, corner) = getCellsAtCorner(quadtree, c)
+          for(cell <- cellsReturned){
             if(edgeCount.get(cell.partitionId).get > 0){
               done = true
+              counter = 200
               nextCellWithEdgesId = cell.partitionId
               referenceCorner = corner
             } else {
@@ -305,66 +321,22 @@ object EdgePartitioner{
           empty.nextCellWithEdgesId = nextCellWithEdgesId
           empty.referenceCorner = referenceCorner
           emptyCells += cell.partitionId -> empty
-        }
+        }        
       }
     }
-    emptyCells.foreach { println }
-    //////////////////////////////////////////////////////////////////////////////
-
-
-
-    //////////////////////////////////////////////////////////////////////////////
-    val zones = quadtree.getLeafZones.asScala.map(z => (z.partitionId -> z)).toMap
-    val quads2 = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
-      val nedges = partition.size
-      val zone = zones.get(index).get
-      val lineage = zone.lineage
-      val region = lineage.takeRight(1).toInt
-      val center = region match {
-        case 0 => geofactory.createPoint(new Coordinate(zone.x + zone.width, zone.y))
-        case 1 => geofactory.createPoint(new Coordinate(zone.x, zone.y))
-        case 2 => geofactory.createPoint(new Coordinate(zone.x + zone.width, zone.y + zone.height))
-        case 3 => geofactory.createPoint(new Coordinate(zone.x, zone.y + zone.height))
-      }
-      val envelope = center.getEnvelopeInternal
-      envelope.expandBy(precision)
-      val siblings = quadtree.findZones(new QuadRectangle(envelope)).asScala.map{ quad =>
-        (quad.partitionId.toInt, quad.lineage.size)
-      }.filterNot(_._1 == index).toList.sortBy(_._2)(Ordering[Int].reverse).map(_._1)
-      val wkt = envelope2Polygon(zone.getEnvelope).toText()
-      List( Quad(index, nedges, lineage, region, wkt, siblings) ).toIterator
-    }.toDS().cache
+    log(stage, timer, emptyCells.size, "END")
     //////////////////////////////////////////////////////////////////////////////
 
     if(debug){
-      var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
-        val cell = cells.get(index).get
-        List(s"${index}\t${envelope2Polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
-      }.collect()
-      var filename = "/tmp/edgesCells.wkt"
+      var WKT = emptyCells.toArray.map{ e =>
+        val emptyCell = e._2
+        s"${e._1}\t${emptyCell.nextCellWithEdgesId}\t${emptyCell.referenceCorner.toText()}\t${envelope2Polygon(emptyCell.cell.getEnvelope).toText()}\n"
+      }
+      var filename = "/tmp/edgesEmptyCells.wkt"
       var f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
-
-      WKT = emptyCells.toArray.map{ e =>
-        s"${e._1}\t${envelope2Polygon(e._2.cell.getEnvelope).toText()}\n"
-      }
-      filename = "/tmp/edgesEmptyCells.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-
-      WKT = empty.map{ e =>
-        s"${e._1}\t${e._2}\t${e._3.toText()}\n"
-      }.collect()
-      filename = "/tmp/edgesEmpty.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-
     }
 
     timer = clocktime
@@ -450,11 +422,9 @@ object EdgePartitioner{
         }while(h != hedge)
         val id = hedges.map(_.id).distinct.filter(_ != "*")
         List((id, hedge)).toIterator
-      //}.filter(!_._1.isEmpty).map{ h => CHECKING POLYGON IDS...
       }
-      //.filter(!_._1.isEmpty)
+      .filter(!_._1.isEmpty)
       .map{ h =>
-        //val id = h._1.head
         val id = h._1.isEmpty match {
           case true  => "*"
           case false => h._1.head
@@ -495,6 +465,22 @@ object EdgePartitioner{
     val nDcel = dcel.count()
     log(stage, timer, nDcel, "END")
 
+
+    ////////////////////////////////////////////////
+    dcel.mapPartitionsWithIndex { case (id, partition) =>
+      val faces = partition.next._3
+      val cell = cells.get(id).get
+      val cellPoints = envelope2Polygon(cell.getEnvelope).getCoordinates.map(geofactory.createPoint).toSet
+      val facesPoints = faces.flatMap{ face =>
+        val mbr = face.toPolygon().getEnvelopeInternal
+        envelope2Polygon(mbr).getCoordinates.map(geofactory.createPoint)
+      }.toSet
+      val flag = cellPoints.subsetOf(facesPoints)
+      List( (id, flag) ).toIterator
+    }.sortBy(_._1).filter(_._2).foreach { println }
+    ////////////////////////////////////////////////
+
+
     if(debug){
       var WKT = dcel.flatMap{ dcel =>
         val faces = dcel._3
@@ -507,54 +493,6 @@ object EdgePartitioner{
       f.write(WKT.mkString(""))
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
-
-      /*
-      WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (i, edges) =>
-        edges.map{ edge =>
-          s"${edge.toText()}\t${edge.getUserData}\t${i}\n"
-        }
-      }.collect()
-      filename = "/tmp/edges.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-
-      WKT = segments.map{ segment =>
-        s"${segment.toText()}\t${segment.getUserData.toString()}\n"
-      }.collect()
-      filename = "/tmp/edgesSegments.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-
-      WKT = dcel.flatMap{ dcel =>
-        val vertices = dcel._1
-        vertices.flatMap{ vertex =>
-          vertex.getHalf_edges.map{ hedge =>
-            s"${vertex.toWKT}\t${hedge.toWKT}\t${hedge.id}\t${hedge.angle}\n"
-          }
-        }
-      }.collect()
-      filename = "/tmp/edgesVertices.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-
-      WKT = dcel.flatMap{ dcel =>
-        val hedges = dcel._2
-        hedges.map{ hedge =>
-            s"${hedge.toWKT}\n"
-        }
-      }.collect()
-      filename = "/tmp/edgesHedges.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-       */
     }
 
     timer = System.currentTimeMillis()

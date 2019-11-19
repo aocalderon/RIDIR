@@ -341,8 +341,7 @@ case class Face(label: String) extends Ordered[Face]{
       }
       coords += new Coordinate(hedge.v2.x, hedge.v2.y)
     }
-    val ring = geofactory.createLinearRing(coords.toArray)
-    geofactory.createPolygon(ring)
+    geofactory.createPolygon(coords.toArray)
   }
 
   override def compare(that: Face): Int = {

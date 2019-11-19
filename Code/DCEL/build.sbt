@@ -13,5 +13,7 @@ libraryDependencies += "org.locationtech.jts" % "jts-core" % "1.16.1"
 libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.7.25"
 libraryDependencies += "org.rogach" % "scallop_2.11" % "2.1.3"
 
-mainClass in (Compile, run) := Some("DCEL")
-mainClass in (Compile, packageBin) := Some("DCEL")
+libraryDependencies += "com.lihaoyi" % "ammonite" % "1.6.7" cross CrossVersion.full
+
+mainClass in (Compile, run) := Some("EdgePartitioner")
+mainClass in (Compile, packageBin) := Some("EdgePartitioner")
