@@ -345,15 +345,7 @@ object EdgePartitioner{
     val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
       val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
       val g1 = edges.map(edge2graphedge).toList
-      var g2 = g1
-
-      //if(emptyCells.keySet.exists(_ == index)){
-      //  val poly = emptyCells.get(index).get
-      //  val id = poly.getUserData.toString().split("\t")(0)
-      //  g2 = linestring2graphedge(cell.getExteriorRing, id)
-      //} else {
-        g2 = linestring2graphedge(cell.getExteriorRing, "*")
-      //}
+      val g2 = linestring2graphedge(cell.getExteriorRing, "*")
 
       SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
         gedge.getLineStrings
@@ -420,19 +412,17 @@ object EdgePartitioner{
           hedges += h
           h = h.next
         }while(h != hedge)
-        val id = hedges.map(_.id).distinct.filter(_ != "*")
-        List((id, hedge)).toIterator
-      }
-      .filter(!_._1.isEmpty)
-      .map{ h =>
-        val id = h._1.isEmpty match {
-          case true  => "*"
-          case false => h._1.head
+        val ids = hedges.map(_.id).distinct.filter(_ != "*")
+        val id = ids.size match {
+          case 1 => ids.head
+          case 0 => "*"
+          case _ => ids.mkString("|")
         }
-        val hedge = h._2
         hedge.id = id
-        hedge
+        List( hedge ).toIterator
       }
+        .filter(_.id != "*")
+      
       var temp_half_edgeList = new ArrayBuffer[Half_edge]()
       temp_half_edgeList ++= half_edgeList
       for(temp_hedge <- temp_half_edgeList){
@@ -456,6 +446,8 @@ object EdgePartitioner{
         val head = f.head
         val tail = f.tail
         head.innerComponent = tail
+        head.outerComponents = f.filter(_.ring == 0)
+        head.innerComponents = f.filter(_.ring != 0)
 
         head
       }.toList
@@ -467,29 +459,36 @@ object EdgePartitioner{
 
 
     ////////////////////////////////////////////////
-    dcel.mapPartitionsWithIndex { case (id, partition) =>
+    val nullCells = dcel.mapPartitionsWithIndex { case (id, partition) =>
       val faces = partition.next._3
       val cell = cells.get(id).get
-      val cellPoints = envelope2Polygon(cell.getEnvelope).getCoordinates.map(geofactory.createPoint).toSet
-      val facesPoints = faces.flatMap{ face =>
-        val mbr = face.toPolygon().getEnvelopeInternal
-        envelope2Polygon(mbr).getCoordinates.map(geofactory.createPoint)
-      }.toSet
-      val flag = cellPoints.subsetOf(facesPoints)
-      List( (id, flag) ).toIterator
-    }.sortBy(_._1).filter(_._2).foreach { println }
+      val cellPoly = envelope2Polygon(cell.getEnvelope)
+      val facesEnvelopes = faces.map(_.getEnvelope).toArray
+      val facesEnvelope = geofactory.createGeometryCollection(facesEnvelopes).getEnvelopeInternal
+      facesEnvelope.expandBy(precision)
+      val facesPoly = envelope2Polygon(facesEnvelope)
+      val flag = cellPoly.getExteriorRing.intersects(facesPoly)
+      List( (id, cellPoly.toText(), facesPoly.toText(), flag, faces.size) ).toIterator
+    }.sortBy(_._1).collect()
     ////////////////////////////////////////////////
 
 
     if(debug){
       var WKT = dcel.flatMap{ dcel =>
         val faces = dcel._3
-        faces.map{ face =>
-            s"${face.toWKT2}\t${face.id}\n"
+        faces.sortBy(_.id).map{ face =>
+            s"${face.toWKT2}\t${face.innerComponent.size}\n"
         }
       }.collect()
       var filename = "/tmp/edgesFaces.wkt"
       var f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+
+      WKT = nullCells.map(n => s"${n._1}\t${n._2}\t${n._3}\t${n._4}\t${n._5}\n")
+      filename = "/tmp/edgesNullCells.wkt"
+      f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
