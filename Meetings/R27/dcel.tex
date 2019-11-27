@@ -96,30 +96,15 @@
 
 \begin{frame}{Working on Edge Partitioner}
     \begin{itemize}
-        \item I have finished with the implementationn to solve empty cells but I was dealing with two particular issues:
+        \item I have been working on the new solution to deal with empty cells.  It is currently working however I have found some minor issues:
         \begin{enumerate}
-            \item Empty cells with `islands'
-            \item Empty cells in the in the exterior of the input
+            \item A cell can be intersected by more than one Polygon's envelope so I test all of them if required.
+            \item Extract the Polygon's envelopes cannot be (easily) done at the moment of edge partitioning because it is done internally by GeoSpark.
+            \item I am currently debugging some issues related with faces, holes and multi-parts.
         \end{enumerate}
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Empty cells with `islands'}
-    \centering
-    \includegraphics[width=1\textwidth]{Figures/Island1}
-\end{frame}
-\begin{frame}{Empty cells with `islands'}
-    \centering
-    \includegraphics[width=1\textwidth]{Figures/Island2}
-\end{frame}
-\begin{frame}{Empty cells with `islands'}
-    \centering
-    \includegraphics[width=1\textwidth]{Figures/Island3}
-\end{frame}
-\begin{frame}{Empty cells with `islands'}
-    \centering
-    \includegraphics[width=1\textwidth]{Figures/Island4}
-\end{frame}
 
 \begin{frame}{Empty cells in the in the exterior}
     \centering
