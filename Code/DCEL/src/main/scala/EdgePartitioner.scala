@@ -280,65 +280,6 @@ object EdgePartitioner{
        */
     }
 
-    //////////////////////////////////////////////////////////////////////////////
-    timer = clocktime
-    stage = "Solving empty cells"
-    log(stage, timer, 0, "START")
-    val edgeCount = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (id, partition) =>
-      List( (id, partition.size) ).toIterator
-    }.collect().toMap
-    var emptyCells = edgeCount.filter(_._2 == 0).map(cell => cells.get(cell._1).get)
-      .map(c => c.partitionId -> EmptyCell(c, solve = false)).toMap
-    if(debug){
-      logger.info(s"Number of empty cell: ${emptyCells.size}")
-    }
-    for(emptyCellId <- emptyCells.keys){
-      val emptyCell = emptyCells.get(emptyCellId).get
-      if(!emptyCell.solve){
-        var done = false
-        var counter = 0
-        var nextCellWithEdgesId: Int = -1
-        var referenceCorner: Point = null
-        var cellList = new ArrayBuffer[QuadRectangle]()
-        cellList += emptyCell.cell
-        while( !done ){
-          val c = cellList.takeRight(1).head
-          val (cellsReturned, corner) = getCellsAtCorner(quadtree, c)
-          for(cell <- cellsReturned){
-            if(edgeCount.get(cell.partitionId).get > 0){
-              done = true
-              counter = 200
-              nextCellWithEdgesId = cell.partitionId
-              referenceCorner = corner
-            } else {
-              cellList += cell
-            }
-          }
-        }
-        cellList.foreach{ cell =>
-          val empty = emptyCells.get(cell.partitionId).get
-          empty.solve = true
-          empty.nextCellWithEdgesId = nextCellWithEdgesId
-          empty.referenceCorner = referenceCorner
-          emptyCells += cell.partitionId -> empty
-        }        
-      }
-    }
-    log(stage, timer, emptyCells.size, "END")
-    //////////////////////////////////////////////////////////////////////////////
-
-    if(debug){
-      var WKT = emptyCells.toArray.map{ e =>
-        val emptyCell = e._2
-        s"${e._1}\t${emptyCell.nextCellWithEdgesId}\t${emptyCell.referenceCorner.toText()}\t${envelope2Polygon(emptyCell.cell.getEnvelope).toText()}\n"
-      }
-      var filename = "/tmp/edgesEmptyCells.wkt"
-      var f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-    }
-
     timer = clocktime
     stage = "Getting segments"
     log(stage, timer, 0, "START")
@@ -412,23 +353,23 @@ object EdgePartitioner{
           hedges += h
           h = h.next
         }while(h != hedge)
-        val ids = hedges.map(_.id).distinct.filter(_ != "*")
+        val ids = hedges.map(_.id).distinct
         val id = ids.size match {
+          case 2 => ids.filter(_ != "*").head
           case 1 => ids.head
-          case 0 => "*"
           case _ => ids.mkString("|")
         }
         hedge.id = id
         List( hedge ).toIterator
       }
-        .filter(_.id != "*")
+      .filter(_.id != "*")
       
       var temp_half_edgeList = new ArrayBuffer[Half_edge]()
       temp_half_edgeList ++= half_edgeList
       for(temp_hedge <- temp_half_edgeList){
         val hedge = half_edgeList.find(_.equals(temp_hedge)).get
         if(hedge.face == null){
-          val f = Face(hedge.id)
+          val f = Face(hedge.id, index)
           f.outerComponent = hedge
           f.outerComponent.face = f
           f.id = hedge.id
@@ -442,14 +383,11 @@ object EdgePartitioner{
         }
       }
       val facesList = faces.groupBy(_.id).map{ case (id, faces) =>
-        val f = faces.toList.sortBy(_.ring)
-        val head = f.head
-        val tail = f.tail
-        head.innerComponent = tail
-        head.outerComponents = f.filter(_.ring == 0)
-        head.innerComponents = f.filter(_.ring != 0)
+        val polys = faces.sortBy(_.area).reverse
+        val outer = polys.head
+        outer.innerComponents = polys.tail.toVector
 
-        head
+        outer
       }.toList
 
       List( (vertices, hedges, facesList) ).toIterator
@@ -457,27 +395,11 @@ object EdgePartitioner{
     val nDcel = dcel.count()
     log(stage, timer, nDcel, "END")
 
-
-    ////////////////////////////////////////////////
-    val nullCells = dcel.mapPartitionsWithIndex { case (id, partition) =>
-      val faces = partition.next._3
-      val cell = cells.get(id).get
-      val cellPoly = envelope2Polygon(cell.getEnvelope)
-      val facesEnvelopes = faces.map(_.getEnvelope).toArray
-      val facesEnvelope = geofactory.createGeometryCollection(facesEnvelopes).getEnvelopeInternal
-      facesEnvelope.expandBy(precision)
-      val facesPoly = envelope2Polygon(facesEnvelope)
-      val flag = cellPoly.getExteriorRing.intersects(facesPoly)
-      List( (id, cellPoly.toText(), facesPoly.toText(), flag, faces.size) ).toIterator
-    }.sortBy(_._1).collect()
-    ////////////////////////////////////////////////
-
-
     if(debug){
       var WKT = dcel.flatMap{ dcel =>
         val faces = dcel._3
         faces.sortBy(_.id).map{ face =>
-            s"${face.toWKT2}\t${face.innerComponent.size}\n"
+            s"${face.toWKT2}\t${face.innerComponents.size}\n"
         }
       }.collect()
       var filename = "/tmp/edgesFaces.wkt"
@@ -486,8 +408,28 @@ object EdgePartitioner{
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
 
-      WKT = nullCells.map(n => s"${n._1}\t${n._2}\t${n._3}\t${n._4}\t${n._5}\n")
-      filename = "/tmp/edgesNullCells.wkt"
+      WKT = dcel.mapPartitionsWithIndex{ case(index, partition) =>
+        val faces = partition.next._3
+        faces.sortBy(_.id).flatMap{ face =>
+          val n = face.getPolygons.size
+          face.getPolygons.map{ poly =>
+            s"${face.id}\t${poly.toText()}\t${n}\t${index}\n"
+          }
+        }.toIterator
+      }.collect()
+      filename = "/tmp/edgesFaces2.wkt"
+      f = new java.io.PrintWriter(filename)
+      f.write(WKT.mkString(""))
+      f.close
+      logger.info(s"${filename} saved [${WKT.size}] records")
+
+      WKT = dcel.flatMap{ dcel =>
+        val faces = dcel._3
+        faces.sortBy(_.id).map{ face =>
+            s"${face.id}\t${face.cell}\t${face.getGeometry._1.toText()}\t${face.getGeometry._2}\t${face.getGeometry._1.toText()}\n"
+        }
+      }.collect()
+      filename = "/tmp/edgesFaces3.wkt"
       f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close

@@ -157,7 +157,6 @@ object SweepLine{
         }
         if(f.area() < 0) { f.exterior = true }
         f.tag = tag.toList.distinct.mkString(" ").split(" ").distinct.sorted.mkString(" ")
-        f.nHalf_edges = count
         faceList += f
       }
     }
