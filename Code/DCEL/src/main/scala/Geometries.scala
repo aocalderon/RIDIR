@@ -1,7 +1,8 @@
+import scala.util.{Try,Success,Failure}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel, Geometry}
-import com.vividsolutions.jts.geom.{Coordinate, LinearRing, Polygon, LineString, Point}
+import com.vividsolutions.jts.geom.{Coordinate, LinearRing, MultiPolygon, Polygon, LineString, Point}
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
   private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
@@ -214,17 +215,24 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   def toWKT: String = s"POINT ($x $y)"
 }
 
-case class Face(label: String) extends Ordered[Face]{
+case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
   private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
   var id: String = ""
   var ring: Int = -1
   var outerComponent: Half_edge = null
-  var innerComponent: List[Face] = List.empty[Face]
   var exterior: Boolean = false
   var tag: String = ""
-  var nHalf_edges = 0
-  var outerComponents: List[Face] = List.empty[Face]
-  var innerComponents: List[Face] = List.empty[Face]
+  var innerComponents: Vector[Face] = Vector.empty[Face]
+
+  def nHalf_edges: Int = {
+    var hedge = outerComponent
+    var n = 1
+    do{
+      hedge = hedge.next
+      n = n + 1
+    }while(hedge != outerComponent)
+    n
+  }
 
   def faceArea(): Double = {
     var a: Double = 0.0
@@ -241,10 +249,25 @@ case class Face(label: String) extends Ordered[Face]{
     (a + (p1.x * p2.y) - (p2.x * p1.y)) / 2.0
   }
 
+  /***
+   * Compute area of irregular polygon
+   * More info at https://www.mathopenref.com/coordpolygonarea2.html
+   ***/
+  def outerComponentArea(): Double = {
+    var area: Double = 0.0
+    var h = outerComponent
+    do{
+      area += (h.v1.x + h.v2.x) * (h.v1.y - h.v2.y)
+      h = h.next
+    }while(h != outerComponent)
+
+    area / -2.0
+  }
+
   def area(): Double = {
-    val boundary = faceArea()
-    val holes = innerComponent.map(_.faceArea()).sum
-    boundary + holes
+    val outer = faceArea()
+    val inner = innerComponents.map(_.faceArea()).sum
+    outer + inner
   }
 
   def perimeter(): Double = {
@@ -285,34 +308,30 @@ case class Face(label: String) extends Ordered[Face]{
     vertex
   }
 
-  def toWKT(): String = {
-    if(area() <= 0){
-      s"${id}\tPOLYGON EMPTY\t${tag}${label}"
+  def getLinearRing(toWKT: Boolean = false): String = {
+    var vertices = new ArrayBuffer[String]()
+    var h = outerComponent
+    vertices += s"${h.v1.x} ${h.v1.y}"
+    do{
+      vertices += s"${h.v2.x} ${h.v2.y}"
+      h = h.next
+    }while(h != outerComponentArea())
+    if(toWKT){
+      s"LINESTRING (${vertices.mkString(",")})"
     } else {
-      var hedge = outerComponent
-      var wkt = new ArrayBuffer[String]()
-      wkt += s"${hedge.v1.x} ${hedge.v1.y}"
-      while(hedge.next != outerComponent){
-        wkt += s"${hedge.v2.x} ${hedge.v2.y}"
-        hedge = hedge.next
-      }
-      wkt += s"${hedge.v2.x} ${hedge.v2.y}"
-    
-      s"${id}\tPOLYGON (( ${wkt.mkString(", ")} ))\t${tag}${label}"
+      s"(${vertices.mkString(",")})"
     }
   }
-
-  private def round(n: Double): Double = { val s = math.pow(10.0, 9) ; (math round n * s) / s }
 
   private def toLine(reverse: Boolean = false): String = {
     var hedge = outerComponent
     var wkt = new ArrayBuffer[String]()
-    wkt += s"${round(hedge.v1.x)} ${round(hedge.v1.y)}"
+    wkt += s"${hedge.v1.x} ${hedge.v1.y}"
     while(hedge.next != outerComponent){
-      wkt += s"${round(hedge.v2.x)} ${round(hedge.v2.y)}"
+      wkt += s"${hedge.v2.x} ${hedge.v2.y}"
       hedge = hedge.next
     }
-    wkt += s"${round(hedge.v2.x)} ${round(hedge.v2.y)}"
+    wkt += s"${hedge.v2.x} ${hedge.v2.y}"
     if(reverse){
       s"(${wkt.reverse.mkString(",")})"
     } else {
@@ -321,35 +340,95 @@ case class Face(label: String) extends Ordered[Face]{
   }
 
   def toWKT2: String = {
-    if(id == ""){
-      s"${id}\tPOLYGON EMPTY"
-    } else {
-      val exterior = toLine() 
-      val interior = innerComponent.map(inner => inner.toLine(true))
-      val wkt = List(exterior) ++ interior
+    val exterior = toLine()
+    val interior = innerComponents.map(inner => inner.toLine(true))
+    val wkt = List(exterior) ++ interior
 
-      s"${id}\tPOLYGON ( ${wkt.mkString(", ")} )"
+    s"${id}\tPOLYGON ( ${wkt.mkString(", ")} )"
+  }
+
+  private def getCoordinates(): Array[Coordinate] = {
+    var coords = ArrayBuffer.empty[Coordinate]
+    var h = outerComponent
+    if(h != null){
+      coords += new Coordinate(h.v1.x, h.v1.y)
+      do{
+        coords += new Coordinate(h.v2.x, h.v2.y)
+        h = h.next
+      }while(h != outerComponent)
     }
+    coords.toArray
   }
 
   def toPolygon(): Polygon = {
-    var coords = ArrayBuffer.empty[Coordinate]
-    if(area() > 0){
-      var hedge = outerComponent
-      coords += new Coordinate(hedge.v1.x, hedge.v1.y)
-      while(hedge.next != outerComponent){
-        coords += new Coordinate(hedge.v2.x, hedge.v2.y)
-        hedge = hedge.next
+    val coords = getCoordinates()
+    geofactory.createPolygon(coords)
+  }
+
+  def getPolygons(): Vector[Polygon] = {
+    toPolygon +: innerComponents.map(_.toPolygon)
+  }
+
+  def getGeometry: (Geometry, String) = {
+    val polys = getPolygons
+    val geom = if(polys.size == 1){
+      polys.head // Return a polygon...
+    } else {
+      // Groups polygons if one contains another...
+
+      val pairs = for{
+        outer <- polys
+        inner <- polys
+      } yield (outer, inner)
+
+      val partial = pairs.filter{ case (outer, inner) => inner.coveredBy(outer) }
+        .groupBy(_._1).mapValues(_.map(_._2))
+      val diff = partial.values.flatMap(_.tail).toSet
+      val result = partial.filterKeys(partial.keySet.diff(diff)).values
+
+      println("Results")
+      result.foreach{println}
+
+      val polygons = result.map{ row =>
+        val outerPoly = row.head
+        val innerPolys = geofactory.createMultiPolygon(row.tail.toArray)
+        outerPoly.difference(innerPolys).asInstanceOf[Polygon]
       }
-      coords += new Coordinate(hedge.v2.x, hedge.v2.y)
+
+      polygons.size match {
+        // Return an empty polygon...
+        case 0 => geofactory.createPolygon(Array.empty[Coordinate])
+        // Return a polygon with holes...
+        case 1 => polygons.head
+        // Return a multi-polygon...
+        case x if x > 1 => geofactory.createMultiPolygon(polygons.toArray)
+      }
     }
-    geofactory.createPolygon(coords.toArray)
+    geom match {
+      case geom if geom.isInstanceOf[Polygon] =>{
+        val poly = geom.asInstanceOf[Polygon]
+        if(poly.getNumInteriorRing > 0){
+          (geom, "Polygon with holes")
+        } else {
+          if(poly.isEmpty()){
+            (geom, "Empty")
+          } else {
+            (geom, "Polygon")
+          }
+        }
+      }
+      case g if g.isInstanceOf[MultiPolygon] => (g, "MultiPolygon")
+    }
+  }
+
+  def toWKT: String = ???
+  
+  def toWKTperComponent(): String = {
+    getPolygons.map(polygon => s"$id\t${polygon.toText()}\n").mkString
   }
 
   def getEnvelope(): Geometry = {
-    val polys = outerComponents.map(_.toPolygon()) ++ innerComponent.map(_.toPolygon())
-
-    geofactory.createGeometryCollection(polys.toArray).getEnvelope
+    geofactory.createGeometryCollection(getPolygons.map(_.getEnvelope).toArray).getEnvelope
   }
 
   override def compare(that: Face): Int = {
@@ -374,7 +453,10 @@ case class Face(label: String) extends Ordered[Face]{
   override def hashCode: Int = {
     val prime = 31
     var result = 1
-    val x = this.id.toInt
+    val x = Try(this.id.toInt) match {
+      case Success(i) => i
+      case _ => 0
+    }
     result = prime * x
     result = prime * result + (if (id == null) 0 else id.hashCode)
     result
@@ -422,49 +504,3 @@ case class Edge(v1: Vertex, v2: Vertex, var label: String = "", id: String = "")
 }
 
 
-/////////////////////////////
-
-case class Half_edge3() extends Ordered[Half_edge3] {
-  private var _id: Long = -1L
-  var origen: Vertex3 = null
-  var next: Half_edge3 = null
-  var prev: Half_edge3 = null
-  var twin: Half_edge3 = null
-  var face: Face3 = null
-
-  def getId = _id
-
-  def setId(id: Long): Unit = {
-    _id = id
-  }
-
-  override def compare(that: Half_edge3): Int = {
-    if (origen.x == that.origen.x) origen.y compare that.origen.y
-    else origen.x compare that.origen.x
-  }
-
-  def toWKT: String = s"LINESTRING (${origen.x} ${origen.y} , ${twin.origen.x} ${twin.origen.y})"
-}
-
-case class Vertex3(x: Double, y: Double) extends Ordered[Vertex3] {
-  private var _id: Double = -1
-  var edge: Half_edge3 = null
-
-  def getId = _id
-
-  def setId(id: Long): Unit = {
-    _id = id
-  }
-
-  override def compare(that: Vertex3): Int = {
-    if (x == that.x) y compare that.y
-    else x compare that.x
-  }
-
-  def toWKT: String = s"${getId}\tPOINT ($x $y)"
-}
-
-case class Face3(var id: Long){
-  var outerComponent: Half_edge3 = null
-  var innerComponent: Half_edge3 = null
-}
