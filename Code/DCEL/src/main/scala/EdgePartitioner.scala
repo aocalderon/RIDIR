@@ -45,6 +45,14 @@ object EdgePartitioner{
     logger.info("EP|%6.2f|%-50s|%6.2f|%6d|%s".format((clocktime-startTime)/1000.0, msg, (clocktime-timer)/1000.0, n, status))
   }
 
+  def timer[A](msg: String)(code: => A): A = {
+    val start = clocktime
+    val resutl = code
+    val end = clocktime
+    logger.info("%-30s|%6.2f".format(msg, (end - start) / 1000.0))
+    code
+  }
+
   def envelope2Polygon(e: Envelope): Polygon = {
     val minX = e.getMinX()
     val minY = e.getMinY()
@@ -72,8 +80,6 @@ object EdgePartitioner{
 
     outerRing ++ innerRings
   }
-
-  def roundAt(p: Int)(n : Double): Double = { val s = math pow (10, p); (math round n * s) / s }
 
   def getHalf_edges(polygon: Polygon): List[LineString] = {
     val polygon_id = polygon.getUserData.toString().split("\t")(0)
@@ -154,6 +160,12 @@ object EdgePartitioner{
     (cells, corner)
   }
 
+  def debug[A](code: => A)(implicit debugState: Boolean): Unit = {
+    if(debugState){
+      code
+    }
+  }
+
   /***
    * The main function...
    **/
@@ -167,7 +179,7 @@ object EdgePartitioner{
     val ppartitions = params.ppartitions()
     val epartitions = params.epartitions()
     val quote = params.quote()
-    val debug = params.debug()
+    implicit val debugState = params.debug()
     precisionModel = new PrecisionModel(math.pow(10, params.decimals()))
     geofactory = new GeometryFactory(precisionModel)
     //precision = 1 / precisionModel.getScale
@@ -181,82 +193,70 @@ object EdgePartitioner{
       case "KDBTREE"   => GridType.KDBTREE
     }
 
-    if(debug){
+    debug{
       logger.info(s"Using Scale=${precisionModel.getScale} and Precision=${precision}")
     }
 
     // Starting session...
-    var timer = clocktime
-    var stage = "Starting session"
-    log(stage, timer, 0, "START")
-    val spark = SparkSession.builder()
-      .config("spark.default.parallelism", 3 * 120)
-      .config("spark.serializer",classOf[KryoSerializer].getName)
-      .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-      .config("spark.scheduler.mode", "FAIR")
-      //.config("spark.cores.max", cores * executors)
-      //.config("spark.executor.cores", cores)
-      //.master(master)
-      .appName("EdgePartitioner")
-      .getOrCreate()
+    val spark = timer{"Starting session"}{
+      SparkSession.builder()
+        .config("spark.default.parallelism", 3 * 120)
+        .config("spark.serializer",classOf[KryoSerializer].getName)
+        .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
+        .config("spark.scheduler.mode", "FAIR")
+        .appName("EdgePartitioner")
+        .getOrCreate()
+    }
     import spark.implicits._
     val appID = spark.sparkContext.applicationId
     val startTime = spark.sparkContext.startTime
-    log(stage, timer, 0, "END")
 
     // Reading data...
-    timer = System.currentTimeMillis()
-    stage = "Reading data"
-    log(stage, timer, 0, "START")
-    val polygonRDD = new SpatialRDD[Polygon]()
-    val polygons = spark.read.textFile(input).repartition(200).rdd.zipWithUniqueId().map{ case (line, i) =>
-      val arr = line.split("\t")
-      val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i))
-      var wkt = arr(offset)
-      if(quote){
-        wkt = wkt.replaceAll("\"", "")
-      }
-      val polygon = new WKTReader(geofactory).read(wkt)
-      polygon.setUserData(userData.mkString("\t"))
-      polygon.asInstanceOf[Polygon]
-    }.cache
-    polygonRDD.setRawSpatialRDD(polygons)
-    polygonRDD.analyze()
-    val nPolygons = polygons.count()
-    log(stage, timer, nPolygons, "END")
-
-    timer = clocktime
-    stage = "Extracting edges"
-    log(stage, timer, 0, "START")
-    val edges = polygons.map(_.asInstanceOf[Polygon]).flatMap(getHalf_edges).cache
-    val nEdges = edges.count()
-    log(stage, timer, nEdges, "END")
-
-    timer = clocktime
-    stage = "Partitioning edges"
-    log(stage, timer, 0, "START")
-    val edgesRDD = new SpatialRDD[LineString]()
-    edgesRDD.setRawSpatialRDD(edges)
-    edgesRDD.analyze()
-    //edgesRDD.spatialPartitioning(GridType.QUADTREE, epartitions)
-    val boundary = new QuadRectangle(edgesRDD.boundaryEnvelope)
-    val quadtree = new StandardQuadTree[LineString](boundary, 0, params.eentries(), params.elevels())
-    for(edge <- edges.sample(false, params.esample(), 42).collect()) { 
-      quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
+    val (polygons, nPolygons) = timer{"Reading data"}{
+      val polygons = spark.read.textFile(input).repartition(200).rdd.zipWithUniqueId().map{ case (line, i) =>
+        val arr = line.split("\t")
+        val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i))
+        val wkt = if(quote){
+          arr(offset).replaceAll("\"", "")
+        } else {
+          arr(offset)
+        }
+        val polygon = new WKTReader(geofactory).read(wkt)
+        polygon.setUserData(userData.mkString("\t"))
+        polygon.asInstanceOf[Polygon]
+      }.cache
+      val nPolygons = polygons.count()
+      (polygons, nPolygons)
     }
-    quadtree.assignPartitionIds()
-    quadtree.assignPartitionLineage()
-    val EdgePartitioner = new QuadTreePartitioner(quadtree)
-    edgesRDD.spatialPartitioning(EdgePartitioner)
-    edgesRDD.spatialPartitionedRDD.rdd.cache
-    val quads = quadtree.getLeafZones.asScala.map(c => c.partitionId -> c.getEnvelope).toMap
-    polygonRDD.spatialPartitioning(EdgePartitioner)
-    polygonRDD.spatialPartitionedRDD.cache
-    val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId -> cell)).toMap
-    val nEdgesPartitions = edgesRDD.spatialPartitionedRDD.rdd.getNumPartitions
-    log(stage, timer, nEdgesPartitions, "END")
 
-    if(debug){
+    val (edges, nEdges) = timer{"Extracting edges"}{
+      val edges = polygons.map(_.asInstanceOf[Polygon]).flatMap(getHalf_edges).cache
+      val nEdges = edges.count()
+      (edges, nEdges)
+    }
+
+    val (edgesRDD, quadtree) = timer{"Partitioning edges"}{
+      val edgesRDD = new SpatialRDD[LineString]()
+      edgesRDD.setRawSpatialRDD(edges)
+      edgesRDD.analyze()
+      //edgesRDD.spatialPartitioning(GridType.QUADTREE, epartitions)
+      val boundary = new QuadRectangle(edgesRDD.boundaryEnvelope)
+      val quadtree = new StandardQuadTree[LineString](boundary, 0, params.eentries(), params.elevels())
+      for(edge <- edges.sample(false, params.esample(), 42).collect()) {
+        quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
+      }
+      quadtree.assignPartitionIds()
+      quadtree.assignPartitionLineage()
+      val EdgePartitioner = new QuadTreePartitioner(quadtree)
+      edgesRDD.spatialPartitioning(EdgePartitioner)
+      edgesRDD.spatialPartitionedRDD.rdd.cache
+      val nEdgesRDD = edgesRDD.spatialPartitionedRDD.rdd.count()
+      (edgesRDD, quadtree)
+    }
+    val quads = quadtree.getLeafZones.asScala.map(c => c.partitionId -> c.getEnvelope).toMap
+    val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId -> cell)).toMap
+
+    debug{
       var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
         val cell = cells.get(index).get
         List(s"${index}\t${envelope2Polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
@@ -266,167 +266,185 @@ object EdgePartitioner{
       f.write(WKT.mkString(""))
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
-
-      /*
-      WKT = polygons.map{ p =>
-        val userData = p.getUserData.toString()
-        s"${p.toText()}\t${userData}\n"
-      }.collect()
-      filename = "/tmp/edgesPolygons.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-       */
     }
 
-    timer = clocktime
-    stage = "Getting segments"
-    log(stage, timer, 0, "START")
-    val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
-      val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
-      val g1 = edges.map(edge2graphedge).toList
-      val g2 = linestring2graphedge(cell.getExteriorRing, "*")
+    val segments = timer{"Getting segments"}{
+      val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
+        val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
+        val g1 = edges.map(edge2graphedge).toList
+        val g2 = linestring2graphedge(cell.getExteriorRing, "*")
 
-      SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
-        gedge.getLineStrings
-      }.filter(line => line.coveredBy(cell)).toIterator
-    }.cache
-    val nSegments = segments.count()
-    log(stage, timer, nSegments, "END")
+        SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
+          gedge.getLineStrings
+        }.filter(line => line.coveredBy(cell)).toIterator
+      }.cache
+      val nSegments = segments.count()
+      segments
+    }
 
-    timer = clocktime
-    stage = "Getting half edges"
-    log(stage, timer, 0, "START")
-    val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
-      segments.flatMap{ segment =>
-        val arr = segment.getUserData.toString().split("\t")
-        val coords = segment.getCoordinates
-        val v1 = Vertex(coords(0).x, coords(0).y)
-        val v2 = Vertex(coords(1).x, coords(1).y)
-        val h1 = Half_edge(v1, v2)
-        h1.id = arr(0); h1.ring = arr(1).toInt; h1.order = arr(2).toInt
-        h1.label = arr(3)
-        val h2 = Half_edge(v2, v1)
-        h2.id = "*"
-        h1.twin = h2
-        h2.twin = h1
-        List(h1, h2)
-      }
-    }.cache
-    val nHalf_edges = half_edges.count()
-    log(stage, timer, nHalf_edges, "END")
-
-    timer = clocktime
-    stage = "Getting local DCEL's"
-    log(stage, timer, 0, "START")
-    val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
-      val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
-        .groupBy(_._1).toList.map{ v =>
-          val vertex = v._1
-          vertex.setHalf_edges(v._2.map(_._2))
-          vertex
+    val (half_edges, nHalf_edges) = timer{"Getting half edges"}{
+      val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
+        segments.flatMap{ segment =>
+          val arr = segment.getUserData.toString().split("\t")
+          val coords = segment.getCoordinates
+          val v1 = Vertex(coords(0).x, coords(0).y)
+          val v2 = Vertex(coords(1).x, coords(1).y)
+          val h1 = Half_edge(v1, v2)
+          h1.id = arr(0); h1.ring = arr(1).toInt; h1.order = arr(2).toInt
+          h1.label = arr(3)
+          val h2 = Half_edge(v2, v1)
+          h2.id = "*"
+          h1.twin = h2
+          h2.twin = h1
+          List(h1, h2)
         }
+      }.cache
+      val nHalf_edges = half_edges.count()
+      (half_edges, nHalf_edges)
+    }
 
-      vertices.foreach{ vertex =>
-        val sortedIncidents = vertex.getHalf_edges()
-        val size = sortedIncidents.size
+    debug{
+      logger.info(s"Number of half edges: $nHalf_edges")
+    }
 
-        for(i <- 0 until (size - 1)){
-          var current = sortedIncidents(i)
-          var next    = sortedIncidents(i + 1)
+    //val (dcel, nDcel) = timer{"Getting local DCEL's"}{
+      val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
+        val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
+          .groupBy(_._1).toList.map{ v =>
+            val vertex = v._1
+            vertex.setHalf_edges(v._2.map(_._2))
+            vertex
+          }
+
+        vertices.foreach{ vertex =>
+          val sortedIncidents = vertex.getHalf_edges()
+          val size = sortedIncidents.size
+
+          for(i <- 0 until (size - 1)){
+            var current = sortedIncidents(i)
+            var next    = sortedIncidents(i + 1)
+            current.next   = next.twin
+            next.twin.prev = current
+          }
+          var current = sortedIncidents(size - 1)
+          var next    = sortedIncidents(0)
           current.next   = next.twin
           next.twin.prev = current
         }
-        var current = sortedIncidents(size - 1)
-        var next    = sortedIncidents(0)
-        current.next   = next.twin
-        next.twin.prev = current
-      }
 
-      val hedges = vertices.flatMap(v => v.getHalf_edges)
-      var faces = new ArrayBuffer[Face]()
-      val half_edgeList = hedges.flatMap{ hedge =>
-        var hedges = new ArrayBuffer[Half_edge]()
-        var h = hedge
-        do{
-          hedges += h
-          h = h.next
-        }while(h != hedge)
-        val ids = hedges.map(_.id).distinct
-        val id = ids.size match {
-          case 2 => ids.filter(_ != "*").head
-          case 1 => ids.head
-          case _ => ids.mkString("|")
+        /////////////////////////////////////////////////////////////////////////////////////
+        import scala.annotation.tailrec
+
+        val hedges2 = vertices.flatMap(_.getHalf_edges).toVector
+
+        @tailrec
+        def getNodes(start: Half_edge, end: Half_edge, v: Vector[Half_edge]): Vector[Half_edge] = {
+          if(start == end){
+            v :+ end
+          } else {
+            getNodes(start.next, end, v :+ start)
+          }
         }
-        hedge.id = id
-        List( hedge ).toIterator
-      }
-      .filter(_.id != "*")
-      
-      var temp_half_edgeList = new ArrayBuffer[Half_edge]()
-      temp_half_edgeList ++= half_edgeList
-      for(temp_hedge <- temp_half_edgeList){
-        val hedge = half_edgeList.find(_.equals(temp_hedge)).get
-        if(hedge.face == null){
-          val f = Face(hedge.id, index)
-          f.outerComponent = hedge
-          f.outerComponent.face = f
-          f.id = hedge.id
-          f.ring = hedge.ring
+
+        @tailrec
+        def getFaces(v: Vector[Half_edge], r: Vector[Vector[Half_edge]]): Vector[Vector[Half_edge]] = {
+          if(v.isEmpty){
+            r
+          } else {
+            val node = v.head
+            val nodes = getNodes(node, node.prev, Vector.empty[Half_edge])
+            val newV = v.filterNot(nodes.contains)
+            val newR = nodes +: r
+            getFaces(newV, newR)
+          }
+        }
+
+        val f = getFaces(hedges2, Vector.empty[Vector[Half_edge]])
+        .map{ hedges =>
+          val ids = hedges.map(_.id).distinct
+          val id = ids.size match {
+            case 2 => ids.filter(_ != "*").head
+            case 1 => ids.head
+            case _ => ids.mkString("|")
+          }
+          (id, hedges)
+        }.filter(_._1 != "*").groupBy(_._1)
+
+        /////////////////////////////////////////////////////////////////////////////////////
+
+        val hedges = vertices.flatMap(v => v.getHalf_edges)
+        var faces = new ArrayBuffer[Face]()
+        val half_edgeList = hedges.flatMap{ hedge =>
+          var hedges = new ArrayBuffer[Half_edge]()
           var h = hedge
           do{
-            half_edgeList.find(_.equals(h)).get.face = f
+            hedges += h
             h = h.next
-          }while(h != f.outerComponent)
-          faces += f
+          }while(h != hedge)
+            val ids = hedges.map(_.id).distinct
+          val id = ids.size match {
+            case 2 => ids.filter(_ != "*").head
+            case 1 => ids.head
+            case _ => ids.mkString("|")
+          }
+          hedge.id = id
+          List( hedge ).toIterator
+        }.filter(_.id != "*")
+        
+        var temp_half_edgeList = new ArrayBuffer[Half_edge]()
+        temp_half_edgeList ++= half_edgeList
+        for(temp_hedge <- temp_half_edgeList){
+          val hedge = half_edgeList.find(_.equals(temp_hedge)).get
+          if(hedge.face == null){
+            val f = Face(hedge.id, index)
+            f.outerComponent = hedge
+            f.outerComponent.face = f
+            f.id = hedge.id
+            f.ring = hedge.ring
+            var h = hedge
+            do{
+              half_edgeList.find(_.equals(h)).get.face = f
+              h = h.next
+            }while(h != f.outerComponent)
+              faces += f
+          }
         }
+        val facesList = faces.groupBy(_.id).map{ case (id, faces) =>
+          val polys = faces.sortBy(_.area).reverse
+          val outer = polys.head
+          outer.innerComponents = polys.tail.toVector
+
+          outer
+        }.toList
+
+        List( (vertices, hedges, facesList, f) ).toIterator
+        //facesList.toIterator
+      }.cache
+      val nDcel = dcel.count()
+      (dcel, nDcel)
+    //}
+
+    debug{
+      val faces = dcel.flatMap{ dcel =>
+        dcel._4
       }
-      val facesList = faces.groupBy(_.id).map{ case (id, faces) =>
-        val polys = faces.sortBy(_.area).reverse
-        val outer = polys.head
-        outer.innerComponents = polys.tail.toVector
+      logger.info(s"Number of faces: ${faces.count()}")
 
-        outer
-      }.toList
-
-      List( (vertices, hedges, facesList) ).toIterator
-    }.cache
-    val nDcel = dcel.count()
-    log(stage, timer, nDcel, "END")
-
-    if(debug){
+      logger.info(s"Partitions on DCEL: ${dcel.getNumPartitions}")
       var WKT = dcel.flatMap{ dcel =>
-        val faces = dcel._3
-        faces.sortBy(_.id).map{ face =>
-            s"${face.toWKT2}\t${face.innerComponents.size}\n"
+        dcel._2.map{ hedge =>
+          s"${hedge.toWKT2}\n"
         }
       }.collect()
-      var filename = "/tmp/edgesFaces.wkt"
+      var filename = "/tmp/edgesHedges.wkt"
       var f = new java.io.PrintWriter(filename)
       f.write(WKT.mkString(""))
       f.close
       logger.info(s"${filename} saved [${WKT.size}] records")
 
-      WKT = dcel.mapPartitionsWithIndex{ case(index, partition) =>
-        val faces = partition.next._3
-        faces.sortBy(_.id).flatMap{ face =>
-          val n = face.getPolygons.size
-          face.getPolygons.map{ poly =>
-            s"${face.id}\t${poly.toText()}\t${n}\t${index}\n"
-          }
-        }.toIterator
-      }.collect()
-      filename = "/tmp/edgesFaces2.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-
       WKT = dcel.flatMap{ dcel =>
-        val faces = dcel._3
-        faces.sortBy(_.id).map{ face =>
-            s"${face.id}\t${face.cell}\t${face.getGeometry._1.toText()}\t${face.getGeometry._2}\t${face.getGeometry._1.toText()}\n"
+        dcel._3.map{ face =>
+          s"${face.id}\t${face.cell}\t${face.getGeometry._1.toText()}\t${face.getGeometry._2}\t${face.getGeometry._1.toText()}\n"
         }
       }.collect()
       filename = "/tmp/edgesFaces3.wkt"
@@ -436,11 +454,9 @@ object EdgePartitioner{
       logger.info(s"${filename} saved [${WKT.size}] records")
     }
 
-    timer = System.currentTimeMillis()
-    stage = "Clossing session"
-    log(stage, timer, 0, "START")
-    spark.close()
-    log(stage, timer, 0, "END")
+    timer{"Clossing session"}{
+      spark.close()
+    }
   }  
 }
 
