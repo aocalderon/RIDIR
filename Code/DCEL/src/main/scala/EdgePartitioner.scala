@@ -25,7 +25,6 @@ object EdgePartitioner{
   private val startTime: Long = 0L
   private val precisionModel: PrecisionModel = new PrecisionModel(1000)
   private val geofactory: GeometryFactory = new GeometryFactory(precisionModel)
-  //private val precision: Double = 0.001
 
   case class Quad(id: Int, nedges: Int, lineage: String, region: Int, wkt: String, siblings: List[Int])
   case class EmptyCell(cell: QuadRectangle, var solve: Boolean){
@@ -41,16 +40,28 @@ object EdgePartitioner{
   
   def clocktime = System.currentTimeMillis()
 
-  def log(msg: String, timer: Long, n: Long, status: String): Unit ={
-    logger.info("EP|%6.2f|%-50s|%6.2f|%6d|%s".format((clocktime-startTime)/1000.0, msg, (clocktime-timer)/1000.0, n, status))
-  }
-
   def timer[A](msg: String)(code: => A): A = {
     val start = clocktime
     val resutl = code
     val end = clocktime
     logger.info("%-30s|%6.2f".format(msg, (end - start) / 1000.0))
     code
+  }
+
+  def debug[A](code: => A)(implicit debugState: Boolean): Unit = {
+    if(debugState){
+      code
+    }
+  }
+
+  def save(filename: String)(content: Seq[String]): Unit = {
+    val start = clocktime
+    val f = new java.io.PrintWriter(filename)
+    f.write(content.mkString(""))
+    f.close
+    val end = clocktime
+    val time = "%.2f".format((end - start) / 1000.0)
+    logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
   }
 
   def envelope2Polygon(e: Envelope): Polygon = {
@@ -79,7 +90,7 @@ object EdgePartitioner{
     outerRing +: innerRings
   }
 
-  def getHalf_edges(polygon: Polygon): List[LineString] = {
+  def getLineStrings(polygon: Polygon): List[LineString] = {
     val polygon_id = polygon.getUserData.toString().split("\t")(0)
     val rings = getRings(polygon).zipWithIndex
     val hasHoles = rings.size > 1 match {
@@ -159,35 +170,186 @@ object EdgePartitioner{
     (cells, corner)
   }
 
-  def debug[A](code: => A)(implicit debugState: Boolean): Unit = {
-    if(debugState){
-      code
+  def getEdges(polygons: RDD[Polygon]): (RDD[LineString], Long) = {
+    val edges = polygons.flatMap(getLineStrings).cache
+    val nEdges = edges.count()
+    (edges, nEdges)
+
+  }
+
+  def partitionEdges(edges: RDD[LineString])(implicit params: EdgePartitionerConf):
+      (SpatialRDD[LineString], StandardQuadTree[LineString], Map[Int, QuadRectangle]) = {
+    val edgesRDD = new SpatialRDD[LineString]()
+    edgesRDD.setRawSpatialRDD(edges)
+    edgesRDD.analyze()
+    val boundary = new QuadRectangle(edgesRDD.boundaryEnvelope)
+    val quadtree = new StandardQuadTree[LineString](boundary, 0, params.maxentries(), params.nlevels())
+    for(edge <- edges.sample(false, params.sample(), 42).collect()) {
+      quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
     }
+    quadtree.assignPartitionIds()
+    quadtree.assignPartitionLineage()
+    val EdgePartitioner = new QuadTreePartitioner(quadtree)
+    edgesRDD.spatialPartitioning(EdgePartitioner)
+    edgesRDD.spatialPartitionedRDD.rdd.cache
+    val nEdgesRDD = edgesRDD.spatialPartitionedRDD.rdd.count()
+    val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId.toInt -> cell)).toMap
+
+    (edgesRDD, quadtree, cells)
+  }
+  
+  def getSegments(edgesRDD: SpatialRDD[LineString], cells: Map[Int, QuadRectangle]): RDD[LineString] = {
+    val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
+      val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
+      val g1 = edges.map(edge2graphedge).toList
+      val g2 = linestring2graphedge(cell.getExteriorRing, "*")
+
+      SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
+        gedge.getLineStrings
+      }.filter(line => line.coveredBy(cell)).toIterator
+    }.cache
+    val nSegments = segments.count()
+    segments
+  }
+
+  def getHalf_edges(segments: RDD[LineString]): (RDD[Half_edge], Long) = {
+    val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
+      segments.flatMap{ segment =>
+        val arr = segment.getUserData.toString().split("\t")
+        val coords = segment.getCoordinates
+        val v1 = Vertex(coords(0).x, coords(0).y)
+        val v2 = Vertex(coords(1).x, coords(1).y)
+        val h1 = Half_edge(v1, v2)
+        h1.id = arr(0); h1.ring = arr(1).toInt; h1.order = arr(2).toInt
+        h1.label = arr(3)
+        val h2 = Half_edge(v2, v1)
+        h2.id = "*"
+        h1.twin = h2
+        h2.twin = h1
+        List(h1, h2)
+      }
+    }.cache
+    val nHalf_edges = half_edges.count()
+    (half_edges, nHalf_edges)
+  }
+
+  def getVertices(half_edges: Iterator[Half_edge]): Vector[Vertex] = {
+    val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
+      .groupBy(_._1).toList.map{ v =>
+        val vertex = v._1
+        vertex.setHalf_edges(v._2.map(_._2))
+        vertex
+      }.toVector
+
+    vertices.foreach{ vertex =>
+      val sortedIncidents = vertex.getHalf_edges()
+      val size = sortedIncidents.size
+
+      for(i <- 0 until (size - 1)){
+        var current = sortedIncidents(i)
+        var next    = sortedIncidents(i + 1)
+        current.next   = next.twin
+        next.twin.prev = current
+      }
+      var current = sortedIncidents(size - 1)
+      var next    = sortedIncidents(0)
+      current.next   = next.twin
+      next.twin.prev = current
+    }
+    vertices
+  }
+
+  import scala.annotation.tailrec
+  @tailrec
+  def getNodes(start: Half_edge, end: Half_edge, v: Vector[Half_edge]): Vector[Half_edge] = {
+    if(start == end){
+      v :+ end
+    } else {
+      getNodes(start.next, end, v :+ start)
+    }
+  }
+
+  @tailrec
+  def connectHedges(v: Vector[Half_edge], r: Vector[Vector[Half_edge]]): Vector[Vector[Half_edge]] = {
+    if(v.isEmpty){
+      r
+    } else {
+      val node = v.head
+      val nodes = getNodes(node, node.prev, Vector.empty[Half_edge])
+      val newV = v.filterNot(nodes.contains)
+      val newR = nodes +: r
+      connectHedges(newV, newR)
+    }
+  }
+
+  def getHedgesList(vertices: Vector[Vertex]): Vector[Vector[Half_edge]] = {
+    val hedges = vertices.flatMap(_.getHalf_edges).toVector
+    connectHedges(hedges, Vector.empty[Vector[Half_edge]])
+  }
+
+  def preprocessFacesAndHedges(vertices: Vector[Vertex], index: Int): Vector[(Face, Vector[Half_edge])] = {
+    getHedgesList(vertices).map{ hedges =>
+      val ids = hedges.map(_.id).distinct
+      val id = ids.size match {
+        case 2 => ids.filter(_ != "*").head
+        case 1 => ids.head
+        case _ => ids.mkString("|")
+      }
+      (id, hedges.map{ h => h.id = id; h })
+    }
+      .filter(_._1 != "*")
+      .map{ case (id, hedges) =>
+        val hedge = hedges.head
+        val face = Face(id, index)
+        face.id = id
+        face.outerComponent = hedge
+        val new_hedges = hedges.map{ h => h.face = face; h }
+
+        (face, new_hedges)
+      }
+  }
+
+  def getHedges(pre: Vector[(Face, Vector[Half_edge])]): Vector[Half_edge] = {
+    pre.flatMap(_._2)
+  }
+
+  def getFaces(pre: Vector[(Face, Vector[Half_edge])]): Vector[Face] = {
+    pre.map(_._1)
+      .groupBy(_.id) // Grouping multi-parts
+      .map{ case (id, faces) =>
+        val polys = faces.sortBy(_.area).reverse
+        val outer = polys.head
+        outer.innerComponents = polys.tail.toVector
+
+        outer
+      }.toVector
+  }
+
+  def getLocalDCELs(half_edges: RDD[Half_edge]):
+      (RDD[(Vector[Vertex], Vector[Half_edge], Vector[Face])], Long) = {
+    val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
+      val vertices = getVertices(half_edges)
+
+      val preFacesAndHedges = preprocessFacesAndHedges(vertices, index)
+
+      val hedges = getHedges(preFacesAndHedges)
+      val faces  = getFaces(preFacesAndHedges)
+
+      List( (vertices, hedges, faces) ).toIterator
+    }.cache
+    val nDcel = dcel.count()
+    (dcel, nDcel)
   }
 
   /************************************
    * The main function...
    ************************************/
   def main(args: Array[String]) = {
-    val params = new EdgePartitionerConf(args)
-    val cores = params.cores()
-    val executors = params.executors()
+    implicit val params = new EdgePartitionerConf(args)
+    implicit val debugState = params.debug()
     val input = params.input()
     val offset = params.offset()
-    val decimals = params.decimals()
-    val ppartitions = params.ppartitions()
-    val epartitions = params.epartitions()
     val quote = params.quote()
-    implicit val debugState = params.debug()
-    val master = params.local() match {
-      case true  => s"local[${cores}]"
-      case false => s"spark://${params.host()}:${params.port()}"
-    }
-    val gridType = params.grid() match {
-      case "EQUALGRID" => GridType.EQUALGRID
-      case "QUADTREE"  => GridType.QUADTREE
-      case "KDBTREE"   => GridType.KDBTREE
-    }
 
     debug{
       val precision = 1 / precisionModel.getScale
@@ -210,7 +372,7 @@ object EdgePartitioner{
 
     // Reading data...
     val (polygons, nPolygons) = timer{"Reading data"}{
-      val polygons = spark.read.textFile(input).repartition(200).rdd.zipWithUniqueId().map{ case (line, i) =>
+      val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
         val arr = line.split("\t")
         val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i))
         val wkt = if(quote){
@@ -228,198 +390,71 @@ object EdgePartitioner{
 
     // Extracting edges...
     val (edges, nEdges) = timer{"Extracting edges"}{
-      val edges = polygons.map(_.asInstanceOf[Polygon]).flatMap(getHalf_edges).cache
-      val nEdges = edges.count()
-      (edges, nEdges)
+      getEdges(polygons)
     }
 
     // Partitioning edges...
-    val (edgesRDD, quadtree) = timer{"Partitioning edges"}{
-      val edgesRDD = new SpatialRDD[LineString]()
-      edgesRDD.setRawSpatialRDD(edges)
-      edgesRDD.analyze()
-      val boundary = new QuadRectangle(edgesRDD.boundaryEnvelope)
-      val quadtree = new StandardQuadTree[LineString](boundary, 0, params.eentries(), params.elevels())
-      for(edge <- edges.sample(false, params.esample(), 42).collect()) {
-        quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
-      }
-      quadtree.assignPartitionIds()
-      quadtree.assignPartitionLineage()
-      val EdgePartitioner = new QuadTreePartitioner(quadtree)
-      edgesRDD.spatialPartitioning(EdgePartitioner)
-      edgesRDD.spatialPartitionedRDD.rdd.cache
-      val nEdgesRDD = edgesRDD.spatialPartitionedRDD.rdd.count()
-      (edgesRDD, quadtree)
-    }
-    val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId -> cell)).toMap
-
-    debug{
-      var WKT = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
-        val cell = cells.get(index).get
-        List(s"${index}\t${envelope2Polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
-      }.collect()
-      var filename = "/tmp/edgesCells.wkt"
-      var f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
+    val (edgesRDD, quadtree, cells) = timer{"Partitioning edges"}{
+      partitionEdges(edges)
     }
 
     // Getting segments...
     val segments = timer{"Getting segments"}{
-      val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
-        val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
-        val g1 = edges.map(edge2graphedge).toList
-        val g2 = linestring2graphedge(cell.getExteriorRing, "*")
-
-        SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{ gedge =>
-          gedge.getLineStrings
-        }.filter(line => line.coveredBy(cell)).toIterator
-      }.cache
-      val nSegments = segments.count()
-      segments
+      getSegments(edgesRDD, cells)
     }
 
     // Getting half edges...
     val (half_edges, nHalf_edges) = timer{"Getting half edges"}{
-      val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
-        segments.flatMap{ segment =>
-          val arr = segment.getUserData.toString().split("\t")
-          val coords = segment.getCoordinates
-          val v1 = Vertex(coords(0).x, coords(0).y)
-          val v2 = Vertex(coords(1).x, coords(1).y)
-          val h1 = Half_edge(v1, v2)
-          h1.id = arr(0); h1.ring = arr(1).toInt; h1.order = arr(2).toInt
-          h1.label = arr(3)
-          val h2 = Half_edge(v2, v1)
-          h2.id = "*"
-          h1.twin = h2
-          h2.twin = h1
-          List(h1, h2)
-        }
-      }.cache
-      val nHalf_edges = half_edges.count()
-      (half_edges, nHalf_edges)
+      getHalf_edges(segments)
     }
 
     // Getting local DCEL's...
     val (dcel, nDcel) = timer{"Getting local DCEL's"}{
-      val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
-        val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
-          .groupBy(_._1).toList.map{ v =>
-            val vertex = v._1
-            vertex.setHalf_edges(v._2.map(_._2))
-            vertex
-          }
-
-        vertices.foreach{ vertex =>
-          val sortedIncidents = vertex.getHalf_edges()
-          val size = sortedIncidents.size
-
-          for(i <- 0 until (size - 1)){
-            var current = sortedIncidents(i)
-            var next    = sortedIncidents(i + 1)
-            current.next   = next.twin
-            next.twin.prev = current
-          }
-          var current = sortedIncidents(size - 1)
-          var next    = sortedIncidents(0)
-          current.next   = next.twin
-          next.twin.prev = current
-        }
-
-        import scala.annotation.tailrec
-        val hedges = vertices.flatMap(_.getHalf_edges).toVector
-
-        @tailrec
-        def getNodes(start: Half_edge, end: Half_edge, v: Vector[Half_edge]): Vector[Half_edge] = {
-          if(start == end){
-            v :+ end
-          } else {
-            getNodes(start.next, end, v :+ start)
-          }
-        }
-
-        @tailrec
-        def getFaces(v: Vector[Half_edge], r: Vector[Vector[Half_edge]]): Vector[Vector[Half_edge]] = {
-          if(v.isEmpty){
-            r
-          } else {
-            val node = v.head
-            val nodes = getNodes(node, node.prev, Vector.empty[Half_edge])
-            val newV = v.filterNot(nodes.contains)
-            val newR = nodes +: r
-            getFaces(newV, newR)
-          }
-        }
-
-        val facesAndHedges = getFaces(hedges, Vector.empty[Vector[Half_edge]])
-          .map{ hedges =>
-            val ids = hedges.map(_.id).distinct
-            val id = ids.size match {
-              case 2 => ids.filter(_ != "*").head
-              case 1 => ids.head
-              case _ => ids.mkString("|")
-            }
-            (id, hedges.map{ h => h.id = id; h })
-          }
-          .filter(_._1 != "*")
-          .map{ case (id, hedges) =>
-            val hedge = hedges.head
-            val face = Face(id, index)
-            face.id = id
-            face.outerComponent = hedge
-            val new_hedges = hedges.map{ h => h.face = face; h }
-
-            (face, new_hedges)
-          }
-
-        val hedgesA = facesAndHedges.flatMap(_._2)
-        val faces = facesAndHedges.map(_._1)
-          .groupBy(_.id) // Grouping multi-parts
-          .map{ case (id, faces) =>
-            val polys = faces.sortBy(_.area).reverse
-            val outer = polys.head
-            outer.innerComponents = polys.tail.toVector
-
-            outer
-          }.toVector
-
-        List( (vertices, hedgesA, faces) ).toIterator
-      }.cache
-      val nDcel = dcel.count()
-      (dcel, nDcel)
+      getLocalDCELs(half_edges)
     }
 
     debug{
-      val hedges = dcel.map{_._3}
-      logger.info(s"Number of faces: ${hedges.count()}")
-      val faces = dcel.map{_._3}
-      logger.info(s"Number of faces: ${faces.count()}")
-
       logger.info(s"Partitions on DCEL: ${dcel.getNumPartitions}")
-      var WKT = dcel.flatMap{ dcel =>
-        dcel._2.map{ hedge =>
-          s"${hedge.toWKT2}\n"
-        }
-      }.collect()
-      var filename = "/tmp/edgesHedges.wkt"
-      var f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
 
-      WKT = dcel.flatMap{ dcel =>
-        dcel._3.map{ face =>
-          s"${face.id}\t${face.cell}\t${face.getGeometry._1.toText()}\t${face.getGeometry._2}\n"
-        }
-      }.collect()
-      filename = "/tmp/edgesFaces.wkt"
-      f = new java.io.PrintWriter(filename)
-      f.write(WKT.mkString(""))
-      f.close
-      logger.info(s"${filename} saved [${WKT.size}] records")
-      
+      val vertices = dcel.flatMap{_._1}
+      logger.info(s"Number of vertices: ${vertices.count()}")
+      val hedges = dcel.flatMap{_._2}
+      logger.info(s"Number of half edges: ${hedges.count()}")
+      val faces = dcel.flatMap{_._3}
+      logger.info(s"Number of faces: ${faces.count()}")
+    }
+
+    if(params.save()){
+      save{"/tmp/edgesCells.wkt"}{
+        edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
+          val cell = cells.get(index).get
+          List(s"${index}\t${envelope2Polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
+        }.collect()
+      }
+
+      save{"/tmp/edgesVertices.wkt"}{
+        dcel.flatMap{ dcel =>
+          dcel._1.map{ vertex =>
+            s"${vertex.toWKT}\n"
+          }
+        }.collect()
+      }
+
+      save{"/tmp/edgesHedges.wkt"}{
+        dcel.flatMap{ dcel =>
+          dcel._2.map{ hedge =>
+            s"${hedge.toWKT2}\n"
+          }
+        }.collect()
+      }
+
+      save{"/tmp/edgesFaces.wkt"}{
+        dcel.flatMap{ dcel =>
+          dcel._3.map{ face =>
+            s"${face.id}\t${face.cell}\t${face.getGeometry._1.toText()}\t${face.getGeometry._2}\n"
+          }
+        }.collect()
+      }
     }
 
     timer{"Clossing session"}{
@@ -437,15 +472,14 @@ class EdgePartitionerConf(args: Seq[String]) extends ScallopConf(args) {
   val executors:   ScallopOption[Int]     = opt[Int]     (default = Some(3))
   val grid:        ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
   val index:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
-  val decimals:    ScallopOption[Int]     = opt[Int]     (default = Some(6))
-  val ppartitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
-  val epartitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
-  val esample:     ScallopOption[Double]  = opt[Double]  (default = Some(0.25))
-  val eentries:    ScallopOption[Int]     = opt[Int]     (default = Some(500))
-  val elevels:     ScallopOption[Int]     = opt[Int]     (default = Some(6))
+  val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(512))
+  val sample:      ScallopOption[Double]  = opt[Double]  (default = Some(0.25))
+  val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(500))
+  val nlevels:     ScallopOption[Int]     = opt[Int]     (default = Some(6))
   val quote:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
   verify()
 }
