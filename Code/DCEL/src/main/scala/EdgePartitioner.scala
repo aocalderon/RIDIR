@@ -17,8 +17,6 @@ import com.vividsolutions.jts.algorithm.{RobustCGAlgorithms, CGAlgorithms}
 import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ListBuffer, TreeSet, ArrayBuffer, HashSet}
-import scala.util.control.Breaks._
 
 object EdgePartitioner{
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
