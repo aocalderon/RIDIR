@@ -18,11 +18,13 @@ import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
 
-object EdgePartitioner{
+object DCELBuilder {
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val startTime: Long = 0L
   private val precisionModel: PrecisionModel = new PrecisionModel(1000)
   private val geofactory: GeometryFactory = new GeometryFactory(precisionModel)
+
+  case class Settings(spark: SparkSession, params: DCELBuilderConf)
 
   case class Quad(id: Int, nedges: Int, lineage: String, region: Int, wkt: String, siblings: List[Int])
   case class EmptyCell(cell: QuadRectangle, var solve: Boolean){
@@ -46,8 +48,8 @@ object EdgePartitioner{
     code
   }
 
-  def debug[A](code: => A)(implicit debugState: Boolean): Unit = {
-    if(debugState){
+  def debug[A](code: => A)(implicit settings: Settings): Unit = {
+    if(settings.params.debug()){
       code
     }
   }
@@ -168,13 +170,15 @@ object EdgePartitioner{
     (cells, corner)
   }
 
+  //////////////////////////////////////////////////////////////////
   // Main methods
+  //////////////////////////////////////////////////////////////////
 
-  def readPolygons(spark: SparkSession, params: EdgePartitionerConf): (RDD[Polygon], Long) = {
-    val input  = params.input()
-    val offset = params.offset()
-    val quote  = params.quote()
-    val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
+  def readPolygons(implicit settings: Settings): (RDD[Polygon], Long) = {
+    val input  = settings.params.input()
+    val offset = settings.params.offset()
+    val quote  = settings.params.quote()
+    val polygons = settings.spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
       val arr = line.split("\t")
       val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i))
       val wkt = if(quote){
@@ -190,21 +194,31 @@ object EdgePartitioner{
     (polygons, nPolygons)
   }
 
-  def getEdges(polygons: RDD[Polygon]): (RDD[LineString], Long) = {
+  def getEdges(polygons: RDD[Polygon]): RDD[LineString] = {
     val edges = polygons.flatMap(getLineStrings).cache
     val nEdges = edges.count()
-    (edges, nEdges)
-
+    edges
   }
 
-  def partitionEdges(edges: RDD[LineString])(implicit params: EdgePartitionerConf):
-      (SpatialRDD[LineString], StandardQuadTree[LineString], Map[Int, QuadRectangle]) = {
+  def setSpatialRDD(edges: RDD[LineString]): (SpatialRDD[LineString], QuadRectangle) = {
     val edgesRDD = new SpatialRDD[LineString]()
     edgesRDD.setRawSpatialRDD(edges)
     edgesRDD.analyze()
     val boundary = new QuadRectangle(edgesRDD.boundaryEnvelope)
-    val quadtree = new StandardQuadTree[LineString](boundary, 0, params.maxentries(), params.nlevels())
-    for(edge <- edges.sample(false, params.sample(), 42).collect()) {
+    (edgesRDD, boundary)
+  }
+
+  def partitionEdges(edges: RDD[LineString])(implicit settings: Settings):
+      (SpatialRDD[LineString], StandardQuadTree[LineString], Map[Int, QuadRectangle]) = {
+    val maxentries = settings.params.maxentries()
+    val nlevels = settings.params.nlevels()
+    val sample = settings.params.sample()
+    val edgesRDD = new SpatialRDD[LineString]()
+    edgesRDD.setRawSpatialRDD(edges)
+    edgesRDD.analyze()
+    val boundary = new QuadRectangle(edgesRDD.boundaryEnvelope)
+    val quadtree = new StandardQuadTree[LineString](boundary, 0, maxentries, nlevels)
+    for(edge <- edges.sample(false, sample, 42).collect()) {
       quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
     }
     quadtree.assignPartitionIds()
@@ -307,7 +321,7 @@ object EdgePartitioner{
     connectHedges(hedges, Vector.empty[Vector[Half_edge]])
   }
 
-  def preprocessFacesAndHedges(vertices: Vector[Vertex], index: Int, tag: String):
+  def preprocessFacesAndHedges(vertices: Vector[Vertex], index: Int, tag: String = ""):
       Vector[(Face, Vector[Half_edge])] = {
     getHedgesList(vertices).map{ hedges =>
       val ids = hedges.map(_.id).distinct
@@ -351,7 +365,7 @@ object EdgePartitioner{
       }.toVector
   }
 
-  def getLocalDCELs(half_edges: RDD[Half_edge], tag: String):  (RDD[LDCEL], Long) = {
+  def getLocalDCELs(half_edges: RDD[Half_edge], tag: String = ""):  (RDD[LDCEL], Long) = {
     val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
       val vertices = getVertices(half_edges)
 
@@ -370,16 +384,11 @@ object EdgePartitioner{
    * The main function...
    ************************************/
   def main(args: Array[String]) = {
-    implicit val params = new EdgePartitionerConf(args)
-    implicit val debugState = params.debug()
+    val params = new DCELBuilderConf(args)
     val input = params.input()
     val offset = params.offset()
     val quote = params.quote()
 
-    debug{
-      val precision = 1 / precisionModel.getScale
-      logger.info(s"Using Scale=${precisionModel.getScale} and Precision=${precision}")
-    }
 
     // Starting session...
     val spark = timer{"Starting session"}{
@@ -394,14 +403,20 @@ object EdgePartitioner{
     import spark.implicits._
     val appID = spark.sparkContext.applicationId
     val startTime = spark.sparkContext.startTime
+    implicit val settings = Settings(spark, params)
+
+    debug{
+      val precision = 1 / precisionModel.getScale
+      logger.info(s"Using Scale=${precisionModel.getScale} and Precision=${precision}")
+    }
 
     // Reading data...
     val (polygons, nPolygons) = timer{"Reading data"}{
-      readPolygons(spark, params)
+      readPolygons
     }
 
     // Extracting edges...
-    val (edges, nEdges) = timer{"Extracting edges"}{
+    val edges = timer{"Extracting edges"}{
       getEdges(polygons)
     }
 
@@ -475,7 +490,7 @@ object EdgePartitioner{
   }  
 }
 
-class EdgePartitionerConf(args: Seq[String]) extends ScallopConf(args) {
+class DCELBuilderConf(args: Seq[String]) extends ScallopConf(args) {
   val input:       ScallopOption[String]  = opt[String]  (required = true)
   val offset:      ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val host:        ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
