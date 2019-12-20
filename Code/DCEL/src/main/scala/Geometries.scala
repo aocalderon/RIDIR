@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.{Coordinate, LinearRing, MultiPolygon, Polygo
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
   private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
+
   def getVerticesSet: List[Vertex] = {
     var vertices = new ArrayBuffer[Vertex]()
     vertices += hedge.v1
@@ -18,11 +19,21 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
     vertices.toList.distinct
   }
 
-  def getLineStrings: List[LineString] = {
-    var lines = new ArrayBuffer[LineString]()
+  def getGraphEdges: List[GraphEdge] = {
     val vertices = this.getVerticesSet.map(v => new Coordinate(v.x, v.y))
     val segments = vertices.zip(vertices.tail)
-    for(segment <- segments){
+    for{
+      segment <- segments
+    } yield {
+      val pts = Array(segment._1, segment._2)
+      new GraphEdge(pts, hedge)
+    }
+  }
+
+  def getLineStrings: List[LineString] = {
+    val vertices = this.getVerticesSet.map(v => new Coordinate(v.x, v.y))
+    val segments = vertices.zip(vertices.tail)
+    for(segment <- segments) yield {
       val arr = Array(segment._1, segment._2)
       val line = geofactory.createLineString(arr)
       val tag = this.hedge.tag
@@ -31,9 +42,8 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
       val ring = this.hedge.ring
       val order = this.hedge.order
       line.setUserData(s"$id\t$ring\t$order\t$tag$label")
-      lines += line
+      line
     }
-    lines.toList
   }
 
   def getHalf_edges: List[Half_edge] = {
@@ -80,6 +90,14 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
       s"POINT(${coord.x} ${coord.y})\t$seg\t$dist\t${hedge.id}"
     }.mkString("\n")
   }
+}
+
+case class LDCEL(id: Int, vertices: Vector[Vertex], half_edges: Vector[Half_edge], faces: Vector[Face],
+  tag: String = "A"){
+
+  val nVertices = vertices.size
+  val nHalf_edges = half_edges.size
+  val nFaces = faces.size
 }
 
 case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: List[Edge] = null) {
