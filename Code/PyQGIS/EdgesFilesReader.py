@@ -2,10 +2,17 @@
 
 import subprocess
 
-subprocess.run(["scp", "acald013@hn:/tmp/edgesCells.wkt", "/home/and/tmp/edges/edgesCells.wkt"])
-subprocess.run(["scp", "acald013@hn:/tmp/edgesFaces.wkt", "/home/and/tmp/edges/edgesFaces.wkt"])
+crs = 2272
+#subprocess.run(["scp", "acald013@hn:/tmp/edgesCells.wkt", "/home/and/tmp/edges/edgesCells.wkt"])
+#subprocess.run(["scp", "acald013@hn:/tmp/edgesSegments.wkt", "/home/and/tmp/edges/edgesSegments.wkt"])
+#subprocess.run(["scp", "acald013@hn:/tmp/edgesHedges.wkt", "/home/and/tmp/edges/edgesHedges.wkt"])
+#subprocess.run(["scp", "acald013@hn:/tmp/edgesFaces.wkt", "/home/and/tmp/edges/edgesFaces.wkt"])
 
-names = ["Cells", "Faces"]
+names = ["Cells", "Segments", "Vertices", "Hedges"]
+
+for name in names:
+  subprocess.run(["scp", "acald013@hn:/tmp/edges{}.wkt".format(name), "/home/and/tmp/edges/edges{}.wkt".format(name)])
+
 
 instance = QgsProject.instance()
 
@@ -16,9 +23,8 @@ for name in names:
 
 iface.mapCanvas().refresh()
 
-uri = "file:///home/and/tmp/edges/edgesCells.wkt?delimiter={}&crs=epsg:2272&wktField={}".format("\\t", "field_2")
-vCell = iface.addVectorLayer(uri, "Cells", "delimitedtext")
 
-uri = "file:///home/and/tmp/edges/edgesFaces.wkt?delimiter={}&crs=epsg:2272&wktField={}".format("\\t", "field_3")
-vFaces = iface.addVectorLayer(uri, "Faces", "delimitedtext")
+for name in names:
+  uri = "file:///home/and/tmp/edges/edges{}.wkt?delimiter={}&useHeader=no&crs=epsg:{}&wktField={}".format(name, "t", crs, "field_1")
+  vCell = iface.addVectorLayer(uri, name, "delimitedtext")
 
