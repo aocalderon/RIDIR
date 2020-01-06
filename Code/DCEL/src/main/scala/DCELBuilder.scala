@@ -299,6 +299,11 @@ object DCELBuilder {
     if(start == end){
       v :+ end
     } else {
+      if(start.next == null){
+        println("The next one is null...")
+        println{s"${start.toWKT2}"}
+        println{s"${start.prev.toWKT2}"}
+      }
       getNodes(start.next, end, v :+ start)
     }
   }
@@ -373,6 +378,8 @@ object DCELBuilder {
 
       val hedges = getHedges(preFacesAndHedges)
       val faces  = getFaces(preFacesAndHedges)
+      //val hedges = Vector.empty[Half_edge]
+      //val faces  = Vector.empty[Face]
 
       Iterator( LDCEL(index, vertices, hedges, faces, tag) )
     }.cache
