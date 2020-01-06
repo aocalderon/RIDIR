@@ -73,7 +73,7 @@ object DCELMerger{
       polygon.asInstanceOf[Polygon]
     }.cache
     val nPolygons = polygons.count()
-    (polygons, nPolygons)
+    (polygons.filter(_.getUserData.toString().split("\t")(0) != "A57"), nPolygons)
   }
 
   def getQuadTree(edges: RDD[LineString], boundary: QuadRectangle)(implicit settings: Settings):
@@ -176,13 +176,13 @@ object DCELMerger{
         val edges = edgesIt.toVector
         val gA = edges.filter(isA).map(edge2graphedge).toList
         val gB = edges.filter(isB).map(edge2graphedge).toList
-
-        val g = SweepLine.getGraphEdgeIntersections(gA, gB).flatMap{_.getGraphEdges}
-
         val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
-        val gcell = linestring2graphedge(cell.getExteriorRing, "*")
+        val gCell = linestring2graphedge(cell.getExteriorRing, "*")
 
-        SweepLine.getGraphEdgeIntersections(g, gcell).flatMap{_.getLineStrings}
+        val g1 = SweepLine.getGraphEdgeIntersections(gA, gCell).flatMap{_.getGraphEdges}
+        val g2 = SweepLine.getGraphEdgeIntersections(gB, gCell).flatMap{_.getGraphEdges}
+
+        SweepLine.getGraphEdgeIntersections(gA, gB).flatMap{_.getLineStrings}
           .filter(line => line.coveredBy(cell))
           .toIterator
       }.cache
@@ -198,8 +198,7 @@ object DCELMerger{
     }
     
     debug{ logger.info(s"Half edges: $nHalf_edges") }
-
-    /*
+/*    
     // Getting local DCEL's...
     val (dcel, nDcel) = timer{"Getting local DCEL's"}{
       getLocalDCELs(half_edges)
@@ -216,7 +215,7 @@ object DCELMerger{
       val nfaces = dcel.map{_.nFaces}.sum()
       logger.info(s"Number of faces: ${nfaces}")
     }
-     */
+ */    
     if(params.save()){
       save{"/tmp/edgesCells.wkt"}{
         cells.values.map{ cell =>
@@ -259,7 +258,7 @@ object DCELMerger{
           }
         }.collect()
       }
- */      
+ */    
     }
 
     // Closing session...

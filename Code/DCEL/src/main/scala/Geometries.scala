@@ -198,11 +198,34 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
     this.half_edges.clear()
     this.half_edges ++= hedges.groupBy(_.angle)
       .flatMap{ hedge =>
-        if(hedge._2.size > 1){ // Removing duplicate half edge and setting new twins...
-          val h1 = hedge._2.filter(_.id != "*").head
-          val h2 = hedge._2.filter(_.id == "*").head
-          h1.twin = h2.twin
-          List(h1)
+        if(hedge._2.size > 1){ // Removing duplicate half edges and setting new twins...
+
+          //////////////////////
+          if(hedge._2.size > 2){
+            println(hedge._2.size)
+            hedge._2.map(_.toWKT2).foreach{println}
+            println("")
+          }
+          if(hedge._2.filter(_.id != "*").isEmpty){
+            hedge._2.map(_.toWKT2).foreach{println}
+          }
+          if(hedge._2.filter(_.id == "*").isEmpty){
+            hedge._2.map(_.toWKT2).foreach{println}
+          }
+          //////////////////////
+
+          val h1s = hedge._2.filter(_.id != "*")
+          val h2s = hedge._2.filter(_.id == "*")
+          val h = (h1s.headOption, h2s.headOption) match {
+            case (Some(h1), Some(h2)) => { // there are exterior and interior edges...
+              h1.twin = h2.twin
+              List(h1)
+            }
+            case (Some(h1), None) => h1s // there are only interior edges...
+            case (None, Some(h2)) => List(h2) // there are only exterior edges..
+            case (None, None) => List.empty[Half_edge] // Can't happen!
+          }
+          h
         } else {
           hedge._2
         }
