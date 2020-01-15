@@ -42,10 +42,10 @@ object DCELBuilder {
 
   def timer[A](msg: String)(code: => A): A = {
     val start = clocktime
-    val resutl = code
+    val result = code
     val end = clocktime
     logger.info("%-30s|%6.2f".format(msg, (end - start) / 1000.0))
-    code
+    result
   }
 
   def debug[A](code: => A)(implicit settings: Settings): Unit = {
@@ -253,10 +253,10 @@ object DCELBuilder {
         val coords = segment.getCoordinates
         val v1 = Vertex(coords(0).x, coords(0).y)
         val v2 = Vertex(coords(1).x, coords(1).y)
-        val h1 = Half_edge(v1, v2)
+        val h1 = Half_edge(v2, v1)
         h1.id = arr(0); h1.ring = arr(1).toInt; h1.order = arr(2).toInt
         h1.label = arr(3)
-        val h2 = Half_edge(v2, v1)
+        val h2 = Half_edge(v1, v2)
         h2.id = "*"
         h1.twin = h2
         h2.twin = h1
@@ -268,7 +268,7 @@ object DCELBuilder {
   }
 
   def getVertices(half_edges: Iterator[Half_edge]): Vector[Vertex] = {
-    val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
+    val vertices = half_edges.map(hedge => (hedge.v1, hedge)).toList
       .groupBy(_._1).toList.map{ v =>
         val vertex = v._1
         vertex.setHalf_edges(v._2.map(_._2))
@@ -299,11 +299,6 @@ object DCELBuilder {
     if(start == end){
       v :+ end
     } else {
-      if(start.next == null){
-        println("The next one is null...")
-        println{s"${start.toWKT2}"}
-        println{s"${start.prev.toWKT2}"}
-      }
       getNodes(start.next, end, v :+ start)
     }
   }
@@ -370,17 +365,19 @@ object DCELBuilder {
       }.toVector
   }
 
+  def debugHedgesMap(vertices: Vector[Vertex]): Vector[Vector[Half_edge]] = {
+    val list = getHedgesList(vertices)
+    list
+  }
+
   def getLocalDCELs(half_edges: RDD[Half_edge], tag: String = ""):  (RDD[LDCEL], Long) = {
     val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
       val vertices = getVertices(half_edges)
 
       val preFacesAndHedges = preprocessFacesAndHedges(vertices, index, tag)
-
       val hedges = getHedges(preFacesAndHedges)
       val faces  = getFaces(preFacesAndHedges)
-      //val hedges = Vector.empty[Half_edge]
-      //val faces  = Vector.empty[Face]
-
+      
       Iterator( LDCEL(index, vertices, hedges, faces, tag) )
     }.cache
     val nDcel = dcel.count()
