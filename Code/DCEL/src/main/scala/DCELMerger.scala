@@ -29,7 +29,7 @@ object DCELMerger{
 
   def timer[A](msg: String)(code: => A)(implicit settings: Settings): A = {
     val start = clocktime
-    val resutl = code
+    val result = code
     val end = clocktime
     val executors = settings.params.executors()
     val cores = settings.params.cores()
@@ -39,7 +39,7 @@ object DCELMerger{
     val log = f"DCELMerger|${settings.appId}|$executors%2d|$cores%2d|$msg%-30s|$time%6.2f"
     logger.info(log)
 
-    code
+    result
   }
 
   def debug[A](code: => A)(implicit settings: Settings): Unit = {
@@ -166,6 +166,7 @@ object DCELMerger{
     }
 
     debug{
+      logger.info(s"Total number of partitions: ${cells.size}")
       logger.info(s"Total number of edges in raw: ${edgesRDD.rawSpatialRDD.count()}")
       logger.info(s"Total number of edges in spatial: ${edgesRDD.spatialPartitionedRDD.count()}")
     }
@@ -182,71 +183,155 @@ object DCELMerger{
         val g1 = SweepLine.getGraphEdgeIntersections(gA, gCell).flatMap{_.getGraphEdges}
         val g2 = SweepLine.getGraphEdgeIntersections(gB, gCell).flatMap{_.getGraphEdges}
 
-        SweepLine.getGraphEdgeIntersections(gA, gB).flatMap{_.getLineStrings}
+        SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{_.getLineStrings}
           .filter(line => line.coveredBy(cell))
-          .toIterator
+          .toIterator 
       }.cache
       val nSegments = segments.count()
       (segments, nSegments)
     }
 
-    debug{ logger.info(s"Segments: $nSegments") }
+    debug{
+      logger.info(s"Segments: $nSegments")
+    }
 
     // Getting half edges...
+    def getHalf_edges2(segments: RDD[LineString]): (RDD[Half_edge], Long) = {
+      val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
+        segments.flatMap{ segment =>
+          val arr = segment.getUserData.toString().split("\t")
+          val coords = segment.getCoordinates
+          val v1 = Vertex(coords(0).x, coords(0).y)
+          val v2 = Vertex(coords(1).x, coords(1).y)
+          val h1 = Half_edge(v1, v2)
+          h1.id = arr(0); h1.ring = arr(1).toInt; h1.order = arr(2).toInt
+          h1.label = arr(3)
+          val h2 = Half_edge(v2, v1)
+          h2.id = "*"
+          h1.twin = h2
+          h2.twin = h1
+          List(h1, h2)
+        }
+      }.cache
+      val nHalf_edges = half_edges.count()
+      (half_edges, nHalf_edges)
+    }
     val (half_edges, nHalf_edges) = timer{"Getting half edges"}{
-      getHalf_edges(segments)
+      getHalf_edges2(segments)
     }
     
     debug{ logger.info(s"Half edges: $nHalf_edges") }
-/*    
+   
     // Getting local DCEL's...
+    def getVerticesByV2(half_edges: Iterator[Half_edge]): Vector[Vertex] = {
+      val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
+        .groupBy(_._1).toList.map{ v =>
+          val vertex = v._1
+          vertex.setHalf_edges(v._2.map(_._2))
+          vertex
+        }.toVector
+
+      vertices.foreach{ vertex =>
+        val sortedIncidents = vertex.getHalf_edges()
+        val size = sortedIncidents.size
+
+        for(i <- 0 until (size - 1)){
+          var current = sortedIncidents(i)
+          var next    = sortedIncidents(i + 1)
+          current.next   = next.twin
+          next.twin.prev = current
+        }
+        var current = sortedIncidents(size - 1)
+        var next    = sortedIncidents(0)
+        current.next   = next.twin
+        next.twin.prev = current
+      }
+      vertices
+    }
+    
+    def preprocess(vertices: Vector[Vertex], index: Int, tag: String = ""):
+        Vector[(Face, Vector[Half_edge])] = {
+      getHedgesList(vertices).map{ hedges =>
+        val id = hedges.map(_.id).distinct.filter(_ != "*" ).sorted.mkString("|")
+        (id, hedges.map{ h => h.id = id; h })
+      }
+        .map{ case (id, hedges) =>
+          val hedge = hedges.head
+          val face = Face(id, index)
+          face.id = id
+          face.tag = tag
+          face.outerComponent = hedge
+          val new_hedges = hedges.map{ h =>
+            h.face = face
+            h.tag = tag
+            h
+          }
+
+          (face, new_hedges)
+        }
+    }
+
+    def getHedges2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Half_edge] = {
+      pre.flatMap(_._2)
+    }
+
+    def getFaces2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Face] = {
+      pre.map(_._1).filter(_.id != "")
+        .groupBy(_.id) // Grouping multi-parts
+        .map{ case (id, faces) =>
+          val polys = faces.sortBy(_.area).reverse
+          val outer = polys.head
+          outer.innerComponents = polys.tail.toVector
+
+          outer
+        }.toVector
+    }
+
     val (dcel, nDcel) = timer{"Getting local DCEL's"}{
-      getLocalDCELs(half_edges)
+      val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
+        val vertices = getVerticesByV2(half_edges)
+
+        val pre = preprocess(vertices, index)
+        val hedges = getHedges2(pre)
+        val faces  = getFaces2(pre)
+
+        Iterator( LDCEL(index, vertices, hedges, faces) )
+      }.cache
+      val nDcel = dcel.count()
+      (dcel, nDcel)
     }
      
-
     debug{
       logger.info(s"Partitions on DCEL: ${dcel.getNumPartitions}")
-
-      val nvertices = dcel.map{_.nVertices}.sum()
-      logger.info(s"Number of vertices: ${nvertices}")
-      val nhedges = dcel.map{_.nHalf_edges}.sum()
-      logger.info(s"Number of half edges: ${nhedges}")
-      val nfaces = dcel.map{_.nFaces}.sum()
-      logger.info(s"Number of faces: ${nfaces}")
     }
- */    
+
     if(params.save()){
       save{"/tmp/edgesCells.wkt"}{
         cells.values.map{ cell =>
-          s"${cell.partitionId}\t${envelope2Polygon(cell.getEnvelope)}\n"
+          s"${envelope2Polygon(cell.getEnvelope)}\t${cell.partitionId}\n"
         }.toVector
       }
 
       save{"/tmp/edgesSegments.wkt"}{
         segments.map{ segment =>
-          s"${segment.toText()}\n"
+          s"${segment.toText()}\t${segment.getUserData.toString()}\n"
         }.collect()
       }
 
-      save{"/tmp/edgesHedges.wkt"}{
-        half_edges.map{ hedge =>
-          s"${hedge.toWKT2}\n"
-        }.collect()
-      }
-/*
       save{"/tmp/edgesVertices.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.vertices.map{ vertex =>
-            s"${vertex.toWKT}\n"
-          }
+            vertex.getHalf_edges.map{ hedge =>
+              s"${vertex.toWKT}\t${hedge.toWKT2}\n"
+            }
+          }.flatten
         }.collect()
       }
 
       save{"/tmp/edgesHedges.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.half_edges.map{ hedge =>
-            s"${hedge.id}\t${hedge.toWKT2}\n"
+            s"${hedge.toWKT2}\t${hedge.id}\n"
           }
         }.collect()
       }
@@ -254,11 +339,10 @@ object DCELMerger{
       save{"/tmp/edgesFaces.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.faces.map{ face =>
-            s"${face.id}\t${face.cell}\t${face.getGeometry._1.toText()}\t${face.getGeometry._2}\n"
+            s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
           }
         }.collect()
       }
- */    
     }
 
     // Closing session...

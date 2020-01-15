@@ -199,21 +199,6 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
     this.half_edges ++= hedges.groupBy(_.angle)
       .flatMap{ hedge =>
         if(hedge._2.size > 1){ // Removing duplicate half edges and setting new twins...
-
-          //////////////////////
-          if(hedge._2.size > 2){
-            println(hedge._2.size)
-            hedge._2.map(_.toWKT2).foreach{println}
-            println("")
-          }
-          if(hedge._2.filter(_.id != "*").isEmpty){
-            hedge._2.map(_.toWKT2).foreach{println}
-          }
-          if(hedge._2.filter(_.id == "*").isEmpty){
-            hedge._2.map(_.toWKT2).foreach{println}
-          }
-          //////////////////////
-
           val h1s = hedge._2.filter(_.id != "*")
           val h2s = hedge._2.filter(_.id == "*")
           val h = (h1s.headOption, h2s.headOption) match {
@@ -426,9 +411,6 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
         .groupBy(_._1).mapValues(_.map(_._2))
       val diff = partial.values.flatMap(_.tail).toSet
       val result = partial.filterKeys(partial.keySet.diff(diff)).values
-
-      println("Results")
-      result.foreach{println}
 
       val polygons = result.map{ row =>
         val outerPoly = row.head
