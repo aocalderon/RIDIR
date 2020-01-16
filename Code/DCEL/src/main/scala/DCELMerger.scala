@@ -180,10 +180,13 @@ object DCELMerger{
         val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
         val gCell = linestring2graphedge(cell.getExteriorRing, "*")
 
-        val g1 = SweepLine.getGraphEdgeIntersections(gA, gCell).flatMap{_.getGraphEdges}
-        val g2 = SweepLine.getGraphEdgeIntersections(gB, gCell).flatMap{_.getGraphEdges}
+        val g = SweepLine.getGraphEdgeIntersections(gA, gB).flatMap{_.getLineStrings}
+          .filter(line => line.coveredBy(cell))
+          .map(edge2graphedge)
+        
+        //val g2 = SweepLine.getGraphEdgeIntersections(g1, gCell).flatMap{_.getGraphEdges}
 
-        SweepLine.getGraphEdgeIntersections(g1, g2).flatMap{_.getLineStrings}
+        SweepLine.getGraphEdgeIntersections(g, gCell).flatMap{_.getLineStrings}
           .filter(line => line.coveredBy(cell))
           .toIterator 
       }.cache
@@ -216,11 +219,29 @@ object DCELMerger{
       val nHalf_edges = half_edges.count()
       (half_edges, nHalf_edges)
     }
+
     val (half_edges, nHalf_edges) = timer{"Getting half edges"}{
       getHalf_edges2(segments)
     }
     
     debug{ logger.info(s"Half edges: $nHalf_edges") }
+    save{"/tmp/edgesCells.wkt"}{
+      cells.values.map{ cell =>
+        s"${envelope2Polygon(cell.getEnvelope)}\t${cell.partitionId}\n"
+      }.toVector
+    }
+
+    save{"/tmp/edgesSegments.wkt"}{
+      segments.map{ segment =>
+        s"${segment.toText()}\t${segment.getUserData.toString()}\n"
+      }.collect()
+    }
+
+    save{"/tmp/edgesHedges.wkt"}{
+      half_edges.map{ hedge =>
+        s"${hedge.toWKT3}\t${hedge.id}\n"
+      }.collect()
+    }
    
     // Getting local DCEL's...
     def getVerticesByV2(half_edges: Iterator[Half_edge]): Vector[Vertex] = {
@@ -276,6 +297,11 @@ object DCELMerger{
     }
 
     def getFaces2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Face] = {
+      pre.filter(_._1.id != "").map{ case (face, hedges) =>
+        val segments = s"${hedges.head.v1.x} ${hedges.head.v1.y}, " +
+        hedges.map(h => s"${h.v2.x} ${h.v2.y}").mkString(", ")
+        s"${face.id}\tLINESTRING($segments)"
+      }.foreach{ println }
       pre.map(_._1).filter(_.id != "")
         .groupBy(_.id) // Grouping multi-parts
         .map{ case (id, faces) =>
@@ -287,9 +313,22 @@ object DCELMerger{
         }.toVector
     }
 
+    def getHedgesList2(vertices: Vector[Vertex], index: Int): Unit = {
+      val hedges = vertices.flatMap(_.getHalf_edges).toVector
+
+      hedges.map { _.toWKT3 }.foreach{ println }
+
+    }
+
     val (dcel, nDcel) = timer{"Getting local DCEL's"}{
       val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
+
+        //val hedges = half_edges.toVector
+        //val faces  = Vector.empty[Face]
+
         val vertices = getVerticesByV2(half_edges)
+
+        //getHedgesList2(vertices, index)
 
         val pre = preprocess(vertices, index)
         val hedges = getHedges2(pre)
@@ -322,7 +361,7 @@ object DCELMerger{
         dcel.flatMap{ dcel =>
           dcel.vertices.map{ vertex =>
             vertex.getHalf_edges.map{ hedge =>
-              s"${vertex.toWKT}\t${hedge.toWKT2}\n"
+              s"${vertex.toWKT}\t${hedge.toWKT3}\n"
             }
           }.flatten
         }.collect()
@@ -331,7 +370,7 @@ object DCELMerger{
       save{"/tmp/edgesHedges.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.half_edges.map{ hedge =>
-            s"${hedge.toWKT2}\t${hedge.id}\n"
+            s"${hedge.toWKT3}\t${hedge.id}\n"
           }
         }.collect()
       }
@@ -339,6 +378,7 @@ object DCELMerger{
       save{"/tmp/edgesFaces.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.faces.map{ face =>
+            //s"${face.getLinearRing(true)}\t${face.id}\n"
             s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
           }
         }.collect()
