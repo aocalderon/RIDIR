@@ -92,8 +92,7 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
   }
 }
 
-case class LDCEL(id: Int, vertices: Vector[Vertex], half_edges: Vector[Half_edge], faces: Vector[Face],
-  tag: String = "A"){
+case class LDCEL(id: Int, vertices: Vector[Vertex], half_edges: Vector[Half_edge], faces: Vector[Face], lines: Vector[String] = null, tag: String = "A"){
 
   val nVertices = vertices.size
   val nHalf_edges = half_edges.size
