@@ -172,6 +172,27 @@ object DCELMerger{
     }
 
     // Extracting segments...
+    def mergeDuplicates(segments: Seq[LineString]): Seq[LineString] = {
+      segments.map{ segment =>
+        ( (segment.getStartPoint, segment.getEndPoint), segment)
+      }
+        .groupBy(_._1).values.map(_.map(_._2))
+        .flatMap{ lines =>
+          if(lines.size > 1){
+              val data0 = lines(0).getUserData.toString().split("\t")
+              val data1 = lines(1).getUserData.toString().split("\t")
+              val new_id = data0.head + "|" + data1.head
+              val new_data = new_id +: data0.tail
+              val line = lines.head
+              line.setUserData(new_data.mkString("\t"))
+              
+              List(line)
+          } else {
+            lines
+          }
+        }.toList
+    }
+
     val (segments, nSegments) = timer{"Extracting segments"}{
       val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edgesIt) =>
         val edges = edgesIt.toVector
@@ -181,14 +202,12 @@ object DCELMerger{
         val gCell = linestring2graphedge(cell.getExteriorRing, "*")
 
         val g = SweepLine.getGraphEdgeIntersections(gA, gB).flatMap{_.getLineStrings}
-          .filter(line => line.coveredBy(cell))
           .map(edge2graphedge)
-        
-        //val g2 = SweepLine.getGraphEdgeIntersections(g1, gCell).flatMap{_.getGraphEdges}
 
-        SweepLine.getGraphEdgeIntersections(g, gCell).flatMap{_.getLineStrings}
+        val segs = SweepLine.getGraphEdgeIntersections(g, gCell).flatMap{_.getLineStrings}
           .filter(line => line.coveredBy(cell))
-          .toIterator 
+        mergeDuplicates(segs).toIterator
+        //segs.toIterator
       }.cache
       val nSegments = segments.count()
       (segments, nSegments)
@@ -225,23 +244,6 @@ object DCELMerger{
     }
     
     debug{ logger.info(s"Half edges: $nHalf_edges") }
-    save{"/tmp/edgesCells.wkt"}{
-      cells.values.map{ cell =>
-        s"${envelope2Polygon(cell.getEnvelope)}\t${cell.partitionId}\n"
-      }.toVector
-    }
-
-    save{"/tmp/edgesSegments.wkt"}{
-      segments.map{ segment =>
-        s"${segment.toText()}\t${segment.getUserData.toString()}\n"
-      }.collect()
-    }
-
-    save{"/tmp/edgesHedges.wkt"}{
-      half_edges.map{ hedge =>
-        s"${hedge.toWKT3}\t${hedge.id}\n"
-      }.collect()
-    }
    
     // Getting local DCEL's...
     def getVerticesByV2(half_edges: Iterator[Half_edge]): Vector[Vertex] = {
@@ -296,12 +298,11 @@ object DCELMerger{
       pre.flatMap(_._2)
     }
 
+    def pruneDuplicateIDs(id: String): String = {
+      id.split("\\|").distinct.mkString("|")
+    }
+
     def getFaces2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Face] = {
-      pre.filter(_._1.id != "").map{ case (face, hedges) =>
-        val segments = s"${hedges.head.v1.x} ${hedges.head.v1.y}, " +
-        hedges.map(h => s"${h.v2.x} ${h.v2.y}").mkString(", ")
-        s"${face.id}\tLINESTRING($segments)"
-      }.foreach{ println }
       pre.map(_._1).filter(_.id != "")
         .groupBy(_.id) // Grouping multi-parts
         .map{ case (id, faces) =>
@@ -309,6 +310,7 @@ object DCELMerger{
           val outer = polys.head
           outer.innerComponents = polys.tail.toVector
 
+          outer.id = pruneDuplicateIDs(outer.id)
           outer
         }.toVector
     }
@@ -325,11 +327,9 @@ object DCELMerger{
 
         //val hedges = half_edges.toVector
         //val faces  = Vector.empty[Face]
-
+        //val vertices = getVerticesByV2(hedges.toIterator)
+        
         val vertices = getVerticesByV2(half_edges)
-
-        //getHedgesList2(vertices, index)
-
         val pre = preprocess(vertices, index)
         val hedges = getHedges2(pre)
         val faces  = getFaces2(pre)
@@ -378,7 +378,6 @@ object DCELMerger{
       save{"/tmp/edgesFaces.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.faces.map{ face =>
-            //s"${face.getLinearRing(true)}\t${face.id}\n"
             s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
           }
         }.collect()
