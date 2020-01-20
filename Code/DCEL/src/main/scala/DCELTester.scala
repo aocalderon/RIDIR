@@ -174,7 +174,7 @@ object DCELTester{
       val f = faces.toArray.sortBy(_.faceArea())(Ordering[Double].reverse)
       val head = f.head
       val tail = f.tail
-      head.innerComponents = tail
+      head.innerComponents = tail.toVector
 
       head
     }
