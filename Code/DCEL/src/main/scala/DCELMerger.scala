@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.{Coordinate, Envelope, Geometry, LineString, 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.io.WKTReader
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.{Dataset, SparkSession}
@@ -25,18 +25,18 @@ object DCELMerger{
   private val geofactory: GeometryFactory = new GeometryFactory();
   private val precision: Double = 1 / model.getScale
 
-  case class Settings(spark: SparkSession, params: DCELMergerConf, appId: String, startTime: Long)
+  case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf, startTime: Long)
 
   def timer[A](msg: String)(code: => A)(implicit settings: Settings): A = {
     val start = clocktime
     val result = code
     val end = clocktime
-    val executors = settings.params.executors()
-    val cores = settings.params.cores()
+    val executors = settings.conf.get("spark.executor.cores").toInt
+    val cores = settings.conf.get("spark.executor.instances").toInt
     val tick = (end - settings.startTime) / 1000.0
     val time = (end - start) / 1000.0
-
-    val log = f"DCELMerger|${settings.appId}|$executors%2d|$cores%2d|$msg%-30s|$time%6.2f"
+    val appId = settings.conf.get("spark.app.id")
+    val log = f"DCELMerger|$appId|$executors%2d|$cores%2d|$msg%-30s|$time%6.2f"
     logger.info(log)
 
     result
@@ -127,14 +127,14 @@ object DCELMerger{
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .config("spark.scheduler.mode", "FAIR")
-        .config("spark.cores.max", cores * executors)
-        .config("spark.executor.cores", cores)
         .appName("DCELMerger")
         .getOrCreate()
     import spark.implicits._
     val appID = spark.sparkContext.applicationId.split("-").last
     val startTime = spark.sparkContext.startTime
-    implicit val settings = Settings(spark, params, appID, startTime)
+    val config = spark.sparkContext.getConf
+    
+    implicit val settings = Settings(spark, params, config, startTime)
     logger.info("Starting session... Done!")
 
     // Reading polygons...
