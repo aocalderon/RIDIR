@@ -2,8 +2,9 @@
 
 import subprocess
 
-crs = 2272
-names = ["Cells", "Faces", "Segments", "Hedges", "Vertices"]
+#crs = 2272
+crs = 6414
+names = ["Cells", "Segments"]
 
 for name in names:
   subprocess.run(["scp", "acald013@hn:/tmp/edges{}.wkt".format(name), "/home/and/tmp/edges/edges{}.wkt".format(name)])
