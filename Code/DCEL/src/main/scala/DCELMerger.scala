@@ -114,8 +114,6 @@ object DCELMerger{
    **/
   def main(args: Array[String]) = {
     val params     = new DCELMergerConf(args)
-    val cores      = params.cores()
-    val executors  = params.executors()
     val input1     = params.input1()
     val offset1    = params.offset1()
     val input2     = params.input2()
@@ -130,7 +128,6 @@ object DCELMerger{
     // Starting session...
     logger.info("Starting session...")
     val spark = SparkSession.builder()
-        .config("spark.default.parallelism", 3 * cores * executors)
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .config("spark.scheduler.mode", "FAIR")
@@ -406,8 +403,6 @@ class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
   val quote1:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val quote2:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
-  val cores:       ScallopOption[Int]     = opt[Int]     (default = Some(4))
-  val executors:   ScallopOption[Int]     = opt[Int]     (default = Some(3))
   val grid:        ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
   val index:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(512))
