@@ -102,6 +102,13 @@ object DCELMerger{
 
   def isB(line: LineString): Boolean = { getTag(line) == "B" }
 
+  def isValidPoligon(wkt: String): Boolean = {
+    val reader = new WKTReader(geofactory)
+    val geom = reader.read(wkt)
+
+    geom.isValid()
+  }
+
   /***
    * The main function...
    **/
