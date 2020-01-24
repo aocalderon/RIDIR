@@ -115,6 +115,13 @@ object DCELMerger{
 
   def isB(line: LineString): Boolean = { getTag(line) == "B" }
 
+  def isValidPoligon(wkt: String): Boolean = {
+    val reader = new WKTReader(geofactory)
+    val geom = reader.read(wkt)
+
+    geom.isValid()
+  }
+
   /***
    * The main function...
    **/
@@ -415,7 +422,6 @@ class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
   val offset2:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val quote1:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val quote2:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-
   val grid:        ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val index:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(512))
