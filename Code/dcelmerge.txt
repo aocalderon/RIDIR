@@ -1,0 +1,1890 @@
+2020-01-23 10:20:12,898|Starting session...
+2020-01-23 10:20:26,535|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 10:20:26,536|Starting session... Done!
+2020-01-23 10:20:36,058|DCELMerger|0096| 4|12|  500|Reading polygons A            |  9.52
+2020-01-23 10:20:45,245|DCELMerger|0096| 4|12|  500|Reading polygons B            |  9.19
+2020-01-23 10:20:45,246|INFO|0096|Polygons in A|7028
+2020-01-23 10:20:45,246|INFO|0096|Polygons in B|8047
+2020-01-23 10:20:53,708|DCELMerger|0096| 4|12|  500|Partitioning edges            |  8.46
+2020-01-23 10:20:53,710|INFO|0096|Total number of partitions|1261
+2020-01-23 10:20:53,832|INFO|0096|Total number of edges in raw|3901477
+2020-01-23 10:20:55,087|INFO|0096|Total number of edges in spatial|3928599
+2020-01-23 10:21:00,703|DCELMerger|0096| 4|12|  500|Extracting segments           |  5.61
+2020-01-23 10:21:00,704|INFO|0096|Segments|4505998
+2020-01-23 10:21:06,843|DCELMerger|0096| 4|12|  500|Getting half edges            |  6.14
+2020-01-23 10:21:06,846|INFO|0096|Half edges|9011996
+2020-01-23 10:21:15,550|DCELMerger|0096| 4|12|  500|Getting local DCEL's          |  8.70
+2020-01-23 10:21:15,553|INFO|0096|Partitions on DCEL|1261
+2020-01-23 10:21:15,676|Saved /tmp/edgesCells500.wkt in 0.00s [1261 records].
+2020-01-23 10:21:20,015|Saved /tmp/edgesFaces500.wkt in 1.39s [58679 records].
+2020-01-23 10:21:20,015|Closing session...
+2020-01-23 10:21:20,206|Closing session... Done!
+2020-01-23 10:21:23,520|Starting session...
+2020-01-23 10:21:36,919|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 10:21:36,919|Starting session... Done!
+2020-01-23 10:21:46,057|DCELMerger|0097| 4|12|  750|Reading polygons A            |  9.13
+2020-01-23 10:21:55,090|DCELMerger|0097| 4|12|  750|Reading polygons B            |  9.03
+2020-01-23 10:21:55,092|INFO|0097|Polygons in A|7028
+2020-01-23 10:21:55,092|INFO|0097|Polygons in B|8047
+2020-01-23 10:22:04,798|DCELMerger|0097| 4|12|  750|Partitioning edges            |  9.70
+2020-01-23 10:22:04,800|INFO|0097|Total number of partitions|1900
+2020-01-23 10:22:04,924|INFO|0097|Total number of edges in raw|3901477
+2020-01-23 10:22:06,017|INFO|0097|Total number of edges in spatial|3935890
+2020-01-23 10:22:12,832|DCELMerger|0097| 4|12|  750|Extracting segments           |  6.81
+2020-01-23 10:22:12,835|INFO|0097|Segments|4522721
+2020-01-23 10:22:19,754|DCELMerger|0097| 4|12|  750|Getting half edges            |  6.92
+2020-01-23 10:22:19,757|INFO|0097|Half edges|9045442
+2020-01-23 10:22:26,552|DCELMerger|0097| 4|12|  750|Getting local DCEL's          |  6.79
+2020-01-23 10:22:26,553|INFO|0097|Partitions on DCEL|1900
+2020-01-23 10:22:26,797|Saved /tmp/edgesCells750.wkt in 0.00s [1900 records].
+2020-01-23 10:22:31,728|Saved /tmp/edgesFaces750.wkt in 1.42s [63372 records].
+2020-01-23 10:22:31,728|Closing session...
+2020-01-23 10:22:32,044|Closing session... Done!
+2020-01-23 10:22:35,763|Starting session...
+2020-01-23 10:22:50,017|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 10:22:50,018|Starting session... Done!
+2020-01-23 10:22:59,548|DCELMerger|0098| 4|12| 1000|Reading polygons A            |  9.53
+2020-01-23 10:23:08,757|DCELMerger|0098| 4|12| 1000|Reading polygons B            |  9.21
+2020-01-23 10:23:08,781|INFO|0098|Polygons in A|7028
+2020-01-23 10:23:08,782|INFO|0098|Polygons in B|8047
+2020-01-23 10:23:18,695|DCELMerger|0098| 4|12| 1000|Partitioning edges            |  9.91
+2020-01-23 10:23:18,698|INFO|0098|Total number of partitions|2554
+2020-01-23 10:23:18,831|INFO|0098|Total number of edges in raw|3901477
+2020-01-23 10:23:20,257|INFO|0098|Total number of edges in spatial|3941912
+2020-01-23 10:23:27,414|DCELMerger|0098| 4|12| 1000|Extracting segments           |  7.16
+2020-01-23 10:23:27,417|INFO|0098|Segments|4537065
+2020-01-23 10:23:35,668|DCELMerger|0098| 4|12| 1000|Getting half edges            |  8.25
+2020-01-23 10:23:35,671|INFO|0098|Half edges|9074130
+2020-01-23 10:23:41,884|DCELMerger|0098| 4|12| 1000|Getting local DCEL's          |  6.21
+2020-01-23 10:23:41,887|INFO|0098|Partitions on DCEL|2554
+2020-01-23 10:23:42,050|Saved /tmp/edgesCells1000.wkt in 0.00s [2554 records].
+2020-01-23 10:23:46,653|Saved /tmp/edgesFaces1000.wkt in 1.20s [67291 records].
+2020-01-23 10:23:46,653|Closing session...
+2020-01-23 10:23:46,829|Closing session... Done!
+2020-01-23 10:23:50,121|Starting session...
+2020-01-23 10:24:04,107|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 10:24:04,107|Starting session... Done!
+2020-01-23 10:24:15,241|DCELMerger|0099| 4|12| 1250|Reading polygons A            | 11.13
+2020-01-23 10:24:24,311|DCELMerger|0099| 4|12| 1250|Reading polygons B            |  9.07
+2020-01-23 10:24:24,313|INFO|0099|Polygons in A|7028
+2020-01-23 10:24:24,313|INFO|0099|Polygons in B|8047
+2020-01-23 10:24:35,264|DCELMerger|0099| 4|12| 1250|Partitioning edges            | 10.95
+2020-01-23 10:24:35,267|INFO|0099|Total number of partitions|3115
+2020-01-23 10:24:35,384|INFO|0099|Total number of edges in raw|3901477
+2020-01-23 10:24:37,458|INFO|0099|Total number of edges in spatial|3946315
+2020-01-23 10:24:45,507|DCELMerger|0099| 4|12| 1250|Extracting segments           |  8.05
+2020-01-23 10:24:45,509|INFO|0099|Segments|4547882
+2020-01-23 10:24:54,023|DCELMerger|0099| 4|12| 1250|Getting half edges            |  8.51
+2020-01-23 10:24:54,026|INFO|0099|Half edges|9095764
+2020-01-23 10:25:00,036|DCELMerger|0099| 4|12| 1250|Getting local DCEL's          |  6.01
+2020-01-23 10:25:00,040|INFO|0099|Partitions on DCEL|3115
+2020-01-23 10:25:00,258|Saved /tmp/edgesCells1250.wkt in 0.01s [3115 records].
+2020-01-23 10:25:05,425|Saved /tmp/edgesFaces1250.wkt in 1.63s [70282 records].
+2020-01-23 10:25:05,425|Closing session...
+2020-01-23 10:25:05,568|Closing session... Done!
+2020-01-23 10:25:08,891|Starting session...
+2020-01-23 10:25:22,549|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 10:25:22,550|Starting session... Done!
+2020-01-23 10:25:31,409|DCELMerger|0100| 4|12| 1500|Reading polygons A            |  8.85
+2020-01-23 10:25:40,454|DCELMerger|0100| 4|12| 1500|Reading polygons B            |  9.04
+2020-01-23 10:25:40,456|INFO|0100|Polygons in A|7028
+2020-01-23 10:25:40,456|INFO|0100|Polygons in B|8047
+2020-01-23 10:25:52,949|DCELMerger|0100| 4|12| 1500|Partitioning edges            | 12.49
+2020-01-23 10:25:52,950|INFO|0100|Total number of partitions|3844
+2020-01-23 10:25:53,049|INFO|0100|Total number of edges in raw|3901477
+2020-01-23 10:25:55,391|INFO|0100|Total number of edges in spatial|3952223
+2020-01-23 10:26:04,509|DCELMerger|0100| 4|12| 1500|Extracting segments           |  9.12
+2020-01-23 10:26:04,512|INFO|0100|Segments|4562392
+2020-01-23 10:26:14,491|DCELMerger|0100| 4|12| 1500|Getting half edges            |  9.98
+2020-01-23 10:26:14,495|INFO|0100|Half edges|9124784
+2020-01-23 10:26:20,072|DCELMerger|0100| 4|12| 1500|Getting local DCEL's          |  5.58
+2020-01-23 10:26:20,075|INFO|0100|Partitions on DCEL|3844
+2020-01-23 10:26:20,280|Saved /tmp/edgesCells1500.wkt in 0.01s [3844 records].
+2020-01-23 10:26:26,190|Saved /tmp/edgesFaces1500.wkt in 1.69s [74191 records].
+2020-01-23 10:26:26,190|Closing session...
+2020-01-23 10:26:26,327|Closing session... Done!
+2020-01-23 10:26:30,376|Starting session...
+2020-01-23 10:26:45,094|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 10:26:45,094|Starting session... Done!
+2020-01-23 10:26:54,404|DCELMerger|0101| 4|12| 1750|Reading polygons A            |  9.31
+2020-01-23 10:27:03,726|DCELMerger|0101| 4|12| 1750|Reading polygons B            |  9.32
+2020-01-23 10:27:03,728|INFO|0101|Polygons in A|7028
+2020-01-23 10:27:03,729|INFO|0101|Polygons in B|8047
+2020-01-23 10:27:16,236|DCELMerger|0101| 4|12| 1750|Partitioning edges            | 12.51
+2020-01-23 10:27:16,238|INFO|0101|Total number of partitions|4579
+2020-01-23 10:27:16,346|INFO|0101|Total number of edges in raw|3901477
+2020-01-23 10:27:19,466|INFO|0101|Total number of edges in spatial|3956873
+2020-01-23 10:27:29,141|DCELMerger|0101| 4|12| 1750|Extracting segments           |  9.67
+2020-01-23 10:27:29,144|INFO|0101|Segments|4574311
+2020-01-23 10:27:40,542|DCELMerger|0101| 4|12| 1750|Getting half edges            | 11.40
+2020-01-23 10:27:40,547|INFO|0101|Half edges|9148622
+2020-01-23 10:27:46,525|DCELMerger|0101| 4|12| 1750|Getting local DCEL's          |  5.98
+2020-01-23 10:27:46,529|INFO|0101|Partitions on DCEL|4579
+2020-01-23 10:27:46,891|Saved /tmp/edgesCells1750.wkt in 0.01s [4579 records].
+2020-01-23 10:27:52,415|Saved /tmp/edgesFaces1750.wkt in 1.26s [77354 records].
+2020-01-23 10:27:52,416|Closing session...
+2020-01-23 10:27:52,747|Closing session... Done!
+2020-01-23 10:27:56,361|Starting session...
+2020-01-23 10:28:09,666|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 10:28:09,667|Starting session... Done!
+2020-01-23 10:28:18,642|DCELMerger|0102| 4|12| 2000|Reading polygons A            |  8.97
+2020-01-23 10:28:27,535|DCELMerger|0102| 4|12| 2000|Reading polygons B            |  8.89
+2020-01-23 10:28:27,536|INFO|0102|Polygons in A|7028
+2020-01-23 10:28:27,537|INFO|0102|Polygons in B|8047
+2020-01-23 10:28:41,510|DCELMerger|0102| 4|12| 2000|Partitioning edges            | 13.97
+2020-01-23 10:28:41,511|INFO|0102|Total number of partitions|5365
+2020-01-23 10:28:41,631|INFO|0102|Total number of edges in raw|3901477
+2020-01-23 10:28:45,917|INFO|0102|Total number of edges in spatial|3961919
+2020-01-23 10:28:56,891|DCELMerger|0102| 4|12| 2000|Extracting segments           | 10.97
+2020-01-23 10:28:56,894|INFO|0102|Segments|4587311
+2020-01-23 10:29:09,685|DCELMerger|0102| 4|12| 2000|Getting half edges            | 12.79
+2020-01-23 10:29:09,690|INFO|0102|Half edges|9174622
+2020-01-23 10:29:15,717|DCELMerger|0102| 4|12| 2000|Getting local DCEL's          |  6.03
+2020-01-23 10:29:15,720|INFO|0102|Partitions on DCEL|5365
+2020-01-23 10:29:16,079|Saved /tmp/edgesCells2000.wkt in 0.01s [5365 records].
+2020-01-23 10:29:23,101|Saved /tmp/edgesFaces2000.wkt in 1.64s [80913 records].
+2020-01-23 10:29:23,101|Closing session...
+2020-01-23 10:29:23,236|Closing session... Done!
+2020-01-23 10:29:26,937|Starting session...
+2020-01-23 10:29:40,366|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 10:29:40,366|Starting session... Done!
+2020-01-23 10:29:49,349|DCELMerger|0103| 4|12|  500|Reading polygons A            |  8.98
+2020-01-23 10:29:58,196|DCELMerger|0103| 4|12|  500|Reading polygons B            |  8.85
+2020-01-23 10:29:58,198|INFO|0103|Polygons in A|7028
+2020-01-23 10:29:58,199|INFO|0103|Polygons in B|8047
+2020-01-23 10:30:06,083|DCELMerger|0103| 4|12|  500|Partitioning edges            |  7.88
+2020-01-23 10:30:06,084|INFO|0103|Total number of partitions|1237
+2020-01-23 10:30:06,215|INFO|0103|Total number of edges in raw|3901477
+2020-01-23 10:30:07,174|INFO|0103|Total number of edges in spatial|3927904
+2020-01-23 10:30:12,700|DCELMerger|0103| 4|12|  500|Extracting segments           |  5.53
+2020-01-23 10:30:12,703|INFO|0103|Segments|4504558
+2020-01-23 10:30:19,137|DCELMerger|0103| 4|12|  500|Getting half edges            |  6.43
+2020-01-23 10:30:19,140|INFO|0103|Half edges|9009116
+2020-01-23 10:30:28,614|DCELMerger|0103| 4|12|  500|Getting local DCEL's          |  9.47
+2020-01-23 10:30:28,617|INFO|0103|Partitions on DCEL|1237
+2020-01-23 10:30:28,867|Saved /tmp/edgesCells500.wkt in 0.01s [1237 records].
+2020-01-23 10:30:33,700|Saved /tmp/edgesFaces500.wkt in 1.72s [58304 records].
+2020-01-23 10:30:33,700|Closing session...
+2020-01-23 10:30:34,230|Closing session... Done!
+2020-01-23 10:30:37,926|Starting session...
+2020-01-23 10:30:52,062|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 10:30:52,063|Starting session... Done!
+2020-01-23 10:31:01,420|DCELMerger|0104| 4|12|  750|Reading polygons A            |  9.35
+2020-01-23 10:31:09,704|DCELMerger|0104| 4|12|  750|Reading polygons B            |  8.28
+2020-01-23 10:31:09,705|INFO|0104|Polygons in A|7028
+2020-01-23 10:31:09,705|INFO|0104|Polygons in B|8047
+2020-01-23 10:31:18,883|DCELMerger|0104| 4|12|  750|Partitioning edges            |  9.18
+2020-01-23 10:31:18,886|INFO|0104|Total number of partitions|1900
+2020-01-23 10:31:19,008|INFO|0104|Total number of edges in raw|3901477
+2020-01-23 10:31:20,911|INFO|0104|Total number of edges in spatial|3935752
+2020-01-23 10:31:27,358|DCELMerger|0104| 4|12|  750|Extracting segments           |  6.45
+2020-01-23 10:31:27,361|INFO|0104|Segments|4522468
+2020-01-23 10:31:34,361|DCELMerger|0104| 4|12|  750|Getting half edges            |  7.00
+2020-01-23 10:31:34,364|INFO|0104|Half edges|9044936
+2020-01-23 10:31:41,859|DCELMerger|0104| 4|12|  750|Getting local DCEL's          |  7.49
+2020-01-23 10:31:41,862|INFO|0104|Partitions on DCEL|1900
+2020-01-23 10:31:42,003|Saved /tmp/edgesCells750.wkt in 0.00s [1900 records].
+2020-01-23 10:31:46,489|Saved /tmp/edgesFaces750.wkt in 1.25s [63256 records].
+2020-01-23 10:31:46,490|Closing session...
+2020-01-23 10:31:46,629|Closing session... Done!
+2020-01-23 10:31:50,024|Starting session...
+2020-01-23 10:32:03,319|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 10:32:03,320|Starting session... Done!
+2020-01-23 10:32:14,936|DCELMerger|0105| 4|12| 1000|Reading polygons A            | 11.61
+2020-01-23 10:32:20,631|DCELMerger|0105| 4|12| 1000|Reading polygons B            |  5.69
+2020-01-23 10:32:20,633|INFO|0105|Polygons in A|7028
+2020-01-23 10:32:20,633|INFO|0105|Polygons in B|8047
+2020-01-23 10:32:35,164|DCELMerger|0105| 4|12| 1000|Partitioning edges            | 14.53
+2020-01-23 10:32:35,166|INFO|0105|Total number of partitions|2524
+2020-01-23 10:32:35,265|INFO|0105|Total number of edges in raw|3901477
+2020-01-23 10:32:36,805|INFO|0105|Total number of edges in spatial|3941579
+2020-01-23 10:32:45,527|DCELMerger|0105| 4|12| 1000|Extracting segments           |  8.72
+2020-01-23 10:32:45,531|INFO|0105|Segments|4536294
+2020-01-23 10:32:55,416|DCELMerger|0105| 4|12| 1000|Getting half edges            |  9.88
+2020-01-23 10:32:55,419|INFO|0105|Half edges|9072588
+2020-01-23 10:33:02,469|DCELMerger|0105| 4|12| 1000|Getting local DCEL's          |  7.05
+2020-01-23 10:33:02,471|INFO|0105|Partitions on DCEL|2524
+2020-01-23 10:33:02,654|Saved /tmp/edgesCells1000.wkt in 0.01s [2524 records].
+2020-01-23 10:33:08,371|Saved /tmp/edgesFaces1000.wkt in 1.81s [67034 records].
+2020-01-23 10:33:08,371|Closing session...
+2020-01-23 10:33:08,513|Closing session... Done!
+2020-01-23 10:33:11,834|Starting session...
+2020-01-23 10:33:25,155|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 10:33:25,155|Starting session... Done!
+2020-01-23 10:33:36,999|DCELMerger|0106| 4|12| 1250|Reading polygons A            | 11.84
+2020-01-23 10:33:45,882|DCELMerger|0106| 4|12| 1250|Reading polygons B            |  8.88
+2020-01-23 10:33:45,883|INFO|0106|Polygons in A|7028
+2020-01-23 10:33:45,884|INFO|0106|Polygons in B|8047
+2020-01-23 10:33:57,576|DCELMerger|0106| 4|12| 1250|Partitioning edges            | 11.69
+2020-01-23 10:33:57,584|INFO|0106|Total number of partitions|3235
+2020-01-23 10:33:57,701|INFO|0106|Total number of edges in raw|3901477
+2020-01-23 10:34:00,360|INFO|0106|Total number of edges in spatial|3947328
+2020-01-23 10:34:08,348|DCELMerger|0106| 4|12| 1250|Extracting segments           |  7.99
+2020-01-23 10:34:08,351|INFO|0106|Segments|4550332
+2020-01-23 10:34:17,289|DCELMerger|0106| 4|12| 1250|Getting half edges            |  8.94
+2020-01-23 10:34:17,293|INFO|0106|Half edges|9100664
+2020-01-23 10:34:22,563|DCELMerger|0106| 4|12| 1250|Getting local DCEL's          |  5.27
+2020-01-23 10:34:22,566|INFO|0106|Partitions on DCEL|3235
+2020-01-23 10:34:22,758|Saved /tmp/edgesCells1250.wkt in 0.01s [3235 records].
+2020-01-23 10:34:28,195|Saved /tmp/edgesFaces1250.wkt in 1.46s [70882 records].
+2020-01-23 10:34:28,195|Closing session...
+2020-01-23 10:34:28,332|Closing session... Done!
+2020-01-23 10:34:31,624|Starting session...
+2020-01-23 10:34:44,678|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 10:34:44,679|Starting session... Done!
+2020-01-23 10:34:53,863|DCELMerger|0107| 4|12| 1500|Reading polygons A            |  9.18
+2020-01-23 10:35:02,590|DCELMerger|0107| 4|12| 1500|Reading polygons B            |  8.73
+2020-01-23 10:35:02,592|INFO|0107|Polygons in A|7028
+2020-01-23 10:35:02,592|INFO|0107|Polygons in B|8047
+2020-01-23 10:35:14,747|DCELMerger|0107| 4|12| 1500|Partitioning edges            | 12.15
+2020-01-23 10:35:14,750|INFO|0107|Total number of partitions|3991
+2020-01-23 10:35:14,848|INFO|0107|Total number of edges in raw|3901477
+2020-01-23 10:35:16,758|INFO|0107|Total number of edges in spatial|3952708
+2020-01-23 10:35:25,438|DCELMerger|0107| 4|12| 1500|Extracting segments           |  8.68
+2020-01-23 10:35:25,441|INFO|0107|Segments|4563850
+2020-01-23 10:35:35,401|DCELMerger|0107| 4|12| 1500|Getting half edges            |  9.96
+2020-01-23 10:35:35,404|INFO|0107|Half edges|9127700
+2020-01-23 10:35:41,670|DCELMerger|0107| 4|12| 1500|Getting local DCEL's          |  6.26
+2020-01-23 10:35:41,673|INFO|0107|Partitions on DCEL|3991
+2020-01-23 10:35:41,975|Saved /tmp/edgesCells1500.wkt in 0.01s [3991 records].
+2020-01-23 10:35:47,807|Saved /tmp/edgesFaces1500.wkt in 1.17s [74589 records].
+2020-01-23 10:35:47,807|Closing session...
+2020-01-23 10:35:48,012|Closing session... Done!
+2020-01-23 10:35:51,856|Starting session...
+2020-01-23 10:36:05,791|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 10:36:05,791|Starting session... Done!
+2020-01-23 10:36:14,998|DCELMerger|0108| 4|12| 1750|Reading polygons A            |  9.20
+2020-01-23 10:36:23,598|DCELMerger|0108| 4|12| 1750|Reading polygons B            |  8.60
+2020-01-23 10:36:23,600|INFO|0108|Polygons in A|7028
+2020-01-23 10:36:23,600|INFO|0108|Polygons in B|8047
+2020-01-23 10:36:35,897|DCELMerger|0108| 4|12| 1750|Partitioning edges            | 12.30
+2020-01-23 10:36:35,899|INFO|0108|Total number of partitions|4570
+2020-01-23 10:36:36,002|INFO|0108|Total number of edges in raw|3901477
+2020-01-23 10:36:38,214|INFO|0108|Total number of edges in spatial|3956702
+2020-01-23 10:36:48,061|DCELMerger|0108| 4|12| 1750|Extracting segments           |  9.85
+2020-01-23 10:36:48,065|INFO|0108|Segments|4573968
+2020-01-23 10:36:59,380|DCELMerger|0108| 4|12| 1750|Getting half edges            | 11.31
+2020-01-23 10:36:59,383|INFO|0108|Half edges|9147936
+2020-01-23 10:37:05,154|DCELMerger|0108| 4|12| 1750|Getting local DCEL's          |  5.77
+2020-01-23 10:37:05,157|INFO|0108|Partitions on DCEL|4570
+2020-01-23 10:37:05,391|Saved /tmp/edgesCells1750.wkt in 0.01s [4570 records].
+2020-01-23 10:37:10,734|Saved /tmp/edgesFaces1750.wkt in 1.31s [77313 records].
+2020-01-23 10:37:10,735|Closing session...
+2020-01-23 10:37:10,873|Closing session... Done!
+2020-01-23 10:37:14,279|Starting session...
+2020-01-23 10:37:27,829|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 10:37:27,829|Starting session... Done!
+2020-01-23 10:37:39,394|DCELMerger|0109| 4|12| 2000|Reading polygons A            | 11.56
+2020-01-23 10:37:48,565|DCELMerger|0109| 4|12| 2000|Reading polygons B            |  9.17
+2020-01-23 10:37:48,567|INFO|0109|Polygons in A|7028
+2020-01-23 10:37:48,568|INFO|0109|Polygons in B|8047
+2020-01-23 10:38:02,036|DCELMerger|0109| 4|12| 2000|Partitioning edges            | 13.47
+2020-01-23 10:38:02,040|INFO|0109|Total number of partitions|5176
+2020-01-23 10:38:02,152|INFO|0109|Total number of edges in raw|3901477
+2020-01-23 10:38:06,789|INFO|0109|Total number of edges in spatial|3961159
+2020-01-23 10:38:17,266|DCELMerger|0109| 4|12| 2000|Extracting segments           | 10.48
+2020-01-23 10:38:17,269|INFO|0109|Segments|4585070
+2020-01-23 10:38:29,582|DCELMerger|0109| 4|12| 2000|Getting half edges            | 12.31
+2020-01-23 10:38:29,591|INFO|0109|Half edges|9170140
+2020-01-23 10:38:35,852|DCELMerger|0109| 4|12| 2000|Getting local DCEL's          |  6.26
+2020-01-23 10:38:35,856|INFO|0109|Partitions on DCEL|5176
+2020-01-23 10:38:36,168|Saved /tmp/edgesCells2000.wkt in 0.01s [5176 records].
+2020-01-23 10:38:41,840|Saved /tmp/edgesFaces2000.wkt in 1.31s [80305 records].
+2020-01-23 10:38:41,840|Closing session...
+2020-01-23 10:38:42,101|Closing session... Done!
+2020-01-23 10:38:45,428|Starting session...
+2020-01-23 10:38:58,865|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 10:38:58,866|Starting session... Done!
+2020-01-23 10:39:07,972|DCELMerger|0110| 4|12|  500|Reading polygons A            |  9.10
+2020-01-23 10:39:16,635|DCELMerger|0110| 4|12|  500|Reading polygons B            |  8.66
+2020-01-23 10:39:16,637|INFO|0110|Polygons in A|7028
+2020-01-23 10:39:16,637|INFO|0110|Polygons in B|8047
+2020-01-23 10:39:24,815|DCELMerger|0110| 4|12|  500|Partitioning edges            |  8.18
+2020-01-23 10:39:24,816|INFO|0110|Total number of partitions|1237
+2020-01-23 10:39:25,049|INFO|0110|Total number of edges in raw|3901477
+2020-01-23 10:39:26,065|INFO|0110|Total number of edges in spatial|3928087
+2020-01-23 10:39:32,300|DCELMerger|0110| 4|12|  500|Extracting segments           |  6.23
+2020-01-23 10:39:32,302|INFO|0110|Segments|4504885
+2020-01-23 10:39:38,192|DCELMerger|0110| 4|12|  500|Getting half edges            |  5.89
+2020-01-23 10:39:38,193|INFO|0110|Half edges|9009770
+2020-01-23 10:39:47,368|DCELMerger|0110| 4|12|  500|Getting local DCEL's          |  9.17
+2020-01-23 10:39:47,370|INFO|0110|Partitions on DCEL|1237
+2020-01-23 10:39:47,559|Saved /tmp/edgesCells500.wkt in 0.00s [1237 records].
+2020-01-23 10:39:52,547|Saved /tmp/edgesFaces500.wkt in 1.32s [58379 records].
+2020-01-23 10:39:52,547|Closing session...
+2020-01-23 10:39:52,672|Closing session... Done!
+2020-01-23 10:39:56,431|Starting session...
+2020-01-23 10:40:09,943|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 10:40:09,943|Starting session... Done!
+2020-01-23 10:40:18,688|DCELMerger|0111| 4|12|  750|Reading polygons A            |  8.74
+2020-01-23 10:40:27,939|DCELMerger|0111| 4|12|  750|Reading polygons B            |  9.25
+2020-01-23 10:40:27,941|INFO|0111|Polygons in A|7028
+2020-01-23 10:40:27,941|INFO|0111|Polygons in B|8047
+2020-01-23 10:40:37,080|DCELMerger|0111| 4|12|  750|Partitioning edges            |  9.14
+2020-01-23 10:40:37,082|INFO|0111|Total number of partitions|1909
+2020-01-23 10:40:37,202|INFO|0111|Total number of edges in raw|3901477
+2020-01-23 10:40:38,330|INFO|0111|Total number of edges in spatial|3935782
+2020-01-23 10:40:44,796|DCELMerger|0111| 4|12|  750|Extracting segments           |  6.46
+2020-01-23 10:40:44,799|INFO|0111|Segments|4522555
+2020-01-23 10:40:51,319|DCELMerger|0111| 4|12|  750|Getting half edges            |  6.52
+2020-01-23 10:40:51,322|INFO|0111|Half edges|9045110
+2020-01-23 10:40:57,743|DCELMerger|0111| 4|12|  750|Getting local DCEL's          |  6.42
+2020-01-23 10:40:57,746|INFO|0111|Partitions on DCEL|1909
+2020-01-23 10:40:57,897|Saved /tmp/edgesCells750.wkt in 0.00s [1909 records].
+2020-01-23 10:41:02,907|Saved /tmp/edgesFaces750.wkt in 2.21s [63276 records].
+2020-01-23 10:41:02,907|Closing session...
+2020-01-23 10:41:03,030|Closing session... Done!
+2020-01-23 10:41:06,554|Starting session...
+2020-01-23 10:41:19,772|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 10:41:19,772|Starting session... Done!
+2020-01-23 10:41:28,699|DCELMerger|0112| 4|12| 1000|Reading polygons A            |  8.92
+2020-01-23 10:41:37,756|DCELMerger|0112| 4|12| 1000|Reading polygons B            |  9.06
+2020-01-23 10:41:37,758|INFO|0112|Polygons in A|7028
+2020-01-23 10:41:37,758|INFO|0112|Polygons in B|8047
+2020-01-23 10:41:48,181|DCELMerger|0112| 4|12| 1000|Partitioning edges            | 10.42
+2020-01-23 10:41:48,183|INFO|0112|Total number of partitions|2554
+2020-01-23 10:41:48,302|INFO|0112|Total number of edges in raw|3901477
+2020-01-23 10:41:50,603|INFO|0112|Total number of edges in spatial|3941814
+2020-01-23 10:41:57,833|DCELMerger|0112| 4|12| 1000|Extracting segments           |  7.23
+2020-01-23 10:41:57,836|INFO|0112|Segments|4536856
+2020-01-23 10:42:05,737|DCELMerger|0112| 4|12| 1000|Getting half edges            |  7.90
+2020-01-23 10:42:05,741|INFO|0112|Half edges|9073712
+2020-01-23 10:42:12,331|DCELMerger|0112| 4|12| 1000|Getting local DCEL's          |  6.59
+2020-01-23 10:42:12,334|INFO|0112|Partitions on DCEL|2554
+2020-01-23 10:42:12,501|Saved /tmp/edgesCells1000.wkt in 0.01s [2554 records].
+2020-01-23 10:42:16,955|Saved /tmp/edgesFaces1000.wkt in 1.31s [67173 records].
+2020-01-23 10:42:16,956|Closing session...
+2020-01-23 10:42:17,129|Closing session... Done!
+2020-01-23 10:42:20,750|Starting session...
+2020-01-23 10:42:35,108|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 10:42:35,108|Starting session... Done!
+2020-01-23 10:42:47,002|DCELMerger|0113| 4|12| 1250|Reading polygons A            | 11.89
+2020-01-23 10:42:55,813|DCELMerger|0113| 4|12| 1250|Reading polygons B            |  8.81
+2020-01-23 10:42:55,815|INFO|0113|Polygons in A|7028
+2020-01-23 10:42:55,815|INFO|0113|Polygons in B|8047
+2020-01-23 10:43:06,719|DCELMerger|0113| 4|12| 1250|Partitioning edges            | 10.90
+2020-01-23 10:43:06,722|INFO|0113|Total number of partitions|3208
+2020-01-23 10:43:06,846|INFO|0113|Total number of edges in raw|3901477
+2020-01-23 10:43:08,554|INFO|0113|Total number of edges in spatial|3947427
+2020-01-23 10:43:16,200|DCELMerger|0113| 4|12| 1250|Extracting segments           |  7.65
+2020-01-23 10:43:16,203|INFO|0113|Segments|4550424
+2020-01-23 10:43:24,633|DCELMerger|0113| 4|12| 1250|Getting half edges            |  8.43
+2020-01-23 10:43:24,638|INFO|0113|Half edges|9100848
+2020-01-23 10:43:30,508|DCELMerger|0113| 4|12| 1250|Getting local DCEL's          |  5.87
+2020-01-23 10:43:30,512|INFO|0113|Partitions on DCEL|3208
+2020-01-23 10:43:30,815|Saved /tmp/edgesCells1250.wkt in 0.01s [3208 records].
+2020-01-23 10:43:36,255|Saved /tmp/edgesFaces1250.wkt in 1.49s [70846 records].
+2020-01-23 10:43:36,255|Closing session...
+2020-01-23 10:43:36,629|Closing session... Done!
+2020-01-23 10:43:40,608|Starting session...
+2020-01-23 10:43:54,270|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 10:43:54,271|Starting session... Done!
+2020-01-23 10:44:03,604|DCELMerger|0114| 4|12| 1500|Reading polygons A            |  9.33
+2020-01-23 10:44:12,217|DCELMerger|0114| 4|12| 1500|Reading polygons B            |  8.61
+2020-01-23 10:44:12,220|INFO|0114|Polygons in A|7028
+2020-01-23 10:44:12,221|INFO|0114|Polygons in B|8047
+2020-01-23 10:44:25,165|DCELMerger|0114| 4|12| 1500|Partitioning edges            | 12.94
+2020-01-23 10:44:25,167|INFO|0114|Total number of partitions|3871
+2020-01-23 10:44:25,265|INFO|0114|Total number of edges in raw|3901477
+2020-01-23 10:44:28,340|INFO|0114|Total number of edges in spatial|3952374
+2020-01-23 10:44:36,850|DCELMerger|0114| 4|12| 1500|Extracting segments           |  8.51
+2020-01-23 10:44:36,853|INFO|0114|Segments|4562761
+2020-01-23 10:44:46,735|DCELMerger|0114| 4|12| 1500|Getting half edges            |  9.88
+2020-01-23 10:44:46,738|INFO|0114|Half edges|9125522
+2020-01-23 10:44:52,539|DCELMerger|0114| 4|12| 1500|Getting local DCEL's          |  5.80
+2020-01-23 10:44:52,542|INFO|0114|Partitions on DCEL|3871
+2020-01-23 10:44:52,771|Saved /tmp/edgesCells1500.wkt in 0.01s [3871 records].
+2020-01-23 10:44:58,037|Saved /tmp/edgesFaces1500.wkt in 1.36s [74256 records].
+2020-01-23 10:44:58,037|Closing session...
+2020-01-23 10:44:58,169|Closing session... Done!
+2020-01-23 10:45:01,567|Starting session...
+2020-01-23 10:45:14,708|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 10:45:14,708|Starting session... Done!
+2020-01-23 10:45:23,505|DCELMerger|0115| 4|12| 1750|Reading polygons A            |  8.79
+2020-01-23 10:45:32,809|DCELMerger|0115| 4|12| 1750|Reading polygons B            |  9.30
+2020-01-23 10:45:32,811|INFO|0115|Polygons in A|7028
+2020-01-23 10:45:32,811|INFO|0115|Polygons in B|8047
+2020-01-23 10:45:45,619|DCELMerger|0115| 4|12| 1750|Partitioning edges            | 12.81
+2020-01-23 10:45:45,623|INFO|0115|Total number of partitions|4504
+2020-01-23 10:45:45,719|INFO|0115|Total number of edges in raw|3901477
+2020-01-23 10:45:49,311|INFO|0115|Total number of edges in spatial|3956112
+2020-01-23 10:45:58,818|DCELMerger|0115| 4|12| 1750|Extracting segments           |  9.51
+2020-01-23 10:45:58,821|INFO|0115|Segments|4572618
+2020-01-23 10:46:09,225|DCELMerger|0115| 4|12| 1750|Getting half edges            | 10.40
+2020-01-23 10:46:09,232|INFO|0115|Half edges|9145236
+2020-01-23 10:46:15,391|DCELMerger|0115| 4|12| 1750|Getting local DCEL's          |  6.16
+2020-01-23 10:46:15,394|INFO|0115|Partitions on DCEL|4504
+2020-01-23 10:46:15,761|Saved /tmp/edgesCells1750.wkt in 0.02s [4504 records].
+2020-01-23 10:46:22,090|Saved /tmp/edgesFaces1750.wkt in 1.66s [76971 records].
+2020-01-23 10:46:22,091|Closing session...
+2020-01-23 10:46:22,268|Closing session... Done!
+2020-01-23 10:46:26,279|Starting session...
+2020-01-23 10:46:40,900|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 10:46:40,901|Starting session... Done!
+2020-01-23 10:46:51,627|DCELMerger|0116| 4|12| 2000|Reading polygons A            | 10.72
+2020-01-23 10:47:00,682|DCELMerger|0116| 4|12| 2000|Reading polygons B            |  9.05
+2020-01-23 10:47:00,684|INFO|0116|Polygons in A|7028
+2020-01-23 10:47:00,684|INFO|0116|Polygons in B|8047
+2020-01-23 10:47:14,793|DCELMerger|0116| 4|12| 2000|Partitioning edges            | 14.11
+2020-01-23 10:47:14,797|INFO|0116|Total number of partitions|5356
+2020-01-23 10:47:14,899|INFO|0116|Total number of edges in raw|3901477
+2020-01-23 10:47:18,184|INFO|0116|Total number of edges in spatial|3962023
+2020-01-23 10:47:28,891|DCELMerger|0116| 4|12| 2000|Extracting segments           | 10.71
+2020-01-23 10:47:28,894|INFO|0116|Segments|4587475
+2020-01-23 10:47:40,440|DCELMerger|0116| 4|12| 2000|Getting half edges            | 11.55
+2020-01-23 10:47:40,446|INFO|0116|Half edges|9174950
+2020-01-23 10:47:47,119|DCELMerger|0116| 4|12| 2000|Getting local DCEL's          |  6.67
+2020-01-23 10:47:47,122|INFO|0116|Partitions on DCEL|5356
+2020-01-23 10:47:47,386|Saved /tmp/edgesCells2000.wkt in 0.01s [5356 records].
+2020-01-23 10:47:53,485|Saved /tmp/edgesFaces2000.wkt in 0.93s [80913 records].
+2020-01-23 10:47:53,485|Closing session...
+2020-01-23 10:47:53,759|Closing session... Done!
+2020-01-23 11:02:52,886|Starting session...
+2020-01-23 11:03:05,940|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 11:03:05,941|Starting session... Done!
+2020-01-23 11:03:17,064|DCELMerger|0117| 4|12|  500|Reading polygons A            | 11.12
+2020-01-23 11:03:26,100|DCELMerger|0117| 4|12|  500|Reading polygons B            |  9.04
+2020-01-23 11:03:26,101|INFO|0117|Polygons in A|7028
+2020-01-23 11:03:26,102|INFO|0117|Polygons in B|8047
+2020-01-23 11:03:35,256|DCELMerger|0117| 4|12|  500|Partitioning edges            |  9.15
+2020-01-23 11:03:35,258|INFO|0117|Total number of partitions|1252
+2020-01-23 11:03:35,517|INFO|0117|Total number of edges in raw|3901477
+2020-01-23 11:03:36,317|INFO|0117|Total number of edges in spatial|3928241
+2020-01-23 11:03:42,181|DCELMerger|0117| 4|12|  500|Extracting segments           |  5.86
+2020-01-23 11:03:42,184|INFO|0117|Segments|4505278
+2020-01-23 11:03:47,305|DCELMerger|0117| 4|12|  500|Getting half edges            |  5.12
+2020-01-23 11:03:47,308|INFO|0117|Half edges|9010556
+2020-01-23 11:03:55,821|DCELMerger|0117| 4|12|  500|Getting local DCEL's          |  8.51
+2020-01-23 11:03:55,824|INFO|0117|Partitions on DCEL|1252
+2020-01-23 11:03:56,023|Saved /tmp/edgesCells500.wkt in 0.00s [1252 records].
+2020-01-23 11:04:02,057|Saved /tmp/edgesFaces500.wkt in 2.26s [58467 records].
+2020-01-23 11:04:02,057|Closing session...
+2020-01-23 11:04:02,186|Closing session... Done!
+2020-01-23 11:04:06,269|Starting session...
+2020-01-23 11:04:20,808|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 11:04:20,808|Starting session... Done!
+2020-01-23 11:04:32,327|DCELMerger|0118| 4|12|  750|Reading polygons A            | 11.51
+2020-01-23 11:04:41,350|DCELMerger|0118| 4|12|  750|Reading polygons B            |  9.02
+2020-01-23 11:04:41,352|INFO|0118|Polygons in A|7028
+2020-01-23 11:04:41,352|INFO|0118|Polygons in B|8047
+2020-01-23 11:04:51,123|DCELMerger|0118| 4|12|  750|Partitioning edges            |  9.77
+2020-01-23 11:04:51,126|INFO|0118|Total number of partitions|1912
+2020-01-23 11:04:51,271|INFO|0118|Total number of edges in raw|3901477
+2020-01-23 11:04:53,142|INFO|0118|Total number of edges in spatial|3935923
+2020-01-23 11:04:59,973|DCELMerger|0118| 4|12|  750|Extracting segments           |  6.83
+2020-01-23 11:04:59,977|INFO|0118|Segments|4522882
+2020-01-23 11:05:06,570|DCELMerger|0118| 4|12|  750|Getting half edges            |  6.59
+2020-01-23 11:05:06,573|INFO|0118|Half edges|9045764
+2020-01-23 11:05:12,672|DCELMerger|0118| 4|12|  750|Getting local DCEL's          |  6.10
+2020-01-23 11:05:12,675|INFO|0118|Partitions on DCEL|1912
+2020-01-23 11:05:12,815|Saved /tmp/edgesCells750.wkt in 0.00s [1912 records].
+2020-01-23 11:05:17,433|Saved /tmp/edgesFaces750.wkt in 1.07s [63345 records].
+2020-01-23 11:05:17,433|Closing session...
+2020-01-23 11:05:17,764|Closing session... Done!
+2020-01-23 11:05:21,117|Starting session...
+2020-01-23 11:05:34,494|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 11:05:34,495|Starting session... Done!
+2020-01-23 11:05:43,655|DCELMerger|0119| 4|12| 1000|Reading polygons A            |  9.16
+2020-01-23 11:05:52,345|DCELMerger|0119| 4|12| 1000|Reading polygons B            |  8.69
+2020-01-23 11:05:52,347|INFO|0119|Polygons in A|7028
+2020-01-23 11:05:52,347|INFO|0119|Polygons in B|8047
+2020-01-23 11:06:02,659|DCELMerger|0119| 4|12| 1000|Partitioning edges            | 10.31
+2020-01-23 11:06:02,662|INFO|0119|Total number of partitions|2509
+2020-01-23 11:06:02,786|INFO|0119|Total number of edges in raw|3901477
+2020-01-23 11:06:04,662|INFO|0119|Total number of edges in spatial|3941626
+2020-01-23 11:06:11,889|DCELMerger|0119| 4|12| 1000|Extracting segments           |  7.22
+2020-01-23 11:06:11,891|INFO|0119|Segments|4536345
+2020-01-23 11:06:19,251|DCELMerger|0119| 4|12| 1000|Getting half edges            |  7.36
+2020-01-23 11:06:19,254|INFO|0119|Half edges|9072690
+2020-01-23 11:06:25,855|DCELMerger|0119| 4|12| 1000|Getting local DCEL's          |  6.60
+2020-01-23 11:06:25,858|INFO|0119|Partitions on DCEL|2509
+2020-01-23 11:06:26,094|Saved /tmp/edgesCells1000.wkt in 0.00s [2509 records].
+2020-01-23 11:06:32,586|Saved /tmp/edgesFaces1000.wkt in 2.21s [67050 records].
+2020-01-23 11:06:32,587|Closing session...
+2020-01-23 11:06:32,732|Closing session... Done!
+2020-01-23 11:06:36,762|Starting session...
+2020-01-23 11:06:50,557|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 11:06:50,558|Starting session... Done!
+2020-01-23 11:07:01,625|DCELMerger|0120| 4|12| 1250|Reading polygons A            | 11.06
+2020-01-23 11:07:10,860|DCELMerger|0120| 4|12| 1250|Reading polygons B            |  9.23
+2020-01-23 11:07:10,861|INFO|0120|Polygons in A|7028
+2020-01-23 11:07:10,861|INFO|0120|Polygons in B|8047
+2020-01-23 11:07:21,540|DCELMerger|0120| 4|12| 1250|Partitioning edges            | 10.68
+2020-01-23 11:07:21,543|INFO|0120|Total number of partitions|3295
+2020-01-23 11:07:21,658|INFO|0120|Total number of edges in raw|3901477
+2020-01-23 11:07:24,272|INFO|0120|Total number of edges in spatial|3947687
+2020-01-23 11:07:32,469|DCELMerger|0120| 4|12| 1250|Extracting segments           |  8.20
+2020-01-23 11:07:32,472|INFO|0120|Segments|4551341
+2020-01-23 11:07:41,536|DCELMerger|0120| 4|12| 1250|Getting half edges            |  9.06
+2020-01-23 11:07:41,545|INFO|0120|Half edges|9102682
+2020-01-23 11:07:47,350|DCELMerger|0120| 4|12| 1250|Getting local DCEL's          |  5.80
+2020-01-23 11:07:47,353|INFO|0120|Partitions on DCEL|3295
+2020-01-23 11:07:47,640|Saved /tmp/edgesCells1250.wkt in 0.01s [3295 records].
+2020-01-23 11:07:53,211|Saved /tmp/edgesFaces1250.wkt in 1.61s [71186 records].
+2020-01-23 11:07:53,212|Closing session...
+2020-01-23 11:07:53,353|Closing session... Done!
+2020-01-23 11:07:57,470|Starting session...
+2020-01-23 11:08:12,132|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 11:08:12,132|Starting session... Done!
+2020-01-23 11:08:21,498|DCELMerger|0121| 4|12| 1500|Reading polygons A            |  9.36
+2020-01-23 11:08:30,487|DCELMerger|0121| 4|12| 1500|Reading polygons B            |  8.99
+2020-01-23 11:08:30,489|INFO|0121|Polygons in A|7028
+2020-01-23 11:08:30,489|INFO|0121|Polygons in B|8047
+2020-01-23 11:08:42,514|DCELMerger|0121| 4|12| 1500|Partitioning edges            | 12.02
+2020-01-23 11:08:42,515|INFO|0121|Total number of partitions|3883
+2020-01-23 11:08:42,636|INFO|0121|Total number of edges in raw|3901477
+2020-01-23 11:08:46,205|INFO|0121|Total number of edges in spatial|3952400
+2020-01-23 11:08:54,783|DCELMerger|0121| 4|12| 1500|Extracting segments           |  8.58
+2020-01-23 11:08:54,786|INFO|0121|Segments|4562791
+2020-01-23 11:09:04,427|DCELMerger|0121| 4|12| 1500|Getting half edges            |  9.64
+2020-01-23 11:09:04,430|INFO|0121|Half edges|9125582
+2020-01-23 11:09:10,139|DCELMerger|0121| 4|12| 1500|Getting local DCEL's          |  5.71
+2020-01-23 11:09:10,142|INFO|0121|Partitions on DCEL|3883
+2020-01-23 11:09:10,543|Saved /tmp/edgesCells1500.wkt in 0.02s [3883 records].
+2020-01-23 11:09:15,857|Saved /tmp/edgesFaces1500.wkt in 1.60s [74198 records].
+2020-01-23 11:09:15,858|Closing session...
+2020-01-23 11:09:16,307|Closing session... Done!
+2020-01-23 11:09:19,697|Starting session...
+2020-01-23 11:09:33,284|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 11:09:33,284|Starting session... Done!
+2020-01-23 11:09:42,295|DCELMerger|0122| 4|12| 1750|Reading polygons A            |  9.01
+2020-01-23 11:09:51,512|DCELMerger|0122| 4|12| 1750|Reading polygons B            |  9.22
+2020-01-23 11:09:51,514|INFO|0122|Polygons in A|7028
+2020-01-23 11:09:51,514|INFO|0122|Polygons in B|8047
+2020-01-23 11:10:03,493|DCELMerger|0122| 4|12| 1750|Partitioning edges            | 11.98
+2020-01-23 11:10:03,496|INFO|0122|Total number of partitions|4573
+2020-01-23 11:10:03,638|INFO|0122|Total number of edges in raw|3901477
+2020-01-23 11:10:07,046|INFO|0122|Total number of edges in spatial|3956819
+2020-01-23 11:10:17,202|DCELMerger|0122| 4|12| 1750|Extracting segments           | 10.16
+2020-01-23 11:10:17,205|INFO|0122|Segments|4574179
+2020-01-23 11:10:28,351|DCELMerger|0122| 4|12| 1750|Getting half edges            | 11.14
+2020-01-23 11:10:28,356|INFO|0122|Half edges|9148358
+2020-01-23 11:10:34,835|DCELMerger|0122| 4|12| 1750|Getting local DCEL's          |  6.48
+2020-01-23 11:10:34,838|INFO|0122|Partitions on DCEL|4573
+2020-01-23 11:10:35,131|Saved /tmp/edgesCells1750.wkt in 0.01s [4573 records].
+2020-01-23 11:10:41,516|Saved /tmp/edgesFaces1750.wkt in 1.73s [77322 records].
+2020-01-23 11:10:41,516|Closing session...
+2020-01-23 11:10:41,719|Closing session... Done!
+2020-01-23 11:10:45,758|Starting session...
+2020-01-23 11:10:58,959|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 11:10:58,960|Starting session... Done!
+2020-01-23 11:11:07,949|DCELMerger|0123| 4|12| 2000|Reading polygons A            |  8.98
+2020-01-23 11:11:17,069|DCELMerger|0123| 4|12| 2000|Reading polygons B            |  9.12
+2020-01-23 11:11:17,071|INFO|0123|Polygons in A|7028
+2020-01-23 11:11:17,071|INFO|0123|Polygons in B|8047
+2020-01-23 11:11:30,730|DCELMerger|0123| 4|12| 2000|Partitioning edges            | 13.66
+2020-01-23 11:11:30,733|INFO|0123|Total number of partitions|5434
+2020-01-23 11:11:30,844|INFO|0123|Total number of edges in raw|3901477
+2020-01-23 11:11:34,476|INFO|0123|Total number of edges in spatial|3962527
+2020-01-23 11:11:45,127|DCELMerger|0123| 4|12| 2000|Extracting segments           | 10.65
+2020-01-23 11:11:45,130|INFO|0123|Segments|4588783
+2020-01-23 11:11:56,823|DCELMerger|0123| 4|12| 2000|Getting half edges            | 11.69
+2020-01-23 11:11:56,826|INFO|0123|Half edges|9177566
+2020-01-23 11:12:03,416|DCELMerger|0123| 4|12| 2000|Getting local DCEL's          |  6.59
+2020-01-23 11:12:03,419|INFO|0123|Partitions on DCEL|5434
+2020-01-23 11:12:03,747|Saved /tmp/edgesCells2000.wkt in 0.01s [5434 records].
+2020-01-23 11:12:09,730|Saved /tmp/edgesFaces2000.wkt in 0.98s [81306 records].
+2020-01-23 11:12:09,731|Closing session...
+2020-01-23 11:12:09,864|Closing session... Done!
+2020-01-23 11:12:13,777|Starting session...
+2020-01-23 11:12:27,935|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 11:12:27,936|Starting session... Done!
+2020-01-23 11:12:37,634|DCELMerger|0124| 4|12|  500|Reading polygons A            |  9.69
+2020-01-23 11:12:46,897|DCELMerger|0124| 4|12|  500|Reading polygons B            |  9.26
+2020-01-23 11:12:46,898|INFO|0124|Polygons in A|7028
+2020-01-23 11:12:46,898|INFO|0124|Polygons in B|8047
+2020-01-23 11:12:55,078|DCELMerger|0124| 4|12|  500|Partitioning edges            |  8.18
+2020-01-23 11:12:55,080|INFO|0124|Total number of partitions|1279
+2020-01-23 11:12:55,255|INFO|0124|Total number of edges in raw|3901477
+2020-01-23 11:12:55,893|INFO|0124|Total number of edges in spatial|3928487
+2020-01-23 11:13:01,376|DCELMerger|0124| 4|12|  500|Extracting segments           |  5.48
+2020-01-23 11:13:01,380|INFO|0124|Segments|4505863
+2020-01-23 11:13:06,110|DCELMerger|0124| 4|12|  500|Getting half edges            |  4.73
+2020-01-23 11:13:06,118|INFO|0124|Half edges|9011726
+2020-01-23 11:13:17,071|DCELMerger|0124| 4|12|  500|Getting local DCEL's          | 10.95
+2020-01-23 11:13:17,075|INFO|0124|Partitions on DCEL|1279
+2020-01-23 11:13:17,203|Saved /tmp/edgesCells500.wkt in 0.00s [1279 records].
+2020-01-23 11:13:22,177|Saved /tmp/edgesFaces500.wkt in 1.67s [58684 records].
+2020-01-23 11:13:22,177|Closing session...
+2020-01-23 11:13:22,725|Closing session... Done!
+2020-01-23 11:13:26,289|Starting session...
+2020-01-23 11:13:39,840|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 11:13:39,840|Starting session... Done!
+2020-01-23 11:13:48,742|DCELMerger|0125| 4|12|  750|Reading polygons A            |  8.90
+2020-01-23 11:13:57,089|DCELMerger|0125| 4|12|  750|Reading polygons B            |  8.35
+2020-01-23 11:13:57,091|INFO|0125|Polygons in A|7028
+2020-01-23 11:13:57,092|INFO|0125|Polygons in B|8047
+2020-01-23 11:14:07,140|DCELMerger|0125| 4|12|  750|Partitioning edges            | 10.05
+2020-01-23 11:14:07,142|INFO|0125|Total number of partitions|1894
+2020-01-23 11:14:07,235|INFO|0125|Total number of edges in raw|3901477
+2020-01-23 11:14:08,541|INFO|0125|Total number of edges in spatial|3935904
+2020-01-23 11:14:14,725|DCELMerger|0125| 4|12|  750|Extracting segments           |  6.18
+2020-01-23 11:14:14,728|INFO|0125|Segments|4522746
+2020-01-23 11:14:21,382|DCELMerger|0125| 4|12|  750|Getting half edges            |  6.65
+2020-01-23 11:14:21,385|INFO|0125|Half edges|9045492
+2020-01-23 11:14:28,970|DCELMerger|0125| 4|12|  750|Getting local DCEL's          |  7.58
+2020-01-23 11:14:28,974|INFO|0125|Partitions on DCEL|1894
+2020-01-23 11:14:29,117|Saved /tmp/edgesCells750.wkt in 0.00s [1894 records].
+2020-01-23 11:14:34,083|Saved /tmp/edgesFaces750.wkt in 1.77s [63323 records].
+2020-01-23 11:14:34,084|Closing session...
+2020-01-23 11:14:34,816|Closing session... Done!
+2020-01-23 11:14:38,087|Starting session...
+2020-01-23 11:14:51,677|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 11:14:51,678|Starting session... Done!
+2020-01-23 11:15:02,740|DCELMerger|0126| 4|12| 1000|Reading polygons A            | 11.06
+2020-01-23 11:15:11,824|DCELMerger|0126| 4|12| 1000|Reading polygons B            |  9.08
+2020-01-23 11:15:11,825|INFO|0126|Polygons in A|7028
+2020-01-23 11:15:11,826|INFO|0126|Polygons in B|8047
+2020-01-23 11:15:21,534|DCELMerger|0126| 4|12| 1000|Partitioning edges            |  9.71
+2020-01-23 11:15:21,536|INFO|0126|Total number of partitions|2446
+2020-01-23 11:15:21,678|INFO|0126|Total number of edges in raw|3901477
+2020-01-23 11:15:22,879|INFO|0126|Total number of edges in spatial|3940898
+2020-01-23 11:15:30,378|DCELMerger|0126| 4|12| 1000|Extracting segments           |  7.50
+2020-01-23 11:15:30,381|INFO|0126|Segments|4534721
+2020-01-23 11:15:37,967|DCELMerger|0126| 4|12| 1000|Getting half edges            |  7.59
+2020-01-23 11:15:37,971|INFO|0126|Half edges|9069442
+2020-01-23 11:15:44,239|DCELMerger|0126| 4|12| 1000|Getting local DCEL's          |  6.27
+2020-01-23 11:15:44,242|INFO|0126|Partitions on DCEL|2446
+2020-01-23 11:15:44,410|Saved /tmp/edgesCells1000.wkt in 0.01s [2446 records].
+2020-01-23 11:15:49,052|Saved /tmp/edgesFaces1000.wkt in 1.16s [66623 records].
+2020-01-23 11:15:49,052|Closing session...
+2020-01-23 11:15:49,239|Closing session... Done!
+2020-01-23 11:15:52,797|Starting session...
+2020-01-23 11:16:06,817|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 11:16:06,818|Starting session... Done!
+2020-01-23 11:16:16,593|DCELMerger|0127| 4|12| 1250|Reading polygons A            |  9.77
+2020-01-23 11:16:25,648|DCELMerger|0127| 4|12| 1250|Reading polygons B            |  9.05
+2020-01-23 11:16:25,650|INFO|0127|Polygons in A|7028
+2020-01-23 11:16:25,650|INFO|0127|Polygons in B|8047
+2020-01-23 11:16:36,721|DCELMerger|0127| 4|12| 1250|Partitioning edges            | 11.07
+2020-01-23 11:16:36,722|INFO|0127|Total number of partitions|3172
+2020-01-23 11:16:36,849|INFO|0127|Total number of edges in raw|3901477
+2020-01-23 11:16:38,651|INFO|0127|Total number of edges in spatial|3946764
+2020-01-23 11:16:46,785|DCELMerger|0127| 4|12| 1250|Extracting segments           |  8.13
+2020-01-23 11:16:46,790|INFO|0127|Segments|4548972
+2020-01-23 11:16:54,959|DCELMerger|0127| 4|12| 1250|Getting half edges            |  8.17
+2020-01-23 11:16:54,962|INFO|0127|Half edges|9097944
+2020-01-23 11:17:01,105|DCELMerger|0127| 4|12| 1250|Getting local DCEL's          |  6.14
+2020-01-23 11:17:01,108|INFO|0127|Partitions on DCEL|3172
+2020-01-23 11:17:01,304|Saved /tmp/edgesCells1250.wkt in 0.01s [3172 records].
+2020-01-23 11:17:05,928|Saved /tmp/edgesFaces1250.wkt in 1.07s [70517 records].
+2020-01-23 11:17:05,928|Closing session...
+2020-01-23 11:17:06,069|Closing session... Done!
+2020-01-23 11:17:09,675|Starting session...
+2020-01-23 11:17:22,621|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 11:17:22,621|Starting session... Done!
+2020-01-23 11:17:34,507|DCELMerger|0128| 4|12| 1500|Reading polygons A            | 11.88
+2020-01-23 11:17:43,650|DCELMerger|0128| 4|12| 1500|Reading polygons B            |  9.14
+2020-01-23 11:17:43,651|INFO|0128|Polygons in A|7028
+2020-01-23 11:17:43,651|INFO|0128|Polygons in B|8047
+2020-01-23 11:17:55,678|DCELMerger|0128| 4|12| 1500|Partitioning edges            | 12.03
+2020-01-23 11:17:55,680|INFO|0128|Total number of partitions|3898
+2020-01-23 11:17:56,017|INFO|0128|Total number of edges in raw|3901477
+2020-01-23 11:17:58,518|INFO|0128|Total number of edges in spatial|3952266
+2020-01-23 11:18:07,205|DCELMerger|0128| 4|12| 1500|Extracting segments           |  8.69
+2020-01-23 11:18:07,207|INFO|0128|Segments|4562579
+2020-01-23 11:18:17,099|DCELMerger|0128| 4|12| 1500|Getting half edges            |  9.89
+2020-01-23 11:18:17,103|INFO|0128|Half edges|9125158
+2020-01-23 11:18:22,801|DCELMerger|0128| 4|12| 1500|Getting local DCEL's          |  5.70
+2020-01-23 11:18:22,804|INFO|0128|Partitions on DCEL|3898
+2020-01-23 11:18:23,046|Saved /tmp/edgesCells1500.wkt in 0.01s [3898 records].
+2020-01-23 11:18:28,647|Saved /tmp/edgesFaces1500.wkt in 1.21s [74201 records].
+2020-01-23 11:18:28,647|Closing session...
+2020-01-23 11:18:29,023|Closing session... Done!
+2020-01-23 11:18:33,064|Starting session...
+2020-01-23 11:18:47,712|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 11:18:47,713|Starting session... Done!
+2020-01-23 11:18:57,272|DCELMerger|0129| 4|12| 1750|Reading polygons A            |  9.55
+2020-01-23 11:19:06,364|DCELMerger|0129| 4|12| 1750|Reading polygons B            |  9.09
+2020-01-23 11:19:06,366|INFO|0129|Polygons in A|7028
+2020-01-23 11:19:06,367|INFO|0129|Polygons in B|8047
+2020-01-23 11:19:18,627|DCELMerger|0129| 4|12| 1750|Partitioning edges            | 12.26
+2020-01-23 11:19:18,629|INFO|0129|Total number of partitions|4609
+2020-01-23 11:19:18,717|INFO|0129|Total number of edges in raw|3901477
+2020-01-23 11:19:21,189|INFO|0129|Total number of edges in spatial|3956944
+2020-01-23 11:19:31,095|DCELMerger|0129| 4|12| 1750|Extracting segments           |  9.91
+2020-01-23 11:19:31,098|INFO|0129|Segments|4574597
+2020-01-23 11:19:42,308|DCELMerger|0129| 4|12| 1750|Getting half edges            | 11.21
+2020-01-23 11:19:42,313|INFO|0129|Half edges|9149194
+2020-01-23 11:19:48,303|DCELMerger|0129| 4|12| 1750|Getting local DCEL's          |  5.99
+2020-01-23 11:19:48,307|INFO|0129|Partitions on DCEL|4609
+2020-01-23 11:19:48,535|Saved /tmp/edgesCells1750.wkt in 0.01s [4609 records].
+2020-01-23 11:19:54,317|Saved /tmp/edgesFaces1750.wkt in 1.39s [77548 records].
+2020-01-23 11:19:54,318|Closing session...
+2020-01-23 11:19:54,451|Closing session... Done!
+2020-01-23 11:19:57,922|Starting session...
+2020-01-23 11:20:11,793|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 11:20:11,793|Starting session... Done!
+2020-01-23 11:20:21,268|DCELMerger|0130| 4|12| 2000|Reading polygons A            |  9.47
+2020-01-23 11:20:29,809|DCELMerger|0130| 4|12| 2000|Reading polygons B            |  8.54
+2020-01-23 11:20:29,811|INFO|0130|Polygons in A|7028
+2020-01-23 11:20:29,811|INFO|0130|Polygons in B|8047
+2020-01-23 11:20:43,994|DCELMerger|0130| 4|12| 2000|Partitioning edges            | 14.18
+2020-01-23 11:20:43,999|INFO|0130|Total number of partitions|5455
+2020-01-23 11:20:44,095|INFO|0130|Total number of edges in raw|3901477
+2020-01-23 11:20:47,963|INFO|0130|Total number of edges in spatial|3962468
+2020-01-23 11:20:58,813|DCELMerger|0130| 4|12| 2000|Extracting segments           | 10.85
+2020-01-23 11:20:58,816|INFO|0130|Segments|4588682
+2020-01-23 11:21:11,071|DCELMerger|0130| 4|12| 2000|Getting half edges            | 12.25
+2020-01-23 11:21:11,075|INFO|0130|Half edges|9177364
+2020-01-23 11:21:17,389|DCELMerger|0130| 4|12| 2000|Getting local DCEL's          |  6.31
+2020-01-23 11:21:17,392|INFO|0130|Partitions on DCEL|5455
+2020-01-23 11:21:17,713|Saved /tmp/edgesCells2000.wkt in 0.01s [5455 records].
+2020-01-23 11:21:24,511|Saved /tmp/edgesFaces2000.wkt in 1.52s [81222 records].
+2020-01-23 11:21:24,512|Closing session...
+2020-01-23 11:21:24,656|Closing session... Done!
+2020-01-23 11:21:28,283|Starting session...
+2020-01-23 11:21:41,542|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 11:21:41,542|Starting session... Done!
+2020-01-23 11:21:50,654|DCELMerger|0131| 4|12|  500|Reading polygons A            |  9.11
+2020-01-23 11:21:59,484|DCELMerger|0131| 4|12|  500|Reading polygons B            |  8.83
+2020-01-23 11:21:59,487|INFO|0131|Polygons in A|7028
+2020-01-23 11:21:59,487|INFO|0131|Polygons in B|8047
+2020-01-23 11:22:07,913|DCELMerger|0131| 4|12|  500|Partitioning edges            |  8.42
+2020-01-23 11:22:07,914|INFO|0131|Total number of partitions|1264
+2020-01-23 11:22:08,054|INFO|0131|Total number of edges in raw|3901477
+2020-01-23 11:22:09,313|INFO|0131|Total number of edges in spatial|3928341
+2020-01-23 11:22:14,864|DCELMerger|0131| 4|12|  500|Extracting segments           |  5.55
+2020-01-23 11:22:14,866|INFO|0131|Segments|4505522
+2020-01-23 11:22:20,390|DCELMerger|0131| 4|12|  500|Getting half edges            |  5.52
+2020-01-23 11:22:20,393|INFO|0131|Half edges|9011044
+2020-01-23 11:22:29,463|DCELMerger|0131| 4|12|  500|Getting local DCEL's          |  9.07
+2020-01-23 11:22:29,466|INFO|0131|Partitions on DCEL|1264
+2020-01-23 11:22:29,581|Saved /tmp/edgesCells500.wkt in 0.00s [1264 records].
+2020-01-23 11:22:34,367|Saved /tmp/edgesFaces500.wkt in 1.90s [58560 records].
+2020-01-23 11:22:34,367|Closing session...
+2020-01-23 11:22:34,537|Closing session... Done!
+2020-01-23 11:22:38,030|Starting session...
+2020-01-23 11:22:51,785|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 11:22:51,786|Starting session... Done!
+2020-01-23 11:23:00,860|DCELMerger|0132| 4|12|  750|Reading polygons A            |  9.07
+2020-01-23 11:23:09,711|DCELMerger|0132| 4|12|  750|Reading polygons B            |  8.85
+2020-01-23 11:23:09,713|INFO|0132|Polygons in A|7028
+2020-01-23 11:23:09,713|INFO|0132|Polygons in B|8047
+2020-01-23 11:23:19,627|DCELMerger|0132| 4|12|  750|Partitioning edges            |  9.91
+2020-01-23 11:23:19,628|INFO|0132|Total number of partitions|1894
+2020-01-23 11:23:19,757|INFO|0132|Total number of edges in raw|3901477
+2020-01-23 11:23:20,841|INFO|0132|Total number of edges in spatial|3935915
+2020-01-23 11:23:27,416|DCELMerger|0132| 4|12|  750|Extracting segments           |  6.57
+2020-01-23 11:23:27,419|INFO|0132|Segments|4522780
+2020-01-23 11:23:34,071|DCELMerger|0132| 4|12|  750|Getting half edges            |  6.65
+2020-01-23 11:23:34,073|INFO|0132|Half edges|9045560
+2020-01-23 11:23:40,786|DCELMerger|0132| 4|12|  750|Getting local DCEL's          |  6.71
+2020-01-23 11:23:40,789|INFO|0132|Partitions on DCEL|1894
+2020-01-23 11:23:41,053|Saved /tmp/edgesCells750.wkt in 0.00s [1894 records].
+2020-01-23 11:23:45,590|Saved /tmp/edgesFaces750.wkt in 1.14s [63359 records].
+2020-01-23 11:23:45,591|Closing session...
+2020-01-23 11:23:45,827|Closing session... Done!
+2020-01-23 11:23:49,413|Starting session...
+2020-01-23 11:24:02,610|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 11:24:02,611|Starting session... Done!
+2020-01-23 11:24:11,774|DCELMerger|0133| 4|12| 1000|Reading polygons A            |  9.16
+2020-01-23 11:24:20,941|DCELMerger|0133| 4|12| 1000|Reading polygons B            |  9.17
+2020-01-23 11:24:20,943|INFO|0133|Polygons in A|7028
+2020-01-23 11:24:20,943|INFO|0133|Polygons in B|8047
+2020-01-23 11:24:30,610|DCELMerger|0133| 4|12| 1000|Partitioning edges            |  9.67
+2020-01-23 11:24:30,613|INFO|0133|Total number of partitions|2494
+2020-01-23 11:24:30,709|INFO|0133|Total number of edges in raw|3901477
+2020-01-23 11:24:31,984|INFO|0133|Total number of edges in spatial|3941279
+2020-01-23 11:24:39,188|DCELMerger|0133| 4|12| 1000|Extracting segments           |  7.20
+2020-01-23 11:24:39,191|INFO|0133|Segments|4535595
+2020-01-23 11:24:47,149|DCELMerger|0133| 4|12| 1000|Getting half edges            |  7.96
+2020-01-23 11:24:47,151|INFO|0133|Half edges|9071190
+2020-01-23 11:24:53,257|DCELMerger|0133| 4|12| 1000|Getting local DCEL's          |  6.11
+2020-01-23 11:24:53,261|INFO|0133|Partitions on DCEL|2494
+2020-01-23 11:24:53,439|Saved /tmp/edgesCells1000.wkt in 0.01s [2494 records].
+2020-01-23 11:24:58,667|Saved /tmp/edgesFaces1000.wkt in 1.51s [66821 records].
+2020-01-23 11:24:58,668|Closing session...
+2020-01-23 11:24:58,797|Closing session... Done!
+2020-01-23 11:25:02,264|Starting session...
+2020-01-23 11:25:16,478|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 11:25:16,478|Starting session... Done!
+2020-01-23 11:25:25,928|DCELMerger|0134| 4|12| 1250|Reading polygons A            |  9.44
+2020-01-23 11:25:34,834|DCELMerger|0134| 4|12| 1250|Reading polygons B            |  8.91
+2020-01-23 11:25:34,836|INFO|0134|Polygons in A|7028
+2020-01-23 11:25:34,836|INFO|0134|Polygons in B|8047
+2020-01-23 11:25:45,779|DCELMerger|0134| 4|12| 1250|Partitioning edges            | 10.94
+2020-01-23 11:25:45,782|INFO|0134|Total number of partitions|3205
+2020-01-23 11:25:45,895|INFO|0134|Total number of edges in raw|3901477
+2020-01-23 11:25:48,534|INFO|0134|Total number of edges in spatial|3947093
+2020-01-23 11:25:56,626|DCELMerger|0134| 4|12| 1250|Extracting segments           |  8.09
+2020-01-23 11:25:56,629|INFO|0134|Segments|4549770
+2020-01-23 11:26:04,965|DCELMerger|0134| 4|12| 1250|Getting half edges            |  8.34
+2020-01-23 11:26:04,968|INFO|0134|Half edges|9099540
+2020-01-23 11:26:10,587|DCELMerger|0134| 4|12| 1250|Getting local DCEL's          |  5.62
+2020-01-23 11:26:10,590|INFO|0134|Partitions on DCEL|3205
+2020-01-23 11:26:10,777|Saved /tmp/edgesCells1250.wkt in 0.01s [3205 records].
+2020-01-23 11:26:15,998|Saved /tmp/edgesFaces1250.wkt in 1.26s [70724 records].
+2020-01-23 11:26:15,998|Closing session...
+2020-01-23 11:26:16,133|Closing session... Done!
+2020-01-23 11:26:19,600|Starting session...
+2020-01-23 11:26:32,847|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 11:26:32,848|Starting session... Done!
+2020-01-23 11:26:43,776|DCELMerger|0135| 4|12| 1500|Reading polygons A            | 10.92
+2020-01-23 11:26:52,716|DCELMerger|0135| 4|12| 1500|Reading polygons B            |  8.94
+2020-01-23 11:26:52,718|INFO|0135|Polygons in A|7028
+2020-01-23 11:26:52,718|INFO|0135|Polygons in B|8047
+2020-01-23 11:27:04,343|DCELMerger|0135| 4|12| 1500|Partitioning edges            | 11.62
+2020-01-23 11:27:04,346|INFO|0135|Total number of partitions|3913
+2020-01-23 11:27:04,443|INFO|0135|Total number of edges in raw|3901477
+2020-01-23 11:27:07,466|INFO|0135|Total number of edges in spatial|3952223
+2020-01-23 11:27:16,918|DCELMerger|0135| 4|12| 1500|Extracting segments           |  9.45
+2020-01-23 11:27:16,920|INFO|0135|Segments|4562642
+2020-01-23 11:27:26,778|DCELMerger|0135| 4|12| 1500|Getting half edges            |  9.86
+2020-01-23 11:27:26,781|INFO|0135|Half edges|9125284
+2020-01-23 11:27:32,515|DCELMerger|0135| 4|12| 1500|Getting local DCEL's          |  5.73
+2020-01-23 11:27:32,518|INFO|0135|Partitions on DCEL|3913
+2020-01-23 11:27:32,748|Saved /tmp/edgesCells1500.wkt in 0.01s [3913 records].
+2020-01-23 11:27:39,178|Saved /tmp/edgesFaces1500.wkt in 2.21s [74247 records].
+2020-01-23 11:27:39,179|Closing session...
+2020-01-23 11:27:39,662|Closing session... Done!
+2020-01-23 11:27:43,475|Starting session...
+2020-01-23 11:27:57,068|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 11:27:57,069|Starting session... Done!
+2020-01-23 11:28:06,451|DCELMerger|0136| 4|12| 1750|Reading polygons A            |  9.38
+2020-01-23 11:28:15,011|DCELMerger|0136| 4|12| 1750|Reading polygons B            |  8.56
+2020-01-23 11:28:15,013|INFO|0136|Polygons in A|7028
+2020-01-23 11:28:15,013|INFO|0136|Polygons in B|8047
+2020-01-23 11:28:28,035|DCELMerger|0136| 4|12| 1750|Partitioning edges            | 13.02
+2020-01-23 11:28:28,037|INFO|0136|Total number of partitions|4666
+2020-01-23 11:28:28,136|INFO|0136|Total number of edges in raw|3901477
+2020-01-23 11:28:30,509|INFO|0136|Total number of edges in spatial|3957477
+2020-01-23 11:28:40,439|DCELMerger|0136| 4|12| 1750|Extracting segments           |  9.93
+2020-01-23 11:28:40,442|INFO|0136|Segments|4575871
+2020-01-23 11:28:51,436|DCELMerger|0136| 4|12| 1750|Getting half edges            | 10.99
+2020-01-23 11:28:51,439|INFO|0136|Half edges|9151742
+2020-01-23 11:28:57,947|DCELMerger|0136| 4|12| 1750|Getting local DCEL's          |  6.51
+2020-01-23 11:28:57,950|INFO|0136|Partitions on DCEL|4666
+2020-01-23 11:28:58,163|Saved /tmp/edgesCells1750.wkt in 0.01s [4666 records].
+2020-01-23 11:29:03,891|Saved /tmp/edgesFaces1750.wkt in 1.46s [77819 records].
+2020-01-23 11:29:03,891|Closing session...
+2020-01-23 11:29:04,036|Closing session... Done!
+2020-01-23 11:29:07,815|Starting session...
+2020-01-23 11:29:21,426|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 11:29:21,426|Starting session... Done!
+2020-01-23 11:29:31,195|DCELMerger|0137| 4|12| 2000|Reading polygons A            |  9.76
+2020-01-23 11:29:40,636|DCELMerger|0137| 4|12| 2000|Reading polygons B            |  9.44
+2020-01-23 11:29:40,651|INFO|0137|Polygons in A|7028
+2020-01-23 11:29:40,652|INFO|0137|Polygons in B|8047
+2020-01-23 11:29:54,041|DCELMerger|0137| 4|12| 2000|Partitioning edges            | 13.39
+2020-01-23 11:29:54,044|INFO|0137|Total number of partitions|5365
+2020-01-23 11:29:54,143|INFO|0137|Total number of edges in raw|3901477
+2020-01-23 11:29:57,925|INFO|0137|Total number of edges in spatial|3961994
+2020-01-23 11:30:09,015|DCELMerger|0137| 4|12| 2000|Extracting segments           | 11.09
+2020-01-23 11:30:09,017|INFO|0137|Segments|4587441
+2020-01-23 11:30:21,013|DCELMerger|0137| 4|12| 2000|Getting half edges            | 12.00
+2020-01-23 11:30:21,016|INFO|0137|Half edges|9174882
+2020-01-23 11:30:27,609|DCELMerger|0137| 4|12| 2000|Getting local DCEL's          |  6.59
+2020-01-23 11:30:27,610|INFO|0137|Partitions on DCEL|5365
+2020-01-23 11:30:27,877|Saved /tmp/edgesCells2000.wkt in 0.01s [5365 records].
+2020-01-23 11:30:33,566|Saved /tmp/edgesFaces2000.wkt in 1.18s [80919 records].
+2020-01-23 11:30:33,566|Closing session...
+2020-01-23 11:30:33,700|Closing session... Done!
+2020-01-23 11:34:05,137|Starting session...
+2020-01-23 11:34:18,342|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 11:34:18,343|Starting session... Done!
+2020-01-23 11:34:29,183|DCELMerger|0138| 4|12|  500|Reading polygons A            | 10.84
+2020-01-23 11:34:38,370|DCELMerger|0138| 4|12|  500|Reading polygons B            |  9.19
+2020-01-23 11:34:38,371|INFO|0138|Polygons in A|7028
+2020-01-23 11:34:38,371|INFO|0138|Polygons in B|8047
+2020-01-23 11:34:46,867|DCELMerger|0138| 4|12|  500|Partitioning edges            |  8.49
+2020-01-23 11:34:46,868|INFO|0138|Total number of partitions|1246
+2020-01-23 11:34:46,989|INFO|0138|Total number of edges in raw|3901477
+2020-01-23 11:34:47,718|INFO|0138|Total number of edges in spatial|3928059
+2020-01-23 11:34:53,379|DCELMerger|0138| 4|12|  500|Extracting segments           |  5.66
+2020-01-23 11:34:53,382|INFO|0138|Segments|4504877
+2020-01-23 11:34:59,092|DCELMerger|0138| 4|12|  500|Getting half edges            |  5.71
+2020-01-23 11:34:59,097|INFO|0138|Half edges|9009754
+2020-01-23 11:35:08,363|DCELMerger|0138| 4|12|  500|Getting local DCEL's          |  9.27
+2020-01-23 11:35:08,366|INFO|0138|Partitions on DCEL|1246
+2020-01-23 11:35:08,493|Saved /tmp/edgesCells500.wkt in 0.00s [1246 records].
+2020-01-23 11:35:12,866|Saved /tmp/edgesFaces500.wkt in 1.21s [58360 records].
+2020-01-23 11:35:12,866|Closing session...
+2020-01-23 11:35:13,004|Closing session... Done!
+2020-01-23 11:35:16,805|Starting session...
+2020-01-23 11:35:31,106|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 11:35:31,106|Starting session... Done!
+2020-01-23 11:35:40,758|DCELMerger|0139| 4|12|  750|Reading polygons A            |  9.65
+2020-01-23 11:35:49,602|DCELMerger|0139| 4|12|  750|Reading polygons B            |  8.84
+2020-01-23 11:35:49,604|INFO|0139|Polygons in A|7028
+2020-01-23 11:35:49,604|INFO|0139|Polygons in B|8047
+2020-01-23 11:35:58,724|DCELMerger|0139| 4|12|  750|Partitioning edges            |  9.12
+2020-01-23 11:35:58,726|INFO|0139|Total number of partitions|1888
+2020-01-23 11:35:58,823|INFO|0139|Total number of edges in raw|3901477
+2020-01-23 11:36:00,376|INFO|0139|Total number of edges in spatial|3935251
+2020-01-23 11:36:06,553|DCELMerger|0139| 4|12|  750|Extracting segments           |  6.18
+2020-01-23 11:36:06,555|INFO|0139|Segments|4521444
+2020-01-23 11:36:12,996|DCELMerger|0139| 4|12|  750|Getting half edges            |  6.44
+2020-01-23 11:36:13,000|INFO|0139|Half edges|9042888
+2020-01-23 11:36:19,638|DCELMerger|0139| 4|12|  750|Getting local DCEL's          |  6.64
+2020-01-23 11:36:19,644|INFO|0139|Partitions on DCEL|1888
+2020-01-23 11:36:19,811|Saved /tmp/edgesCells750.wkt in 0.00s [1888 records].
+2020-01-23 11:36:24,068|Saved /tmp/edgesFaces750.wkt in 1.38s [62970 records].
+2020-01-23 11:36:24,068|Closing session...
+2020-01-23 11:36:24,217|Closing session... Done!
+2020-01-23 11:36:27,742|Starting session...
+2020-01-23 11:36:41,173|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 11:36:41,174|Starting session... Done!
+2020-01-23 11:36:50,234|DCELMerger|0140| 4|12| 1000|Reading polygons A            |  9.05
+2020-01-23 11:36:59,001|DCELMerger|0140| 4|12| 1000|Reading polygons B            |  8.77
+2020-01-23 11:36:59,003|INFO|0140|Polygons in A|7028
+2020-01-23 11:36:59,003|INFO|0140|Polygons in B|8047
+2020-01-23 11:37:09,059|DCELMerger|0140| 4|12| 1000|Partitioning edges            | 10.05
+2020-01-23 11:37:09,061|INFO|0140|Total number of partitions|2533
+2020-01-23 11:37:09,202|INFO|0140|Total number of edges in raw|3901477
+2020-01-23 11:37:10,585|INFO|0140|Total number of edges in spatial|3941649
+2020-01-23 11:37:17,663|DCELMerger|0140| 4|12| 1000|Extracting segments           |  7.08
+2020-01-23 11:37:17,664|INFO|0140|Segments|4536533
+2020-01-23 11:37:25,176|DCELMerger|0140| 4|12| 1000|Getting half edges            |  7.51
+2020-01-23 11:37:25,179|INFO|0140|Half edges|9073066
+2020-01-23 11:37:31,231|DCELMerger|0140| 4|12| 1000|Getting local DCEL's          |  6.05
+2020-01-23 11:37:31,232|INFO|0140|Partitions on DCEL|2533
+2020-01-23 11:37:31,474|Saved /tmp/edgesCells1000.wkt in 0.01s [2533 records].
+2020-01-23 11:37:36,659|Saved /tmp/edgesFaces1000.wkt in 1.79s [67120 records].
+2020-01-23 11:37:36,660|Closing session...
+2020-01-23 11:37:37,261|Closing session... Done!
+2020-01-23 11:37:41,219|Starting session...
+2020-01-23 11:37:55,336|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 11:37:55,336|Starting session... Done!
+2020-01-23 11:38:05,110|DCELMerger|0141| 4|12| 1250|Reading polygons A            |  9.77
+2020-01-23 11:38:14,289|DCELMerger|0141| 4|12| 1250|Reading polygons B            |  9.18
+2020-01-23 11:38:14,290|INFO|0141|Polygons in A|7028
+2020-01-23 11:38:14,290|INFO|0141|Polygons in B|8047
+2020-01-23 11:38:24,871|DCELMerger|0141| 4|12| 1250|Partitioning edges            | 10.58
+2020-01-23 11:38:24,874|INFO|0141|Total number of partitions|3250
+2020-01-23 11:38:25,020|INFO|0141|Total number of edges in raw|3901477
+2020-01-23 11:38:27,559|INFO|0141|Total number of edges in spatial|3947464
+2020-01-23 11:38:35,889|DCELMerger|0141| 4|12| 1250|Extracting segments           |  8.33
+2020-01-23 11:38:35,892|INFO|0141|Segments|4550680
+2020-01-23 11:38:45,142|DCELMerger|0141| 4|12| 1250|Getting half edges            |  9.25
+2020-01-23 11:38:45,149|INFO|0141|Half edges|9101360
+2020-01-23 11:38:50,376|DCELMerger|0141| 4|12| 1250|Getting local DCEL's          |  5.23
+2020-01-23 11:38:50,380|INFO|0141|Partitions on DCEL|3250
+2020-01-23 11:38:50,586|Saved /tmp/edgesCells1250.wkt in 0.01s [3250 records].
+2020-01-23 11:38:56,230|Saved /tmp/edgesFaces1250.wkt in 1.41s [70975 records].
+2020-01-23 11:38:56,230|Closing session...
+2020-01-23 11:38:56,378|Closing session... Done!
+2020-01-23 11:38:59,933|Starting session...
+2020-01-23 11:39:13,933|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 11:39:13,933|Starting session... Done!
+2020-01-23 11:39:23,544|DCELMerger|0142| 4|12| 1500|Reading polygons A            |  9.61
+2020-01-23 11:39:32,288|DCELMerger|0142| 4|12| 1500|Reading polygons B            |  8.74
+2020-01-23 11:39:32,291|INFO|0142|Polygons in A|7028
+2020-01-23 11:39:32,292|INFO|0142|Polygons in B|8047
+2020-01-23 11:39:44,708|DCELMerger|0142| 4|12| 1500|Partitioning edges            | 12.41
+2020-01-23 11:39:44,711|INFO|0142|Total number of partitions|3868
+2020-01-23 11:39:44,804|INFO|0142|Total number of edges in raw|3901477
+2020-01-23 11:39:47,645|INFO|0142|Total number of edges in spatial|3952213
+2020-01-23 11:39:56,236|DCELMerger|0142| 4|12| 1500|Extracting segments           |  8.59
+2020-01-23 11:39:56,239|INFO|0142|Segments|4562311
+2020-01-23 11:40:06,159|DCELMerger|0142| 4|12| 1500|Getting half edges            |  9.92
+2020-01-23 11:40:06,163|INFO|0142|Half edges|9124622
+2020-01-23 11:40:12,120|DCELMerger|0142| 4|12| 1500|Getting local DCEL's          |  5.96
+2020-01-23 11:40:12,123|INFO|0142|Partitions on DCEL|3868
+2020-01-23 11:40:12,329|Saved /tmp/edgesCells1500.wkt in 0.01s [3868 records].
+2020-01-23 11:40:17,539|Saved /tmp/edgesFaces1500.wkt in 1.41s [74109 records].
+2020-01-23 11:40:17,539|Closing session...
+2020-01-23 11:40:17,695|Closing session... Done!
+2020-01-23 11:40:21,052|Starting session...
+2020-01-23 11:40:34,487|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 11:40:34,487|Starting session... Done!
+2020-01-23 11:40:45,484|DCELMerger|0143| 4|12| 1750|Reading polygons A            | 10.99
+2020-01-23 11:40:54,501|DCELMerger|0143| 4|12| 1750|Reading polygons B            |  9.02
+2020-01-23 11:40:54,503|INFO|0143|Polygons in A|7028
+2020-01-23 11:40:54,503|INFO|0143|Polygons in B|8047
+2020-01-23 11:41:07,318|DCELMerger|0143| 4|12| 1750|Partitioning edges            | 12.81
+2020-01-23 11:41:07,321|INFO|0143|Total number of partitions|4519
+2020-01-23 11:41:07,418|INFO|0143|Total number of edges in raw|3901477
+2020-01-23 11:41:10,252|INFO|0143|Total number of edges in spatial|3956618
+2020-01-23 11:41:20,634|DCELMerger|0143| 4|12| 1750|Extracting segments           | 10.38
+2020-01-23 11:41:20,637|INFO|0143|Segments|4573585
+2020-01-23 11:41:32,045|DCELMerger|0143| 4|12| 1750|Getting half edges            | 11.41
+2020-01-23 11:41:32,048|INFO|0143|Half edges|9147170
+2020-01-23 11:41:37,669|DCELMerger|0143| 4|12| 1750|Getting local DCEL's          |  5.62
+2020-01-23 11:41:37,671|INFO|0143|Partitions on DCEL|4519
+2020-01-23 11:41:37,939|Saved /tmp/edgesCells1750.wkt in 0.01s [4519 records].
+2020-01-23 11:41:43,902|Saved /tmp/edgesFaces1750.wkt in 1.44s [77190 records].
+2020-01-23 11:41:43,902|Closing session...
+2020-01-23 11:41:44,550|Closing session... Done!
+2020-01-23 11:41:48,405|Starting session...
+2020-01-23 11:42:02,617|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 11:42:02,617|Starting session... Done!
+2020-01-23 11:42:11,731|DCELMerger|0144| 4|12| 2000|Reading polygons A            |  9.11
+2020-01-23 11:42:20,389|DCELMerger|0144| 4|12| 2000|Reading polygons B            |  8.66
+2020-01-23 11:42:20,391|INFO|0144|Polygons in A|7028
+2020-01-23 11:42:20,391|INFO|0144|Polygons in B|8047
+2020-01-23 11:42:34,084|DCELMerger|0144| 4|12| 2000|Partitioning edges            | 13.69
+2020-01-23 11:42:34,087|INFO|0144|Total number of partitions|5401
+2020-01-23 11:42:34,184|INFO|0144|Total number of edges in raw|3901477
+2020-01-23 11:42:37,043|INFO|0144|Total number of edges in spatial|3962416
+2020-01-23 11:42:47,733|DCELMerger|0144| 4|12| 2000|Extracting segments           | 10.69
+2020-01-23 11:42:47,737|INFO|0144|Segments|4588415
+2020-01-23 11:43:00,048|DCELMerger|0144| 4|12| 2000|Getting half edges            | 12.31
+2020-01-23 11:43:00,053|INFO|0144|Half edges|9176830
+2020-01-23 11:43:06,562|DCELMerger|0144| 4|12| 2000|Getting local DCEL's          |  6.51
+2020-01-23 11:43:06,566|INFO|0144|Partitions on DCEL|5401
+2020-01-23 11:43:06,823|Saved /tmp/edgesCells2000.wkt in 0.01s [5401 records].
+2020-01-23 11:43:14,120|Saved /tmp/edgesFaces2000.wkt in 1.99s [81196 records].
+2020-01-23 11:43:14,120|Closing session...
+2020-01-23 11:43:14,804|Closing session... Done!
+2020-01-23 11:43:18,682|Starting session...
+2020-01-23 11:43:33,075|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 11:43:33,075|Starting session... Done!
+2020-01-23 11:43:42,297|DCELMerger|0145| 4|12|  500|Reading polygons A            |  9.22
+2020-01-23 11:43:50,968|DCELMerger|0145| 4|12|  500|Reading polygons B            |  8.67
+2020-01-23 11:43:50,969|INFO|0145|Polygons in A|7028
+2020-01-23 11:43:50,970|INFO|0145|Polygons in B|8047
+2020-01-23 11:43:59,138|DCELMerger|0145| 4|12|  500|Partitioning edges            |  8.17
+2020-01-23 11:43:59,140|INFO|0145|Total number of partitions|1210
+2020-01-23 11:43:59,244|INFO|0145|Total number of edges in raw|3901477
+2020-01-23 11:44:00,487|INFO|0145|Total number of edges in spatial|3927821
+2020-01-23 11:44:06,142|DCELMerger|0145| 4|12|  500|Extracting segments           |  5.65
+2020-01-23 11:44:06,144|INFO|0145|Segments|4504265
+2020-01-23 11:44:11,598|DCELMerger|0145| 4|12|  500|Getting half edges            |  5.45
+2020-01-23 11:44:11,599|INFO|0145|Half edges|9008530
+2020-01-23 11:44:21,141|DCELMerger|0145| 4|12|  500|Getting local DCEL's          |  9.54
+2020-01-23 11:44:21,144|INFO|0145|Partitions on DCEL|1210
+2020-01-23 11:44:21,294|Saved /tmp/edgesCells500.wkt in 0.00s [1210 records].
+2020-01-23 11:44:25,293|Saved /tmp/edgesFaces500.wkt in 1.41s [58226 records].
+2020-01-23 11:44:25,294|Closing session...
+2020-01-23 11:44:25,431|Closing session... Done!
+2020-01-23 11:44:28,724|Starting session...
+2020-01-23 11:44:42,190|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 11:44:42,190|Starting session... Done!
+2020-01-23 11:44:51,249|DCELMerger|0146| 4|12|  750|Reading polygons A            |  9.05
+2020-01-23 11:45:00,246|DCELMerger|0146| 4|12|  750|Reading polygons B            |  9.00
+2020-01-23 11:45:00,248|INFO|0146|Polygons in A|7028
+2020-01-23 11:45:00,248|INFO|0146|Polygons in B|8047
+2020-01-23 11:45:09,655|DCELMerger|0146| 4|12|  750|Partitioning edges            |  9.41
+2020-01-23 11:45:09,656|INFO|0146|Total number of partitions|1900
+2020-01-23 11:45:09,779|INFO|0146|Total number of edges in raw|3901477
+2020-01-23 11:45:10,733|INFO|0146|Total number of edges in spatial|3935746
+2020-01-23 11:45:17,466|DCELMerger|0146| 4|12|  750|Extracting segments           |  6.73
+2020-01-23 11:45:17,469|INFO|0146|Segments|4522461
+2020-01-23 11:45:23,963|DCELMerger|0146| 4|12|  750|Getting half edges            |  6.49
+2020-01-23 11:45:23,968|INFO|0146|Half edges|9044922
+2020-01-23 11:45:30,890|DCELMerger|0146| 4|12|  750|Getting local DCEL's          |  6.92
+2020-01-23 11:45:30,894|INFO|0146|Partitions on DCEL|1900
+2020-01-23 11:45:31,038|Saved /tmp/edgesCells750.wkt in 0.00s [1900 records].
+2020-01-23 11:45:35,418|Saved /tmp/edgesFaces750.wkt in 1.46s [63230 records].
+2020-01-23 11:45:35,418|Closing session...
+2020-01-23 11:45:35,588|Closing session... Done!
+2020-01-23 11:45:39,417|Starting session...
+2020-01-23 11:45:53,615|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 11:45:53,616|Starting session... Done!
+2020-01-23 11:46:03,415|DCELMerger|0147| 4|12| 1000|Reading polygons A            |  9.79
+2020-01-23 11:46:12,763|DCELMerger|0147| 4|12| 1000|Reading polygons B            |  9.35
+2020-01-23 11:46:12,766|INFO|0147|Polygons in A|7028
+2020-01-23 11:46:12,766|INFO|0147|Polygons in B|8047
+2020-01-23 11:46:23,188|DCELMerger|0147| 4|12| 1000|Partitioning edges            | 10.42
+2020-01-23 11:46:23,190|INFO|0147|Total number of partitions|2494
+2020-01-23 11:46:23,292|INFO|0147|Total number of edges in raw|3901477
+2020-01-23 11:46:25,352|INFO|0147|Total number of edges in spatial|3941149
+2020-01-23 11:46:32,214|DCELMerger|0147| 4|12| 1000|Extracting segments           |  6.86
+2020-01-23 11:46:32,217|INFO|0147|Segments|4535382
+2020-01-23 11:46:40,057|DCELMerger|0147| 4|12| 1000|Getting half edges            |  7.84
+2020-01-23 11:46:40,061|INFO|0147|Half edges|9070764
+2020-01-23 11:46:46,594|DCELMerger|0147| 4|12| 1000|Getting local DCEL's          |  6.53
+2020-01-23 11:46:46,597|INFO|0147|Partitions on DCEL|2494
+2020-01-23 11:46:46,769|Saved /tmp/edgesCells1000.wkt in 0.01s [2494 records].
+2020-01-23 11:46:51,864|Saved /tmp/edgesFaces1000.wkt in 1.36s [66855 records].
+2020-01-23 11:46:51,865|Closing session...
+2020-01-23 11:46:52,011|Closing session... Done!
+2020-01-23 11:46:55,537|Starting session...
+2020-01-23 11:47:08,448|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 11:47:08,448|Starting session... Done!
+2020-01-23 11:47:17,402|DCELMerger|0148| 4|12| 1250|Reading polygons A            |  8.95
+2020-01-23 11:47:26,581|DCELMerger|0148| 4|12| 1250|Reading polygons B            |  9.18
+2020-01-23 11:47:26,583|INFO|0148|Polygons in A|7028
+2020-01-23 11:47:26,583|INFO|0148|Polygons in B|8047
+2020-01-23 11:47:36,805|DCELMerger|0148| 4|12| 1250|Partitioning edges            | 10.22
+2020-01-23 11:47:36,814|INFO|0148|Total number of partitions|3133
+2020-01-23 11:47:36,923|INFO|0148|Total number of edges in raw|3901477
+2020-01-23 11:47:39,384|INFO|0148|Total number of edges in spatial|3946574
+2020-01-23 11:47:47,227|DCELMerger|0148| 4|12| 1250|Extracting segments           |  7.84
+2020-01-23 11:47:47,231|INFO|0148|Segments|4548492
+2020-01-23 11:47:55,331|DCELMerger|0148| 4|12| 1250|Getting half edges            |  8.10
+2020-01-23 11:47:55,335|INFO|0148|Half edges|9096984
+2020-01-23 11:48:01,712|DCELMerger|0148| 4|12| 1250|Getting local DCEL's          |  6.38
+2020-01-23 11:48:01,714|INFO|0148|Partitions on DCEL|3133
+2020-01-23 11:48:01,920|Saved /tmp/edgesCells1250.wkt in 0.01s [3133 records].
+2020-01-23 11:48:07,430|Saved /tmp/edgesFaces1250.wkt in 1.65s [70379 records].
+2020-01-23 11:48:07,431|Closing session...
+2020-01-23 11:48:07,588|Closing session... Done!
+2020-01-23 11:48:11,021|Starting session...
+2020-01-23 11:48:24,340|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 11:48:24,341|Starting session... Done!
+2020-01-23 11:48:36,214|DCELMerger|0149| 4|12| 1500|Reading polygons A            | 11.87
+2020-01-23 11:48:41,749|DCELMerger|0149| 4|12| 1500|Reading polygons B            |  5.53
+2020-01-23 11:48:41,751|INFO|0149|Polygons in A|7028
+2020-01-23 11:48:41,751|INFO|0149|Polygons in B|8047
+2020-01-23 11:48:55,510|DCELMerger|0149| 4|12| 1500|Partitioning edges            | 13.76
+2020-01-23 11:48:55,513|INFO|0149|Total number of partitions|3877
+2020-01-23 11:48:55,626|INFO|0149|Total number of edges in raw|3901477
+2020-01-23 11:48:58,524|INFO|0149|Total number of edges in spatial|3952184
+2020-01-23 11:49:08,953|DCELMerger|0149| 4|12| 1500|Extracting segments           | 10.43
+2020-01-23 11:49:08,956|INFO|0149|Segments|4562385
+2020-01-23 11:49:20,174|DCELMerger|0149| 4|12| 1500|Getting half edges            | 11.22
+2020-01-23 11:49:20,178|INFO|0149|Half edges|9124770
+2020-01-23 11:49:26,564|DCELMerger|0149| 4|12| 1500|Getting local DCEL's          |  6.38
+2020-01-23 11:49:26,568|INFO|0149|Partitions on DCEL|3877
+2020-01-23 11:49:26,780|Saved /tmp/edgesCells1500.wkt in 0.01s [3877 records].
+2020-01-23 11:49:32,154|Saved /tmp/edgesFaces1500.wkt in 1.45s [74072 records].
+2020-01-23 11:49:32,154|Closing session...
+2020-01-23 11:49:32,404|Closing session... Done!
+2020-01-23 11:49:36,034|Starting session...
+2020-01-23 11:49:49,106|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 11:49:49,106|Starting session... Done!
+2020-01-23 11:50:00,132|DCELMerger|0150| 4|12| 1750|Reading polygons A            | 11.02
+2020-01-23 11:50:05,717|DCELMerger|0150| 4|12| 1750|Reading polygons B            |  5.59
+2020-01-23 11:50:05,718|INFO|0150|Polygons in A|7028
+2020-01-23 11:50:05,719|INFO|0150|Polygons in B|8047
+2020-01-23 11:50:23,738|DCELMerger|0150| 4|12| 1750|Partitioning edges            | 18.02
+2020-01-23 11:50:23,741|INFO|0150|Total number of partitions|4648
+2020-01-23 11:50:23,851|INFO|0150|Total number of edges in raw|3901477
+2020-01-23 11:50:27,419|INFO|0150|Total number of edges in spatial|3957457
+2020-01-23 11:50:38,425|DCELMerger|0150| 4|12| 1750|Extracting segments           | 11.00
+2020-01-23 11:50:38,428|INFO|0150|Segments|4575727
+2020-01-23 11:50:51,368|DCELMerger|0150| 4|12| 1750|Getting half edges            | 12.94
+2020-01-23 11:50:51,371|INFO|0150|Half edges|9151454
+2020-01-23 11:50:58,289|DCELMerger|0150| 4|12| 1750|Getting local DCEL's          |  6.92
+2020-01-23 11:50:58,292|INFO|0150|Partitions on DCEL|4648
+2020-01-23 11:50:58,641|Saved /tmp/edgesCells1750.wkt in 0.01s [4648 records].
+2020-01-23 11:51:04,976|Saved /tmp/edgesFaces1750.wkt in 1.57s [77831 records].
+2020-01-23 11:51:04,976|Closing session...
+2020-01-23 11:51:05,198|Closing session... Done!
+2020-01-23 11:51:09,041|Starting session...
+2020-01-23 11:51:23,058|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 11:51:23,058|Starting session... Done!
+2020-01-23 11:51:31,917|DCELMerger|0151| 4|12| 2000|Reading polygons A            |  8.85
+2020-01-23 11:51:41,203|DCELMerger|0151| 4|12| 2000|Reading polygons B            |  9.29
+2020-01-23 11:51:41,205|INFO|0151|Polygons in A|7028
+2020-01-23 11:51:41,206|INFO|0151|Polygons in B|8047
+2020-01-23 11:51:54,085|DCELMerger|0151| 4|12| 2000|Partitioning edges            | 12.88
+2020-01-23 11:51:54,087|INFO|0151|Total number of partitions|5368
+2020-01-23 11:51:54,182|INFO|0151|Total number of edges in raw|3901477
+2020-01-23 11:51:57,669|INFO|0151|Total number of edges in spatial|3962354
+2020-01-23 11:52:08,219|DCELMerger|0151| 4|12| 2000|Extracting segments           | 10.55
+2020-01-23 11:52:08,222|INFO|0151|Segments|4588132
+2020-01-23 11:52:20,430|DCELMerger|0151| 4|12| 2000|Getting half edges            | 12.21
+2020-01-23 11:52:20,433|INFO|0151|Half edges|9176264
+2020-01-23 11:52:27,225|DCELMerger|0151| 4|12| 2000|Getting local DCEL's          |  6.79
+2020-01-23 11:52:27,228|INFO|0151|Partitions on DCEL|5368
+2020-01-23 11:52:27,556|Saved /tmp/edgesCells2000.wkt in 0.03s [5368 records].
+2020-01-23 11:52:34,150|Saved /tmp/edgesFaces2000.wkt in 1.45s [81015 records].
+2020-01-23 11:52:34,150|Closing session...
+2020-01-23 11:52:34,375|Closing session... Done!
+2020-01-23 11:52:38,581|Starting session...
+2020-01-23 11:52:52,808|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 11:52:52,808|Starting session... Done!
+2020-01-23 11:53:01,802|DCELMerger|0152| 4|12|  500|Reading polygons A            |  8.99
+2020-01-23 11:53:10,826|DCELMerger|0152| 4|12|  500|Reading polygons B            |  9.02
+2020-01-23 11:53:10,827|INFO|0152|Polygons in A|7028
+2020-01-23 11:53:10,827|INFO|0152|Polygons in B|8047
+2020-01-23 11:53:20,108|DCELMerger|0152| 4|12|  500|Partitioning edges            |  9.28
+2020-01-23 11:53:20,110|INFO|0152|Total number of partitions|1258
+2020-01-23 11:53:20,252|INFO|0152|Total number of edges in raw|3901477
+2020-01-23 11:53:21,070|INFO|0152|Total number of edges in spatial|3928247
+2020-01-23 11:53:26,618|DCELMerger|0152| 4|12|  500|Extracting segments           |  5.55
+2020-01-23 11:53:26,620|INFO|0152|Segments|4505298
+2020-01-23 11:53:31,569|DCELMerger|0152| 4|12|  500|Getting half edges            |  4.95
+2020-01-23 11:53:31,573|INFO|0152|Half edges|9010596
+2020-01-23 11:53:40,398|DCELMerger|0152| 4|12|  500|Getting local DCEL's          |  8.82
+2020-01-23 11:53:40,407|INFO|0152|Partitions on DCEL|1258
+2020-01-23 11:53:40,535|Saved /tmp/edgesCells500.wkt in 0.00s [1258 records].
+2020-01-23 11:53:44,501|Saved /tmp/edgesFaces500.wkt in 1.42s [58500 records].
+2020-01-23 11:53:44,501|Closing session...
+2020-01-23 11:53:44,633|Closing session... Done!
+2020-01-23 11:53:47,969|Starting session...
+2020-01-23 11:54:01,481|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 11:54:01,481|Starting session... Done!
+2020-01-23 11:54:10,393|DCELMerger|0153| 4|12|  750|Reading polygons A            |  8.91
+2020-01-23 11:54:19,089|DCELMerger|0153| 4|12|  750|Reading polygons B            |  8.70
+2020-01-23 11:54:19,091|INFO|0153|Polygons in A|7028
+2020-01-23 11:54:19,092|INFO|0153|Polygons in B|8047
+2020-01-23 11:54:27,942|DCELMerger|0153| 4|12|  750|Partitioning edges            |  8.85
+2020-01-23 11:54:27,945|INFO|0153|Total number of partitions|1993
+2020-01-23 11:54:28,051|INFO|0153|Total number of edges in raw|3901477
+2020-01-23 11:54:29,458|INFO|0153|Total number of edges in spatial|3936719
+2020-01-23 11:54:35,658|DCELMerger|0153| 4|12|  750|Extracting segments           |  6.20
+2020-01-23 11:54:35,660|INFO|0153|Segments|4524761
+2020-01-23 11:54:42,305|DCELMerger|0153| 4|12|  750|Getting half edges            |  6.64
+2020-01-23 11:54:42,307|INFO|0153|Half edges|9049522
+2020-01-23 11:54:48,791|DCELMerger|0153| 4|12|  750|Getting local DCEL's          |  6.48
+2020-01-23 11:54:48,793|INFO|0153|Partitions on DCEL|1993
+2020-01-23 11:54:48,940|Saved /tmp/edgesCells750.wkt in 0.00s [1993 records].
+2020-01-23 11:54:54,193|Saved /tmp/edgesFaces750.wkt in 1.47s [63873 records].
+2020-01-23 11:54:54,193|Closing session...
+2020-01-23 11:54:54,790|Closing session... Done!
+2020-01-23 11:54:58,531|Starting session...
+2020-01-23 11:55:12,564|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 11:55:12,565|Starting session... Done!
+2020-01-23 11:55:21,812|DCELMerger|0154| 4|12| 1000|Reading polygons A            |  9.24
+2020-01-23 11:55:29,996|DCELMerger|0154| 4|12| 1000|Reading polygons B            |  8.18
+2020-01-23 11:55:29,997|INFO|0154|Polygons in A|7028
+2020-01-23 11:55:29,998|INFO|0154|Polygons in B|8047
+2020-01-23 11:55:39,694|DCELMerger|0154| 4|12| 1000|Partitioning edges            |  9.70
+2020-01-23 11:55:39,696|INFO|0154|Total number of partitions|2581
+2020-01-23 11:55:39,803|INFO|0154|Total number of edges in raw|3901477
+2020-01-23 11:55:41,151|INFO|0154|Total number of edges in spatial|3941938
+2020-01-23 11:55:48,334|DCELMerger|0154| 4|12| 1000|Extracting segments           |  7.18
+2020-01-23 11:55:48,338|INFO|0154|Segments|4537255
+2020-01-23 11:55:56,588|DCELMerger|0154| 4|12| 1000|Getting half edges            |  8.25
+2020-01-23 11:55:56,591|INFO|0154|Half edges|9074510
+2020-01-23 11:56:02,589|DCELMerger|0154| 4|12| 1000|Getting local DCEL's          |  6.00
+2020-01-23 11:56:02,592|INFO|0154|Partitions on DCEL|2581
+2020-01-23 11:56:02,761|Saved /tmp/edgesCells1000.wkt in 0.01s [2581 records].
+2020-01-23 11:56:08,709|Saved /tmp/edgesFaces1000.wkt in 2.24s [67341 records].
+2020-01-23 11:56:08,710|Closing session...
+2020-01-23 11:56:08,946|Closing session... Done!
+2020-01-23 11:56:12,283|Starting session...
+2020-01-23 11:56:25,823|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 11:56:25,824|Starting session... Done!
+2020-01-23 11:56:37,654|DCELMerger|0155| 4|12| 1250|Reading polygons A            | 11.82
+2020-01-23 11:56:46,530|DCELMerger|0155| 4|12| 1250|Reading polygons B            |  8.88
+2020-01-23 11:56:46,532|INFO|0155|Polygons in A|7028
+2020-01-23 11:56:46,532|INFO|0155|Polygons in B|8047
+2020-01-23 11:56:57,599|DCELMerger|0155| 4|12| 1250|Partitioning edges            | 11.07
+2020-01-23 11:56:57,602|INFO|0155|Total number of partitions|3193
+2020-01-23 11:56:57,723|INFO|0155|Total number of edges in raw|3901477
+2020-01-23 11:57:00,508|INFO|0155|Total number of edges in spatial|3947123
+2020-01-23 11:57:08,827|DCELMerger|0155| 4|12| 1250|Extracting segments           |  8.32
+2020-01-23 11:57:08,830|INFO|0155|Segments|4549812
+2020-01-23 11:57:18,082|DCELMerger|0155| 4|12| 1250|Getting half edges            |  9.25
+2020-01-23 11:57:18,085|INFO|0155|Half edges|9099624
+2020-01-23 11:57:24,342|DCELMerger|0155| 4|12| 1250|Getting local DCEL's          |  6.26
+2020-01-23 11:57:24,345|INFO|0155|Partitions on DCEL|3193
+2020-01-23 11:57:24,584|Saved /tmp/edgesCells1250.wkt in 0.01s [3193 records].
+2020-01-23 11:57:29,956|Saved /tmp/edgesFaces1250.wkt in 1.65s [70770 records].
+2020-01-23 11:57:29,957|Closing session...
+2020-01-23 11:57:30,104|Closing session... Done!
+2020-01-23 11:57:33,460|Starting session...
+2020-01-23 11:57:46,911|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 11:57:46,912|Starting session... Done!
+2020-01-23 11:57:58,459|DCELMerger|0156| 4|12| 1500|Reading polygons A            | 11.54
+2020-01-23 11:58:07,544|DCELMerger|0156| 4|12| 1500|Reading polygons B            |  9.08
+2020-01-23 11:58:07,546|INFO|0156|Polygons in A|7028
+2020-01-23 11:58:07,546|INFO|0156|Polygons in B|8047
+2020-01-23 11:58:20,248|DCELMerger|0156| 4|12| 1500|Partitioning edges            | 12.70
+2020-01-23 11:58:20,253|INFO|0156|Total number of partitions|3865
+2020-01-23 11:58:20,361|INFO|0156|Total number of edges in raw|3901477
+2020-01-23 11:58:22,720|INFO|0156|Total number of edges in spatial|3951927
+2020-01-23 11:58:31,395|DCELMerger|0156| 4|12| 1500|Extracting segments           |  8.67
+2020-01-23 11:58:31,398|INFO|0156|Segments|4561871
+2020-01-23 11:58:41,541|DCELMerger|0156| 4|12| 1500|Getting half edges            | 10.14
+2020-01-23 11:58:41,545|INFO|0156|Half edges|9123742
+2020-01-23 11:58:47,261|DCELMerger|0156| 4|12| 1500|Getting local DCEL's          |  5.71
+2020-01-23 11:58:47,262|INFO|0156|Partitions on DCEL|3865
+2020-01-23 11:58:47,559|Saved /tmp/edgesCells1500.wkt in 0.01s [3865 records].
+2020-01-23 11:58:54,319|Saved /tmp/edgesFaces1500.wkt in 2.91s [73984 records].
+2020-01-23 11:58:54,320|Closing session...
+2020-01-23 11:58:54,467|Closing session... Done!
+2020-01-23 11:58:58,301|Starting session...
+2020-01-23 11:59:12,093|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 11:59:12,093|Starting session... Done!
+2020-01-23 11:59:21,495|DCELMerger|0157| 4|12| 1750|Reading polygons A            |  9.40
+2020-01-23 11:59:30,166|DCELMerger|0157| 4|12| 1750|Reading polygons B            |  8.67
+2020-01-23 11:59:30,168|INFO|0157|Polygons in A|7028
+2020-01-23 11:59:30,168|INFO|0157|Polygons in B|8047
+2020-01-23 11:59:42,942|DCELMerger|0157| 4|12| 1750|Partitioning edges            | 12.77
+2020-01-23 11:59:42,943|INFO|0157|Total number of partitions|4633
+2020-01-23 11:59:43,038|INFO|0157|Total number of edges in raw|3901477
+2020-01-23 11:59:45,149|INFO|0157|Total number of edges in spatial|3957386
+2020-01-23 11:59:55,046|DCELMerger|0157| 4|12| 1750|Extracting segments           |  9.90
+2020-01-23 11:59:55,049|INFO|0157|Segments|4575534
+2020-01-23 12:00:06,307|DCELMerger|0157| 4|12| 1750|Getting half edges            | 11.26
+2020-01-23 12:00:06,310|INFO|0157|Half edges|9151068
+2020-01-23 12:00:12,155|DCELMerger|0157| 4|12| 1750|Getting local DCEL's          |  5.84
+2020-01-23 12:00:12,158|INFO|0157|Partitions on DCEL|4633
+2020-01-23 12:00:12,397|Saved /tmp/edgesCells1750.wkt in 0.01s [4633 records].
+2020-01-23 12:00:18,639|Saved /tmp/edgesFaces1750.wkt in 1.67s [77647 records].
+2020-01-23 12:00:18,639|Closing session...
+2020-01-23 12:00:18,773|Closing session... Done!
+2020-01-23 12:00:22,553|Starting session...
+2020-01-23 12:00:35,979|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 12:00:35,980|Starting session... Done!
+2020-01-23 12:00:45,240|DCELMerger|0158| 4|12| 2000|Reading polygons A            |  9.26
+2020-01-23 12:00:53,823|DCELMerger|0158| 4|12| 2000|Reading polygons B            |  8.58
+2020-01-23 12:00:53,825|INFO|0158|Polygons in A|7028
+2020-01-23 12:00:53,825|INFO|0158|Polygons in B|8047
+2020-01-23 12:01:07,827|DCELMerger|0158| 4|12| 2000|Partitioning edges            | 14.00
+2020-01-23 12:01:07,830|INFO|0158|Total number of partitions|5419
+2020-01-23 12:01:07,927|INFO|0158|Total number of edges in raw|3901477
+2020-01-23 12:01:11,522|INFO|0158|Total number of edges in spatial|3962726
+2020-01-23 12:01:21,926|DCELMerger|0158| 4|12| 2000|Extracting segments           | 10.40
+2020-01-23 12:01:21,929|INFO|0158|Segments|4589114
+2020-01-23 12:01:34,040|DCELMerger|0158| 4|12| 2000|Getting half edges            | 12.11
+2020-01-23 12:01:34,044|INFO|0158|Half edges|9178228
+2020-01-23 12:01:40,608|DCELMerger|0158| 4|12| 2000|Getting local DCEL's          |  6.56
+2020-01-23 12:01:40,612|INFO|0158|Partitions on DCEL|5419
+2020-01-23 12:01:40,872|Saved /tmp/edgesCells2000.wkt in 0.01s [5419 records].
+2020-01-23 12:01:47,094|Saved /tmp/edgesFaces2000.wkt in 1.42s [81436 records].
+2020-01-23 12:01:47,094|Closing session...
+2020-01-23 12:01:47,229|Closing session... Done!
+2020-01-23 12:01:50,889|Starting session...
+2020-01-23 12:02:04,158|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 500 --save --debug
+2020-01-23 12:02:04,158|Starting session... Done!
+2020-01-23 12:02:13,003|DCELMerger|0159| 4|12|  500|Reading polygons A            |  8.84
+2020-01-23 12:02:22,069|DCELMerger|0159| 4|12|  500|Reading polygons B            |  9.07
+2020-01-23 12:02:22,071|INFO|0159|Polygons in A|7028
+2020-01-23 12:02:22,071|INFO|0159|Polygons in B|8047
+2020-01-23 12:02:30,680|DCELMerger|0159| 4|12|  500|Partitioning edges            |  8.61
+2020-01-23 12:02:30,681|INFO|0159|Total number of partitions|1261
+2020-01-23 12:02:30,917|INFO|0159|Total number of edges in raw|3901477
+2020-01-23 12:02:31,636|INFO|0159|Total number of edges in spatial|3928465
+2020-01-23 12:02:36,900|DCELMerger|0159| 4|12|  500|Extracting segments           |  5.26
+2020-01-23 12:02:36,902|INFO|0159|Segments|4505785
+2020-01-23 12:02:42,838|DCELMerger|0159| 4|12|  500|Getting half edges            |  5.93
+2020-01-23 12:02:42,841|INFO|0159|Half edges|9011570
+2020-01-23 12:02:52,847|DCELMerger|0159| 4|12|  500|Getting local DCEL's          | 10.01
+2020-01-23 12:02:52,851|INFO|0159|Partitions on DCEL|1261
+2020-01-23 12:02:52,977|Saved /tmp/edgesCells500.wkt in 0.00s [1261 records].
+2020-01-23 12:02:57,214|Saved /tmp/edgesFaces500.wkt in 1.44s [58669 records].
+2020-01-23 12:02:57,214|Closing session...
+2020-01-23 12:02:57,467|Closing session... Done!
+2020-01-23 12:03:01,202|Starting session...
+2020-01-23 12:03:16,002|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 750 --save --debug
+2020-01-23 12:03:16,002|Starting session... Done!
+2020-01-23 12:03:26,368|DCELMerger|0160| 4|12|  750|Reading polygons A            | 10.36
+2020-01-23 12:03:35,688|DCELMerger|0160| 4|12|  750|Reading polygons B            |  9.32
+2020-01-23 12:03:35,690|INFO|0160|Polygons in A|7028
+2020-01-23 12:03:35,690|INFO|0160|Polygons in B|8047
+2020-01-23 12:03:44,424|DCELMerger|0160| 4|12|  750|Partitioning edges            |  8.73
+2020-01-23 12:03:44,426|INFO|0160|Total number of partitions|1906
+2020-01-23 12:03:44,530|INFO|0160|Total number of edges in raw|3901477
+2020-01-23 12:03:46,960|INFO|0160|Total number of edges in spatial|3935813
+2020-01-23 12:03:53,680|DCELMerger|0160| 4|12|  750|Extracting segments           |  6.72
+2020-01-23 12:03:53,682|INFO|0160|Segments|4522664
+2020-01-23 12:04:00,355|DCELMerger|0160| 4|12|  750|Getting half edges            |  6.67
+2020-01-23 12:04:00,358|INFO|0160|Half edges|9045328
+2020-01-23 12:04:08,151|DCELMerger|0160| 4|12|  750|Getting local DCEL's          |  7.79
+2020-01-23 12:04:08,153|INFO|0160|Partitions on DCEL|1906
+2020-01-23 12:04:08,301|Saved /tmp/edgesCells750.wkt in 0.00s [1906 records].
+2020-01-23 12:04:13,488|Saved /tmp/edgesFaces750.wkt in 2.01s [63271 records].
+2020-01-23 12:04:13,488|Closing session...
+2020-01-23 12:04:13,646|Closing session... Done!
+2020-01-23 12:04:17,584|Starting session...
+2020-01-23 12:04:30,635|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1000 --save --debug
+2020-01-23 12:04:30,635|Starting session... Done!
+2020-01-23 12:04:40,012|DCELMerger|0161| 4|12| 1000|Reading polygons A            |  9.37
+2020-01-23 12:04:48,503|DCELMerger|0161| 4|12| 1000|Reading polygons B            |  8.49
+2020-01-23 12:04:48,506|INFO|0161|Polygons in A|7028
+2020-01-23 12:04:48,506|INFO|0161|Polygons in B|8047
+2020-01-23 12:04:58,773|DCELMerger|0161| 4|12| 1000|Partitioning edges            | 10.26
+2020-01-23 12:04:58,774|INFO|0161|Total number of partitions|2530
+2020-01-23 12:04:58,876|INFO|0161|Total number of edges in raw|3901477
+2020-01-23 12:05:01,594|INFO|0161|Total number of edges in spatial|3941781
+2020-01-23 12:05:08,914|DCELMerger|0161| 4|12| 1000|Extracting segments           |  7.32
+2020-01-23 12:05:08,916|INFO|0161|Segments|4536748
+2020-01-23 12:05:16,658|DCELMerger|0161| 4|12| 1000|Getting half edges            |  7.74
+2020-01-23 12:05:16,666|INFO|0161|Half edges|9073496
+2020-01-23 12:05:22,872|DCELMerger|0161| 4|12| 1000|Getting local DCEL's          |  6.20
+2020-01-23 12:05:22,873|INFO|0161|Partitions on DCEL|2530
+2020-01-23 12:05:23,169|Saved /tmp/edgesCells1000.wkt in 0.01s [2530 records].
+2020-01-23 12:05:27,705|Saved /tmp/edgesFaces1000.wkt in 1.09s [67228 records].
+2020-01-23 12:05:27,706|Closing session...
+2020-01-23 12:05:27,858|Closing session... Done!
+2020-01-23 12:05:31,175|Starting session...
+2020-01-23 12:05:44,267|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1250 --save --debug
+2020-01-23 12:05:44,267|Starting session... Done!
+2020-01-23 12:05:53,237|DCELMerger|0162| 4|12| 1250|Reading polygons A            |  8.97
+2020-01-23 12:06:02,403|DCELMerger|0162| 4|12| 1250|Reading polygons B            |  9.16
+2020-01-23 12:06:02,405|INFO|0162|Polygons in A|7028
+2020-01-23 12:06:02,405|INFO|0162|Polygons in B|8047
+2020-01-23 12:06:13,244|DCELMerger|0162| 4|12| 1250|Partitioning edges            | 10.84
+2020-01-23 12:06:13,246|INFO|0162|Total number of partitions|3244
+2020-01-23 12:06:13,338|INFO|0162|Total number of edges in raw|3901477
+2020-01-23 12:06:15,250|INFO|0162|Total number of edges in spatial|3947445
+2020-01-23 12:06:23,366|DCELMerger|0162| 4|12| 1250|Extracting segments           |  8.12
+2020-01-23 12:06:23,369|INFO|0162|Segments|4550585
+2020-01-23 12:06:32,359|DCELMerger|0162| 4|12| 1250|Getting half edges            |  8.99
+2020-01-23 12:06:32,363|INFO|0162|Half edges|9101170
+2020-01-23 12:06:38,695|DCELMerger|0162| 4|12| 1250|Getting local DCEL's          |  6.33
+2020-01-23 12:06:38,698|INFO|0162|Partitions on DCEL|3244
+2020-01-23 12:06:38,907|Saved /tmp/edgesCells1250.wkt in 0.01s [3244 records].
+2020-01-23 12:06:44,083|Saved /tmp/edgesFaces1250.wkt in 1.07s [70913 records].
+2020-01-23 12:06:44,083|Closing session...
+2020-01-23 12:06:44,216|Closing session... Done!
+2020-01-23 12:06:48,131|Starting session...
+2020-01-23 12:07:01,598|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1500 --save --debug
+2020-01-23 12:07:01,599|Starting session... Done!
+2020-01-23 12:07:11,096|DCELMerger|0163| 4|12| 1500|Reading polygons A            |  9.49
+2020-01-23 12:07:19,757|DCELMerger|0163| 4|12| 1500|Reading polygons B            |  8.66
+2020-01-23 12:07:19,759|INFO|0163|Polygons in A|7028
+2020-01-23 12:07:19,759|INFO|0163|Polygons in B|8047
+2020-01-23 12:07:32,196|DCELMerger|0163| 4|12| 1500|Partitioning edges            | 12.44
+2020-01-23 12:07:32,200|INFO|0163|Total number of partitions|3856
+2020-01-23 12:07:32,336|INFO|0163|Total number of edges in raw|3901477
+2020-01-23 12:07:34,602|INFO|0163|Total number of edges in spatial|3952115
+2020-01-23 12:07:43,306|DCELMerger|0163| 4|12| 1500|Extracting segments           |  8.70
+2020-01-23 12:07:43,309|INFO|0163|Segments|4562240
+2020-01-23 12:07:53,383|DCELMerger|0163| 4|12| 1500|Getting half edges            | 10.07
+2020-01-23 12:07:53,387|INFO|0163|Half edges|9124480
+2020-01-23 12:07:59,403|DCELMerger|0163| 4|12| 1500|Getting local DCEL's          |  6.02
+2020-01-23 12:07:59,407|INFO|0163|Partitions on DCEL|3856
+2020-01-23 12:07:59,623|Saved /tmp/edgesCells1500.wkt in 0.01s [3856 records].
+2020-01-23 12:08:05,092|Saved /tmp/edgesFaces1500.wkt in 1.35s [74158 records].
+2020-01-23 12:08:05,092|Closing session...
+2020-01-23 12:08:05,228|Closing session... Done!
+2020-01-23 12:08:08,910|Starting session...
+2020-01-23 12:08:22,221|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 1750 --save --debug
+2020-01-23 12:08:22,221|Starting session... Done!
+2020-01-23 12:08:33,154|DCELMerger|0164| 4|12| 1750|Reading polygons A            | 10.93
+2020-01-23 12:08:42,244|DCELMerger|0164| 4|12| 1750|Reading polygons B            |  9.09
+2020-01-23 12:08:42,246|INFO|0164|Polygons in A|7028
+2020-01-23 12:08:42,246|INFO|0164|Polygons in B|8047
+2020-01-23 12:08:55,374|DCELMerger|0164| 4|12| 1750|Partitioning edges            | 13.13
+2020-01-23 12:08:55,376|INFO|0164|Total number of partitions|4612
+2020-01-23 12:08:55,480|INFO|0164|Total number of edges in raw|3901477
+2020-01-23 12:08:59,055|INFO|0164|Total number of edges in spatial|3956998
+2020-01-23 12:09:09,144|DCELMerger|0164| 4|12| 1750|Extracting segments           | 10.09
+2020-01-23 12:09:09,147|INFO|0164|Segments|4574684
+2020-01-23 12:09:20,485|DCELMerger|0164| 4|12| 1750|Getting half edges            | 11.34
+2020-01-23 12:09:20,489|INFO|0164|Half edges|9149368
+2020-01-23 12:09:26,869|DCELMerger|0164| 4|12| 1750|Getting local DCEL's          |  6.38
+2020-01-23 12:09:26,873|INFO|0164|Partitions on DCEL|4612
+2020-01-23 12:09:27,105|Saved /tmp/edgesCells1750.wkt in 0.01s [4612 records].
+2020-01-23 12:09:32,879|Saved /tmp/edgesFaces1750.wkt in 1.24s [77482 records].
+2020-01-23 12:09:32,879|Closing session...
+2020-01-23 12:09:33,272|Closing session... Done!
+2020-01-23 12:09:36,699|Starting session...
+2020-01-23 12:09:50,212|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2000 --save --debug
+2020-01-23 12:09:50,213|Starting session... Done!
+2020-01-23 12:09:59,425|DCELMerger|0165| 4|12| 2000|Reading polygons A            |  9.21
+2020-01-23 12:10:08,784|DCELMerger|0165| 4|12| 2000|Reading polygons B            |  9.36
+2020-01-23 12:10:08,786|INFO|0165|Polygons in A|7028
+2020-01-23 12:10:08,786|INFO|0165|Polygons in B|8047
+2020-01-23 12:10:22,206|DCELMerger|0165| 4|12| 2000|Partitioning edges            | 13.42
+2020-01-23 12:10:22,209|INFO|0165|Total number of partitions|5428
+2020-01-23 12:10:22,306|INFO|0165|Total number of edges in raw|3901477
+2020-01-23 12:10:25,762|INFO|0165|Total number of edges in spatial|3962389
+2020-01-23 12:10:36,674|DCELMerger|0165| 4|12| 2000|Extracting segments           | 10.91
+2020-01-23 12:10:36,677|INFO|0165|Segments|4588480
+2020-01-23 12:10:48,696|DCELMerger|0165| 4|12| 2000|Getting half edges            | 12.02
+2020-01-23 12:10:48,702|INFO|0165|Half edges|9176960
+2020-01-23 12:10:55,670|DCELMerger|0165| 4|12| 2000|Getting local DCEL's          |  6.97
+2020-01-23 12:10:55,673|INFO|0165|Partitions on DCEL|5428
+2020-01-23 12:10:55,949|Saved /tmp/edgesCells2000.wkt in 0.01s [5428 records].
+2020-01-23 12:11:02,475|Saved /tmp/edgesFaces2000.wkt in 1.37s [81133 records].
+2020-01-23 12:11:02,475|Closing session...
+2020-01-23 12:11:02,923|Closing session... Done!
+2020-01-23 12:14:55,425|Starting session...
+2020-01-23 12:15:09,528|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2250 --save --debug
+2020-01-23 12:15:09,529|Starting session... Done!
+2020-01-23 12:15:19,240|DCELMerger|0166| 4|12| 2250|Reading polygons A            |  9.71
+2020-01-23 12:15:28,402|DCELMerger|0166| 4|12| 2250|Reading polygons B            |  9.16
+2020-01-23 12:15:28,410|INFO|0166|Polygons in A|7028
+2020-01-23 12:15:28,410|INFO|0166|Polygons in B|8047
+2020-01-23 12:15:42,983|DCELMerger|0166| 4|12| 2250|Partitioning edges            | 14.57
+2020-01-23 12:15:42,985|INFO|0166|Total number of partitions|6181
+2020-01-23 12:15:43,079|INFO|0166|Total number of edges in raw|3901477
+2020-01-23 12:15:46,691|INFO|0166|Total number of edges in spatial|3967125
+2020-01-23 12:15:58,403|DCELMerger|0166| 4|12| 2250|Extracting segments           | 11.71
+2020-01-23 12:15:58,406|INFO|0166|Segments|4600697
+2020-01-23 12:16:12,156|DCELMerger|0166| 4|12| 2250|Getting half edges            | 13.75
+2020-01-23 12:16:12,160|INFO|0166|Half edges|9201394
+2020-01-23 12:16:19,146|DCELMerger|0166| 4|12| 2250|Getting local DCEL's          |  6.98
+2020-01-23 12:16:19,150|INFO|0166|Partitions on DCEL|6181
+2020-01-23 12:16:19,422|Saved /tmp/edgesCells2250.wkt in 0.01s [6181 records].
+2020-01-23 12:16:26,189|Saved /tmp/edgesFaces2250.wkt in 1.42s [84378 records].
+2020-01-23 12:16:26,190|Closing session...
+2020-01-23 12:16:26,344|Closing session... Done!
+2020-01-23 12:16:30,026|Starting session...
+2020-01-23 12:16:43,227|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2500 --save --debug
+2020-01-23 12:16:43,227|Starting session... Done!
+2020-01-23 12:16:54,891|DCELMerger|0167| 4|12| 2500|Reading polygons A            | 11.66
+2020-01-23 12:17:03,856|DCELMerger|0167| 4|12| 2500|Reading polygons B            |  8.96
+2020-01-23 12:17:03,858|INFO|0167|Polygons in A|7028
+2020-01-23 12:17:03,859|INFO|0167|Polygons in B|8047
+2020-01-23 12:17:18,763|DCELMerger|0167| 4|12| 2500|Partitioning edges            | 14.90
+2020-01-23 12:17:18,765|INFO|0167|Total number of partitions|6532
+2020-01-23 12:17:18,860|INFO|0167|Total number of edges in raw|3901477
+2020-01-23 12:17:23,732|INFO|0167|Total number of edges in spatial|3969297
+2020-01-23 12:17:35,904|DCELMerger|0167| 4|12| 2500|Extracting segments           | 12.17
+2020-01-23 12:17:35,907|INFO|0167|Segments|4606267
+2020-01-23 12:17:50,317|DCELMerger|0167| 4|12| 2500|Getting half edges            | 14.41
+2020-01-23 12:17:50,320|INFO|0167|Half edges|9212534
+2020-01-23 12:17:57,735|DCELMerger|0167| 4|12| 2500|Getting local DCEL's          |  7.41
+2020-01-23 12:17:57,738|INFO|0167|Partitions on DCEL|6532
+2020-01-23 12:17:58,044|Saved /tmp/edgesCells2500.wkt in 0.01s [6532 records].
+2020-01-23 12:18:05,121|Saved /tmp/edgesFaces2500.wkt in 1.23s [86000 records].
+2020-01-23 12:18:05,121|Closing session...
+2020-01-23 12:18:05,262|Closing session... Done!
+2020-01-23 12:18:08,682|Starting session...
+2020-01-23 12:18:21,881|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2750 --save --debug
+2020-01-23 12:18:21,881|Starting session... Done!
+2020-01-23 12:18:33,814|DCELMerger|0168| 4|12| 2750|Reading polygons A            | 11.93
+2020-01-23 12:18:39,395|DCELMerger|0168| 4|12| 2750|Reading polygons B            |  5.58
+2020-01-23 12:18:39,397|INFO|0168|Polygons in A|7028
+2020-01-23 12:18:39,397|INFO|0168|Polygons in B|8047
+2020-01-23 12:19:00,524|DCELMerger|0168| 4|12| 2750|Partitioning edges            | 21.13
+2020-01-23 12:19:00,527|INFO|0168|Total number of partitions|7477
+2020-01-23 12:19:01,024|INFO|0168|Total number of edges in raw|3901477
+2020-01-23 12:19:06,488|INFO|0168|Total number of edges in spatial|3974269
+2020-01-23 12:19:21,399|DCELMerger|0168| 4|12| 2750|Extracting segments           | 14.91
+2020-01-23 12:19:21,402|INFO|0168|Segments|4619699
+2020-01-23 12:19:37,943|DCELMerger|0168| 4|12| 2750|Getting half edges            | 16.54
+2020-01-23 12:19:37,947|INFO|0168|Half edges|9239398
+2020-01-23 12:19:47,909|DCELMerger|0168| 4|12| 2750|Getting local DCEL's          |  9.96
+2020-01-23 12:19:47,913|INFO|0168|Partitions on DCEL|7477
+2020-01-23 12:19:48,224|Saved /tmp/edgesCells2750.wkt in 0.01s [7477 records].
+2020-01-23 12:19:57,636|Saved /tmp/edgesFaces2750.wkt in 1.41s [89472 records].
+2020-01-23 12:19:57,636|Closing session...
+2020-01-23 12:19:57,781|Closing session... Done!
+2020-01-23 12:20:01,352|Starting session...
+2020-01-23 12:20:14,373|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 3000 --save --debug
+2020-01-23 12:20:14,374|Starting session... Done!
+2020-01-23 12:20:23,261|DCELMerger|0169| 4|12| 3000|Reading polygons A            |  8.88
+2020-01-23 12:20:32,544|DCELMerger|0169| 4|12| 3000|Reading polygons B            |  9.28
+2020-01-23 12:20:32,545|INFO|0169|Polygons in A|7028
+2020-01-23 12:20:32,546|INFO|0169|Polygons in B|8047
+2020-01-23 12:20:49,259|DCELMerger|0169| 4|12| 3000|Partitioning edges            | 16.71
+2020-01-23 12:20:49,262|INFO|0169|Total number of partitions|8089
+2020-01-23 12:20:49,424|INFO|0169|Total number of edges in raw|3901477
+2020-01-23 12:20:54,982|INFO|0169|Total number of edges in spatial|3977610
+2020-01-23 12:21:10,137|DCELMerger|0169| 4|12| 3000|Extracting segments           | 15.15
+2020-01-23 12:21:10,141|INFO|0169|Segments|4628581
+2020-01-23 12:21:26,993|DCELMerger|0169| 4|12| 3000|Getting half edges            | 16.85
+2020-01-23 12:21:26,998|INFO|0169|Half edges|9257162
+2020-01-23 12:21:36,197|DCELMerger|0169| 4|12| 3000|Getting local DCEL's          |  9.20
+2020-01-23 12:21:36,200|INFO|0169|Partitions on DCEL|8089
+2020-01-23 12:21:36,686|Saved /tmp/edgesCells3000.wkt in 0.01s [8089 records].
+2020-01-23 12:21:45,769|Saved /tmp/edgesFaces3000.wkt in 1.60s [91919 records].
+2020-01-23 12:21:45,770|Closing session...
+2020-01-23 12:21:45,911|Closing session... Done!
+2020-01-23 12:21:49,428|Starting session...
+2020-01-23 12:22:02,676|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2250 --save --debug
+2020-01-23 12:22:02,676|Starting session... Done!
+2020-01-23 12:22:11,593|DCELMerger|0170| 4|12| 2250|Reading polygons A            |  8.91
+2020-01-23 12:22:20,612|DCELMerger|0170| 4|12| 2250|Reading polygons B            |  9.02
+2020-01-23 12:22:20,614|INFO|0170|Polygons in A|7028
+2020-01-23 12:22:20,614|INFO|0170|Polygons in B|8047
+2020-01-23 12:22:35,077|DCELMerger|0170| 4|12| 2250|Partitioning edges            | 14.46
+2020-01-23 12:22:35,079|INFO|0170|Total number of partitions|6136
+2020-01-23 12:22:35,183|INFO|0170|Total number of edges in raw|3901477
+2020-01-23 12:22:38,877|INFO|0170|Total number of edges in spatial|3966797
+2020-01-23 12:22:50,513|DCELMerger|0170| 4|12| 2250|Extracting segments           | 11.63
+2020-01-23 12:22:50,516|INFO|0170|Segments|4599866
+2020-01-23 12:23:03,636|DCELMerger|0170| 4|12| 2250|Getting half edges            | 13.12
+2020-01-23 12:23:03,640|INFO|0170|Half edges|9199732
+2020-01-23 12:23:10,876|DCELMerger|0170| 4|12| 2250|Getting local DCEL's          |  7.23
+2020-01-23 12:23:10,883|INFO|0170|Partitions on DCEL|6136
+2020-01-23 12:23:11,178|Saved /tmp/edgesCells2250.wkt in 0.01s [6136 records].
+2020-01-23 12:23:18,400|Saved /tmp/edgesFaces2250.wkt in 1.36s [84253 records].
+2020-01-23 12:23:18,400|Closing session...
+2020-01-23 12:23:18,559|Closing session... Done!
+2020-01-23 12:23:22,354|Starting session...
+2020-01-23 12:23:36,389|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2500 --save --debug
+2020-01-23 12:23:36,389|Starting session... Done!
+2020-01-23 12:23:45,693|DCELMerger|0171| 4|12| 2500|Reading polygons A            |  9.30
+2020-01-23 12:23:55,046|DCELMerger|0171| 4|12| 2500|Reading polygons B            |  9.35
+2020-01-23 12:23:55,047|INFO|0171|Polygons in A|7028
+2020-01-23 12:23:55,047|INFO|0171|Polygons in B|8047
+2020-01-23 12:24:09,385|DCELMerger|0171| 4|12| 2500|Partitioning edges            | 14.34
+2020-01-23 12:24:09,391|INFO|0171|Total number of partitions|6502
+2020-01-23 12:24:09,490|INFO|0171|Total number of edges in raw|3901477
+2020-01-23 12:24:13,558|INFO|0171|Total number of edges in spatial|3969088
+2020-01-23 12:24:25,687|DCELMerger|0171| 4|12| 2500|Extracting segments           | 12.12
+2020-01-23 12:24:25,691|INFO|0171|Segments|4605761
+2020-01-23 12:24:39,469|DCELMerger|0171| 4|12| 2500|Getting half edges            | 13.78
+2020-01-23 12:24:39,474|INFO|0171|Half edges|9211522
+2020-01-23 12:24:46,539|DCELMerger|0171| 4|12| 2500|Getting local DCEL's          |  7.06
+2020-01-23 12:24:46,542|INFO|0171|Partitions on DCEL|6502
+2020-01-23 12:24:46,841|Saved /tmp/edgesCells2500.wkt in 0.01s [6502 records].
+2020-01-23 12:24:54,370|Saved /tmp/edgesFaces2500.wkt in 1.42s [85824 records].
+2020-01-23 12:24:54,370|Closing session...
+2020-01-23 12:24:54,905|Closing session... Done!
+2020-01-23 12:24:58,700|Starting session...
+2020-01-23 12:25:12,467|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2750 --save --debug
+2020-01-23 12:25:12,467|Starting session... Done!
+2020-01-23 12:25:21,698|DCELMerger|0172| 4|12| 2750|Reading polygons A            |  9.23
+2020-01-23 12:25:30,207|DCELMerger|0172| 4|12| 2750|Reading polygons B            |  8.51
+2020-01-23 12:25:30,209|INFO|0172|Polygons in A|7028
+2020-01-23 12:25:30,209|INFO|0172|Polygons in B|8047
+2020-01-23 12:25:46,229|DCELMerger|0172| 4|12| 2750|Partitioning edges            | 16.02
+2020-01-23 12:25:46,231|INFO|0172|Total number of partitions|7390
+2020-01-23 12:25:46,376|INFO|0172|Total number of edges in raw|3901477
+2020-01-23 12:25:51,277|INFO|0172|Total number of edges in spatial|3973953
+2020-01-23 12:26:04,809|DCELMerger|0172| 4|12| 2750|Extracting segments           | 13.53
+2020-01-23 12:26:04,812|INFO|0172|Segments|4618707
+2020-01-23 12:26:19,759|DCELMerger|0172| 4|12| 2750|Getting half edges            | 14.95
+2020-01-23 12:26:19,766|INFO|0172|Half edges|9237414
+2020-01-23 12:26:28,185|DCELMerger|0172| 4|12| 2750|Getting local DCEL's          |  8.42
+2020-01-23 12:26:28,187|INFO|0172|Partitions on DCEL|7390
+2020-01-23 12:26:28,511|Saved /tmp/edgesCells2750.wkt in 0.01s [7390 records].
+2020-01-23 12:26:36,783|Saved /tmp/edgesFaces2750.wkt in 1.43s [89205 records].
+2020-01-23 12:26:36,783|Closing session...
+2020-01-23 12:26:36,926|Closing session... Done!
+2020-01-23 12:26:40,415|Starting session...
+2020-01-23 12:26:53,702|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 3000 --save --debug
+2020-01-23 12:26:53,703|Starting session... Done!
+2020-01-23 12:27:02,996|DCELMerger|0173| 4|12| 3000|Reading polygons A            |  9.29
+2020-01-23 12:27:11,648|DCELMerger|0173| 4|12| 3000|Reading polygons B            |  8.65
+2020-01-23 12:27:11,653|INFO|0173|Polygons in A|7028
+2020-01-23 12:27:11,653|INFO|0173|Polygons in B|8047
+2020-01-23 12:27:28,341|DCELMerger|0173| 4|12| 3000|Partitioning edges            | 16.68
+2020-01-23 12:27:28,343|INFO|0173|Total number of partitions|8131
+2020-01-23 12:27:28,511|INFO|0173|Total number of edges in raw|3901477
+2020-01-23 12:27:34,031|INFO|0173|Total number of edges in spatial|3978084
+2020-01-23 12:27:48,498|DCELMerger|0173| 4|12| 3000|Extracting segments           | 14.46
+2020-01-23 12:27:48,502|INFO|0173|Segments|4629633
+2020-01-23 12:28:05,832|DCELMerger|0173| 4|12| 3000|Getting half edges            | 17.33
+2020-01-23 12:28:05,840|INFO|0173|Half edges|9259266
+2020-01-23 12:28:15,200|DCELMerger|0173| 4|12| 3000|Getting local DCEL's          |  9.36
+2020-01-23 12:28:15,203|INFO|0173|Partitions on DCEL|8131
+2020-01-23 12:28:15,564|Saved /tmp/edgesCells3000.wkt in 0.02s [8131 records].
+2020-01-23 12:28:25,752|Saved /tmp/edgesFaces3000.wkt in 2.09s [92070 records].
+2020-01-23 12:28:25,752|Closing session...
+2020-01-23 12:28:25,894|Closing session... Done!
+2020-01-23 12:28:29,520|Starting session...
+2020-01-23 12:28:42,659|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2250 --save --debug
+2020-01-23 12:28:42,659|Starting session... Done!
+2020-01-23 12:28:51,564|DCELMerger|0174| 4|12| 2250|Reading polygons A            |  8.90
+2020-01-23 12:29:00,755|DCELMerger|0174| 4|12| 2250|Reading polygons B            |  9.19
+2020-01-23 12:29:00,756|INFO|0174|Polygons in A|7028
+2020-01-23 12:29:00,757|INFO|0174|Polygons in B|8047
+2020-01-23 12:29:14,942|DCELMerger|0174| 4|12| 2250|Partitioning edges            | 14.18
+2020-01-23 12:29:14,945|INFO|0174|Total number of partitions|6091
+2020-01-23 12:29:15,055|INFO|0174|Total number of edges in raw|3901477
+2020-01-23 12:29:19,092|INFO|0174|Total number of edges in spatial|3966553
+2020-01-23 12:29:30,931|DCELMerger|0174| 4|12| 2250|Extracting segments           | 11.84
+2020-01-23 12:29:30,935|INFO|0174|Segments|4599089
+2020-01-23 12:29:44,831|DCELMerger|0174| 4|12| 2250|Getting half edges            | 13.90
+2020-01-23 12:29:44,839|INFO|0174|Half edges|9198178
+2020-01-23 12:29:52,168|DCELMerger|0174| 4|12| 2250|Getting local DCEL's          |  7.33
+2020-01-23 12:29:52,172|INFO|0174|Partitions on DCEL|6091
+2020-01-23 12:29:52,444|Saved /tmp/edgesCells2250.wkt in 0.01s [6091 records].
+2020-01-23 12:29:59,116|Saved /tmp/edgesFaces2250.wkt in 1.46s [84039 records].
+2020-01-23 12:29:59,117|Closing session...
+2020-01-23 12:29:59,318|Closing session... Done!
+2020-01-23 12:30:02,837|Starting session...
+2020-01-23 12:30:15,780|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2500 --save --debug
+2020-01-23 12:30:15,781|Starting session... Done!
+2020-01-23 12:30:24,460|DCELMerger|0175| 4|12| 2500|Reading polygons A            |  8.67
+2020-01-23 12:30:33,729|DCELMerger|0175| 4|12| 2500|Reading polygons B            |  9.27
+2020-01-23 12:30:33,730|INFO|0175|Polygons in A|7028
+2020-01-23 12:30:33,730|INFO|0175|Polygons in B|8047
+2020-01-23 12:30:48,423|DCELMerger|0175| 4|12| 2500|Partitioning edges            | 14.69
+2020-01-23 12:30:48,426|INFO|0175|Total number of partitions|6595
+2020-01-23 12:30:48,531|INFO|0175|Total number of edges in raw|3901477
+2020-01-23 12:30:52,312|INFO|0175|Total number of edges in spatial|3969480
+2020-01-23 12:31:05,188|DCELMerger|0175| 4|12| 2500|Extracting segments           | 12.87
+2020-01-23 12:31:05,191|INFO|0175|Segments|4606850
+2020-01-23 12:31:19,403|DCELMerger|0175| 4|12| 2500|Getting half edges            | 14.21
+2020-01-23 12:31:19,406|INFO|0175|Half edges|9213700
+2020-01-23 12:31:27,048|DCELMerger|0175| 4|12| 2500|Getting local DCEL's          |  7.64
+2020-01-23 12:31:27,051|INFO|0175|Partitions on DCEL|6595
+2020-01-23 12:31:27,435|Saved /tmp/edgesCells2500.wkt in 0.01s [6595 records].
+2020-01-23 12:31:35,916|Saved /tmp/edgesFaces2500.wkt in 2.02s [85997 records].
+2020-01-23 12:31:35,917|Closing session...
+2020-01-23 12:31:36,053|Closing session... Done!
+2020-01-23 12:31:39,690|Starting session...
+2020-01-23 12:31:53,082|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2750 --save --debug
+2020-01-23 12:31:53,082|Starting session... Done!
+2020-01-23 12:32:01,879|DCELMerger|0176| 4|12| 2750|Reading polygons A            |  8.79
+2020-01-23 12:32:11,202|DCELMerger|0176| 4|12| 2750|Reading polygons B            |  9.32
+2020-01-23 12:32:11,205|INFO|0176|Polygons in A|7028
+2020-01-23 12:32:11,205|INFO|0176|Polygons in B|8047
+2020-01-23 12:32:27,012|DCELMerger|0176| 4|12| 2750|Partitioning edges            | 15.81
+2020-01-23 12:32:27,015|INFO|0176|Total number of partitions|7432
+2020-01-23 12:32:27,191|INFO|0176|Total number of edges in raw|3901477
+2020-01-23 12:32:31,954|INFO|0176|Total number of edges in spatial|3973854
+2020-01-23 12:32:45,622|DCELMerger|0176| 4|12| 2750|Extracting segments           | 13.66
+2020-01-23 12:32:45,626|INFO|0176|Segments|4618722
+2020-01-23 12:33:00,624|DCELMerger|0176| 4|12| 2750|Getting half edges            | 15.00
+2020-01-23 12:33:00,628|INFO|0176|Half edges|9237444
+2020-01-23 12:33:09,030|DCELMerger|0176| 4|12| 2750|Getting local DCEL's          |  8.40
+2020-01-23 12:33:09,034|INFO|0176|Partitions on DCEL|7432
+2020-01-23 12:33:09,330|Saved /tmp/edgesCells2750.wkt in 0.01s [7432 records].
+2020-01-23 12:33:17,982|Saved /tmp/edgesFaces2750.wkt in 1.73s [89233 records].
+2020-01-23 12:33:17,982|Closing session...
+2020-01-23 12:33:18,422|Closing session... Done!
+2020-01-23 12:33:22,290|Starting session...
+2020-01-23 12:33:35,977|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 3000 --save --debug
+2020-01-23 12:33:35,977|Starting session... Done!
+2020-01-23 12:33:44,952|DCELMerger|0177| 4|12| 3000|Reading polygons A            |  8.97
+2020-01-23 12:33:53,972|DCELMerger|0177| 4|12| 3000|Reading polygons B            |  9.02
+2020-01-23 12:33:53,974|INFO|0177|Polygons in A|7028
+2020-01-23 12:33:53,974|INFO|0177|Polygons in B|8047
+2020-01-23 12:34:10,552|DCELMerger|0177| 4|12| 3000|Partitioning edges            | 16.58
+2020-01-23 12:34:10,555|INFO|0177|Total number of partitions|8083
+2020-01-23 12:34:10,740|INFO|0177|Total number of edges in raw|3901477
+2020-01-23 12:34:15,963|INFO|0177|Total number of edges in spatial|3977797
+2020-01-23 12:34:30,480|DCELMerger|0177| 4|12| 3000|Extracting segments           | 14.51
+2020-01-23 12:34:30,484|INFO|0177|Segments|4628812
+2020-01-23 12:34:47,369|DCELMerger|0177| 4|12| 3000|Getting half edges            | 16.88
+2020-01-23 12:34:47,373|INFO|0177|Half edges|9257624
+2020-01-23 12:34:56,254|DCELMerger|0177| 4|12| 3000|Getting local DCEL's          |  8.88
+2020-01-23 12:34:56,258|INFO|0177|Partitions on DCEL|8083
+2020-01-23 12:34:56,644|Saved /tmp/edgesCells3000.wkt in 0.01s [8083 records].
+2020-01-23 12:35:06,259|Saved /tmp/edgesFaces3000.wkt in 1.45s [91928 records].
+2020-01-23 12:35:06,259|Closing session...
+2020-01-23 12:35:06,806|Closing session... Done!
+2020-01-23 12:35:10,539|Starting session...
+2020-01-23 12:35:24,387|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2250 --save --debug
+2020-01-23 12:35:24,387|Starting session... Done!
+2020-01-23 12:35:33,770|DCELMerger|0178| 4|12| 2250|Reading polygons A            |  9.38
+2020-01-23 12:35:42,349|DCELMerger|0178| 4|12| 2250|Reading polygons B            |  8.58
+2020-01-23 12:35:42,352|INFO|0178|Polygons in A|7028
+2020-01-23 12:35:42,352|INFO|0178|Polygons in B|8047
+2020-01-23 12:35:57,374|DCELMerger|0178| 4|12| 2250|Partitioning edges            | 15.02
+2020-01-23 12:35:57,377|INFO|0178|Total number of partitions|6094
+2020-01-23 12:35:57,484|INFO|0178|Total number of edges in raw|3901477
+2020-01-23 12:36:01,075|INFO|0178|Total number of edges in spatial|3966675
+2020-01-23 12:36:12,878|DCELMerger|0178| 4|12| 2250|Extracting segments           | 11.80
+2020-01-23 12:36:12,881|INFO|0178|Segments|4599436
+2020-01-23 12:36:27,134|DCELMerger|0178| 4|12| 2250|Getting half edges            | 14.25
+2020-01-23 12:36:27,138|INFO|0178|Half edges|9198872
+2020-01-23 12:36:34,010|DCELMerger|0178| 4|12| 2250|Getting local DCEL's          |  6.87
+2020-01-23 12:36:34,014|INFO|0178|Partitions on DCEL|6094
+2020-01-23 12:36:34,282|Saved /tmp/edgesCells2250.wkt in 0.01s [6094 records].
+2020-01-23 12:36:41,901|Saved /tmp/edgesFaces2250.wkt in 1.51s [84134 records].
+2020-01-23 12:36:41,901|Closing session...
+2020-01-23 12:36:42,050|Closing session... Done!
+2020-01-23 12:36:45,461|Starting session...
+2020-01-23 12:36:58,783|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2500 --save --debug
+2020-01-23 12:36:58,783|Starting session... Done!
+2020-01-23 12:37:07,968|DCELMerger|0179| 4|12| 2500|Reading polygons A            |  9.18
+2020-01-23 12:37:16,559|DCELMerger|0179| 4|12| 2500|Reading polygons B            |  8.59
+2020-01-23 12:37:16,561|INFO|0179|Polygons in A|7028
+2020-01-23 12:37:16,561|INFO|0179|Polygons in B|8047
+2020-01-23 12:37:32,925|DCELMerger|0179| 4|12| 2500|Partitioning edges            | 16.36
+2020-01-23 12:37:32,928|INFO|0179|Total number of partitions|6931
+2020-01-23 12:37:33,033|INFO|0179|Total number of edges in raw|3901477
+2020-01-23 12:37:37,536|INFO|0179|Total number of edges in spatial|3971295
+2020-01-23 12:37:50,996|DCELMerger|0179| 4|12| 2500|Extracting segments           | 13.46
+2020-01-23 12:37:51,000|INFO|0179|Segments|4611789
+2020-01-23 12:38:07,291|DCELMerger|0179| 4|12| 2500|Getting half edges            | 16.29
+2020-01-23 12:38:07,303|INFO|0179|Half edges|9223578
+2020-01-23 12:38:14,991|DCELMerger|0179| 4|12| 2500|Getting local DCEL's          |  7.69
+2020-01-23 12:38:14,994|INFO|0179|Partitions on DCEL|6931
+2020-01-23 12:38:15,277|Saved /tmp/edgesCells2500.wkt in 0.01s [6931 records].
+2020-01-23 12:38:23,637|Saved /tmp/edgesFaces2500.wkt in 1.38s [87395 records].
+2020-01-23 12:38:23,638|Closing session...
+2020-01-23 12:38:23,788|Closing session... Done!
+2020-01-23 12:38:27,233|Starting session...
+2020-01-23 12:38:40,609|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2750 --save --debug
+2020-01-23 12:38:40,609|Starting session... Done!
+2020-01-23 12:38:52,264|DCELMerger|0180| 4|12| 2750|Reading polygons A            | 11.65
+2020-01-23 12:38:57,782|DCELMerger|0180| 4|12| 2750|Reading polygons B            |  5.52
+2020-01-23 12:38:57,783|INFO|0180|Polygons in A|7028
+2020-01-23 12:38:57,783|INFO|0180|Polygons in B|8047
+2020-01-23 12:39:17,500|DCELMerger|0180| 4|12| 2750|Partitioning edges            | 19.72
+2020-01-23 12:39:17,504|INFO|0180|Total number of partitions|7486
+2020-01-23 12:39:17,697|INFO|0180|Total number of edges in raw|3901477
+2020-01-23 12:39:23,163|INFO|0180|Total number of edges in spatial|3974480
+2020-01-23 12:39:38,662|DCELMerger|0180| 4|12| 2750|Extracting segments           | 15.50
+2020-01-23 12:39:38,666|INFO|0180|Segments|4620122
+2020-01-23 12:39:56,751|DCELMerger|0180| 4|12| 2750|Getting half edges            | 18.08
+2020-01-23 12:39:56,754|INFO|0180|Half edges|9240244
+2020-01-23 12:40:05,671|DCELMerger|0180| 4|12| 2750|Getting local DCEL's          |  8.92
+2020-01-23 12:40:05,675|INFO|0180|Partitions on DCEL|7486
+2020-01-23 12:40:05,965|Saved /tmp/edgesCells2750.wkt in 0.01s [7486 records].
+2020-01-23 12:40:17,458|Saved /tmp/edgesFaces2750.wkt in 1.41s [89618 records].
+2020-01-23 12:40:17,459|Closing session...
+2020-01-23 12:40:17,594|Closing session... Done!
+2020-01-23 12:40:21,128|Starting session...
+2020-01-23 12:40:34,099|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 3000 --save --debug
+2020-01-23 12:40:34,100|Starting session... Done!
+2020-01-23 12:40:42,981|DCELMerger|0181| 4|12| 3000|Reading polygons A            |  8.88
+2020-01-23 12:40:52,054|DCELMerger|0181| 4|12| 3000|Reading polygons B            |  9.07
+2020-01-23 12:40:52,056|INFO|0181|Polygons in A|7028
+2020-01-23 12:40:52,056|INFO|0181|Polygons in B|8047
+2020-01-23 12:41:09,305|DCELMerger|0181| 4|12| 3000|Partitioning edges            | 17.25
+2020-01-23 12:41:09,308|INFO|0181|Total number of partitions|8125
+2020-01-23 12:41:09,454|INFO|0181|Total number of edges in raw|3901477
+2020-01-23 12:41:15,312|INFO|0181|Total number of edges in spatial|3977626
+2020-01-23 12:41:30,241|DCELMerger|0181| 4|12| 3000|Extracting segments           | 14.93
+2020-01-23 12:41:30,244|INFO|0181|Segments|4628813
+2020-01-23 12:41:47,412|DCELMerger|0181| 4|12| 3000|Getting half edges            | 17.17
+2020-01-23 12:41:47,416|INFO|0181|Half edges|9257626
+2020-01-23 12:41:56,580|DCELMerger|0181| 4|12| 3000|Getting local DCEL's          |  9.16
+2020-01-23 12:41:56,583|INFO|0181|Partitions on DCEL|8125
+2020-01-23 12:41:57,161|Saved /tmp/edgesCells3000.wkt in 0.02s [8125 records].
+2020-01-23 12:42:07,106|Saved /tmp/edgesFaces3000.wkt in 1.84s [91858 records].
+2020-01-23 12:42:07,107|Closing session...
+2020-01-23 12:42:07,253|Closing session... Done!
+2020-01-23 12:42:10,992|Starting session...
+2020-01-23 12:42:24,104|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2250 --save --debug
+2020-01-23 12:42:24,105|Starting session... Done!
+2020-01-23 12:42:32,975|DCELMerger|0182| 4|12| 2250|Reading polygons A            |  8.86
+2020-01-23 12:42:42,008|DCELMerger|0182| 4|12| 2250|Reading polygons B            |  9.03
+2020-01-23 12:42:42,010|INFO|0182|Polygons in A|7028
+2020-01-23 12:42:42,010|INFO|0182|Polygons in B|8047
+2020-01-23 12:42:56,301|DCELMerger|0182| 4|12| 2250|Partitioning edges            | 14.29
+2020-01-23 12:42:56,304|INFO|0182|Total number of partitions|6130
+2020-01-23 12:42:56,400|INFO|0182|Total number of edges in raw|3901477
+2020-01-23 12:42:59,909|INFO|0182|Total number of edges in spatial|3966751
+2020-01-23 12:43:12,258|DCELMerger|0182| 4|12| 2250|Extracting segments           | 12.35
+2020-01-23 12:43:12,261|INFO|0182|Segments|4599703
+2020-01-23 12:43:26,324|DCELMerger|0182| 4|12| 2250|Getting half edges            | 14.06
+2020-01-23 12:43:26,329|INFO|0182|Half edges|9199406
+2020-01-23 12:43:33,616|DCELMerger|0182| 4|12| 2250|Getting local DCEL's          |  7.29
+2020-01-23 12:43:33,619|INFO|0182|Partitions on DCEL|6130
+2020-01-23 12:43:33,902|Saved /tmp/edgesCells2250.wkt in 0.01s [6130 records].
+2020-01-23 12:43:41,306|Saved /tmp/edgesFaces2250.wkt in 1.91s [84215 records].
+2020-01-23 12:43:41,306|Closing session...
+2020-01-23 12:43:41,534|Closing session... Done!
+2020-01-23 12:43:45,391|Starting session...
+2020-01-23 12:43:59,194|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2500 --save --debug
+2020-01-23 12:43:59,195|Starting session... Done!
+2020-01-23 12:44:08,081|DCELMerger|0183| 4|12| 2500|Reading polygons A            |  8.88
+2020-01-23 12:44:16,966|DCELMerger|0183| 4|12| 2500|Reading polygons B            |  8.88
+2020-01-23 12:44:16,968|INFO|0183|Polygons in A|7028
+2020-01-23 12:44:16,968|INFO|0183|Polygons in B|8047
+2020-01-23 12:44:32,345|DCELMerger|0183| 4|12| 2500|Partitioning edges            | 15.37
+2020-01-23 12:44:32,348|INFO|0183|Total number of partitions|6949
+2020-01-23 12:44:32,449|INFO|0183|Total number of edges in raw|3901477
+2020-01-23 12:44:36,806|INFO|0183|Total number of edges in spatial|3971792
+2020-01-23 12:44:49,715|DCELMerger|0183| 4|12| 2500|Extracting segments           | 12.91
+2020-01-23 12:44:49,717|INFO|0183|Segments|4612799
+2020-01-23 12:45:04,554|DCELMerger|0183| 4|12| 2500|Getting half edges            | 14.84
+2020-01-23 12:45:04,558|INFO|0183|Half edges|9225598
+2020-01-23 12:45:13,004|DCELMerger|0183| 4|12| 2500|Getting local DCEL's          |  8.44
+2020-01-23 12:45:13,007|INFO|0183|Partitions on DCEL|6949
+2020-01-23 12:45:13,309|Saved /tmp/edgesCells2500.wkt in 0.01s [6949 records].
+2020-01-23 12:45:20,891|Saved /tmp/edgesFaces2500.wkt in 1.31s [87645 records].
+2020-01-23 12:45:20,892|Closing session...
+2020-01-23 12:45:22,006|Closing session... Done!
+2020-01-23 12:45:25,669|Starting session...
+2020-01-23 12:45:39,050|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 2750 --save --debug
+2020-01-23 12:45:39,050|Starting session... Done!
+2020-01-23 12:45:48,179|DCELMerger|0184| 4|12| 2750|Reading polygons A            |  9.12
+2020-01-23 12:45:56,788|DCELMerger|0184| 4|12| 2750|Reading polygons B            |  8.61
+2020-01-23 12:45:56,789|INFO|0184|Polygons in A|7028
+2020-01-23 12:45:56,790|INFO|0184|Polygons in B|8047
+2020-01-23 12:46:12,526|DCELMerger|0184| 4|12| 2750|Partitioning edges            | 15.74
+2020-01-23 12:46:12,529|INFO|0184|Total number of partitions|7540
+2020-01-23 12:46:12,727|INFO|0184|Total number of edges in raw|3901477
+2020-01-23 12:46:17,398|INFO|0184|Total number of edges in spatial|3974447
+2020-01-23 12:46:30,952|DCELMerger|0184| 4|12| 2750|Extracting segments           | 13.55
+2020-01-23 12:46:30,956|INFO|0184|Segments|4620310
+2020-01-23 12:46:46,054|DCELMerger|0184| 4|12| 2750|Getting half edges            | 15.10
+2020-01-23 12:46:46,060|INFO|0184|Half edges|9240620
+2020-01-23 12:46:54,518|DCELMerger|0184| 4|12| 2750|Getting local DCEL's          |  8.46
+2020-01-23 12:46:54,521|INFO|0184|Partitions on DCEL|7540
+2020-01-23 12:46:54,866|Saved /tmp/edgesCells2750.wkt in 0.01s [7540 records].
+2020-01-23 12:47:03,760|Saved /tmp/edgesFaces2750.wkt in 1.54s [89607 records].
+2020-01-23 12:47:03,761|Closing session...
+2020-01-23 12:47:03,916|Closing session... Done!
+2020-01-23 12:47:07,649|Starting session...
+2020-01-23 12:47:21,449|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=16g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 4 --executor-memory 12g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --nlevels 10 --maxentries 100 --fraction 0.25 --partitions 3000 --save --debug
+2020-01-23 12:47:21,450|Starting session... Done!
+2020-01-23 12:47:31,009|DCELMerger|0185| 4|12| 3000|Reading polygons A            |  9.55
+2020-01-23 12:47:40,261|DCELMerger|0185| 4|12| 3000|Reading polygons B            |  9.25
+2020-01-23 12:47:40,263|INFO|0185|Polygons in A|7028
+2020-01-23 12:47:40,263|INFO|0185|Polygons in B|8047
+2020-01-23 12:47:57,634|DCELMerger|0185| 4|12| 3000|Partitioning edges            | 17.37
+2020-01-23 12:47:57,636|INFO|0185|Total number of partitions|8107
+2020-01-23 12:47:57,813|INFO|0185|Total number of edges in raw|3901477
+2020-01-23 12:48:03,538|INFO|0185|Total number of edges in spatial|3977931
+2020-01-23 12:48:18,045|DCELMerger|0185| 4|12| 3000|Extracting segments           | 14.50
+2020-01-23 12:48:18,048|INFO|0185|Segments|4629379
+2020-01-23 12:48:34,506|DCELMerger|0185| 4|12| 3000|Getting half edges            | 16.46
+2020-01-23 12:48:34,509|INFO|0185|Half edges|9258758
+2020-01-23 12:48:43,763|DCELMerger|0185| 4|12| 3000|Getting local DCEL's          |  9.25
+2020-01-23 12:48:43,766|INFO|0185|Partitions on DCEL|8107
+2020-01-23 12:48:44,096|Saved /tmp/edgesCells3000.wkt in 0.01s [8107 records].
+2020-01-23 12:48:53,434|Saved /tmp/edgesFaces3000.wkt in 1.39s [91957 records].
+2020-01-23 12:48:53,435|Closing session...
+2020-01-23 12:48:53,575|Closing session... Done!

@@ -31,12 +31,20 @@ object DCELMerger{
     val start = clocktime
     val result = code
     val end = clocktime
-    val executors = settings.conf.get("spark.executor.cores").toInt
-    val cores = settings.conf.get("spark.executor.instances").toInt
+    val (cores, executors, appId) = if(settings.params.local()){
+      val cores = java.lang.Runtime.getRuntime().availableProcessors()
+      val appId = settings.conf.get("spark.app.id")
+      (cores, 1, appId)
+    } else {
+      val cores = settings.conf.get("spark.executor.instances").toInt
+      val executors = settings.conf.get("spark.executor.cores").toInt
+      val appId = settings.conf.get("spark.app.id").takeRight(4)
+      (cores, executors, appId)
+    }
     val tick = (end - settings.startTime) / 1000.0
     val time = (end - start) / 1000.0
-    val appId = settings.conf.get("spark.app.id")
-    val log = f"DCELMerger|$appId|$executors%2d|$cores%2d|$msg%-30s|$time%6.2f"
+    val partitions = settings.params.partitions()
+    val log = f"DCELMerger|$appId|$executors%2d|$cores%2d|$partitions%5d|$msg%-30s|$time%6.2f"
     logger.info(log)
 
     result
@@ -46,6 +54,11 @@ object DCELMerger{
     if(settings.params.debug()){
       code
     }
+  }
+
+  def log(msg: String)(implicit spark: SparkSession): Unit = {
+    val appId = spark.sparkContext.applicationId.takeRight(4)
+    logger.info(f"INFO|$appId|$msg")
   }
 
   def readPolygonsA(implicit settings: Settings): (RDD[Polygon], Long) = {
@@ -107,8 +120,6 @@ object DCELMerger{
    **/
   def main(args: Array[String]) = {
     val params     = new DCELMergerConf(args)
-    val cores      = params.cores()
-    val executors  = params.executors()
     val input1     = params.input1()
     val offset1    = params.offset1()
     val input2     = params.input2()
@@ -122,17 +133,19 @@ object DCELMerger{
 
     // Starting session...
     logger.info("Starting session...")
-    val spark = SparkSession.builder()
-        .config("spark.default.parallelism", 3 * cores * executors)
+    implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .config("spark.scheduler.mode", "FAIR")
         .appName("DCELMerger")
         .getOrCreate()
     import spark.implicits._
-    val appID = spark.sparkContext.applicationId.split("-").last
     val startTime = spark.sparkContext.startTime
     val config = spark.sparkContext.getConf
+    if(!params.local()){
+      val command = System.getProperty("sun.java.command")
+      logger.info(command)
+    }
     
     implicit val settings = Settings(spark, params, config, startTime)
     logger.info("Starting session... Done!")
@@ -146,8 +159,8 @@ object DCELMerger{
     }
 
     debug{
-      logger.info(s"Polygons in A: $nPolygonsA")
-      logger.info(s"Polygons in B: $nPolygonsB")
+      log(f"Polygons in A|$nPolygonsA")
+      log(f"Polygons in B|$nPolygonsB")
     }
 
     // Partitioning edges...
@@ -155,20 +168,28 @@ object DCELMerger{
       val edgesA = getEdges(polygonsA)
       val edgesB = getEdges(polygonsB)
       val edges = edgesA.union(edgesB).cache
-      val (edgesRDD, boundary) = setSpatialRDD(edges)
-      val quadtree = getQuadTree(edges, boundary)
-      val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId.toInt -> cell)).toMap
-      val partitioner = new QuadTreePartitioner(quadtree)
-      edgesRDD.spatialPartitioning(partitioner)
+      val (edgesRDD, cells) = if(params.custom()){
+        val (edgesRDD, boundary) = setSpatialRDD(edges)
+        val quadtree = getQuadTree(edges, boundary)
+        val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId.toInt -> cell)).toMap
+        val partitioner = new QuadTreePartitioner(quadtree)
+        edgesRDD.spatialPartitioning(partitioner)
+        (edgesRDD, cells)
+      } else {
+        val (edgesRDD, boundary) = setSpatialRDD(edges)
+        edgesRDD.spatialPartitioning(GridType.QUADTREE, params.partitions())
+        val cells = edgesRDD.partitionTree.getLeafZones.asScala.map(cell => (cell.partitionId.toInt -> cell)).toMap
+        (edgesRDD, cells)
+      }
       edgesRDD.spatialPartitionedRDD.rdd.cache
       val nEdgesRDD = edgesRDD.spatialPartitionedRDD.rdd.count()
       (edgesRDD, nEdgesRDD, cells)
     }
 
     debug{
-      logger.info(s"Total number of partitions: ${cells.size}")
-      logger.info(s"Total number of edges in raw: ${edgesRDD.rawSpatialRDD.count()}")
-      logger.info(s"Total number of edges in spatial: ${edgesRDD.spatialPartitionedRDD.count()}")
+      log(f"Total number of partitions|${cells.size}")
+      log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
+      log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
     }
 
     // Extracting segments...
@@ -207,14 +228,13 @@ object DCELMerger{
         val segs = SweepLine.getGraphEdgeIntersections(g, gCell).flatMap{_.getLineStrings}
           .filter(line => line.coveredBy(cell))
         mergeDuplicates(segs).toIterator
-        //segs.toIterator
       }.cache
       val nSegments = segments.count()
       (segments, nSegments)
     }
 
     debug{
-      logger.info(s"Segments: $nSegments")
+      log(f"Segments|$nSegments")
     }
 
     // Getting half edges...
@@ -243,7 +263,7 @@ object DCELMerger{
       getHalf_edges2(segments)
     }
     
-    debug{ logger.info(s"Half edges: $nHalf_edges") }
+    debug{ log(f"Half edges|$nHalf_edges") }
    
     // Getting local DCEL's...
     def getVerticesByV2(half_edges: Iterator[Half_edge]): Vector[Vertex] = {
@@ -325,10 +345,6 @@ object DCELMerger{
     val (dcel, nDcel) = timer{"Getting local DCEL's"}{
       val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
 
-        //val hedges = half_edges.toVector
-        //val faces  = Vector.empty[Face]
-        //val vertices = getVerticesByV2(hedges.toIterator)
-        
         val vertices = getVerticesByV2(half_edges)
         val pre = preprocess(vertices, index)
         val hedges = getHedges2(pre)
@@ -341,16 +357,17 @@ object DCELMerger{
     }
      
     debug{
-      logger.info(s"Partitions on DCEL: ${dcel.getNumPartitions}")
+      log(f"Partitions on DCEL|${dcel.getNumPartitions}")
     }
 
     if(params.save()){
-      save{"/tmp/edgesCells.wkt"}{
+      save{s"/tmp/edgesCells${params.partitions()}.wkt"}{
         cells.values.map{ cell =>
           s"${envelope2Polygon(cell.getEnvelope)}\t${cell.partitionId}\n"
         }.toVector
       }
 
+      /*
       save{"/tmp/edgesSegments.wkt"}{
         segments.map{ segment =>
           s"${segment.toText()}\t${segment.getUserData.toString()}\n"
@@ -374,8 +391,8 @@ object DCELMerger{
           }
         }.collect()
       }
-
-      save{"/tmp/edgesFaces.wkt"}{
+       */
+      save{s"/tmp/edgesFaces${params.partitions()}.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.faces.map{ face =>
             s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
@@ -399,14 +416,13 @@ class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
   val quote1:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val quote2:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
-  val cores:       ScallopOption[Int]     = opt[Int]     (default = Some(4))
-  val executors:   ScallopOption[Int]     = opt[Int]     (default = Some(3))
-  val grid:        ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
+  val grid:        ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val index:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(512))
   val fraction:    ScallopOption[Double]  = opt[Double]  (default = Some(0.25))
   val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(500))
   val nlevels:     ScallopOption[Int]     = opt[Int]     (default = Some(6))
+  val custom:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
