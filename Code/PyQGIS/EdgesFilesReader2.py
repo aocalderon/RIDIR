@@ -1,7 +1,7 @@
 # exec(open('/home/and/RIDIR/Code/PyQGIS/EdgesFilesReader2.py'.encode('utf-8')).read())
 
 crs = 2272
-names = ["Cells", "Faces", "Segments", "Hedges", "Vertices"]
+names = ["Cells1", "Faces1"]
 
 instance = QgsProject.instance()
 for name in names:
