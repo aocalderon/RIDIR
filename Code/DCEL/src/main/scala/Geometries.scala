@@ -97,6 +97,27 @@ case class LDCEL(id: Int, vertices: Vector[Vertex], half_edges: Vector[Half_edge
   val nVertices = vertices.size
   val nHalf_edges = half_edges.size
   val nFaces = faces.size
+
+  def union(): Vector[Face] = {
+    faces.filter(_.area() > 0)
+  }
+
+  def intersection(): Vector[Face] = {
+    faces.filter(_.id.split("\\|").size == 2)
+  }
+
+  def symmetricDifference(): Vector[Face] = {
+    faces.filter(_.id.split("\\|").size == 1)
+      .filter(_.area() > 0)
+  }
+
+  def differenceA(): Vector[Face] = {
+    symmetricDifference().filter(_.id.size > 1).filter(_.id.substring(0, 1) == "A")
+  }
+
+  def differenceB(): Vector[Face] = {
+    symmetricDifference().filter(_.id.size > 1).filter(_.id.substring(0, 1) == "B")
+  }
 }
 
 case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], edges: List[Edge] = null) {
@@ -106,18 +127,18 @@ case class LocalDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: L
   var executionTime: Long = 0L
 }
 
-case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex], partition: Int = -1, edges: Set[Edge] = null, source: List[Half_edge] = null) {
+case class MergedDCEL(half_edges: List[Half_edge], faces: List[Face], vertices: List[Vertex]) {
   
   def union(): List[Face] = {
     faces.filter(_.area() > 0)
   }
 
   def intersection(): List[Face] = {
-    faces.filter(_.tag.split(" ").size == 2)
+    faces.filter(_.tag.split("|").size == 2)
   }
 
   def symmetricDifference(): List[Face] = {
-    faces.filter(_.tag.split(" ").size == 1)
+    faces.filter(_.tag.split("|").size == 1)
       .filter(_.area() > 0)
   }
 
