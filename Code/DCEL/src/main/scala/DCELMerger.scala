@@ -299,8 +299,15 @@ object DCELMerger{
       vertices
     }
     
+    def getHedgesList2(vertices: Vector[Vertex], index: Int): Unit = {
+      val hedges = vertices.flatMap(_.getHalf_edges).toVector
+
+      hedges.map { _.toWKT3 }.foreach{ println }
+    }
+
     def preprocess(vertices: Vector[Vertex], index: Int, tag: String = ""):
         Vector[(Face, Vector[Half_edge])] = {
+      getHedgesList2(vertices, index)
       getHedgesList(vertices).map{ hedges =>
         val id = hedges.map(_.id).distinct.filter(_ != "*" ).sorted.mkString("|")
         (id, hedges.map{ h => h.id = id; h })
@@ -342,13 +349,6 @@ object DCELMerger{
         }.toVector
     }
 
-    def getHedgesList2(vertices: Vector[Vertex], index: Int): Unit = {
-      val hedges = vertices.flatMap(_.getHalf_edges).toVector
-
-      hedges.map { _.toWKT3 }.foreach{ println }
-
-    }
-
     def doublecheckFaces(faces: Vector[Face], p: Int): Vector[Face] = {
       val f_prime = faces.filter(_.id.split("\\|").size == 1)
       val f_primeA = f_prime.filter(_.id.head == 'A')
@@ -383,10 +383,14 @@ object DCELMerger{
     val (dcel, nDcel) = timer{"Merging DCELs"}{
       val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
 
-        val vertices = getVerticesByV2(half_edges)
-        val pre = preprocess(vertices, index)
-        val hedges = getHedges2(pre)
-        val faces  = doublecheckFaces(getFaces2(pre), index)
+        val hedges = half_edges.toVector
+        val vertices = getVerticesByV2(hedges.toIterator)
+        val faces = Vector.empty[Face]
+
+        //val pre = preprocess(vertices, index)
+        //val hedges = getHedges2(pre)
+        //val faces  = doublecheckFaces(getFaces2(pre), index)
+        //val faces  = getFaces2(pre)
 
         Iterator( LDCEL(index, vertices, hedges, faces) )
       }.cache

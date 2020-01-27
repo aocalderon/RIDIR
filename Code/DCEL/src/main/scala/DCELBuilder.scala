@@ -299,6 +299,7 @@ object DCELBuilder {
     if(start == end){
       v :+ end
     } else {
+      println(s"Who is next? ${start} ${start.id} ")
       getNodes(start.next, end, v :+ start)
     }
   }
