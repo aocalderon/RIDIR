@@ -34,3 +34,4 @@ Code/Validation/GeometryChecker/.ensime_cache/*
 *.snm
 *.toc
 *.synctex.gz
+*.Rhistory
