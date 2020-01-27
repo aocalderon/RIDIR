@@ -22,7 +22,7 @@ import DCELBuilder._
 object DCELMerger{
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val model: PrecisionModel = new PrecisionModel(1000)
-  private val geofactory: GeometryFactory = new GeometryFactory();
+  private val geofactory: GeometryFactory = new GeometryFactory(model);
   private val precision: Double = 1 / model.getScale
 
   case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf, startTime: Long)
@@ -272,7 +272,7 @@ object DCELMerger{
     
     debug{ log(f"Half edges|$nHalf_edges") }
    
-    // Getting local DCEL's...
+    // Merging DCELs...
     def getVerticesByV2(half_edges: Iterator[Half_edge]): Vector[Vertex] = {
       val vertices = half_edges.map(hedge => (hedge.v2, hedge)).toList
         .groupBy(_._1).toList.map{ v =>
@@ -349,13 +349,44 @@ object DCELMerger{
 
     }
 
-    val (dcel, nDcel) = timer{"Getting local DCEL's"}{
+    def doublecheckFaces(faces: Vector[Face], p: Int): Vector[Face] = {
+      val f_prime = faces.filter(_.id.split("\\|").size == 1)
+      val f_primeA = f_prime.filter(_.id.head == 'A')
+      val f_primeB = f_prime.filter(_.id.head == 'B')
+
+      if(f_primeA.isEmpty){
+        faces
+      } else if(f_primeB.isEmpty){
+        faces
+      } else {
+        val f = for{
+          a <- f_primeA
+          b <- f_primeB
+        } yield {
+          logger.info(s"In $p ${a.id} vs ${b.id}")
+          if(a.toPolygon().coveredBy(b.toPolygon())){
+            a.id = s"${a.id}|${b.id}"
+            Vector(a, b)
+          } else if(b.toPolygon().coveredBy(b.toPolygon())){
+            b.id = s"${a.id}|${b.id}"
+            Vector(a, b)
+          } else {
+            Vector(a,b)
+          }
+        }
+        f.flatten.foreach{i => logger.info(s"In $p ${i.toString}")}
+
+        f.flatten.union(faces.filter(_.id.split("\\|").size == 2))
+      }
+    }
+
+    val (dcel, nDcel) = timer{"Merging DCELs"}{
       val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
 
         val vertices = getVerticesByV2(half_edges)
         val pre = preprocess(vertices, index)
         val hedges = getHedges2(pre)
-        val faces  = getFaces2(pre)
+        val faces  = doublecheckFaces(getFaces2(pre), index)
 
         Iterator( LDCEL(index, vertices, hedges, faces) )
       }.cache
@@ -367,21 +398,71 @@ object DCELMerger{
       log(f"Partitions on DCEL|${dcel.getNumPartitions}")
     }
 
+    def mergePolygons(a: String, b:String): String = {
+      val reader = new WKTReader(geofactory)
+      val pa = reader.read(a)
+      val pb = reader.read(b)
+      pa.union(pb).toText()
+    }
+
+    def intersection(dcel: LDCEL): Vector[Face] = {
+      dcel.faces.filter(_.id.split("\\|").size == 2)
+    }
+    def union(dcel: LDCEL): Vector[Face] = {
+      dcel.faces.filter(_.area() > 0)
+    }
+    def symmetricDifference(dcel: LDCEL): Vector[Face] = {
+      dcel.faces.filter(_.id.split("\\|").size == 1)
+        .filter(_.area() > 0)
+    }
+    def differenceA(dcel: LDCEL): Vector[Face] = {
+      symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "A")
+    }
+    def differenceB(dcel: LDCEL): Vector[Face] = {
+      symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "B")
+    }
+    
+    def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[Face], filename: String = "/tmp/overlay.wkt"){
+      save{filename}{
+        dcel.flatMap{op}
+        .map(f => (f.id, f.toPolygon().toText()))
+        .reduceByKey(mergePolygons)
+          .map{ case(id, wkt) => s"$wkt\t$id\n" }.collect()
+      }
+    }
+
+    val output_path = "/tmp/edges"
+    timer{"Intersection"}{
+      overlapOp(dcel, intersection, s"${output_path}OpIntersection.wkt")
+    }
+    timer{"Union"}{
+      overlapOp(dcel, union, s"${output_path}OpUnion.wkt")
+    }
+    timer{"Symmetric"}{
+      overlapOp(dcel, symmetricDifference, s"${output_path}OpSymmetric.wkt")
+    }
+    timer{"Diff A"}{
+      overlapOp(dcel, differenceA, s"${output_path}OpDifferenceA.wkt")
+    }
+    timer{"Diff B"}{
+      overlapOp(dcel, differenceB, s"${output_path}OpDifferenceB.wkt")
+    }
+
     if(params.save()){
-      save{s"/tmp/edgesCells${params.partitions()}.wkt"}{
+      val file_id = ""
+      save{s"/tmp/edgesCells${file_id}.wkt"}{
         cells.values.map{ cell =>
           s"${envelope2Polygon(cell.getEnvelope)}\t${cell.partitionId}\n"
         }.toVector
       }
 
-      /*
-      save{"/tmp/edgesSegments.wkt"}{
+      save{s"/tmp/edgesSegments${file_id}.wkt"}{
         segments.map{ segment =>
           s"${segment.toText()}\t${segment.getUserData.toString()}\n"
         }.collect()
       }
 
-      save{"/tmp/edgesVertices.wkt"}{
+      save{s"/tmp/edgesVertices${file_id}.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.vertices.map{ vertex =>
             vertex.getHalf_edges.map{ hedge =>
@@ -391,15 +472,14 @@ object DCELMerger{
         }.collect()
       }
 
-      save{"/tmp/edgesHedges.wkt"}{
+      save{s"/tmp/edgesHedges${file_id}.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.half_edges.map{ hedge =>
             s"${hedge.toWKT3}\t${hedge.id}\n"
           }
         }.collect()
       }
-       */
-      save{s"/tmp/edgesFaces${params.partitions()}.wkt"}{
+      save{s"/tmp/edgesFaces${file_id}.wkt"}{
         dcel.flatMap{ dcel =>
           dcel.faces.map{ face =>
             s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
