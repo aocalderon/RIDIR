@@ -305,11 +305,17 @@ object DCELMerger{
       hedges.map { _.toWKT3 }.foreach{ println }
     }
 
+    def pruneDuplicateIDs(id: String): String = {
+      id.split("\\|").distinct.mkString("|")
+    }
+
     def preprocess(vertices: Vector[Vertex], index: Int, tag: String = ""):
         Vector[(Face, Vector[Half_edge])] = {
-      getHedgesList2(vertices, index)
       getHedgesList(vertices).map{ hedges =>
-        val id = hedges.map(_.id).distinct.filter(_ != "*" ).sorted.mkString("|")
+        val id = pruneDuplicateIDs(
+          hedges.map(_.id).distinct.filter(_ != "*" ).sorted.mkString("|")
+        )
+        
         (id, hedges.map{ h => h.id = id; h })
       }
         .map{ case (id, hedges) =>
@@ -332,10 +338,6 @@ object DCELMerger{
       pre.flatMap(_._2)
     }
 
-    def pruneDuplicateIDs(id: String): String = {
-      id.split("\\|").distinct.mkString("|")
-    }
-
     def getFaces2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Face] = {
       pre.map(_._1).filter(_.id != "")
         .groupBy(_.id) // Grouping multi-parts
@@ -344,53 +346,31 @@ object DCELMerger{
           val outer = polys.head
           outer.innerComponents = polys.tail.toVector
 
-          outer.id = pruneDuplicateIDs(outer.id)
           outer
         }.toVector
     }
 
     def doublecheckFaces(faces: Vector[Face], p: Int): Vector[Face] = {
       val f_prime = faces.filter(_.id.split("\\|").size == 1)
-      val f_primeA = f_prime.filter(_.id.head == 'A')
-      val f_primeB = f_prime.filter(_.id.head == 'B')
-
-      if(f_primeA.isEmpty){
-        faces
-      } else if(f_primeB.isEmpty){
-        faces
-      } else {
-        val f = for{
-          a <- f_primeA
-          b <- f_primeB
-        } yield {
-          logger.info(s"In $p ${a.id} vs ${b.id}")
-          if(a.toPolygon().coveredBy(b.toPolygon())){
-            a.id = s"${a.id}|${b.id}"
-            Vector(a, b)
-          } else if(b.toPolygon().coveredBy(b.toPolygon())){
-            b.id = s"${a.id}|${b.id}"
-            Vector(a, b)
-          } else {
-            Vector(a,b)
+        .map{ face =>
+          val hedges = face.getHedges
+          face.id = face.isSurroundedBy match{
+            case Some(id) => face.id + "|" + id
+            case None => face.id
           }
+          face
         }
-        f.flatten.foreach{i => logger.info(s"In $p ${i.toString}")}
 
-        f.flatten.union(faces.filter(_.id.split("\\|").size == 2))
-      }
+      faces.filter(_.id.split("\\|").size == 2).union(f_prime)
     }
 
     val (dcel, nDcel) = timer{"Merging DCELs"}{
       val dcel = half_edges.mapPartitionsWithIndex{ case (index, half_edges) =>
 
-        val hedges = half_edges.toVector
-        val vertices = getVerticesByV2(hedges.toIterator)
-        val faces = Vector.empty[Face]
-
-        //val pre = preprocess(vertices, index)
-        //val hedges = getHedges2(pre)
-        //val faces  = doublecheckFaces(getFaces2(pre), index)
-        //val faces  = getFaces2(pre)
+        val vertices = getVerticesByV2(half_edges)
+        val pre = preprocess(vertices, index)
+        val hedges = getHedges2(pre)
+        val faces  = doublecheckFaces(getFaces2(pre), index)
 
         Iterator( LDCEL(index, vertices, hedges, faces) )
       }.cache
