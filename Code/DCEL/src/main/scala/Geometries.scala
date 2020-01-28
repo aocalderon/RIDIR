@@ -1,6 +1,7 @@
 import scala.util.{Try,Success,Failure}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
+import scala.annotation.tailrec
 import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel, Geometry}
 import com.vividsolutions.jts.geom.{Coordinate, LinearRing, MultiPolygon, Polygon, LineString, Point}
 
@@ -260,9 +261,9 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
       case _ => false
     }
 
-  override def toString = s"($x, $y)"
+  override def toString = s"$x $y"
 
-  def toWKT: String = s"POINT ($x $y)"
+  def toWKT: String = s"POINT($x $y)"
 }
 
 case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
@@ -274,14 +275,39 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
   var tag: String = ""
   var innerComponents: Vector[Face] = Vector.empty[Face]
 
+  @tailrec
+  private def getNodes(start: Half_edge, end: Half_edge, v: Vector[Half_edge]): Vector[Half_edge] = {
+    if(start == end){
+      v :+ end
+    } else {
+      getNodes(start.next, end, v :+ start)
+    }
+  }
+
+  def getHedges: Vector[Half_edge] = {
+    val start = this.outerComponent
+    getNodes(start, start.prev, Vector.empty[Half_edge])
+  }
+
+  def isSurroundedBy: Option[String] = {
+    if(id == ""){
+      None
+    } else {
+      val tag = id.substring(0, 1)
+      val ids = getHedges.flatMap(_.twin.id.split("\\|"))
+        .map{ id => if(id == "") "*" else id}
+        .filter(_.substring(0, 1) != tag)
+
+      if(ids.distinct.size == 1){
+        Some(ids.distinct.head)
+      } else {
+        None
+      }
+    }
+  }
+
   def nHalf_edges: Int = {
-    var hedge = outerComponent
-    var n = 1
-    do{
-      hedge = hedge.next
-      n = n + 1
-    }while(hedge != outerComponent)
-    n
+    getHedges.size
   }
 
   def faceArea(): Double = {
