@@ -2,9 +2,9 @@
 
 import subprocess
 
-#crs = 2272
-crs = 6414
-names = ["Cells", "Segments"]
+crs = 2272
+#crs = 6414
+names = ["Cells", "Segments", "Hedges", "Vertices", "Faces", "OpIntersection"]
 
 for name in names:
   subprocess.run(["scp", "acald013@hn:/tmp/edges{}.wkt".format(name), "/home/and/tmp/edges/edges{}.wkt".format(name)])
@@ -19,4 +19,3 @@ iface.mapCanvas().refresh()
 for name in names:
   uri = "file:///home/and/tmp/edges/edges{}.wkt?delimiter={}&useHeader=no&crs=epsg:{}&wktField={}".format(name, "\\t", crs, "field_1")
   iface.addVectorLayer(uri, name, "delimitedtext")
-
