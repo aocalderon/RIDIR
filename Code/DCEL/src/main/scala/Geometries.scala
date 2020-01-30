@@ -298,7 +298,7 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
         .map{ id => if(id == "") "*" else id}
         .filter(_.substring(0, 1) != tag)
 
-      if(ids.distinct.size == 1){
+      if(ids.filter(_ != "*").distinct.size == 1){
         Some(ids.distinct.head)
       } else {
         None
