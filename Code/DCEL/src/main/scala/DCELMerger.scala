@@ -25,25 +25,21 @@ object DCELMerger{
   private val geofactory: GeometryFactory = new GeometryFactory(model);
   private val precision: Double = 1 / model.getScale
 
-  case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf, startTime: Long)
+  case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf,
+    startTime: Long, appId: String, cores: Int, executors: Int)
 
   def timer[A](msg: String)(code: => A)(implicit settings: Settings): A = {
     val start = clocktime
     val result = code
     val end = clocktime
-    val (cores, executors, appId) = if(settings.params.local()){
-      val cores = java.lang.Runtime.getRuntime().availableProcessors()
-      val appId = settings.conf.get("spark.app.id")
-      (cores, 1, appId)
-    } else {
-      val cores = settings.conf.get("spark.executor.instances").toInt
-      val executors = settings.conf.get("spark.executor.cores").toInt
-      val appId = settings.conf.get("spark.app.id").takeRight(4)
-      (cores, executors, appId)
-    }
-    val tick = (end - settings.startTime) / 1000.0
-    val time = (end - start) / 1000.0
+
+    val tick = (end - settings.startTime) / 1e3
+    val time = (end - start) / 1e3
     val partitions = settings.params.partitions()
+
+    val appId = settings.appId
+    val cores = settings.cores
+    val executors = settings.executors
     val log = f"DCELMerger|$appId|$executors%2d|$cores%2d|$partitions%5d|$msg%-30s|$time%6.2f"
     logger.info(log)
 
@@ -56,9 +52,8 @@ object DCELMerger{
     }
   }
 
-  def log(msg: String)(implicit spark: SparkSession): Unit = {
-    val appId = spark.sparkContext.applicationId.takeRight(4)
-    logger.info(f"INFO|$appId|$msg")
+  def log(msg: String)(implicit settings: Settings): Unit = {
+    logger.info(f"DEBUG|${settings.appId}|$msg")
   }
 
   def readPolygonsA(implicit settings: Settings): (RDD[Polygon], Long) = {
@@ -75,8 +70,7 @@ object DCELMerger{
     readPolygons(spark: SparkSession, input: String, offset: Int, "B")
   }
 
-  def readPolygons(spark: SparkSession, input: String, offset: Int, tag: String):
-      (RDD[Polygon], Long) = {
+  def readPolygons(spark: SparkSession, input: String, offset: Int, tag: String): (RDD[Polygon], Long) = {
     val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
       val arr = line.split("\t")
       val userData = s"${tag}${i}" +: (0 until arr.size).filter(_ != offset).map(i => arr(i))
@@ -86,11 +80,10 @@ object DCELMerger{
       polygon.asInstanceOf[Polygon]
     }.cache
     val nPolygons = polygons.count()
-    (polygons.filter(_.getUserData.toString().split("\t")(0) != "A57"), nPolygons)
+    (polygons, nPolygons)
   }
 
-  def getQuadTree(edges: RDD[LineString], boundary: QuadRectangle)(implicit settings: Settings):
-      StandardQuadTree[LineString] = {
+  def getQuadTree(edges: RDD[LineString], boundary: QuadRectangle)(implicit settings: Settings): StandardQuadTree[LineString] = {
     val maxentries = settings.params.maxentries()
     val nlevels = settings.params.nlevels()
     val fraction = settings.params.fraction()
@@ -143,18 +136,26 @@ object DCELMerger{
     implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-        .config("spark.scheduler.mode", "FAIR")
         .appName("DCELMerger")
         .getOrCreate()
     import spark.implicits._
     val startTime = spark.sparkContext.startTime
     val config = spark.sparkContext.getConf
-    if(!params.local()){
+    val local = config.get("spark.master").contains("local")
+    val (appId, cores, executors) = if(local){
+      val appId = config.get("spark.app.id")
+      val cores = config.get("spark.master").split("\\[")(1).replace("]","").toInt
+      (appId, cores, 1)
+    } else {
       val command = System.getProperty("sun.java.command")
       logger.info(command)
+      val appId = config.get("spark.app.id").takeRight(4)
+      val cores = config.get("spark.executor.cores").toInt
+      val executors = config.get("spark.executor.instances").toInt
+      (appId, cores, executors)
     }
+    implicit val settings = Settings(spark, params, config, startTime, appId, cores, executors)
     
-    implicit val settings = Settings(spark, params, config, startTime)
     logger.info("Starting session... Done!")
 
     // Reading polygons...
@@ -389,15 +390,14 @@ object DCELMerger{
       pa.union(pb).toText()
     }
 
-    def intersection(dcel: LDCEL): Vector[Face] = {
-      dcel.faces.filter(_.id.split("\\|").size == 2)
+    def intersection(dcel: LDCEL): Vector[(String, Geometry)] = {
+      dcel.faces.filter(_.id.split("\\|").size == 2).map(f => (f.id, f.getGeometry._1))
     }
     def union(dcel: LDCEL): Vector[Face] = {
-      dcel.faces.filter(_.area() > 0)
+      dcel.faces
     }
     def symmetricDifference(dcel: LDCEL): Vector[Face] = {
       dcel.faces.filter(_.id.split("\\|").size == 1)
-        .filter(_.area() > 0)
     }
     def differenceA(dcel: LDCEL): Vector[Face] = {
       symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "A")
@@ -406,10 +406,10 @@ object DCELMerger{
       symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "B")
     }
     
-    def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[Face], filename: String = "/tmp/overlay.wkt"){
+    def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[(String, Geometry)],
+      filename: String = "/tmp/overlay.wkt"){
       save{filename}{
-        dcel.flatMap{op}
-        .map(f => (f.id, f.toPolygon().toText()))
+        dcel.flatMap{op}.map{case (id, geom) => (id, geom.toText())}
         .reduceByKey(mergePolygons)
           .map{ case(id, wkt) => s"$wkt\t$id\n" }.collect()
       }
@@ -419,6 +419,7 @@ object DCELMerger{
     timer{"Intersection"}{
       overlapOp(dcel, intersection, s"${output_path}OpIntersection.wkt")
     }
+    /*
     timer{"Union"}{
       overlapOp(dcel, union, s"${output_path}OpUnion.wkt")
     }
@@ -431,7 +432,7 @@ object DCELMerger{
     timer{"Diff B"}{
       overlapOp(dcel, differenceB, s"${output_path}OpDifferenceB.wkt")
     }
-
+     */
     if(params.save()){
       val file_id = ""
       save{s"/tmp/edgesCells${file_id}.wkt"}{
