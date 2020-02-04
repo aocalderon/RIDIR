@@ -6,7 +6,7 @@ CORES=4
 SPARK_JARS=/home/acald013/Spark/2.4/jars/
 CLASS_JAR=/home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=/home/acald013/Spark/2.4/conf/log4j.properties
-MASTER=yarn
+MASTER=local[10]
 
 PHILI1=/user/acald013/Datasets/Phili/phili_2000_2272.wkt
 PHILI2=/user/acald013/Datasets/Phili/phili_2010_2272.wkt

@@ -164,6 +164,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   var label: String = null
   var tag: String = ""
   var visited: Boolean = false
+  var isTwin: Boolean = false
 
   val angle  = math.toDegrees(hangle(v2.x - v1.x, v2.y - v1.y))
   val length = math.sqrt(math.pow(v2.x - v1.x, 2) + math.pow(v2.y - v1.y, 2))
@@ -196,11 +197,11 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     this.equals(that) && this.label == that.label
   }
 
-  def toWKT: String = s"LINESTRING (${twin.origen.x} ${twin.origen.y} , ${origen.x} ${origen.y})\t$id\t$ring\t$order"
+  def toWKT: String = s"LINESTRING (${twin.origen.x} ${twin.origen.y} , ${origen.x} ${origen.y})\t$id"
 
-  def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t$id\t$ring\t$order"
+  def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t$id"
 
-  def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})\t$id\t$ring\t$order"
+  def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})\t$id"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
@@ -295,10 +296,10 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
     } else {
       val tag = id.substring(0, 1)
       val ids = getHedges.flatMap(_.twin.id.split("\\|"))
-        .map{ id => if(id == "") "*" else id}
+        .map{ id => if(id == "") "*" else id }
         .filter(_.substring(0, 1) != tag)
 
-      if(ids.filter(_ != "*").distinct.size == 1){
+      if(ids.distinct.size == 1){
         Some(ids.distinct.head)
       } else {
         None

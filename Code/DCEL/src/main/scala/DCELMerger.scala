@@ -169,6 +169,16 @@ object DCELMerger{
     debug{
       log(f"Polygons in A|$nPolygonsA")
       log(f"Polygons in B|$nPolygonsB")
+      save{"/tmp/edgesA.wkt"}{
+        polygonsA.map{ a =>
+          s"${a.toText}\t${a.getUserData}\n"
+        }.collect()
+      }
+      save{"/tmp/edgesB.wkt"}{
+        polygonsB.map{ b =>
+          s"${b.toText}\t${b.getUserData}\n"
+        }.collect()
+      }
     }
 
     // Partitioning edges...
@@ -245,6 +255,80 @@ object DCELMerger{
       log(f"Segments|$nSegments")
     }
 
+    def transform(hedges: List[LineString], cell: Polygon): Vector[Half_edge] = {
+        hedges.filter(line => line.coveredBy(cell))
+        .flatMap{ segment =>
+          val arr = segment.getUserData.toString().split("\t")
+          val coords = segment.getCoordinates
+          val v1 = Vertex(coords(0).x, coords(0).y)
+          val v2 = Vertex(coords(1).x, coords(1).y)
+          val h1 = Half_edge(v1, v2)
+          h1.id = arr(0)
+          val t1 = Half_edge(v2, v1)
+          t1.id = arr(0).substring(0, 1)
+          t1.isTwin = true
+          Vector(h1, t1)
+        }.toVector
+    }
+
+    def filter(hedges: Vector[Half_edge]): Vector[Half_edge] = {
+      hedges.map(h => ((h.v1, h.v2), h)).groupBy(_._1).values.map(_.map(_._2))
+        .flatMap{ hedges =>
+          if(hedges.size > 1){
+            val (h, t) = if(hedges(0).isTwin) (hedges(1), hedges(0)) else (hedges(0), hedges(1))
+            h.twin = t.twin
+            t.twin.twin = h
+            Vector(h)
+          } else {
+            hedges
+          }
+        }.toVector
+    }
+
+    def pair(hedges: Vector[Half_edge]): Vector[Half_edge] = {
+      hedges.map{ h =>
+        if (h.isTwin) ((h.v2, h.v1), h) else ((h.v1, h.v2), h)
+      }.groupBy(_._1).values.map(_.map(_._2))
+        .flatMap{ h =>
+          h(0).twin = h(1)
+          h(1).twin = h(0)
+          h
+        }.toVector
+    }
+
+    val (segments_prime, nSegments_prime) = timer{"Extracting segments"}{
+      val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edgesIt) =>
+        val edges = edgesIt.toVector
+        val gA = edges.filter(isA).map(edge2graphedge).toList
+        val gB = edges.filter(isB).map(edge2graphedge).toList
+        val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
+        val gCellA = linestring2graphedge(cell.getExteriorRing, "A")
+        val gCellB = linestring2graphedge(cell.getExteriorRing, "B")
+
+        val hA = SweepLine.getGraphEdgeIntersections(gA, gCellA).flatMap{_.getLineStrings}
+        val tA = transform(hA, cell)
+        val pA = pair(tA)
+        val fA = filter(pA)
+
+        val hB = SweepLine.getGraphEdgeIntersections(gB, gCellB).flatMap{_.getLineStrings}
+        val tB = transform(hB, cell)
+        val pB = pair(tB)
+        val fB = filter(pB)
+
+        fB.toIterator
+      }.cache
+      val nSegments = segments.count()
+      (segments, nSegments)
+    }
+    debug{
+      log(f"Segments_prime|$nSegments_prime")
+      save{"/tmp/edgesSprime.wkt"}{
+        segments_prime.map { hedge =>
+          s"${hedge.toWKT3}\t${hedge.twin.id}\n"
+        }.collect()
+      }
+    }
+    
     // Getting half edges...
     def getHalf_edges2(segments: RDD[LineString]): (RDD[Half_edge], Long) = {
       val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
@@ -371,7 +455,8 @@ object DCELMerger{
         val vertices = getVerticesByV2(half_edges)
         val pre = preprocess(vertices, index)
         val hedges = getHedges2(pre)
-        val faces  = doublecheckFaces(getFaces2(pre), index)
+        //val faces  = doublecheckFaces(getFaces2(pre), index)
+        val faces  = getFaces2(pre)
 
         Iterator( LDCEL(index, vertices, hedges, faces) )
       }.cache
@@ -396,15 +481,17 @@ object DCELMerger{
     def union(dcel: LDCEL): Vector[Face] = {
       dcel.faces
     }
-    def symmetricDifference(dcel: LDCEL): Vector[Face] = {
-      dcel.faces.filter(_.id.split("\\|").size == 1)
+    def symmetricDifference(dcel: LDCEL): Vector[(String, Geometry)] = {
+      dcel.faces.filter(_.id.split("\\|").size == 1).map(f => (f.id, f.getGeometry._1))
     }
+    /*
     def differenceA(dcel: LDCEL): Vector[Face] = {
       symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "A")
     }
     def differenceB(dcel: LDCEL): Vector[Face] = {
       symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "B")
     }
+     */
     
     def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[(String, Geometry)],
       filename: String = "/tmp/overlay.wkt"){
@@ -419,12 +506,12 @@ object DCELMerger{
     timer{"Intersection"}{
       overlapOp(dcel, intersection, s"${output_path}OpIntersection.wkt")
     }
+    timer{"Symmetric"}{
+      overlapOp(dcel, symmetricDifference, s"${output_path}OpSymmetric.wkt")
+    }
     /*
     timer{"Union"}{
       overlapOp(dcel, union, s"${output_path}OpUnion.wkt")
-    }
-    timer{"Symmetric"}{
-      overlapOp(dcel, symmetricDifference, s"${output_path}OpSymmetric.wkt")
     }
     timer{"Diff A"}{
       overlapOp(dcel, differenceA, s"${output_path}OpDifferenceA.wkt")
