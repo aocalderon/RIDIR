@@ -400,7 +400,6 @@ object DCELBuilder {
         .config("spark.default.parallelism", 3 * 120)
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-        .config("spark.scheduler.mode", "FAIR")
         .appName("EdgePartitioner")
         .getOrCreate()
     }
