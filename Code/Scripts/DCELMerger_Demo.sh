@@ -17,5 +17,5 @@ spark-submit \
     --class DCELMerger $CLASS_JAR \
     --input1 $A --offset1 0 \
     --input2 $B --offset2 0 \
-    --nlevels 0 --maxentries 10 --fraction 1 --custom \
+    --nlevels 1 --maxentries 10 --fraction 1 --custom \
     --local --save --debug

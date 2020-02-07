@@ -58,6 +58,7 @@ class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolut
       he.id = this.hedge.id
       he.ring = this.hedge.ring
       he.order = this.hedge.order
+      he.isTwin = this.hedge.isTwin
       half_edges += he
     }
     half_edges.toList.distinct
@@ -167,6 +168,7 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   var isTwin: Boolean = false
 
   val angle  = math.toDegrees(hangle(v2.x - v1.x, v2.y - v1.y))
+
   val length = math.sqrt(math.pow(v2.x - v1.x, 2) + math.pow(v2.y - v1.y, 2))
 
   def hangle(dx: Double, dy: Double): Double = {
@@ -242,6 +244,8 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
         }
       }
   }
+
+  def toCoordinate: Coordinate = new Coordinate(x, y)
 
   def getHalf_edges(): List[Half_edge] = {
     this.half_edges.toList.sortBy(_.angle)(Ordering[Double].reverse)
