@@ -1,2 +1,2 @@
 # RIDIR
-Code for RIDIR project...
+Code for RIDIR project
