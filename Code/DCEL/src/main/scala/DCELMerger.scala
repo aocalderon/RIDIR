@@ -255,8 +255,8 @@ object DCELMerger{
       log(f"Segments|$nSegments")
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    def transform(hedges: List[LineString], cell: Polygon): Vector[Half_edge] = {
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    def transform(hedges: List[LineString], cell: Polygon, index: Int = -1): Vector[Half_edge] = {
         hedges.filter(line => line.coveredBy(cell)).flatMap{ segment =>
           val arr = segment.getUserData.toString().split("\t")
           val coords = segment.getCoordinates
@@ -264,9 +264,11 @@ object DCELMerger{
           val v2 = Vertex(coords(1).x, coords(1).y)
           val h1 = Half_edge(v1, v2)
           h1.id = arr(0)
+          h1.label = index.toString()
           val t1 = Half_edge(v2, v1)
           t1.id = arr(0).substring(0, 1)
           t1.isTwin = true
+          t1.label = index.toString()
           Vector(h1, t1)
         }.toVector
     }
@@ -346,14 +348,17 @@ object DCELMerger{
         val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
         val gCell = cell2gedges(cell)
 
-        val ABh = SweepLine.getGraphEdgeIntersections(gA, gB).flatMap{_.getLineStrings}
+        val A = SweepLine.computeIntersections(gA, gCell)
+        val B = SweepLine.computeIntersections(gB, A._2)
+
+        val ABh = SweepLine.getGraphEdgeIntersections(A._1, B._1).flatMap{_.getLineStrings}
         val ABt = transform(ABh, cell)
         val ABm = merge(ABt)
         val ABp = pair(ABm)
         val ABf = filter(ABp)
-        val AB  = ABf.filter(_.id.size == 1).map(hedge2gedge).toList
+        //val AB  = ABf.filter(_.id.size == 1).map(hedge2gedge).toList
 
-        val h = SweepLine.getGraphEdgeIntersectionsOnB(AB, gCell).flatMap{_.getLineStrings}
+        val h = B._2.flatMap{_.getLineStrings}
         val t = transformCell(h)
         val p = pair(t) ++ ABf
         //val t = transform(h, cell)
@@ -370,7 +375,8 @@ object DCELMerger{
       log(f"Hedges_prime|$nHedges_prime")
       save{"/tmp/edgesHprime.wkt"}{
         hedges_prime.map { hedge =>
-          s"${hedge.toWKT3}\t${hedge.twin.id}\t${hedge.isTwin}\n"
+          //s"${hedge.toText()}\t${hedge.getUserData}\n"
+          s"${hedge.toWKT3}\t${hedge.twin.id}\n"
         }.collect()
       }
     }
@@ -425,6 +431,11 @@ object DCELMerger{
           face.id = id
           face.tag = tag
           face.outerComponent = hedge
+          face.exterior = if(hedges.filter(_.isTwin).size == hedges.size){
+            true
+          } else {
+            false
+          }
           val new_hedges = hedges.map{ h =>
             h.face = face
             h.tag = tag
@@ -441,7 +452,7 @@ object DCELMerger{
 
     def getFaces2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Face] = {
       pre.map(_._1)
-        .filter{ f =>  CGAlgorithms.isCCW(f.toPolygon().getCoordinates) }
+        .filterNot{ _.exterior }
         .groupBy(_.id) // Grouping multi-parts
         .map{ case (id, faces) =>
           val polys = faces.sortBy(_.area).reverse
@@ -472,8 +483,8 @@ object DCELMerger{
         val vertices = getVerticesByV2(half_edges)
         val pre = preprocess(vertices, index)
         val hedges = getHedges2(pre)
-        //val faces  = doublecheckFaces(getFaces2(pre), index)
-        val faces  = getFaces2(pre)
+        val faces  = doublecheckFaces(getFaces2(pre), index)
+        //val faces  = getFaces2(pre)
 
         Iterator( LDCEL(index, vertices, hedges, faces) )
       }.cache
@@ -495,9 +506,9 @@ object DCELMerger{
         }
       }.collect()
     }
-    
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+  
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+
     // Getting half edges...
     def getHalf_edges2(segments: RDD[LineString]): (RDD[Half_edge], Long) = {
       val half_edges = segments.mapPartitionsWithIndex{ case (index, segments) =>
