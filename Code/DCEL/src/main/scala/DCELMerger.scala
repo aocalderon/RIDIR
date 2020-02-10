@@ -324,15 +324,15 @@ object DCELMerger{
       }.toList      
     }
 
-    def transformCell(hedges: List[LineString], cell: Polygon): Vector[Half_edge] = {
+    def transformCell(hedges: List[LineString]): Vector[Half_edge] = {
         hedges.flatMap{ segment =>
           val coords = segment.getCoordinates
           val v1 = Vertex(coords(0).x, coords(0).y)
           val v2 = Vertex(coords(1).x, coords(1).y)
           val h1 = Half_edge(v1, v2)
-          h1.id = "*"
+          h1.id = "D"
           val t1 = Half_edge(v2, v1)
-          t1.id = "*"
+          t1.id = "E"
           t1.isTwin = true
           Vector(h1, t1)
         }.toVector
@@ -351,10 +351,10 @@ object DCELMerger{
         val ABm = merge(ABt)
         val ABp = pair(ABm)
         val ABf = filter(ABp)
-        val AB  = ABf.map(hedge2gedge).toList
+        val AB  = ABf.filter(_.id.size == 1).map(hedge2gedge).toList
 
-        val h = SweepLine.getGraphEdgeIntersections(AB, gCell).flatMap{_.getLineStrings}
-        val t = transformCell(h.filter(_.getUserData.toString.split("\t")(0) == "*"), cell)
+        val h = SweepLine.getGraphEdgeIntersectionsOnB(AB, gCell).flatMap{_.getLineStrings}
+        val t = transformCell(h)
         val p = pair(t) ++ ABf
         //val t = transform(h, cell)
         //val m = merge(t)
@@ -370,7 +370,7 @@ object DCELMerger{
       log(f"Hedges_prime|$nHedges_prime")
       save{"/tmp/edgesHprime.wkt"}{
         hedges_prime.map { hedge =>
-          s"${hedge.toWKT3}\t${hedge.twin.id}\n"
+          s"${hedge.toWKT3}\t${hedge.twin.id}\t${hedge.isTwin}\n"
         }.collect()
       }
     }
@@ -406,9 +406,10 @@ object DCELMerger{
         .filter(_ != "A")
         .filter(_ != "B")
         .filter(_ != "C")
-        .filter(_ != "*" )
+        .filter(_ != "D" )
+        .filter(_ != "E" )
         .sorted.mkString("|")
-      if(id == "") "E" + i else id.split("\\|").distinct.mkString("|")
+      if(id == "") "F" + i else id.split("\\|").distinct.mkString("|")
     }
 
     def preprocess(vertices: Vector[Vertex], index: Int, tag: String = ""):
@@ -418,9 +419,6 @@ object DCELMerger{
         
         (id, hedges.map{ h => h.id = id; h })
       }
-        //.filterNot{ case(id, hedges) =>
-        //  id.substring(0, 1) == "E" && hedges.head.isTwin
-        //}
         .map{ case (id, hedges) =>
           val hedge = hedges.head
           val face = Face(id, index)
@@ -493,7 +491,7 @@ object DCELMerger{
     save{s"/tmp/edgesHprime2.wkt"}{
       dcel_prime.flatMap{ dcel =>
         dcel.half_edges.map{ h =>
-          s"${h.toWKT3}\n"
+          s"${h.toWKT3}\t${h.isTwin}\n"
         }
       }.collect()
     }
