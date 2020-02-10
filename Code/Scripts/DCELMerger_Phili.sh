@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PARTITIONS=8
+PARTITIONS=64
 EXECUTORS=18
 CORES=3
 DMEMORY=18g
@@ -8,7 +8,7 @@ EMEMORY=10g
 SPARK_JARS=/home/acald013/Spark/2.4/jars/
 CLASS_JAR=/home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=/home/acald013/Spark/2.4/conf/log4j.properties
-MASTER=yarn
+MASTER=local[8]
 
 PHILI1=/user/acald013/Datasets/Phili/phili_2000_2272.wkt
 PHILI2=/user/acald013/Datasets/Phili/phili_2010_2272.wkt

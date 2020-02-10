@@ -432,9 +432,13 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
     var coords = ArrayBuffer.empty[Coordinate]
     var h = outerComponent
     if(h != null){
-      coords += new Coordinate(h.v1.x, h.v1.y)
+      val x = BigDecimal(h.v1.x).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+      val y = BigDecimal(h.v1.y).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+      coords += new Coordinate(x, y)
       do{
-        coords += new Coordinate(h.v2.x, h.v2.y)
+        val x = BigDecimal(h.v2.x).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+        val y = BigDecimal(h.v2.y).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+        coords += new Coordinate(x, y)
         h = h.next
       }while(h != outerComponent)
     }
@@ -456,7 +460,6 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
       polys.head // Return a polygon...
     } else {
       // Groups polygons if one contains another...
-
       val pairs = for{
         outer <- polys
         inner <- polys
