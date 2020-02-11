@@ -273,6 +273,21 @@ object DCELMerger{
         }.toVector
     }
 
+    def transform2(hedges: List[LineString]): Vector[Half_edge] = {
+        hedges.flatMap{ segment =>
+          val arr = segment.getUserData.toString().split("\t")
+          val coords = segment.getCoordinates
+          val v1 = Vertex(coords(0).x, coords(0).y)
+          val v2 = Vertex(coords(1).x, coords(1).y)
+          val h1 = Half_edge(v1, v2)
+          h1.id = arr(0)
+          val t1 = Half_edge(v2, v1)
+          t1.id = arr(0).substring(0, 1)
+          t1.isTwin = true
+          Vector(h1, t1)
+        }.toVector
+    }
+
     def merge(hedges: Vector[Half_edge]): Vector[Half_edge] = {
       hedges.map(h => ((h.v1, h.v2), h)).groupBy(_._1).values.map(_.map(_._2))
         .flatMap{ hedges =>
@@ -356,15 +371,10 @@ object DCELMerger{
         val ABm = merge(ABt)
         val ABp = pair(ABm)
         val ABf = filter(ABp)
-        //val AB  = ABf.filter(_.id.size == 1).map(hedge2gedge).toList
 
         val h = B._2.flatMap{_.getLineStrings}
         val t = transformCell(h)
         val p = pair(t) ++ ABf
-        //val t = transform(h, cell)
-        //val m = merge(t)
-        //val p = pair(m)
-        //val f = filter(p)
 
         p.toIterator
       }.cache
@@ -418,7 +428,7 @@ object DCELMerger{
       if(id == "") "F" + i else id.split("\\|").distinct.mkString("|")
     }
 
-    def preprocess(vertices: Vector[Vertex], index: Int, tag: String = ""):
+    def preprocess(vertices: Vector[Vertex], index: Int = -1, tag: String = ""):
         Vector[(Face, Vector[Half_edge])] = {
       getHedgesList(vertices).zipWithIndex.map{ case(hedges, i) =>
         val id = parseIds(hedges.map(_.id), i)
@@ -431,11 +441,7 @@ object DCELMerger{
           face.id = id
           face.tag = tag
           face.outerComponent = hedge
-          face.exterior = if(hedges.filter(_.isTwin).size == hedges.size){
-            true
-          } else {
-            false
-          }
+          face.exterior = !CGAlgorithms.isCCW(face.toPolygon().getCoordinates)
           val new_hedges = hedges.map{ h =>
             h.face = face
             h.tag = tag
@@ -463,18 +469,19 @@ object DCELMerger{
         }.toVector
     }
 
-    def doublecheckFaces(faces: Vector[Face], p: Int): Vector[Face] = {
+    def doublecheckFaces(faces: Vector[Face]): Vector[Face] = {
       val f_prime = faces.filter(_.id.split("\\|").size == 1)
         .map{ face =>
           val hedges = face.getHedges
           face.id = face.isSurroundedBy match{
-            case Some(id) => face.id + "|" + id
+            case Some(id) => List(face.id, id).sorted.mkString("|")
             case None => face.id
           }
           face
         }
 
-      faces.filter(_.id.split("\\|").size == 2).union(f_prime)
+      //faces.filter(_.id.split("\\|").size == 2).union(f_prime)
+      faces
     }
 
     val (dcel_prime, nDcel_prime) = timer{"Merging DCELs prime"}{
@@ -483,7 +490,7 @@ object DCELMerger{
         val vertices = getVerticesByV2(half_edges)
         val pre = preprocess(vertices, index)
         val hedges = getHedges2(pre)
-        val faces  = doublecheckFaces(getFaces2(pre), index)
+        val faces  = doublecheckFaces(getFaces2(pre))
         //val faces  = getFaces2(pre)
 
         Iterator( LDCEL(index, vertices, hedges, faces) )
@@ -507,6 +514,92 @@ object DCELMerger{
       }.collect()
     }
   
+
+    //////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////
+    val hedgesRDD = timer{"Extracting A and B DCELs"}{
+      val hedgesRDD = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edgesIt) =>
+        val edges = edgesIt.toVector
+        val gA = edges.filter(isA).map(edge2graphedge).toList
+        val gB = edges.filter(isB).map(edge2graphedge).toList
+        val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
+        val gCellA = cell2gedges(cell)
+        val gCellB = cell2gedges(cell)
+
+        val Ah = SweepLine.getGraphEdgeIntersections(gA, gCellA).flatMap{_.getLineStrings}
+        val At = transform(Ah, cell)
+        val Am = merge(At)
+        val Ap = pair(Am)
+        val Af = filter(Ap)
+
+
+        val Bh = SweepLine.getGraphEdgeIntersections(gB, gCellB).flatMap{_.getLineStrings}
+        val Bt = transform(Bh, cell)
+        val Bm = merge(Bt)
+        val Bp = pair(Bm)
+        val Bf = filter(Bp)
+
+        val r =(Af, Bf)
+        Iterator(r)
+      }.cache
+      val nHedges = hedgesRDD.count()
+      hedgesRDD
+    }
+    val hedgesARDD = hedgesRDD.flatMap{_._1}
+    val hedgesBRDD = hedgesRDD.flatMap{_._2}
+
+    debug{
+      log(f"H2prime")
+      save{"/tmp/edgesHAprime.wkt"}{
+        hedgesARDD.map{ h =>
+          s"${h.toWKT3}\t${h.twin.id}\n"
+        }.collect()
+      }
+      save{"/tmp/edgesHBprime.wkt"}{
+        hedgesBRDD.map{ h =>
+          s"${h.toWKT3}\t${h.twin.id}\n"
+        }.collect()
+      }
+    }
+
+    val dcels = timer{"Merging Halfedges..."}{
+      hedgesARDD.zipPartitions(hedgesBRDD, preservesPartitioning=true){ (iterA, iterB) =>
+        val gA = iterA.map(hedge2gedge).toList
+        val gB = iterB.map(hedge2gedge).toList
+        val Ch = SweepLine.getGraphEdgeIntersections(gA, gB).flatMap{_.getLineStrings}
+        val Ct = transform2(Ch)
+        val Cm = merge(Ct)
+        val Cp = pair(Cm)
+        val Cf = filter(Cp)
+
+        val vertices = getVerticesByV2(Cf.toIterator)
+        val pre = preprocess(vertices)
+        val hedges = getHedges2(pre)
+        val faces  = doublecheckFaces(getFaces2(pre))
+        //val faces  = getFaces2(pre)
+
+        Iterator( LDCEL(0, vertices, hedges, faces) )
+      }.cache
+    }
+    
+    debug{
+      save{s"/tmp/edgesF2prime.wkt"}{
+        dcels.flatMap{ dcel =>
+          dcel.faces.map{ face =>
+            s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
+          }
+        }.collect()
+      }
+      save{s"/tmp/edgesH2prime.wkt"}{
+        dcel_prime.flatMap{ dcel =>
+          dcel.half_edges.map{ h =>
+            s"${h.toWKT3}\t${h.isTwin}\n"
+          }
+        }.collect()
+      }
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Getting half edges...
