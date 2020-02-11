@@ -295,18 +295,34 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
   }
 
   def isSurroundedBy: Option[String] = {
-    if(id == ""){
+    if(id.substring(0,1) == "F"){
+      None
+    } else if(id.contains("|")){
       None
     } else {
       val tag = id.substring(0, 1)
-      val ids = getHedges.flatMap(_.twin.id.split("\\|"))
-        .map{ id => if(id == "") "*" else id }
-        .filter(_.substring(0, 1) != tag)
+      val hedges = getHedges
+      val ids = hedges.flatMap(_.twin.id.split("\\|"))
+      val n = hedges.size
 
-      if(ids.distinct.size == 1){
-        Some(ids.distinct.head)
-      } else {
-        None
+      tag match {
+        case "A" => {
+          val sid = ids.filter(_.substring(0,1) == "B")
+          if(sid.size == n && sid.distinct.size == 1){
+            Some(sid.head) 
+          } else {
+            None
+          }
+        }
+        case "B" => {
+          val sid = ids.filter(_.substring(0,1) == "A")
+          if(sid.size == n && sid.distinct.size == 1){
+            Some(sid.head)
+          } else {
+            None
+          }
+        }
+        case _ => None
       }
     }
   }
