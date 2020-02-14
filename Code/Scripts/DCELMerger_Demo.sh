@@ -6,8 +6,8 @@ CLASS_JAR=/home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=/home/acald013/Spark/2.4/conf/log4j.properties
 MASTER=local[4]
 
-A=/user/acald013/Datasets/Demo/A.wkt
-B=/user/acald013/Datasets/Demo/B.wkt
+A=/user/acald013/Datasets/Demo/B2.wkt
+B=/user/acald013/Datasets/Demo/B3.wkt
 
 spark-submit \
     --files $LOG_FILE \
@@ -17,5 +17,5 @@ spark-submit \
     --class DCELMerger $CLASS_JAR \
     --input1 $A --offset1 0 \
     --input2 $B --offset2 0 \
-    --nlevels 1 --maxentries 10 --fraction 1 --custom \
+    --nlevels 2 --maxentries 1 --fraction 1 --custom \
     --local --save --debug
