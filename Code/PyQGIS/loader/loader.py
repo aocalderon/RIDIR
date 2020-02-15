@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMessageBox
-from qgis.core import QgsProject, Qgis, QgsFillSymbol
+from qgis.core import QgsProject, Qgis, QgsFillSymbol, QgsPalLayerSettings, QgsVectorLayerSimpleLabeling
 from qgis.utils import iface
 from PyQt5 import uic
 import subprocess
@@ -36,6 +36,17 @@ class LoaderDialog(DialogType, DialogBase):
             if name == "Cells":
                 symbol = QgsFillSymbol.createSimple({'color_border': 'blue', 'style': 'no', 'style_border': 'dash'})
                 layer.renderer().setSymbol(symbol)
+                layer.triggerRepaint()
+            if name == "Faces":
+                symbol = QgsFillSymbol.createSimple({'color': 'green'})
+                layer.renderer().setSymbol(symbol)
+                pal_layer = QgsPalLayerSettings()
+                pal_layer.fieldName = 'field_2'
+                pal_layer.enabled = True
+                pal_layer.placement = QgsPalLayerSettings.Free
+                labels = QgsVectorLayerSimpleLabeling(pal_layer)
+                layer.setLabeling(labels)
+                layer.setLabelsEnabled(True)
                 layer.triggerRepaint()
         with open(os.path.join(os.path.dirname(__file__), 'history.txt'), 'w') as f:
             f.write("{}\n{}".format(text, crs))

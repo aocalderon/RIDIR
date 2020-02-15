@@ -1,9 +1,0 @@
-Cells
-Segments
-Hedges
-Vertices
-Faces
-OpIntersection
-OpUnion
-OpSymmetric
-2272
