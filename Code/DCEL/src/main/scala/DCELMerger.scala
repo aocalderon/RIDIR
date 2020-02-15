@@ -217,7 +217,7 @@ object DCELMerger{
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    // functions
+    // Functions
     //////////////////////////////////////////////////////////////////////////////////////////////////
     def transform(hedges: List[LineString], cell: Polygon, index: Int = -1): Vector[Half_edge] = {
         hedges.filter(line => line.coveredBy(cell)).flatMap{ segment =>
@@ -476,7 +476,7 @@ object DCELMerger{
       }
     }
 
-    val dcels = timer{"Merging Halfedges..."}{
+    val dcels_prime = timer{"Merging Halfedges..."}{
       dcelARDD.zipPartitions(dcelBRDD, preservesPartitioning=true){ (iterA, iterB) =>
         val dcelA = iterA.next() 
         val gA = dcelA.half_edges.map(hedge2gedge).toList
@@ -491,20 +491,66 @@ object DCELMerger{
 
         val mergedDCEL = getLDCEL(Cf)
 
-        Iterator(mergedDCEL)
+        val dcels = (mergedDCEL, dcelA, dcelB)
+        Iterator(dcels)
       }.cache
     }
     
+    val dcels = timer{"Postprocessing..."}{
+      dcels_prime.map{ dcels =>
+        val facesM = dcels._1.faces
+        val singleA = facesM.filter(_.id.substring(0,1) == "A")
+        val facesB = if(singleA.size > 0){
+          Some(dcels._3.faces)
+        } else {
+          None
+        }
+
+        facesB match {
+          case Some(faces) => {
+            for{
+              B <- faces
+              A <- singleA if B.toPolygon().getCentroid.coveredBy(A.toPolygon())
+            } yield {
+              A.id = A.id + "|" + B.id
+            }
+          }
+          case None => logger.info("No single labels with A")
+        }
+
+        val singleB = facesM.filter(_.id.substring(0,1) == "B")
+        val facesA = if(singleB.size > 0){
+          Some(dcels._2.faces)
+        } else {
+          None
+        }
+
+        facesA match {
+          case Some(faces) => {
+            for{
+              A <- faces
+              B <- singleB if A.toPolygon().getCentroid.coveredBy(B.toPolygon())
+            } yield {
+              B.id = B.id + "|" + A.id
+            }
+          }
+          case None => logger.info("No single labels with B")
+        }
+        dcels
+      }.cache
+        //.flatMap(_._1.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\n")).foreach(print)
+    }
+
     debug{
-      save{s"/tmp/edgesF2prime.wkt"}{
-        dcels.flatMap{ dcel =>
+      save{s"/tmp/edgesFaces.wkt"}{
+        dcels.map(_._1).flatMap{ dcel =>
           dcel.faces.map{ face =>
             s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
           }
         }.collect()
       }
-      save{s"/tmp/edgesH2prime.wkt"}{
-        dcels.flatMap{ dcel =>
+      save{s"/tmp/edgesHedges.wkt"}{
+        dcels.map(_._1).flatMap{ dcel =>
           dcel.half_edges.map{ h =>
             s"${h.toWKT3}\t${h.isTwin}\n"
           }
