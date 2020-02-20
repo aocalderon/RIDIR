@@ -18,6 +18,8 @@ import org.geotools.geometry.jts.GeometryClipper
 import org.rogach.scallop._
 import org.slf4j.{Logger, LoggerFactory}
 import DCELBuilder._
+import CellManager._
+import SingleLabelChecker._
 
 object DCELMerger{
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -115,22 +117,6 @@ object DCELMerger{
     geom.isValid()
   }
 
-  def getCellsAtCorner(quadtree: StandardQuadTree[LineString], c: QuadRectangle, precision: Double): (List[QuadRectangle], Point) = {
-    val region = c.lineage.takeRight(1).toInt
-    val corner = region match {
-      case 0 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMinY))
-      case 1 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMinY))
-      case 2 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMaxY))
-      case 3 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMaxY))
-    }
-    val envelope = corner.getEnvelopeInternal
-    envelope.expandBy(precision)
-    val cells = quadtree.findZones(new QuadRectangle(envelope)).asScala
-      .filterNot(_.partitionId == c.partitionId).toList
-      .sortBy(_.lineage.size)
-    (cells, corner)
-  }
-
   /***
    * The main function...
    **/
@@ -219,8 +205,6 @@ object DCELMerger{
       val nEdgesRDD = edgesRDD.spatialPartitionedRDD.rdd.count()
       (edgesRDD, nEdgesRDD, cells, quadtree)
     }
-
-    
 
     debug{
       log(f"Total number of partitions|${cells.size}")
@@ -467,97 +451,15 @@ object DCELMerger{
       val n = dcels.count()
       dcels
     }
-    val dcelARDD = dcelsRDD.map{_._1}
-    val dcelBRDD = dcelsRDD.map{_._2}
 
-    save{"/tmp/edgesHedgesByIndex.wkt"}{
-      dcelARDD.mapPartitionsWithIndex{ case(index, iter) =>
-        val dcel = iter.next()
-        dcel.half_edges.map(h => s"${h.toWKT3}\t$index\n").toIterator
-      }.collect()
+    // Calling methods in CellManager.scala
+    val (dcelARDD, dcelBRDD) = timer{"Updating empty cells"}{
+      val dcelARDD = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree).cache()
+      dcelARDD.count()
+      val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree).cache()
+      dcelBRDD.count()
+      (dcelARDD, dcelBRDD)
     }
-
-    def getNextCellWithEdges(MA: Map[Int, Int]): List[(Int, Int, Point)] = {
-      var result = new ListBuffer[(Int, Int, Point)]()
-      MA.filter{ case(index, size) => size == 0 }.map{ case(index, size) =>
-        var cellList = new ListBuffer[QuadRectangle]()
-        var nextCellWithEdges = -1
-        var referenceCorner = geofactory.createPoint(new Coordinate(0,0))
-        cellList += cells(index)
-        var done = false
-        while(!done){
-          val c = cellList.last
-          val (ncells, corner) = getCellsAtCorner(quadtree, c, precision)
-          for(cell <- ncells){
-            val nedges = MA(cell.partitionId)
-            if(nedges > 0){
-              nextCellWithEdges = cell.partitionId
-              referenceCorner = corner
-              done = true
-            } else {
-              cellList += cell
-            }
-          }
-        }
-        for(cell <- cellList){
-          println(s"${cell}\t${nextCellWithEdges}\t${referenceCorner.toText()}")
-          val r = (cell.partitionId.toInt, nextCellWithEdges, referenceCorner)
-          result += r
-        }
-      }
-      result.toList
-    }
-
-    val MA = dcelARDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-      val r = (index, dcel.half_edges.filter(_.id.substring(0,1) != "F").size)
-      Iterator(r)
-    }.collect().toMap
-
-    val Aecells = getNextCellWithEdges(MA)
-    val Afcells = dcelARDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-      val r = if(Aecells.map(_._2).contains(index)){
-        val ecells = Aecells.filter(_._2 == index).map{ e =>
-          val id = e._1
-          val corner = e._3.buffer(0.001)
-          (id, corner)
-        }
-        val fcells = dcel.faces.map{ f =>
-          val id = f.id
-          val face = f.getGeometry._1
-          (id, face)
-        }
-        for{
-          ecell <- ecells
-          fcell <- fcells if fcell._2.intersects(ecell._2)
-        } yield {
-          (ecell._1, fcell._1)
-        }
-      } else {
-        Vector.empty[(Int, String)]
-      }
-      r.toIterator
-    }.collect()
-    dcelARDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-      if(Afcells.map(_._1).contains(index)){
-        val cell = Afcells.filter(_._1 == index)
-        dcel.faces.map{ f =>
-          f.id = cell.head._2
-          f
-        }
-      }
-      Iterator(dcel)
-    }.flatMap(_.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}")).foreach{println}
-
-    val MB = dcelBRDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-      val r = (index, dcel.half_edges.filter(_.id.substring(0,1) != "F").size)
-      Iterator(r)
-    }.collect().toMap
-
-    //getNextCellWithEdges(MB).foreach { println }
 
     debug{
       save{"/tmp/edgesHAprime.wkt"}{
@@ -582,8 +484,8 @@ object DCELMerger{
       }
     }
 
-    val dcels_prime = timer{"Merging Halfedges..."}{
-      dcelARDD.zipPartitions(dcelBRDD, preservesPartitioning=true){ (iterA, iterB) =>
+    val dcels_prime = timer{"Merging Halfedges"}{
+      val dcels = dcelARDD.zipPartitions(dcelBRDD, preservesPartitioning=true){ (iterA, iterB) =>
         val dcelA = iterA.next() 
         val gA = dcelA.half_edges.map(hedge2gedge).toList
         val dcelB = iterB.next()
@@ -600,51 +502,15 @@ object DCELMerger{
         val dcels = (mergedDCEL, dcelA, dcelB)
         Iterator(dcels)
       }.cache
+      dcels.count()
+      dcels
     }
-    
-    val dcels = timer{"Postprocessing..."}{
-      dcels_prime.map{ dcels =>
-        val facesM = dcels._1.faces
-        val singleA = facesM.filter(_.id.substring(0,1) == "A")
-        val facesB = if(singleA.size > 0){
-          Some(dcels._3.faces)
-        } else {
-          None
-        }
 
-        facesB match {
-          case Some(faces) => {
-            for{
-              B <- faces
-              A <- singleA if B.toPolygon().getCentroid.coveredBy(A.toPolygon())
-            } yield {
-              A.id = A.id + "|" + B.id
-            }
-          }
-          case None => //logger.warn("No single labels with A")
-        }
-
-        val singleB = facesM.filter(_.id.substring(0,1) == "B")
-        val facesA = if(singleB.size > 0){
-          Some(dcels._2.faces)
-        } else {
-          None
-        }
-
-        facesA match {
-          case Some(faces) => {
-            for{
-              A <- faces
-              B <- singleB if A.toPolygon().getCentroid.coveredBy(B.toPolygon())
-            } yield {
-              B.id = B.id + "|" + A.id
-            }
-          }
-          case None => //logger.warn("No single labels with B")
-        }
-        dcels
-      }.cache
-        //.flatMap(_._1.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\n")).foreach(print)
+    // Calling methods in SingleLabelChecker...
+    val dcels = timer{"Checking single-label faces"}{
+      val dcels = checkSingleLabels(dcels_prime).cache
+      dcels.count()
+      dcels
     }
 
     debug{
