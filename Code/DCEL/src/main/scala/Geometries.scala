@@ -445,15 +445,16 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
   }
 
   private def getCoordinates(): Array[Coordinate] = {
+    val scale = 2
     var coords = ArrayBuffer.empty[Coordinate]
     var h = outerComponent
     if(h != null){
-      val x = BigDecimal(h.v1.x).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
-      val y = BigDecimal(h.v1.y).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+      val x = BigDecimal(h.v1.x).setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
+      val y = BigDecimal(h.v1.y).setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
       coords += new Coordinate(x, y)
       do{
-        val x = BigDecimal(h.v2.x).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
-        val y = BigDecimal(h.v2.y).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+        val x = BigDecimal(h.v2.x).setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
+        val y = BigDecimal(h.v2.y).setScale(scale, BigDecimal.RoundingMode.HALF_UP).toDouble
         coords += new Coordinate(x, y)
         h = h.next
       }while(h != outerComponent)
