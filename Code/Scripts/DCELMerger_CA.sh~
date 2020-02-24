@@ -1,17 +1,17 @@
 #!/bin/bash
 
-PARTITIONS=256
-EXECUTORS=18
+PARTITIONS=36
+EXECUTORS=36
 CORES=3
-DMEMORY=18g
-EMEMORY=10g
+DMEMORY=4g
+EMEMORY=5g
 SPARK_JARS=/home/acald013/Spark/2.4/jars/
 CLASS_JAR=/home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=/home/acald013/Spark/2.4/conf/log4j.properties
-MASTER=local[8]
+MASTER=yarn
 
-PHILI1=/user/acald013/Datasets/Phili/phili_2000_2272.wkt
-PHILI2=/user/acald013/Datasets/Phili/phili_2010_2272.wkt
+A=/user/acald013/Datasets/CA/cali2000_polygons6414.tsv
+B=/user/acald013/Datasets/CA/cali2010_polygons6414.tsv
 
 spark-submit --files $LOG_FILE \
 	     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
@@ -19,6 +19,6 @@ spark-submit --files $LOG_FILE \
 	     --master $MASTER --deploy-mode client \
 	     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
 	     --class DCELMerger $CLASS_JAR \
-	     --input1 $PHILI1 --offset1 2 --input2 $PHILI2 --offset2 2 \
+	     --input1 $A --offset1 2 --input2 $B --offset2 2 \
 	     --partitions $PARTITIONS --save --debug
 

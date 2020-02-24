@@ -516,17 +516,17 @@ object DCELMerger{
     }
 
     debug{
-      save{s"/tmp/edgesFaces.wkt"}{
-        dcels.map(_._1).flatMap{ dcel =>
-          dcel.faces.map{ face =>
-            s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
-          }
-        }.collect()
-      }
       save{s"/tmp/edgesHedges.wkt"}{
         dcels.map(_._1).flatMap{ dcel =>
           dcel.half_edges.map{ h =>
             s"${h.toWKT3}\t${h.isTwin}\n"
+          }
+        }.collect()
+      }
+      save{s"/tmp/edgesFaces.wkt"}{
+        dcels.map(_._1).flatMap{ dcel =>
+          dcel.faces.map{ face =>
+            s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
           }
         }.collect()
       }
