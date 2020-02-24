@@ -1,0 +1,140 @@
+\documentclass{beamer}
+
+\usefonttheme{professionalfonts} % using non standard fonts for beamer
+\usefonttheme{serif} % default family is serif
+
+%\usepackage{hyperref}
+
+%\usepackage{minted}
+
+\usepackage{animate}
+
+\usepackage{graphicx}
+
+\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+
+\usepackage{color}
+
+\usepackage{tikz}
+
+\usepackage{amssymb}
+
+\usepackage{enumerate}
+
+
+\newcommand\blfootnote[1]{%
+
+  \begingroup
+
+  \renewcommand\thefootnote{}\footnote{#1}%
+
+  \addtocounter{footnote}{-1}%
+
+  \endgroup
+
+}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+
+ % this default might be overridden by plain title style
+
+ \newcommand\makebeamertitle{\frame{\maketitle}}%
+
+ % (ERT) argument for the TOC
+
+ \AtBeginDocument{%
+
+   \let\origtableofcontents=\tableofcontents
+
+   \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+
+   \def\gobbletableofcontents#1{\origtableofcontents}
+
+ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+\usetheme{Malmoe}
+
+% or ...
+
+\useoutertheme{infolines}
+
+\addtobeamertemplate{headline}{}{\vskip2pt}
+
+
+
+\setbeamercovered{transparent}
+
+% or whatever (possibly just delete it)
+
+\makeatother
+
+\begin{document}
+\title[DCEL report]{RIDIR Report}
+\author[AC]{Andres Calderon}
+\institute[Winter'20]{University of California, Riverside}
+\makebeamertitle
+\newif\iflattersubsect
+
+\AtBeginSection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsection]  
+    \end{frame}
+    \lattersubsectfalse
+}
+
+\AtBeginSubsection[] {
+    \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsubsection]  
+    \end{frame}
+}
+
+\begin{frame}{Polygons covered by polygons...}
+    \centering
+    \includegraphics[trim=2cm 0 4cm 0, clip, width=0.49\textwidth]{figures/A2}
+    \includegraphics[trim=4cm 0 2cm 0, clip, width=0.49\textwidth]{figures/B2}
+\end{frame}
+
+\begin{frame}{Polygons covered by polygons...}
+    \centering
+    \includegraphics[trim=1cm 0 1cm 0, clip, width=0.7\textwidth]{figures/A2B2}
+\end{frame}
+
+\begin{frame}{Polygons covered by polygons...}
+    \centering
+    \includegraphics[trim=2cm 0 3cm 0, clip, width=0.49\textwidth]{figures/AHedges}
+    \includegraphics[trim=3cm 0 2cm 0, clip, width=0.49\textwidth]{figures/BHedges}
+\end{frame}
+
+\begin{frame}{Polygons covered by polygons...}
+    \centering
+    \includegraphics[trim=1cm 0 1cm 0, clip, width=0.7\textwidth]{figures/Merge1}
+\end{frame}
+
+\begin{frame}{Polygons covered by polygons...}
+    \centering
+    \includegraphics[trim=1cm 0 1cm 0, clip, width=0.7\textwidth]{figures/Merge2}
+\end{frame}
+
+\begin{frame}{Polygons covered by polygons...}
+    \centering
+    \includegraphics[trim=1cm 0 1cm 0, clip, width=0.7\textwidth]{figures/Faces}
+\end{frame}
+
+\begin{frame}{Solution querying original DCELs...}
+    \centering
+    \includegraphics[trim=2cm 0 3cm 0, clip, width=0.49\textwidth]{figures/Case1}
+    \includegraphics[trim=3cm 0 2cm 0, clip, width=0.49\textwidth]{figures/BHedges}
+\end{frame}
+
+\begin{frame}{Solution querying original DCELs...}
+    \centering
+    \includegraphics[trim=2cm 0 3cm 0, clip, width=0.49\textwidth]{figures/Case2}
+    \includegraphics[trim=3cm 0 2cm 0, clip, width=0.49\textwidth]{figures/BHedges}
+\end{frame}
+\end{document}
