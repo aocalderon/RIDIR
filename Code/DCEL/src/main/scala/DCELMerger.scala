@@ -455,9 +455,9 @@ object DCELMerger{
 
     // Calling methods in CellManager.scala
     val (dcelARDD, dcelBRDD) = timer{"Updating empty cells"}{
-      val dcelARDD = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree).cache()
+      val dcelARDD = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree, cells).cache()
       dcelARDD.count()
-      val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree).cache()
+      val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree, cells).cache()
       dcelBRDD.count()
       (dcelARDD, dcelBRDD)
     }

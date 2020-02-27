@@ -5,11 +5,12 @@ import com.vividsolutions.jts.geom.{Envelope, Coordinate, Point, LineString}
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
 import DCELMerger.timer
+import DCELBuilder.envelope2Polygon
 
 case class Cell(id: Int, lineage: String, envelope: Envelope)
 
 object CellManager{
-  private val model: PrecisionModel = new PrecisionModel(1000)
+  private val model: PrecisionModel = new PrecisionModel(100)
   private val geofactory: GeometryFactory = new GeometryFactory(model);
   private val precision: Double = 1 / model.getScale
 
@@ -30,12 +31,12 @@ object CellManager{
     (cells, corner)
   }
 
-  def getNextCellWithEdges(M: Map[Int, Int], quadtree: StandardQuadTree[LineString]): List[(Int, Int, Point)] = {
-    val cells = quadtree.getLeafZones.asScala.map(cell => cell.partitionId.toInt -> Cell(cell.partitionId.toInt, cell.lineage, cell.getEnvelope)).toMap
+  def getNextCellWithEdges(M: Map[Int, Int], quadtree: StandardQuadTree[LineString], grids: Map[Int, QuadRectangle]): List[(Int, Int, Point)] = {
+    val cells = grids.map(grid => grid._1 -> Cell(grid._2.partitionId.toInt, grid._2.lineage, grid._2.getEnvelope)).toMap
     var result = new ListBuffer[(Int, Int, Point)]()
     var R = new ListBuffer[Int]()
 
-    val Z = M.filter{ case(index, size) => size == 0 }.map(_._1)
+    val Z = M.filter{ case(index, size) => size == 0 }.map(_._1).toVector.sorted
     Z.map{ index =>
       if(R.contains(index)){
       } else {
@@ -109,15 +110,16 @@ object CellManager{
           val r = (cell.id, nextCellWithEdges, referenceCorner)
           result += r
 
-          println(s"Z ==> ${Z.mkString(" ")} ")
-          println(s"R ==> ${R.mkString(" ")} ")
+          //println(s"Z ==> ${Z.mkString(" ")} ")
+          //println(s"R ==> ${R.mkString(" ")} ")
         }
+        R = R.sorted
       }
     }
     result.toList
   }
 
-  def updateCellsWithoutId(dcelRDD: RDD[LDCEL], quadtree: StandardQuadTree[LineString]): RDD[LDCEL] = {
+  def updateCellsWithoutId(dcelRDD: RDD[LDCEL], quadtree: StandardQuadTree[LineString], grids: Map[Int, QuadRectangle]): RDD[LDCEL] = {
     val M = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
       val dcel = iter.next()
       val r = (index, dcel.half_edges.filter(_.id.substring(0,1) != "F").size)
@@ -125,7 +127,7 @@ object CellManager{
     }.collect().toMap
     println("Getting M...")
 
-    val ecells = getNextCellWithEdges(M, quadtree)
+    val ecells = getNextCellWithEdges(M, quadtree, grids)
     println("getNextCell...")
 
     val fcells = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
@@ -133,18 +135,28 @@ object CellManager{
       val r = if(ecells.map(_._2).contains(index)){
         val ecs = ecells.filter(_._2 == index).map{ e =>
           val id = e._1
-          val corner = e._3.buffer(precision)
-          (id, corner)
+          val corner = e._3.getEnvelopeInternal
+          corner.expandBy(precision)
+          (id, envelope2Polygon(corner))
         }
         val fcs = dcel.faces.map{ f =>
           val id = f.id
           val face = f.getGeometry._1
           (id, face)
         }
+        
+        for{
+          ecell <- ecs
+          fcell <- fcs
+        } yield {
+          println(s"To eval: $ecell <-> $fcell")
+        }
+
         for{
           ecell <- ecs
           fcell <- fcs if fcell._2.intersects(ecell._2)
         } yield {
+          println(s"Eval: ${ecell._1} <-> ${fcell._1}")
           (ecell._1, fcell._1)
         }
       } else {
