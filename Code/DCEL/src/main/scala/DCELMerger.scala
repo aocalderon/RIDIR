@@ -23,9 +23,9 @@ import SingleLabelChecker._
 
 object DCELMerger{
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
-  private val model: PrecisionModel = new PrecisionModel(1000)
-  private val geofactory: GeometryFactory = new GeometryFactory(model);
-  private val precision: Double = 1 / model.getScale
+  private val model: PrecisionModel = new PrecisionModel(10000)
+  val geofactory: GeometryFactory = new GeometryFactory(model);
+  val precision: Double = 1 / model.getScale
 
   case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf,
     startTime: Long, appId: String, cores: Int, executors: Int)
@@ -526,7 +526,7 @@ object DCELMerger{
       save{s"/tmp/edgesHedges.wkt"}{
         dcels.map(_._1).flatMap{ dcel =>
           dcel.half_edges.map{ h =>
-            s"${h.toWKT3}\t${h.isTwin}\n"
+            s"${h.toLineString.toText()}\t${h.isTwin}\n"
           }
         }.collect()
       }
