@@ -4,6 +4,7 @@ import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 import scala.annotation.tailrec
 import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel, Geometry}
 import com.vividsolutions.jts.geom.{Coordinate, LinearRing, MultiPolygon, Polygon, LineString, Point}
+import DCELMerger.geofactory
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
   private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
@@ -204,6 +205,11 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
   def toWKT2: String = s"LINESTRING (${v2.x} ${v2.y} , ${v1.x} ${v1.y})\t$id"
 
   def toWKT3: String = s"LINESTRING (${v1.x} ${v1.y} , ${v2.x} ${v2.y})\t$id"
+
+  def toLineString: LineString = {
+    val arr = Array(new Coordinate(v1.x, v1.y), new Coordinate(v2.x, v2.y))
+    geofactory.createLineString(arr)
+  }
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
@@ -269,10 +275,11 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   override def toString = s"$x $y"
 
   def toWKT: String = s"POINT($x $y)"
+
+  def toPoint: Point = geofactory.createPoint(new Coordinate(x, y))
 }
 
 case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
-  private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
   var id: String = ""
   var ring: Int = -1
   var outerComponent: Half_edge = null
@@ -445,7 +452,7 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
   }
 
   private def getCoordinates(): Array[Coordinate] = {
-    val scale = 2
+    val scale = 4
     var coords = ArrayBuffer.empty[Coordinate]
     var h = outerComponent
     if(h != null){

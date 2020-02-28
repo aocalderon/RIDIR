@@ -4,15 +4,12 @@ import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import com.vividsolutions.jts.geom.{Envelope, Coordinate, Point, LineString}
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
-import DCELMerger.timer
+import DCELMerger.{timer, geofactory, precision}
 import DCELBuilder.envelope2Polygon
 
 case class Cell(id: Int, lineage: String, envelope: Envelope)
 
 object CellManager{
-  private val model: PrecisionModel = new PrecisionModel(100)
-  private val geofactory: GeometryFactory = new GeometryFactory(model);
-  private val precision: Double = 1 / model.getScale
 
   def getCellsAtCorner(quadtree: StandardQuadTree[LineString], c: Cell): (List[Cell], Point) = {
     val region = c.lineage.takeRight(1).toInt
@@ -47,14 +44,12 @@ object CellManager{
         var done = false
         while(!done){
           val c = cellList.last
-          println(s"Current cell: ${c.id} [${c.lineage}]")
           val (ncells, corner) = getCellsAtCorner(quadtree, c)
 
           val ncells_prime = ncells.par.map(c => (c, M(c.id))).filter(_._2 != 0)
           val hasEdges = if(ncells_prime.size == 0) None else Some(ncells_prime.head._1)
           done = hasEdges match {
             case Some(cell) => {
-              println(s"Found a cell at ${cell.id} and ${corner}")
               nextCellWithEdges = cell.id
               referenceCorner = corner
               true
@@ -64,29 +59,10 @@ object CellManager{
 
           if(!done){
             cellList ++= ncells
-            println(s"cellList: ${cellList.mkString(" ")}")
           }
-
-          /*
-           for(cell <- ncells){
-           val nedges = M(cell.id)
-           println(s"Evaluating $cell: $nedges")
-           if(nedges > 0){
-           nextCellWithEdges = cell.id
-           referenceCorner = corner
-           println(s"Done! $nextCellWithEdges")
-           done = true
-           } else {
-           cellList += cell
-           }
-           }
-           */
           if(!done && cellList.takeRight(4).map(_.lineage.size).distinct.size == 1){
-            println(s"4 empty cells detected around cell ${c.id}:")
             val quads = cellList.takeRight(4).sortBy(_.lineage)
-            quads.map(c => s"${c.id}: [${c.lineage}]").foreach{println}
             val parent_pos = quads.head.lineage.takeRight(2).head
-
             val new_c_pos = parent_pos match {
               case '0' => '3'
               case '1' => '2'
@@ -94,24 +70,17 @@ object CellManager{
               case '3' => '0'
               case _ => ' '
             }
-
             cellList.remove(cellList.size - 4, 4)
             cellList = cellList ++ quads.filter(_.lineage.last != new_c_pos)
             val c_prime = quads.filter(_.lineage.last == new_c_pos).head
             val l_prime = c_prime.lineage
             cellList += c_prime.copy(lineage = l_prime.substring(0, l_prime.size - 1))
-
-            println("New cell list:")
-            cellList.foreach{println}
           }
         }
         for(cell <- cellList){
           R += cell.id
           val r = (cell.id, nextCellWithEdges, referenceCorner)
           result += r
-
-          //println(s"Z ==> ${Z.mkString(" ")} ")
-          //println(s"R ==> ${R.mkString(" ")} ")
         }
         R = R.sorted
       }
@@ -125,11 +94,8 @@ object CellManager{
       val r = (index, dcel.half_edges.filter(_.id.substring(0,1) != "F").size)
       Iterator(r)
     }.collect().toMap
-    println("Getting M...")
 
     val ecells = getNextCellWithEdges(M, quadtree, grids)
-    println("getNextCell...")
-
     val fcells = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
       val dcel = iter.next()
       val r = if(ecells.map(_._2).contains(index)){
@@ -147,16 +113,8 @@ object CellManager{
         
         for{
           ecell <- ecs
-          fcell <- fcs
-        } yield {
-          println(s"To eval: $ecell <-> $fcell")
-        }
-
-        for{
-          ecell <- ecs
           fcell <- fcs if fcell._2.intersects(ecell._2)
         } yield {
-          println(s"Eval: ${ecell._1} <-> ${fcell._1}")
           (ecell._1, fcell._1)
         }
       } else {
@@ -164,7 +122,6 @@ object CellManager{
       }
       r.toIterator
     }.collect()
-    println("fcells...")
 
     val dcelRDD_prime = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
       val dcel = iter.next()
@@ -185,7 +142,6 @@ object CellManager{
         Iterator(dcel)
       }
     }
-    println("dcel_prime...")
 
     dcelRDD_prime
   }
