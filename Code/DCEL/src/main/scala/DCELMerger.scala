@@ -413,14 +413,18 @@ object DCELMerger{
     ////////////////////////////////////////////////////////////////////////////////////
     // main functions
     ////////////////////////////////////////////////////////////////////////////////////
-    def getLDCEL(h: Vector[Half_edge]): LDCEL = {
+    def getLDCEL(h: Vector[Half_edge], tag: String, keepEmptyFaces: Boolean = false): LDCEL = {
       val vertices = getVerticesByV2(h.toIterator)
       val pre = preprocess(vertices)
       val hedges = getHedges2(pre)
-      val faces  = doublecheckFaces(getFaces2(pre))
-        .filter(_.id.substring(0,1) != "F")
+      val faces  = if(keepEmptyFaces){
+        doublecheckFaces(getFaces2(pre))
+      } else {
+        doublecheckFaces(getFaces2(pre))
+          .filter(_.id.substring(0,1) != "F")
+      }
 
-      LDCEL(0, vertices, hedges, faces)
+      LDCEL(0, vertices, hedges, faces, tag)
     }
 
     val dcelsRDD = timer{"Extracting A and B DCELs"}{
@@ -437,14 +441,14 @@ object DCELMerger{
         val Am = merge(At)
         val Ap = pair(Am)
         val Af = filter(Ap)
-        val dcelA = getLDCEL(Af)
+        val dcelA = getLDCEL(Af, index.toString(), true)
 
         val Bh = SweepLine.getGraphEdgeIntersections(gB, gCellB).flatMap{_.getLineStrings}
         val Bt = transform(Bh, cell)
         val Bm = merge(Bt)
         val Bp = pair(Bm)
         val Bf = filter(Bp)
-        val dcelB = getLDCEL(Bf)
+        val dcelB = getLDCEL(Bf, index.toString(), true)
 
         val r = (dcelA, dcelB)
         Iterator(r)
@@ -453,10 +457,45 @@ object DCELMerger{
       dcels
     }
 
+    debug{
+      save{"/tmp/edgesHA.wkt"}{
+        dcelsRDD.flatMap{ dcels =>
+          val dcel = dcels._1 
+          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.tag}\n")
+        }.collect()
+      }
+      save{"/tmp/edgesHB.wkt"}{
+        dcelsRDD.flatMap{ dcels =>
+          val dcel = dcels._2 
+          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.tag}\n")
+        }.collect()
+      }
+      save{"/tmp/edgesFA.wkt"}{
+        dcelsRDD.flatMap{ dcels =>
+          val dcel = dcels._1 
+          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.tag}\n")
+        }.collect()
+      }
+      save{"/tmp/edgesFB.wkt"}{
+        dcelsRDD.flatMap{ dcels =>
+          val dcel = dcels._2 
+          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.tag}\n")
+        }.collect()
+      }
+    }
+
     // Calling methods in CellManager.scala
     val (dcelARDD, dcelBRDD) = timer{"Updating empty cells"}{
+
+      //println("A")
+      //getEmptyCells(dcelsRDD.map{_._1}, cells).foreach{println}
+      //println("B")
+      //getEmptyCells(dcelsRDD.map{_._2}, cells).foreach{println}
+
+      println("Cleaning DCEL A")
       val dcelARDD = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree, cells).cache()
       dcelARDD.count()
+      println("Cleaning DCEL B")
       val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree, cells).cache()
       dcelBRDD.count()
       (dcelARDD, dcelBRDD)
@@ -466,22 +505,22 @@ object DCELMerger{
     debug{
       save{"/tmp/edgesHAprime.wkt"}{
         dcelARDD.flatMap{ dcel =>
-          dcel.half_edges.map(h => s"${h.toWKT3}\t${h.twin.id}\n")
+          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.tag}\n")
         }.collect()
       }
       save{"/tmp/edgesFAprime.wkt"}{
         dcelARDD.flatMap{ dcel =>
-          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\n")
+          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.tag}\n")
         }.collect()
       }
       save{"/tmp/edgesHBprime.wkt"}{
         dcelBRDD.flatMap{ dcel =>
-          dcel.half_edges.map(h => s"${h.toWKT3}\t${h.twin.id}\n")
+          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.tag}\n")
         }.collect()
       }
       save{"/tmp/edgesFBprime.wkt"}{
         dcelBRDD.flatMap{ dcel =>
-          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\n")
+          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.tag}\n")
         }.collect()
       }
     }
@@ -499,7 +538,7 @@ object DCELMerger{
         val Cp = pair(Cm)
         val Cf = filter(Cp)
 
-        val mergedDCEL = getLDCEL(Cf)
+        val mergedDCEL = getLDCEL(Cf, dcelA.tag)
 
         val dcels = (mergedDCEL, dcelA, dcelB)
         Iterator(dcels)

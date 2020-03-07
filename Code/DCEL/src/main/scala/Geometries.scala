@@ -210,6 +210,8 @@ case class Half_edge(v1: Vertex, v2: Vertex) extends Ordered[Half_edge] {
     val arr = Array(new Coordinate(v1.x, v1.y), new Coordinate(v2.x, v2.y))
     geofactory.createLineString(arr)
   }
+
+  override def toString: String = s"${toLineString.toText()}\t$id"
 }
 
 case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
@@ -566,6 +568,8 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
     result = prime * result + (if (id == null) 0 else id.hashCode)
     result
   }
+
+  override def toString: String = s"$id"
 }
 
 case class Edge(v1: Vertex, v2: Vertex, var label: String = "", id: String = "") extends Ordered[Edge] {
