@@ -378,7 +378,7 @@ object DCELBuilder {
       val hedges = getHedges(preFacesAndHedges)
       val faces  = getFaces(preFacesAndHedges)
       
-      Iterator( LDCEL(index, vertices, hedges, faces, tag) )
+      Iterator( LDCEL(index, vertices, hedges, faces, index) )
     }.cache
     val nDcel = dcel.count()
     (dcel, nDcel)

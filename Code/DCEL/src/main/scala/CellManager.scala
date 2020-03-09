@@ -193,7 +193,7 @@ object CellManager{
         }
         //val facesA = dcel.faces.filter(_.id.substring(0,1) != "F")
         //val faces = facesA ++ facesF
-        val d = LDCEL(index, dcel.vertices, dcel.half_edges, dcel.faces)
+        val d = LDCEL(index, dcel.vertices, dcel.half_edges, dcel.faces, dcel.index)
 
         //
         dcel.faces.foreach{println}
@@ -203,7 +203,7 @@ object CellManager{
       } else {
         // prune empty faces...
         val faces = dcel.faces.filter(_.id.substring(0, 1) != "F")
-        val d = LDCEL(index, dcel.vertices, dcel.half_edges, faces)
+        val d = LDCEL(index, dcel.vertices, dcel.half_edges, faces, dcel.index)
         Iterator(d)
       }
     }
