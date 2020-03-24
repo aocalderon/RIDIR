@@ -4,8 +4,10 @@ object SingleLabelChecker{
   def parseId(id: String): String = id.split("\\|").distinct.sorted.mkString("|")
 
   def checkSingleLabels(dcels_prime: RDD[(LDCEL, LDCEL, LDCEL)]): RDD[(LDCEL, LDCEL, LDCEL)] = {
-    dcels_prime.map{ dcels =>
-      val facesM = dcels._1.faces
+    dcels_prime.mapPartitionsWithIndex{ case(index, iter) =>
+      val dcels = iter.next()
+      val facesM = dcels._1.faces.filterNot(_.id.contains("|"))
+
       val singleA = facesM.filter(_.id.substring(0,1) == "A")
       val facesB = if(singleA.size > 0){
         Some(dcels._3.faces)
@@ -17,7 +19,7 @@ object SingleLabelChecker{
         case Some(faces) => {
           for{
             B <- faces
-            A <- singleA if B.toPolygon().getCentroid.coveredBy(A.toPolygon())
+            A <- singleA if A.toPolygon().getInteriorPoint.coveredBy(B.toPolygon())
           } yield {
             A.id = parseId(A.id + "|" + B.id)
           }
@@ -26,6 +28,12 @@ object SingleLabelChecker{
       }
 
       val singleB = facesM.filter(_.id.substring(0,1) == "B")
+
+      //
+      if(index == 11){
+        println(s"singleB ${singleB.map(_.id).mkString(" ")}")
+      }
+
       val facesA = if(singleB.size > 0){
         Some(dcels._2.faces)
       } else {
@@ -34,16 +42,24 @@ object SingleLabelChecker{
 
       facesA match {
         case Some(faces) => {
+          //
+          if(index == 11){
+            println(s"facesA ${faces.map(_.id).mkString(" ")}")
+          }
+
           for{
             A <- faces
-            B <- singleB if A.toPolygon().getCentroid.coveredBy(B.toPolygon())
+            B <- singleB if B.toPolygon().getInteriorPoint.coveredBy(A.toPolygon())
           } yield {
+            if(index == 11){
+              println(s"A: ${A.id} B: ${B.id}")
+            }
             B.id = parseId(A.id + "|" + B.id)
           }
         }
         case None => //logger.warn("No single labels with B")
       }
-      dcels
+      Iterator(dcels)
     }
   }
 }

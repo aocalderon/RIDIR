@@ -1,40 +1,60 @@
 import org.datasyslab.geospark.spatialPartitioning.quadtree.{StandardQuadTree, QuadRectangle}
 import org.apache.spark.rdd.RDD
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.{Envelope, Coordinate, Point, LineString}
+import com.vividsolutions.jts.geom.{Envelope, Coordinate, Point, LineString, Polygon}
+import com.vividsolutions.jts.io.WKTReader
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
-import DCELMerger.{timer, geofactory, precision}
-import DCELBuilder.envelope2Polygon
+import DCELMerger.{timer, geofactory, precision, logger}
 
 case class Cell(id: Int, lineage: String, envelope: Envelope)
 
 object CellManager{
 
+  def envelope2Polygon(e: Envelope): Polygon = {
+    val minX = e.getMinX()
+    val minY = e.getMinY()
+    val maxX = e.getMaxX()
+    val maxY = e.getMaxY()
+    val p1 = new Coordinate(minX, minY)
+    val p2 = new Coordinate(maxX, minY)
+    val p3 = new Coordinate(maxX, maxY)
+    val p4 = new Coordinate(minX, maxY)
+    geofactory.createPolygon(Array(p1,p2,p3,p4,p1))
+  }
+
+  def equalFaceAndCell(face: Face, cell: Polygon): Boolean = {
+    if(face.id.substring(0,1) != "F"){
+      false
+    } else if(face.getNVertices != 5){
+      false
+    } else if(face.isCW) {
+      false
+    } else {
+      val reader = new WKTReader(geofactory)
+      val a = reader.read(face.toPolygon().toText())
+      val b = reader.read(cell.toText())
+      a.equals(b)
+    }
+  }
+
   def getEmptyCells(dcelRDD: RDD[LDCEL], grids: Map[Int, QuadRectangle]): Map[Int, Int] = {
-    dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
+    val M = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
       val dcel = iter.next()
-      val faces = dcel.faces.filter(_.id.substring(0, 1) == "F")
-      val m = if(faces.size == 0){
-        println(s"Cell: $index 1 Faces: ${faces.map(_.id).mkString(" ")}")
-        (index, 1)
+      val index = dcel.index
+      val cell = envelope2Polygon(grids(index).getEnvelope)
+      val face = dcel.faces.filter(f => equalFaceAndCell(f, cell))
+      val m = if(!face.isEmpty){
+        face.head.isCellFace = true
+        (index, 0)
       } else {
-        val cellFace = envelope2Polygon(grids(index).getEnvelope)
-        val equals = faces.filter { face =>
-          val compare = face.toPolygon().equals(cellFace)
-          println(s"Cell: $index Compare: $compare \n${face.toPolygon.toText()}\n${cellFace.toText()}")
-          face.toPolygon().equals(cellFace)
-        }
-        if(equals.isEmpty){
-          println(s"Cell: $index 1 Faces: ${faces.map(_.id).mkString(" ")}")
-          (index, 1)
-        } else {
-          println(s"Cell: $index 0 Faces: ${faces.map(_.id).mkString(" ")}")
-          (index, 0)
-        }
+        (index, 1)
       }
+
       Iterator(m)
-    }.collect().toMap
+    }
+
+    M.collect().toMap
   }
 
   def getCellsAtCorner(quadtree: StandardQuadTree[LineString], c: Cell): (List[Cell], Point) = {
@@ -59,10 +79,14 @@ object CellManager{
     var result = new ListBuffer[(Int, Int, Point)]()
     var R = new ListBuffer[Int]()
 
+    //
+    println(s"M: ${M.size}...")
+
     val Z = M.filter{ case(index, size) => size == 0 }.map(_._1).toVector.sorted
 
-    println("Printing Z...")
-    Z.foreach(println)
+    //
+    println(s"Z: ${Z.size}...")
+    
 
     Z.map{ index =>
       if(R.contains(index)){
@@ -77,17 +101,17 @@ object CellManager{
           val (ncells, corner) = getCellsAtCorner(quadtree, c)
 
           //
-          println(s"$c => IDs: ${ncells.map(_.id).mkString(" ")} Corner: ${corner.toText()}")
+          //println(s"$c => IDs: ${ncells.map(_.id).mkString(" ")} Corner: ${corner.toText()}")
 
           val ncells_prime = ncells.par.map(c => (c, M(c.id))).filter(_._2 != 0)
 
           //
-          ncells_prime.foreach(println)
+          //ncells_prime.foreach(println)
 
           val hasEdges = if(ncells_prime.size == 0) None else Some(ncells_prime.head._1)
 
           //
-          println(hasEdges)
+          //println(hasEdges)
 
           done = hasEdges match {
             case Some(cell) => {
@@ -130,19 +154,9 @@ object CellManager{
   }
 
   def updateCellsWithoutId(dcelRDD: RDD[LDCEL], quadtree: StandardQuadTree[LineString], grids: Map[Int, QuadRectangle]): RDD[LDCEL] = {
-    /*
-    val M = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-      val r = (index, dcel.half_edges.filter(_.id.substring(0,1) != "F").size)
-      Iterator(r)
-     }.collect().toMap*/
 
     val M = getEmptyCells(dcelRDD: RDD[LDCEL], grids: Map[Int, QuadRectangle])
-
     val ecells = getNextCellWithEdges(M, quadtree, grids)
-
-    //
-    ecells.foreach { println }
 
     val fcells = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
       val dcel = iter.next()
@@ -161,6 +175,7 @@ object CellManager{
         
         for{
           ecell <- ecs
+          // Query which face it intersects...
           fcell <- fcs if fcell._2.intersects(ecell._2)
         } yield {
           (ecell._1, fcell._1)
@@ -171,33 +186,18 @@ object CellManager{
       r.toIterator
     }.collect().filter(_._2.substring(0, 1) != "F")
 
-    //
-    fcells.foreach { println }
-
     val dcelRDD_prime = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
       val dcel = iter.next()
       if(fcells.map(_._1).contains(index)){
         val cell = fcells.filter(_._1 == index)
         val id = cell.head._2
-        val hedges = dcel.half_edges.filter(_.id.substring(0,1) == "F").map{ h =>
-          h.id = id
-          h
-        }
-        //val hedgesA = dcel.half_edges.filter(_.id.substring(0,1) != "F")
-        //val hedges = hedgesA ++ hedgesF
-
-        dcel.faces.filter(_.id.substring(0,1) == "F").map{ f =>
+        
+        dcel.faces.filter(_.isCellFace).map{ f =>
           f.id = id
-          f.outerComponent = hedges.head
+          f.getHedges.foreach(_.id = id)
           f
         }
-        //val facesA = dcel.faces.filter(_.id.substring(0,1) != "F")
-        //val faces = facesA ++ facesF
         val d = LDCEL(index, dcel.vertices, dcel.half_edges, dcel.faces, dcel.index)
-
-        //
-        dcel.faces.foreach{println}
-        println(d)
 
         Iterator(d)
       } else {

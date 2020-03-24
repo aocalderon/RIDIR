@@ -18,11 +18,12 @@ import com.vividsolutions.jts.io.WKTReader
 import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
 
+import DCELMerger.geofactory
+import CellManager.envelope2Polygon
+
 object DCELBuilder {
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val startTime: Long = 0L
-  private val precisionModel: PrecisionModel = new PrecisionModel(1000)
-  private val geofactory: GeometryFactory = new GeometryFactory(precisionModel)
 
   case class Settings(spark: SparkSession, params: DCELBuilderConf)
 
@@ -62,19 +63,6 @@ object DCELBuilder {
     val end = clocktime
     val time = "%.2f".format((end - start) / 1000.0)
     logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
-  }
-
-  def envelope2Polygon(e: Envelope): Polygon = {
-    val minX = e.getMinX()
-    val minY = e.getMinY()
-    val maxX = e.getMaxX()
-    val maxY = e.getMaxY()
-    val p1 = new Coordinate(minX, minY)
-    val p2 = new Coordinate(maxX, minY)
-    val p3 = new Coordinate(maxX, maxY)
-    val p4 = new Coordinate(minX, maxY)
-    val ring = geofactory.createLinearRing(Array(p1,p2,p3,p4,p1))
-    geofactory.createPolygon(ring)
   }
 
   def getRings(polygon: Polygon): List[Array[Coordinate]] = {
@@ -162,7 +150,7 @@ object DCELBuilder {
       case 3 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMaxY))
     }
     val envelope = corner.getEnvelopeInternal
-    val precision = 1 / precisionModel.getScale
+    val precision = 1 / geofactory.getPrecisionModel.getScale
     envelope.expandBy(precision)
     val cells = quadtree.findZones(new QuadRectangle(envelope)).asScala
       .filterNot(_.partitionId == c.partitionId).toList
@@ -409,8 +397,8 @@ object DCELBuilder {
     implicit val settings = Settings(spark, params)
 
     debug{
-      val precision = 1 / precisionModel.getScale
-      logger.info(s"Using Scale=${precisionModel.getScale} and Precision=${precision}")
+      val precision = 1 / geofactory.getPrecisionModel.getScale
+      logger.info(s"Using Scale=${geofactory.getPrecisionModel.getScale} and Precision=${precision}")
     }
 
     // Reading data...

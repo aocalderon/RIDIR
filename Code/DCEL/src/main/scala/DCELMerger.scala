@@ -206,17 +206,25 @@ object DCELMerger{
       val nEdgesRDD = edgesRDD.spatialPartitionedRDD.rdd.count()
       (edgesRDD, nEdgesRDD, cells, quadtree)
     }
+    val grids = spark.sparkContext
+      .broadcast{
+        cells.toSeq.sortBy(_._1).map{ case (i,q) => envelope2Polygon(q.getEnvelope)}
+      }
+  
 
     debug{
       log(f"Total number of partitions|${cells.size}")
       log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
       log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
       save{"/tmp/edgesCells.wkt"}{
+        /*
         edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
           val cell = cells.get(index).get
           List(s"${envelope2Polygon(cell.getEnvelope).toText()}\t${index}\t${partition.size}\n").toIterator
         }.collect()
-      }      
+         */
+        grids.value.zipWithIndex.map{ case(g, i) => s"${g.toText()}\t$i\n" }
+      }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -349,6 +357,10 @@ object DCELMerger{
       if(id == "") "F" + i else id.split("\\|").distinct.mkString("|")
     }
 
+    def removeTag(id: String, tag: String): String = {
+      id.split("\\|").filterNot(_ == tag).mkString("|")
+    }
+
     def preprocess(vertices: Vector[Vertex], index: Int): Vector[(Face, Vector[Half_edge])] = {
       val cell = envelope2Polygon(cells(index).getEnvelope)
       getHedgesList(vertices).zipWithIndex.map{ case(hedges, i) =>
@@ -362,9 +374,12 @@ object DCELMerger{
           face.id = id
           face.outerComponent = hedge
           val poly = face.toPolygon()
-          face.exterior = !CGAlgorithms.isCCW(poly.getCoordinates) & poly.equals(cell) 
+          face.exterior = face.isCellBorder(grids)
           val new_hedges = hedges.map{ h =>
             h.face = face
+            if(face.exterior){
+              h.id = "F"
+            }
             h
           }
 
@@ -373,18 +388,18 @@ object DCELMerger{
     }
 
     def getHedges2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Half_edge] = {
-      pre.flatMap(_._2)
+      pre.flatMap(_._2).map{ h =>
+        h.id = removeTag(h.id, "C")
+        h
+      }
     }
 
     def getFaces2(pre: Vector[(Face, Vector[Half_edge])]): Vector[Face] = {
-      pre.map(_._1)
+      pre.map(_._1).map{ f =>
+        f.id = removeTag(f.id, "C")
+        f
+      }
         .filterNot{ f => f.exterior }
-        .map{f =>
-          f.id = f.id.split("\\|")
-            .filterNot(_ == "C")
-            .mkString("|")
-          f
-        }
         .toVector
     }
 
@@ -419,7 +434,6 @@ object DCELMerger{
       } else {
         getFaces2(pre).filter(_.id.substring(0,1) != "F")
       }
-      
 
       LDCEL(0, vertices, hedges, faces, index)
     }
@@ -429,7 +443,7 @@ object DCELMerger{
         val edges = edgesIt.toVector
         val gA = edges.filter(isA).map(edge2graphedge).toList
         val gB = edges.filter(isB).map(edge2graphedge).toList
-        val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
+        val cell = envelope2Polygon(cells(index).getEnvelope)
         val gCellA = cell2gedges(cell)
         val gCellB = cell2gedges(cell)
 
@@ -456,34 +470,30 @@ object DCELMerger{
 
     debug{
       save{"/tmp/edgesHA.wkt"}{
-        dcelsRDD.flatMap{ dcels =>
-          val dcel = dcels._1 
-          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.index}\n")
-        }.collect()
-      }
-      save{"/tmp/edgesHB.wkt"}{
-        dcelsRDD.flatMap{ dcels =>
-          val dcel = dcels._2 
+        dcelsRDD.map(_._1).flatMap{ dcel =>
           dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.index}\n")
         }.collect()
       }
       save{"/tmp/edgesFA.wkt"}{
-        dcelsRDD.flatMap{ dcels =>
-          val dcel = dcels._1 
-          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.index}\n")
+        dcelsRDD.map(_._1).flatMap{ dcel =>
+          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.index}\t${f.isCellBorder(grids)}\n")
+        }.collect()
+      }
+      save{"/tmp/edgesHB.wkt"}{
+        dcelsRDD.map(_._2).flatMap{ dcel =>
+          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.index}\n")
         }.collect()
       }
       save{"/tmp/edgesFB.wkt"}{
-        dcelsRDD.flatMap{ dcels =>
-          val dcel = dcels._2 
-          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.index}\n")
+        dcelsRDD.map(_._2).flatMap{ dcel =>
+          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.index}\t${f.isCellBorder(grids)}\n")
         }.collect()
       }
     }
 
+
     // Calling methods in CellManager.scala
     val (dcelARDD, dcelBRDD) = timer{"Updating empty cells"}{
-      println("Cleaning DCEL A")
       val dcelARDD = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree, cells)
         .mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
@@ -495,12 +505,13 @@ object DCELMerger{
 
               outer
             }.toVector
-          println(s"Cell: $index Faces: ${faces.map(_.id).mkString(" ")}")
-          Iterator(dcel.copy(faces = doublecheckFaces(faces)))
+          faces.foreach{ f =>
+            f.exterior = f.isCellBorder(grids)
+          }
+          Iterator(dcel.copy(faces = faces))
         }
         .cache()
       dcelARDD.count()
-      println("Cleaning DCEL B")
       val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree, cells)
         .mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
@@ -512,8 +523,10 @@ object DCELMerger{
 
               outer
             }.toVector
-          println(s"Cell: $index Faces: ${faces.map(_.id).mkString(" ")}")
-          Iterator(dcel.copy(faces = doublecheckFaces(faces)))
+          faces.foreach{ f =>
+            f.exterior = f.isCellBorder(grids)
+          }
+          Iterator(dcel.copy(faces = faces))
         }
         .cache()
       dcelBRDD.count()
@@ -565,24 +578,88 @@ object DCELMerger{
       dcels
     }
 
+    debug{
+      save{s"/tmp/edgesFC.wkt"}{
+        dcels_prime.map(_._1).flatMap{ dcel =>
+          dcel.faces.map{ face =>
+            s"${face.getGeometry._1.toText()}\t${face.id}\t${face.cell}\t${face.getGeometry._2}\n"
+          }
+        }.collect()
+      }
+      save{s"/tmp/edgesHC.wkt"}{
+        dcels_prime.map(_._1).flatMap{ dcel =>
+          dcel.half_edges.map{ h =>
+            s"${h.toLineString.toText()}\t${h.id}\n"
+          }
+        }.collect()
+      }
+    }
+
     // Calling methods in SingleLabelChecker...
     val dcels = timer{"Checking single-label faces"}{
-      val dcels = checkSingleLabels(dcels_prime)
+      val dcels0 = dcels_prime
         .mapPartitionsWithIndex{ case(index, iter) =>
           val dcels = iter.next()
           val dcel = dcels._1
-          val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
-            .map{ case (id, f) =>
-              val polys = f.sortBy(_.area).reverse
-              val outer = polys.head
-              outer.innerComponents = polys.tail.toVector
 
-              outer
-            }.toVector
-          println(s"Cell: $index Faces: ${faces.map(_.id).mkString(" ")}")
-          Iterator( (dcel.copy(faces = doublecheckFaces(faces)), dcels._2, dcels._3) )
+          val hasHoles = dcel.faces.exists(!_.isCCW)
+          if(hasHoles){
+            val outers = dcel.faces.filter(_.isCCW)
+
+            //
+            //outers.foreach { f => println(s"Outer: ${f.getGeometry._1.toText()}\t${f.id}") }
+            //println( s"Outers: ${outers.map(_.id).mkString(" ")}" )
+
+            val inners = dcel.faces.filter(!_.isCCW)
+
+            //
+            //inners.foreach { f => println(s"Inner: ${f.getGeometry._1.toText()}\t${f.id}") }
+            //println( s"Inners: ${inners.map(_.id).mkString(" ")}" )
+
+            for{
+              outer <- outers
+              inner <- inners if {
+                val a = outer.toPolygon()
+                val b = inner.toPolygon()
+                a.covers(b) && !a.equals(b)
+              }
+            } yield {
+
+              //
+              //println(s"Outer: ${outer.id} vs Inner: ${inner.id}")
+
+              inner.id = outer.id
+            }
+            val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
+              .map{ case (id, f) =>
+                val polys = f.sortBy(_.area).reverse
+                val outer = polys.head
+                outer.innerComponents = polys.tail.toVector
+
+                outer
+              }.toVector
+
+            //
+            //println(s"Result -> Cell: $index Faces: ${faces.map(_.id).mkString(" ")}")
+            //faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}").foreach{println}
+
+            Iterator( (dcel.copy(faces = faces), dcels._2, dcels._3) )
+          } else {
+            val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
+              .map{ case (id, f) =>
+                val polys = f.sortBy(_.area).reverse
+                val outer = polys.head
+                outer.innerComponents = polys.tail.toVector
+
+                outer
+              }.toVector
+            Iterator( (dcel.copy(faces = faces), dcels._2, dcels._3) )
+          }
         }
         .cache
+
+      val dcels = checkSingleLabels(dcels0)
+      //val dcels = dcels0
       dcels.count()
       dcels
     }
@@ -608,7 +685,6 @@ object DCELMerger{
     // overlay functions
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*
     def mergePolygons(a: String, b:String): String = {
       val reader = new WKTReader(geofactory)
       val pa = reader.read(a)
@@ -619,18 +695,18 @@ object DCELMerger{
     def intersection(dcel: LDCEL): Vector[(String, Geometry)] = {
       dcel.faces.filter(_.id.split("\\|").size == 2).map(f => (f.id, f.getGeometry._1))
     }
-    def union(dcel: LDCEL): Vector[Face] = {
-      dcel.faces
+    def union(dcel: LDCEL): Vector[(String, Geometry)] = {
+      dcel.faces.map(f => (f.id, f.getGeometry._1))
     }
     def symmetricDifference(dcel: LDCEL): Vector[(String, Geometry)] = {
       dcel.faces.filter(_.id.split("\\|").size == 1).map(f => (f.id, f.getGeometry._1))
     }
     
-    def differenceA(dcel: LDCEL): Vector[Face] = {
-      symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "A")
+    def differenceA(dcel: LDCEL): Vector[(String, Geometry)] = {
+      symmetricDifference(dcel).filter(_._1.substring(0, 1) == "A")
     }
-    def differenceB(dcel: LDCEL): Vector[Face] = {
-      symmetricDifference(dcel).filter(_.id.size > 1).filter(_.id.substring(0, 1) == "B")
+    def differenceB(dcel: LDCEL): Vector[(String, Geometry)] = {
+      symmetricDifference(dcel).filter(_._1.substring(0, 1) == "B")
     }
     
     def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[(String, Geometry)],
@@ -643,6 +719,7 @@ object DCELMerger{
     }
 
     val output_path = "/tmp/edges"
+    val dcel = dcels.map(_._1).cache()
     timer{"Intersection"}{
       overlapOp(dcel, intersection, s"${output_path}OpIntersection.wkt")
     }
@@ -658,7 +735,6 @@ object DCELMerger{
     timer{"Diff B"}{
       overlapOp(dcel, differenceB, s"${output_path}OpDifferenceB.wkt")
     }
-     */
 
     // Closing session...
     logger.info("Closing session...")

@@ -2,12 +2,15 @@ import scala.util.{Try,Success,Failure}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, HashSet, ArrayBuffer}
 import scala.annotation.tailrec
-import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel, Geometry}
-import com.vividsolutions.jts.geom.{Coordinate, LinearRing, MultiPolygon, Polygon, LineString, Point}
+import org.apache.spark.broadcast.Broadcast
+import com.vividsolutions.jts.geom.{Geometry, Coordinate, LinearRing}
+import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, Point}
+import com.vividsolutions.jts.algorithm.CGAlgorithms
+import com.vividsolutions.jts.io.WKTReader
+
 import DCELMerger.geofactory
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
-  private val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000));
 
   def getVerticesSet: List[Vertex] = {
     var vertices = new ArrayBuffer[Vertex]()
@@ -281,11 +284,12 @@ case class Vertex(x: Double, y: Double) extends Ordered[Vertex] {
   def toPoint: Point = geofactory.createPoint(new Coordinate(x, y))
 }
 
-case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
+case class Face(label: String, cell: Int) extends Ordered[Face]{
   var id: String = ""
   var ring: Int = -1
   var outerComponent: Half_edge = null
   var exterior: Boolean = false
+  var isCellFace: Boolean = false
   var tag: String = ""
   var innerComponents: Vector[Face] = Vector.empty[Face]
 
@@ -453,8 +457,36 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
     s"${id}\tPOLYGON ( ${wkt.mkString(", ")} )"
   }
 
+  def isCCW: Boolean = {
+    CGAlgorithms.isCCW(getCoordinates)
+  }
+
+  def isCW: Boolean = {
+    !CGAlgorithms.isCCW(getCoordinates)
+  }
+
+  def equalPolygons(p1: Polygon, p2: Polygon): Boolean = {
+    val reader = new WKTReader(geofactory)
+    val a = reader.read(p1.toText())
+    val b = reader.read(p2.toText())
+
+    a.equals(b)
+  }
+
+  def isCellBorder(grids: Broadcast[Seq[Polygon]]): Boolean = {
+    val grid = grids.value(cell)
+    if(isCCW) {
+      false
+    } else if(!equalPolygons(this.toPolygon(), grid)){
+      false
+    } else {
+      true
+    }
+  }
+
   private def getCoordinates(): Array[Coordinate] = {
-    val scale = 4
+    //val scale = math.log10(geofactory.getPrecisionModel.getScale).toInt
+    val scale = 5
     var coords = ArrayBuffer.empty[Coordinate]
     var h = outerComponent
     if(h != null){
@@ -470,6 +502,8 @@ case class Face(label: String, cell: Int = -1) extends Ordered[Face]{
     }
     coords.toArray
   }
+
+  def getNVertices(): Int = getCoordinates.size
 
   def toPolygon(): Polygon = {
     val coords = getCoordinates()
