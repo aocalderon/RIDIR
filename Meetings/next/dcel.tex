@@ -94,42 +94,86 @@
     \end{frame}
 }
 
-\begin{frame}{Fixing previous bugs...}
+\begin{frame}{Overlay operator validation}
     \begin{itemize}
-     \item There were related with the current precision on float-point operations.  Currently set at 4 digits.
+        \item For small demos: Visual inspection...
+        \item For bigger datasets:
+        \begin{enumerate}
+            \item Run and extract polygons of the overlay operator from our implementation.
+            \item Run and extract polygons of the overlay operator using QGIS.
+            \item Run difference operator on the two outputs using QGIS.
+            \item If outputs are equal, difference operator must be empty.
+        \end{enumerate}
     \end{itemize}
-    \centering
-	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.45\textwidth]{figures/DCEL}
 \end{frame}
 
-\begin{frame}{Some statistics...}
+\begin{frame}{Testing overlay operators: Empty partitions...}
     \centering
-    \begin{tabular}{ll}
-        \hline
-        \textbf{Phase} & \textbf{Execution time [s]} \\
-        \hline
-        Partitioning & 10.22 \\
-        Building single DCELs & 4.02 \\
-        Updating empy cells & 7.82 \\
-        Merging DCELs & 5.28 \\
-        Checking single-label faces & 4.34 \\
-        \textbf{Total} & \textbf{31.69} \\
-        \hline
-    \end{tabular}
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.9\textwidth]{figures/Demo_A}
+\end{frame}
+\begin{frame}{Testing overlay operators: Empty partitions...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.9\textwidth]{figures/Demo_B}
+\end{frame}
+\begin{frame}{Testing overlay operators: Empty partitions...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.9\textwidth]{figures/Demo_Faces}
+\end{frame}
+\begin{frame}{Testing overlay operators: Empty partitions, Intersections...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.9\textwidth]{figures/Demo_Intersection}
+\end{frame}
+\begin{frame}{Testing overlay operators: Empty partitions, Symmetric difference...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.9\textwidth]{figures/Demo_Symmetric}
 \end{frame}
 
-\begin{frame}{Exploring sequential implementation...}
-    \begin{itemize}
-     \item CGAL 5.0.2 - 2D Arrangements\footnote{\tiny Available at \url{https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html}}
-    \end{itemize}
+\begin{frame}{Testing overlay operators: Holes...}
     \centering
-	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.6\textwidth]{figures/CGAL}
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Holes_A}
+\end{frame}
+\begin{frame}{Testing overlay operators: Holes...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Holes_B}
+\end{frame}
+\begin{frame}{Testing overlay operators: Holes...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Holes_Faces}
+\end{frame}
+\begin{frame}{Testing overlay operators: Holes, Intersections...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Holes_Intersection}
+\end{frame}
+\begin{frame}{Testing overlay operators: Holes, Symmetric difference...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Holes_Symmetric}
+\end{frame}
+
+\begin{frame}{Testing overlay operators: Phili, Faces...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Phili_Faces}
+\end{frame}
+\begin{frame}{Testing overlay operators: Phili, Intersections...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Phili_Intersections}
+\end{frame}
+\begin{frame}{Testing overlay operators: Phili, Symmetric difference...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/Phili_Symmetric}
+\end{frame}
+
+\begin{frame}{Testing overlay operators: CA, Faces...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/CA_Faces}
+\end{frame}
+\begin{frame}{Testing overlay operators: CA, Intersections...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/CA_Intersections}
 \end{frame}
 
 \begin{frame}{What's next?}
     \begin{itemize}
-        \item Integrating overlay operators...
-        \item Cleaning and Validation...
+        \item I still have a bug at the moment of the merge in the full CA dataset.  Currently working on that...
         \item Tuning cluster parameters...
         \item Benchmarking with sequential tool...
     \end{itemize}
