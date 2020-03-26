@@ -647,7 +647,12 @@ object DCELMerger{
           } else {
             val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
               .map{ case (id, f) =>
-                val polys = f.sortBy(_.area).reverse
+                if(id == "A5|B14"){
+                  f.map(_.getGeometry._1.toText).foreach(println)
+                }
+                // Removing very small faces...
+                val polys = f//.filter(_.getGeometry._1.getArea >= 0.001)
+                  .sortBy(_.area).reverse
                 val outer = polys.head
                 outer.innerComponents = polys.tail.toVector
 
@@ -689,7 +694,12 @@ object DCELMerger{
       val reader = new WKTReader(geofactory)
       val pa = reader.read(a)
       val pb = reader.read(b)
-      pa.union(pb).toText()
+      if(pa.getArea < 0.001 || pa.getArea.isNaN()) b
+      else if(pb.getArea < 0.001 || pb.getArea.isNaN()) a
+      else{
+        geofactory.createGeometryCollection(Array(pa, pb)).buffer(0.0).toText()
+       // pa.union(pb).toText()
+      }
     }
 
     def intersection(dcel: LDCEL): Vector[(String, Geometry)] = {
@@ -711,9 +721,19 @@ object DCELMerger{
     
     def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[(String, Geometry)],
       filename: String = "/tmp/overlay.wkt"){
+      dcel.flatMap{op}.filter{_._2.getArea > 0.0001}
+        .map{ case (id, geom) =>
+          (id, geom.toText())
+        }.groupBy(_._1).filter(_._1 == "A14|B5").foreach{println}
+
       save{filename}{
-        dcel.flatMap{op}.map{case (id, geom) => (id, geom.toText())}
-        .reduceByKey(mergePolygons)
+        dcel.flatMap{op}.filter{_._2.getArea > 0.0001}
+          .map{ case (id, geom) =>
+            (id, geom.toText())
+          }
+          .reduceByKey{ case(a, b) =>
+            mergePolygons(a, b)
+          }
           .map{ case(id, wkt) => s"$wkt\t$id\n" }.collect()
       }
     }
