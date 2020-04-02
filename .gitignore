@@ -25,10 +25,12 @@ Code/dyn4j/.ensime_cache/*
 Code/CGAL/dcel_code/CMakeLists.txt
 Code/CGAL/dcel_code/Makefile
 Code/CGAL/dcel_code/cmake_install.cmake
+Code/CGAL/dcel_code/CMakeFiles/*
 
 Code/CGAL/overlay_color/CMakeLists.txt
 Code/CGAL/overlay_color/Makefile
 Code/CGAL/overlay_color/cmake_install.cmake
+Code/CGAL/overlay_color/CMakeFiles/*
 
 Code/Validation/GeometryChecker/target/*
 Code/Validation/GeometryChecker/project/*
