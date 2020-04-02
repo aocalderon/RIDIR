@@ -26,6 +26,7 @@ Code/CGAL/dcel_code/CMakeLists.txt
 Code/CGAL/dcel_code/Makefile
 Code/CGAL/dcel_code/cmake_install.cmake
 Code/CGAL/dcel_code/CMakeFiles/*
+Code/CGAL/dcel_code/CMakeCache.txt
 
 Code/CGAL/overlay_color/CMakeLists.txt
 Code/CGAL/overlay_color/Makefile
