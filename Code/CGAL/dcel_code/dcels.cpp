@@ -1,4 +1,4 @@
-//! \file examples/Arrangement_on_surface_2/overlay_unbounded.cpp
+// Based on examples/Arrangement_on_surface_2/overlay_unbounded.cpp
 // A face overlay of two arrangements with unbounded faces.
 
 #include <string>
@@ -17,12 +17,12 @@
 #include <iostream>
 
 #include "dcels.h"
+#include "arr_print.h"
 
 using namespace std;
 namespace bg = boost::geometry;
 
 typedef bg::model::d2::point_xy<double> point_type;
-bg::model::polygon<point_type> poly;
 
 vector<vector<string>> read_tsv(string fname) {
   vector<vector<string>> items;
@@ -70,61 +70,77 @@ typedef CGAL::Arr_face_overlay_traits<ArrangementA_2,
                                       ArrangementRes_2,
                                       Overlay_label>        Overlay_traits;
 
-int main ()
-{
-  string filename1 = "arr1.wkt";
+int main (int argc, char* argv[]){
+  if (argc < 3) {
+    cerr << "usage: " << argv[0] << " file1 file2" << endl;
+    exit(-1);
+  }
+  
+  string filename1 = argv[1];
   vector<vector<string>> data1 = read_tsv(filename1);
   vector<array<double, 2>> points;
-  for (int i; i < data1.size(); ++i) {
-    bg::read_wkt(data1[i][0], poly);
+  ArrangementA_2 arr1;
 
-    //getting the vertices back
+  for (int i; i < data1.size(); ++i) {
+    bg::model::polygon<point_type> poly;
+    bg::read_wkt(data1[i][0], poly);
+    for(auto it = boost::begin(bg::exterior_ring(poly)); it != boost::end(bg::exterior_ring(poly)); ++it){
+      double x = bg::get<0>(*it);
+      double y = bg::get<1>(*it);
+      array<double, 2> point = {x, y};
+      points.push_back(point);
+    }
+    cout << "Points read " << data1[i][0]  << endl;
+    for (int i = 0; i < points.size() - 1; ++i) {
+      array<double, 2> p1 = points[i];
+      array<double, 2> p2 = points[i + 1];
+    
+      Segment_2 s (Point_2(p1.at(0), p1.at(1)), Point_2(p2.at(0), p2.at(1)));
+      cout << s << endl;
+      insert (arr1, s);
+    }
+    cout << "Segments added" << endl;
+    points.clear();
+  }
+  //Segment_2 s1 = (Point_2(, p1.at(1)), Point_2(p2.at(0), p2.at(1)));w
+  
+  //CGAL_assertion (arr1.number_of_faces() == 2);
+
+  string filename2 = argv[2];
+  vector<vector<string>> data2 = read_tsv(filename2);
+  points.clear();
+  for (int i; i < data2.size(); ++i) {
+    bg::model::polygon<point_type> poly;
+    bg::read_wkt(data2[i][0], poly);
     for(auto it = boost::begin(bg::exterior_ring(poly)); it != boost::end(bg::exterior_ring(poly)); ++it)
       {
         double x = bg::get<0>(*it);
 	double y = bg::get<1>(*it);
 	array<double, 2> point = {x, y};
 	points.push_back(point);
-	//cout << "(" << point.at(0) << ", " << point.at(1) << ")"<< endl;
       }    
-
-    //cout << bg::num_points(poly) << endl;
   }
-  
-  ArrangementA_2 arr1;
-  
-  for (int i = 0; i < points.size() - 1; ++i) {
-    array<double, 2> p1 = points[i];
-    array<double, 2> p2 = points[i + 1];
-    
-    Segment_2 s (Point_2(p1.at(0), p1.at(1)), Point_2(p2.at(0), p2.at(1)));
-    cout << s << endl;
-    insert_non_intersecting_curve (arr1, s);
-  }
-
-  CGAL_assertion (arr1.number_of_faces() == 2);
 
   ArrangementA_2::Face_iterator ait;
   int n = 0;
   for (ait = arr1.faces_begin(); ait != arr1.faces_end(); ++ait){
     string id = "A" + boost::lexical_cast<string>(n);;
     ait->set_data(id);
+    
     n++;
   }
   cout << "Done with arr1." << endl;
 
-  // Construct the second arrangement, containing a single square-shaped face.
   ArrangementB_2 arr2;
 
-  Segment_2 t1 (Point_2(4, 1), Point_2(7, 4));
-  Segment_2 t2 (Point_2(7, 4), Point_2(4, 7));
-  Segment_2 t3 (Point_2(4, 7), Point_2(1, 4));
-  Segment_2 t4 (Point_2(1, 4), Point_2(4, 1));
-
-  insert_non_intersecting_curve (arr2, t1);
-  insert_non_intersecting_curve (arr2, t2);
-  insert_non_intersecting_curve (arr2, t3);
-  insert_non_intersecting_curve (arr2, t4);
+  for (int i = 0; i < points.size() - 1; ++i) {
+    array<double, 2> p1 = points[i];
+    array<double, 2> p2 = points[i + 1];
+    
+    Segment_2 s (Point_2(p1.at(0), p1.at(1)), Point_2(p2.at(0), p2.at(1)));
+    cout << s << endl;
+    insert (arr2, s);
+  }
   
   CGAL_assertion (arr2.number_of_faces() == 2);
 
@@ -147,12 +163,11 @@ int main ()
   ArrangementRes_2::Face_iterator  res_fit;
 
   std::cout << "The overlay faces are: ";
-  for (res_fit = overlay_arr.faces_begin();
-       res_fit != overlay_arr.faces_end(); ++res_fit)
-  {
+  for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
     std::cout << res_fit->data() << " ("
               << (res_fit->is_unbounded() ? "unbounded" : "bounded")
               << ")." << std::endl;
+    print_face<ArrangementRes_2> (res_fit);
   }
 
   return 0;
