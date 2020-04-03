@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/and/RIDIR/Code/CGAL/dcel_code
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -111,19 +111,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named ALL_CGAL_TARGETS
-
-# Build rule for target.
-ALL_CGAL_TARGETS: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ALL_CGAL_TARGETS
-.PHONY : ALL_CGAL_TARGETS
-
-# fast build rule for target.
-ALL_CGAL_TARGETS/fast:
-	$(MAKE) -f CMakeFiles/ALL_CGAL_TARGETS.dir/build.make CMakeFiles/ALL_CGAL_TARGETS.dir/build
-.PHONY : ALL_CGAL_TARGETS/fast
-
-#=============================================================================
 # Target rules for targets named cgal_check_build_system
 
 # Build rule for target.
@@ -137,19 +124,6 @@ cgal_check_build_system/fast:
 .PHONY : cgal_check_build_system/fast
 
 #=============================================================================
-# Target rules for targets named reader
-
-# Build rule for target.
-reader: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 reader
-.PHONY : reader
-
-# fast build rule for target.
-reader/fast:
-	$(MAKE) -f CMakeFiles/reader.dir/build.make CMakeFiles/reader.dir/build
-.PHONY : reader/fast
-
-#=============================================================================
 # Target rules for targets named dcels
 
 # Build rule for target.
@@ -161,6 +135,19 @@ dcels: cmake_check_build_system
 dcels/fast:
 	$(MAKE) -f CMakeFiles/dcels.dir/build.make CMakeFiles/dcels.dir/build
 .PHONY : dcels/fast
+
+#=============================================================================
+# Target rules for targets named ALL_CGAL_TARGETS
+
+# Build rule for target.
+ALL_CGAL_TARGETS: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ALL_CGAL_TARGETS
+.PHONY : ALL_CGAL_TARGETS
+
+# fast build rule for target.
+ALL_CGAL_TARGETS/fast:
+	$(MAKE) -f CMakeFiles/ALL_CGAL_TARGETS.dir/build.make CMakeFiles/ALL_CGAL_TARGETS.dir/build
+.PHONY : ALL_CGAL_TARGETS/fast
 
 dcels.o: dcels.cpp.o
 
@@ -189,51 +176,20 @@ dcels.cpp.s:
 	$(MAKE) -f CMakeFiles/dcels.dir/build.make CMakeFiles/dcels.dir/dcels.cpp.s
 .PHONY : dcels.cpp.s
 
-reader.o: reader.cpp.o
-
-.PHONY : reader.o
-
-# target to build an object file
-reader.cpp.o:
-	$(MAKE) -f CMakeFiles/reader.dir/build.make CMakeFiles/reader.dir/reader.cpp.o
-.PHONY : reader.cpp.o
-
-reader.i: reader.cpp.i
-
-.PHONY : reader.i
-
-# target to preprocess a source file
-reader.cpp.i:
-	$(MAKE) -f CMakeFiles/reader.dir/build.make CMakeFiles/reader.dir/reader.cpp.i
-.PHONY : reader.cpp.i
-
-reader.s: reader.cpp.s
-
-.PHONY : reader.s
-
-# target to generate assembly for a file
-reader.cpp.s:
-	$(MAKE) -f CMakeFiles/reader.dir/build.make CMakeFiles/reader.dir/reader.cpp.s
-.PHONY : reader.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... ALL_CGAL_TARGETS"
-	@echo "... cgal_check_build_system"
-	@echo "... reader"
-	@echo "... dcels"
 	@echo "... edit_cache"
+	@echo "... rebuild_cache"
+	@echo "... cgal_check_build_system"
+	@echo "... dcels"
+	@echo "... ALL_CGAL_TARGETS"
 	@echo "... dcels.o"
 	@echo "... dcels.i"
 	@echo "... dcels.s"
-	@echo "... reader.o"
-	@echo "... reader.i"
-	@echo "... reader.s"
 .PHONY : help
 
 
