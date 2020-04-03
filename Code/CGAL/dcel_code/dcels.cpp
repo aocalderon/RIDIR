@@ -78,8 +78,8 @@ int main (int argc, char* argv[]){
   
   string filename1 = argv[1];
   vector<vector<string>> data1 = read_tsv(filename1);
-  vector<array<double, 2>> points;
   ArrangementA_2 arr1;
+  vector<array<double, 2>> points;
 
   for (int i; i < data1.size(); ++i) {
     bg::model::polygon<point_type> poly;
@@ -102,24 +102,6 @@ int main (int argc, char* argv[]){
     cout << "Segments added" << endl;
     points.clear();
   }
-  //Segment_2 s1 = (Point_2(, p1.at(1)), Point_2(p2.at(0), p2.at(1)));w
-  
-  //CGAL_assertion (arr1.number_of_faces() == 2);
-
-  string filename2 = argv[2];
-  vector<vector<string>> data2 = read_tsv(filename2);
-  points.clear();
-  for (int i; i < data2.size(); ++i) {
-    bg::model::polygon<point_type> poly;
-    bg::read_wkt(data2[i][0], poly);
-    for(auto it = boost::begin(bg::exterior_ring(poly)); it != boost::end(bg::exterior_ring(poly)); ++it)
-      {
-        double x = bg::get<0>(*it);
-	double y = bg::get<1>(*it);
-	array<double, 2> point = {x, y};
-	points.push_back(point);
-      }    
-  }
 
   ArrangementA_2::Face_iterator ait;
   int n = 0;
@@ -130,19 +112,35 @@ int main (int argc, char* argv[]){
     n++;
   }
   cout << "Done with arr1." << endl;
-
-  ArrangementB_2 arr2;
-
-  for (int i = 0; i < points.size() - 1; ++i) {
-    array<double, 2> p1 = points[i];
-    array<double, 2> p2 = points[i + 1];
-    
-    Segment_2 s (Point_2(p1.at(0), p1.at(1)), Point_2(p2.at(0), p2.at(1)));
-    cout << s << endl;
-    insert (arr2, s);
-  }
+  //-----------------------------------------------------------------------------------------------------------
   
-  CGAL_assertion (arr2.number_of_faces() == 2);
+  string filename2 = argv[2];
+  vector<vector<string>> data2 = read_tsv(filename2);
+  ArrangementB_2 arr2;
+  points.clear();
+
+  for (int i; i < data2.size(); ++i) {
+    bg::model::polygon<point_type> poly;
+    bg::read_wkt(data2[i][0], poly);
+    for(auto it = boost::begin(bg::exterior_ring(poly)); it != boost::end(bg::exterior_ring(poly)); ++it)
+      {
+        double x = bg::get<0>(*it);
+	double y = bg::get<1>(*it);
+	array<double, 2> point = {x, y};
+	points.push_back(point);
+      }    
+    cout << "Points read " << data2[i][0]  << endl;
+    for (int i = 0; i < points.size() - 1; ++i) {
+      array<double, 2> p1 = points[i];
+      array<double, 2> p2 = points[i + 1];
+    
+      Segment_2 s (Point_2(p1.at(0), p1.at(1)), Point_2(p2.at(0), p2.at(1)));
+      cout << s << endl;
+      insert (arr2, s);
+    }
+    cout << "Segments added" << endl;
+    points.clear();
+  }
 
   ArrangementB_2::Face_iterator bit;
   int m = 0;
@@ -152,23 +150,28 @@ int main (int argc, char* argv[]){
     m++;
   }
   cout << "Done with arr2." << endl;
+  //-----------------------------------------------------------------------------------------------------------
 
   // Compute the overlay of the two arrangements.
-  ArrangementRes_2       overlay_arr;
-  Overlay_traits         overlay_traits;
+  ArrangementRes_2 overlay_arr;
+  Overlay_traits   overlay_traits;
 
   overlay (arr1, arr2, overlay_arr, overlay_traits);
 
   // Go over the faces of the overlaid arrangement and their labels.
   ArrangementRes_2::Face_iterator  res_fit;
 
-  std::cout << "The overlay faces are: ";
+  ofstream wkt;
+  wkt.open ("faces.wkt");
+  cout << "The overlay faces are: " << endl;
   for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
-    std::cout << res_fit->data() << " ("
-              << (res_fit->is_unbounded() ? "unbounded" : "bounded")
-              << ")." << std::endl;
-    print_face<ArrangementRes_2> (res_fit);
+    if(!res_fit->is_unbounded()){
+      string w = get_face_wkt<ArrangementRes_2> (res_fit);
+      cout << w;
+      wkt << w;
+    }
   }
+  wkt.close();
 
   return 0;
 }

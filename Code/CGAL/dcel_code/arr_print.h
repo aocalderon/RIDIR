@@ -1,6 +1,39 @@
 #ifndef _PRINT_ARR_H_
 #define _PRINT_ARR_H_
 
+
+//-----------------------------------------------------------------------------
+// Print all vertices in WKT format.
+//
+template<class Arrangement>
+std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
+{
+  typename Arrangement::Ccb_halfedge_const_circulator  curr = circ;
+  typename Arrangement::Halfedge_const_handle          he;
+  std::stringstream ss;
+
+  ss << "POLYGON ((" << curr->source()->point();
+  do {
+    he = curr;
+    ss << ", " << he->target()->point();
+
+    ++curr;
+  } while (curr != circ);
+  ss << "))";
+
+  return ss.str();
+}
+
+//-----------------------------------------------------------------------------
+// Print the boundary description of an arrangement face in WKT format.
+//
+template<class Arrangement>
+std::string get_face_wkt (typename Arrangement::Face_const_handle f)
+{
+  // Print the outer boundary.
+  return get_wkt<Arrangement> (f->outer_ccb()) + "\t" + f->data() + "\n";
+}
+
 //-----------------------------------------------------------------------------
 // Print all neighboring vertices to a given arrangement vertex.
 //
