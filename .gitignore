@@ -28,10 +28,17 @@ Code/CGAL/dcel_code/cmake_install.cmake
 Code/CGAL/dcel_code/CMakeFiles/*
 Code/CGAL/dcel_code/CMakeCache.txt
 
+Code/CGAL/WKTReader/CMakeLists.txt
+Code/CGAL/WKTReader/Makefile
+Code/CGAL/WKTReader/cmake_install.cmake
+Code/CGAL/WKTReader/CMakeFiles/*
+Code/CGAL/WKTReader/CMakeCache.txt
+
 Code/CGAL/overlay_color/CMakeLists.txt
 Code/CGAL/overlay_color/Makefile
 Code/CGAL/overlay_color/cmake_install.cmake
 Code/CGAL/overlay_color/CMakeFiles/*
+Code/CGAL/overlay_color/CMakeCache.txt
 
 Code/Validation/GeometryChecker/target/*
 Code/Validation/GeometryChecker/project/*
