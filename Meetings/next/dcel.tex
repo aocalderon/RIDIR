@@ -94,6 +94,14 @@
     \end{frame}
 }
 
+\begin{frame}{Working on CGAL implementation}
+    \begin{itemize}
+        \item Based on Arrangements in 2D in the CGAL library (Section 8. Extending the DCEL))\footnote{\tiny \url{https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html\#title51}}.
+        \item Theory and resources are discussed at ``\textit{CGAL Arrangements and Their Applications: A Step-by-Step Guide}'' (Fogel et al, 2012)\footnote{\tiny \url{https://www.springer.com/gp/book/9783642172823}}.
+        \item Code available at repository\footnote{\tiny \url{https://github.com/aocalderon/RIDIR/tree/master/Code/CGAL/dcel_code}}.
+    \end{itemize}
+\end{frame}
+
 \begin{frame}{CA subset [CGAL]...}
     \centering
 	\includegraphics[width=0.625\textwidth]{figures/CA_Faces_CGAL}
@@ -122,8 +130,7 @@
 
 \begin{frame}{What's next?}
     \begin{itemize}
-        \item I still have a bug at the moment of the merge in the full CA dataset.  Currently working on that...
-        \item Tuning cluster parameters...
+        \item Currently working on CGAL implementation dealing with polygons with holes...
         \item Benchmarking with sequential tool...
     \end{itemize}
 \end{frame}
