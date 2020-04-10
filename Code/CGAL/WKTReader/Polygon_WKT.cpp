@@ -22,7 +22,24 @@
 
 using namespace std;
 
-// Define a functor for creating a label from a character and an integer.
+// Adding a timer function...
+#include <cstdlib>
+#include <sys/timeb.h>
+int getMilliCount(){
+	timeb tb;
+	ftime(&tb);
+	int nCount = tb.millitm + (tb.time & 0xfffff) * 1000;
+	return nCount;
+}
+
+int getMilliSpan(int nTimeStart){
+	int nSpan = getMilliCount() - nTimeStart;
+	if(nSpan < 0)
+		nSpan += 0x100000 * 1000;
+	return nSpan;
+}
+
+// Defining a functor for creating the face label...
 struct Overlay_label{
   string operator() (string a, string b) const {
     return a + "|" + b;
@@ -60,6 +77,9 @@ int main(int argc, char* argv[]) {
       exit(-1);
     }
 
+    cout << "Starting timer..." << endl;
+    int start = getMilliCount();
+
     //-----------------------------------------------------------------------------------------------------------
     ifstream isA( argv[1] );
     ArrangementA_2 arr1;
@@ -81,19 +101,19 @@ int main(int argc, char* argv[]) {
       points.push_back(points[0]);
       // Outer segments...
       int n=0;
-      cout << "Outer: " << endl;
+      //cout << "Outer: " << endl;
       for(int i = 0; i < points.size() - 1; ++i){
-	cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
+	//cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
 	Point_2 p1 = points[i];
 	Point_2 p2 = points[i + 1];
 	Segment_2 s (p1, p2);
-	cout << s << endl;
+	//cout << s << endl;
 	insert (arr1, s);
       }
-      cout << endl;
+      cout << "Polygon added. " << points.size() << " segments." << endl;
       // Inner segments...
       if(p.has_holes()){
-	cout << "Hole(s): " << endl;
+	//cout << "Hole(s): " << endl;
 	for (holeIt hit = p.holes_begin(); hit != p.holes_end(); ++hit){
 	  points.clear();
 	  for (vertexIt vi = (*hit).begin(); vi != (*hit).end(); ++vi){
@@ -102,14 +122,14 @@ int main(int argc, char* argv[]) {
 	  points.push_back(points[0]);
 	  
 	  for(int i = 0; i < points.size() - 1; ++i){
-	    cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
+	    //cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
 	    Point_2 p1 = points[i];
 	    Point_2 p2 = points[i + 1];
 	    Segment_2 s (p1, p2);
-	    cout << s << endl;
+	    //cout << s << endl;
 	    insert (arr1, s);
 	  }
-	  cout << endl;
+	  cout << "Hole added. " << points.size() << " segments." << endl;
 	}
       }
     }
@@ -145,19 +165,19 @@ int main(int argc, char* argv[]) {
       points.push_back(points[0]);
       // Outer segments...
       int n = 0;
-      cout << "Outer: " << endl;
+      //cout << "Outer: " << endl;
       for(int i = 0; i < points.size() - 1; ++i){
-	cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
+	//cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
 	Point_2 p1 = points[i];
 	Point_2 p2 = points[i + 1];
 	Segment_2 s (p1, p2);
-	cout << s << endl;
+	//cout << s << endl;
 	insert (arr2, s);
       }
-      cout << endl;
+      cout << "Polygon added. " << points.size() << " segments." << endl;
       // Inner segments...
       if(p.has_holes()){
-	cout << "Hole(s): " << endl;
+	//cout << "Hole(s): " << endl;
 	for (holeIt hit = p.holes_begin(); hit != p.holes_end(); ++hit){
 	  points.clear();
 	  for (vertexIt vi = (*hit).begin(); vi != (*hit).end(); ++vi){
@@ -166,14 +186,14 @@ int main(int argc, char* argv[]) {
 	  points.push_back(points[0]);
 	  
 	  for(int i = 0; i < points.size() - 1; ++i){
-	    cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
+	    //cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
 	    Point_2 p1 = points[i];
 	    Point_2 p2 = points[i + 1];
 	    Segment_2 s (p1, p2);
-	    cout << s << endl;
+	    //cout << s << endl;
 	    insert (arr2, s);
 	  }
-	  cout << endl;
+	  cout << "Hole added: " << points.size() << " segments." << endl;
 	}
       }
     }
@@ -194,21 +214,24 @@ int main(int argc, char* argv[]) {
 
     overlay (arr1, arr2, overlay_arr, overlay_traits);
 
+    int milliSecondsElapsed = getMilliSpan(start);
+    cout << "Total time: " << milliSecondsElapsed << endl;
+    
     // Go over the faces of the overlaid arrangement and their labels.
     ArrangementRes_2::Face_iterator  res_fit;
 
     ofstream wkt;
     wkt.open ("faces.wkt");
-    cout << "The overlay faces are: " << endl;
+    cout << "Saving faces to faces.wkt..." << endl;
     for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
       if(!res_fit->is_unbounded()){
 	string w = get_face_wkt<ArrangementRes_2> (res_fit);
-	cout << w;
+	//cout << w;
 	wkt << w;
       }
     }
     wkt.close();
-    
+    cout << "Done!!!" << endl;
   }
   
   return 0;
