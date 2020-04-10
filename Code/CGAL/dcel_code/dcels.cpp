@@ -1,20 +1,28 @@
 // Based on examples/Arrangement_on_surface_2/overlay_unbounded.cpp
 // A face overlay of two arrangements with unbounded faces.
 
-#include <string>
+#include <boost/config.hpp>
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 105600 && (! defined(BOOST_GCC) || BOOST_GCC >= 40500)
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Arr_linear_traits_2.h>
 #include <CGAL/Arrangement_2.h>
 #include <CGAL/Arr_extended_dcel.h>
 #include <CGAL/Arr_overlay_2.h>
 #include <CGAL/Arr_default_overlay_traits.h>
+#include <CGAL/IO/WKT.h>
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
 
 #include "dcels.h"
 #include "arr_print.h"
@@ -53,6 +61,7 @@ struct Overlay_label{
 };
 
 typedef CGAL::Exact_predicates_exact_constructions_kernel   Kernel;
+//typedef CGAL::Simple_cartesian<CGAL::Gmpq>                  Kernel;
 typedef CGAL::Arr_linear_traits_2<Kernel>                   Traits_2;
 typedef Traits_2::Point_2                                   Point_2;
 typedef Traits_2::Segment_2                                 Segment_2;
@@ -83,6 +92,8 @@ int main (int argc, char* argv[]){
 
   for (int i; i < data1.size(); ++i) {
     bg::model::polygon<point_type> poly;
+
+    
     bg::read_wkt(data1[i][0], poly);
     for(auto it = boost::begin(bg::exterior_ring(poly)); it != boost::end(bg::exterior_ring(poly)); ++it){
       double x = bg::get<0>(*it);
@@ -175,3 +186,9 @@ int main (int argc, char* argv[]){
 
   return 0;
 }
+#else
+int main()
+{
+  return 0;
+}
+#endif
