@@ -157,7 +157,7 @@ object DCELTester{
     for(temp_hedge <- temp_half_edgeList){
       val hedge = half_edgeList.find(_.equals(temp_hedge)).get
       if(hedge.face == null){
-        val f = Face(hedge.label)
+        val f = Face(hedge.label, 0)
         f.outerComponent = hedge
         f.outerComponent.face = f
         f.id = hedge.id
