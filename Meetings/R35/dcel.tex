@@ -94,42 +94,43 @@
     \end{frame}
 }
 
-\begin{frame}{Fixing previous bugs...}
+\begin{frame}{Working on CGAL implementation}
     \begin{itemize}
-     \item There were related with the current precision on float-point operations.  Currently set at 4 digits.
+        \item Based on Arrangements in 2D in the CGAL library (Section 8. Extending the DCEL))\footnote{\tiny \url{https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html\#title51}}.
+        \item Theory and resources are discussed at ``\textit{CGAL Arrangements and Their Applications: A Step-by-Step Guide}'' (Fogel et al, 2012)\footnote{\tiny \url{https://www.springer.com/gp/book/9783642172823}}.
+        \item Code available at repository\footnote{\tiny \url{https://github.com/aocalderon/RIDIR/tree/master/Code/CGAL/dcel_code}}.
     \end{itemize}
-    \centering
-	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.45\textwidth]{figures/DCEL}
 \end{frame}
 
-\begin{frame}{Some statistics...}
+\begin{frame}{CA subset [CGAL]...}
     \centering
-    \begin{tabular}{ll}
-        \hline
-        \textbf{Phase} & \textbf{Execution time [s]} \\
-        \hline
-        Partitioning & 10.22 \\
-        Building single DCELs & 4.02 \\
-        Updating empy cells & 7.82 \\
-        Merging DCELs & 9.62 \\
-        \textbf{Total} & \textbf{31.69} \\
-        \hline
-    \end{tabular}
+	\includegraphics[width=0.625\textwidth]{figures/CA_Faces_CGAL}
+\end{frame}
+\begin{frame}{CA subset [RIDIR]...}
+    \centering
+	\includegraphics[width=0.625\textwidth]{figures/CA_Faces_RIDIR}
 \end{frame}
 
-\begin{frame}{Exploring sequential implementation...}
-    \begin{itemize}
-     \item CGAL 5.0.2 - 2D Arrangements\footnote{\tiny Available at \url{https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html}}
-    \end{itemize}
+\begin{frame}{Phili dataset [CGAL]...}
     \centering
-	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.6\textwidth]{figures/CGAL}
+	\includegraphics[width=0.625\textwidth]{figures/Phili_Faces_CGAL}
+\end{frame}
+\begin{frame}{Phili dataset [RIDIR]...}
+    \centering
+	\includegraphics[width=0.625\textwidth]{figures/Phili_Faces_RIDIR}
+\end{frame}
+\begin{frame}{Phili dataset [CGAL] details...}
+    \centering
+	\includegraphics[width=0.9\textwidth]{figures/Phili_Faces_CGAL_details}
+\end{frame}
+\begin{frame}{Phili dataset [RIDIR] details...}
+    \centering
+	\includegraphics[width=0.9\textwidth]{figures/Phili_Faces_RIDIR_details}
 \end{frame}
 
 \begin{frame}{What's next?}
     \begin{itemize}
-        \item Integrating overlay operators...
-        \item Cleaning and Validation...
-        \item Tuning cluster parameters...
+        \item Currently working on CGAL implementation dealing with polygons with holes...
         \item Benchmarking with sequential tool...
     \end{itemize}
 \end{frame}

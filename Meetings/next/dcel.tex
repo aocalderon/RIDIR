@@ -73,9 +73,9 @@
 \makeatother
 
 \begin{document}
-\title[DCEL report]{RIDIR Report}
+\title[DDCEL report]{A Distributed DCEL implementation}
 \author[AC]{Andres Calderon}
-\institute[Winter'20]{University of California, Riverside}
+\institute[Spring'20]{University of California, Riverside}
 \makebeamertitle
 \newif\iflattersubsect
 
@@ -94,7 +94,73 @@
     \end{frame}
 }
 
-\begin{frame}{Working on CGAL implementation}
+\begin{frame}{A Distributed DCEL...}{Local DCELs}
+    \centering
+	\includegraphics[width=1\textwidth]{figures/01-MergeSteps/OverlayParted}
+\end{frame}
+
+\begin{frame}{A Distributed DCEL...}{Merged DCEL}
+    \centering
+	\includegraphics[width=1\textwidth]{figures/02-Splits/Part2}
+\end{frame}
+\begin{frame}{A Distributed DCEL...}{Merged DCEL}
+    \centering
+	\includegraphics[trim=0 0 0 6mm, clip,width=0.55\textwidth]{figures/03-Overlays1/FinalPartitionedDCEL}
+\end{frame}
+
+\begin{frame}{A Distributed DCEL...}{Overlay Operations}
+    \centering
+	\includegraphics[width=1\textwidth]{figures/03-Overlays1/OverlayParted2}
+\end{frame}
+
+\begin{frame}{A Distributed DCEL...}{Overlay Operations}
+    \centering
+	\includegraphics[width=1\textwidth]{figures/04-Overlays2/OverlayOperations1}
+\end{frame}
+\begin{frame}{A Distributed DCEL...}{Overlay Operations}
+    \centering
+	\includegraphics[width=1\textwidth]{figures/04-Overlays2/OverlayOperations2}
+\end{frame}
+
+\begin{frame}{The Empty Cell problem...}
+    \centering
+	\includegraphics[page=1,width=0.6\textwidth]{figures/05-EmptyCells/Example}
+\end{frame}
+\begin{frame}{The Empty Cell problem...}
+    \centering
+	\includegraphics[page=2,width=0.6\textwidth]{figures/05-EmptyCells/Example}
+\end{frame}
+\begin{frame}{The Empty Cell problem...}
+    \centering
+	\includegraphics[page=3,width=0.6\textwidth]{figures/05-EmptyCells/Example}
+\end{frame}
+
+\begin{frame}{Correctness...}
+    \begin{enumerate}
+        \item Run and extract polygons of the overlay operator from our implementation.
+        \item Run and extract polygons of the overlay operator using QGIS.
+        \item Run difference operator on the two outputs using QGIS.
+        \item If outputs are equal, difference operator must be empty.
+    \end{enumerate}
+\end{frame}
+\begin{frame}{Correctness...}{Philadelphia districts 2000 (381 polygons) and 2010 (384 polygons)}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.7\textwidth]{figures/06-Correctness/Phili_Faces}
+\end{frame}
+\begin{frame}{Intersections...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/06-Correctness/Phili_Intersections}
+\end{frame}
+\begin{frame}{Symmetric difference...}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.8\textwidth]{figures/06-Correctness/Phili_Symmetric}
+\end{frame}
+
+\begin{frame}{Performance...}{CA districts 2000 (7028 polygons) and 2010 (8047 polygons)}
+    \centering
+	\includegraphics[trim=1cm 0 1cm 0, clip, width=0.5\textwidth]{figures/06-Correctness/CA_Faces}
+\end{frame}
+\begin{frame}{Performance...}{Working on CGAL implementation}
     \begin{itemize}
         \item Based on Arrangements in 2D in the CGAL library (Section 8. Extending the DCEL))\footnote{\tiny \url{https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html\#title51}}.
         \item Theory and resources are discussed at ``\textit{CGAL Arrangements and Their Applications: A Step-by-Step Guide}'' (Fogel et al, 2012)\footnote{\tiny \url{https://www.springer.com/gp/book/9783642172823}}.
@@ -102,37 +168,41 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{CA subset [CGAL]...}
+\begin{frame}{Performance...}{Preliminary experiments }
     \centering
-	\includegraphics[width=0.625\textwidth]{figures/CA_Faces_CGAL}
-\end{frame}
-\begin{frame}{CA subset [RIDIR]...}
-    \centering
-	\includegraphics[width=0.625\textwidth]{figures/CA_Faces_RIDIR}
-\end{frame}
-
-\begin{frame}{Phili dataset [CGAL]...}
-    \centering
-	\includegraphics[width=0.625\textwidth]{figures/Phili_Faces_CGAL}
-\end{frame}
-\begin{frame}{Phili dataset [RIDIR]...}
-    \centering
-	\includegraphics[width=0.625\textwidth]{figures/Phili_Faces_RIDIR}
-\end{frame}
-\begin{frame}{Phili dataset [CGAL] details...}
-    \centering
-	\includegraphics[width=0.9\textwidth]{figures/Phili_Faces_CGAL_details}
-\end{frame}
-\begin{frame}{Phili dataset [RIDIR] details...}
-    \centering
-	\includegraphics[width=0.9\textwidth]{figures/Phili_Faces_RIDIR_details}
+    \begin{tabular}{ll}
+        \hline
+        \textbf{DDCEL} & \textbf{Execution time [s]} \\
+        \hline
+        Partitioning & 10.22 \\
+        Building single DCELs & 4.02 \\
+        Updating empy cells & 7.82 \\
+        Merging DCELs & 9.62 \\
+        \textbf{Total} & \textbf{31.69} \\
+        \hline \\
+        & \\
+        \hline
+        \textbf{CGAL} & \textbf{Execution time [s]} \\
+        \textbf{Total} & \textbf{198934.76} \\
+        \hline
+    \end{tabular} 
 \end{frame}
 
-\begin{frame}{What's next?}
+\begin{frame}{Performance...}{Some notes }
     \begin{itemize}
-        \item Currently working on CGAL implementation dealing with polygons with holes...
-        \item Benchmarking with sequential tool...
-    \end{itemize}
+        \item Most relevant reference about CGAL Arrangements performance found at Haran and Halperin (2009)\footnote{\url{https://dl.acm.org/doi/10.1145/1412228.1412237}}.
+        \item It reports an execution time of 97.6 s for the construction of only one arrangement of uniform random segments with 1,366,364 edges.
+        \item By comparisson, our arrangements have: \\
+        \begin{tabular}{ll}
+            \hline
+             & \textbf{Number of edges} \\
+            \hline
+            CA 2000 & 999,808 \\
+            CA 2010 & 2,901,802 \\
+            Merged  & 4,455,399 \\
+            \hline \\
+        \end{tabular} 
+    \   \end{itemize}
 \end{frame}
 
 \end{document}
