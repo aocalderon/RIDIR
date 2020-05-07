@@ -1,3 +1,5 @@
+package edu.ucr.dblab
+
 import org.locationtech.jts.geom.{Coordinate, LineString}
 import org.locationtech.jts.geom.{GeometryFactory, PrecisionModel}
 import org.rogach.scallop.ScallopConf
@@ -19,13 +21,6 @@ object REG {
     val maxY = corners(3)
     val width  = maxX - minX
     val height = maxY - minY
-    /*
-    val p1 = new Coordinate(minX, minY)
-    val p2 = new Coordinate(maxX, minY)
-    val p3 = new Coordinate(maxX, maxY)
-    val p4 = new Coordinate(minX, maxY)
-    val boundary = geofactory.createPolygon(Array(p1,p2,p3,p4,p1))
-     */
     val random = if(params.seed() != 0){
       new Random()
     } else {
@@ -46,9 +41,9 @@ object REG {
       line
     }
 
-    save{"/tmp/edgesEdges.wkt"}{
+    save{params.output()}{
       lines.map{ line =>
-        s"${line.toText()}\t${line.getUserData.toString()}\n"
+        s"${line.toText()}\n"
       }.seq
     }
   }
@@ -58,6 +53,7 @@ class REGConf(args: Seq[String]) extends ScallopConf(args) {
   val boundary = opt[String](default = Some("0 0 1000 1000"))
   val n = opt[Int](default = Some(100))
   val seed = opt[Long](default = Some(0))
+  val output = opt[String](default = Some("/tmp/edgesRandom.wkt"))
 
   verify()
 }
