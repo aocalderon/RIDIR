@@ -1,5 +1,5 @@
 name := "REG"
-organization := "UCR-DBLab"
+organization := "edu.ucr.dblab"
 version := "0.1"
 scalaVersion in ThisBuild := "2.11.8"
 
@@ -17,5 +17,5 @@ libraryDependencies += "edu.ucr.dblab" % "utils_2.11" % "0.1"
 
 libraryDependencies += "com.lihaoyi" % "ammonite" % "1.6.7" cross CrossVersion.full
 
-mainClass in (Compile, run) := Some("REG")
-mainClass in (Compile, packageBin) := Some("REG")
+mainClass in (Compile, run) := Some("edu.ucr.dblab.REG")
+mainClass in (Compile, packageBin) := Some("edu.ucr.dblab.REG")

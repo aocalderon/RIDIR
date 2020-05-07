@@ -1,0 +1,3 @@
+/home/and/RIDIR/Code/CGAL/Polylines/CMakeFiles/rebuild_cache.dir
+/home/and/RIDIR/Code/CGAL/Polylines/CMakeFiles/polylines.dir
+/home/and/RIDIR/Code/CGAL/Polylines/CMakeFiles/edit_cache.dir

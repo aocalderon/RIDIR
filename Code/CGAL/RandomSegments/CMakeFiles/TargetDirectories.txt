@@ -1,0 +1,6 @@
+/home/and/RIDIR/Code/CGAL/RandomSegments/CMakeFiles/rebuild_cache.dir
+/home/and/RIDIR/Code/CGAL/RandomSegments/CMakeFiles/ALL_CGAL_TARGETS.dir
+/home/and/RIDIR/Code/CGAL/RandomSegments/CMakeFiles/random_segments2.dir
+/home/and/RIDIR/Code/CGAL/RandomSegments/CMakeFiles/cgal_check_build_system.dir
+/home/and/RIDIR/Code/CGAL/RandomSegments/CMakeFiles/random_segments.dir
+/home/and/RIDIR/Code/CGAL/RandomSegments/CMakeFiles/edit_cache.dir
