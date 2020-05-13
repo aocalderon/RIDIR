@@ -1,0 +1,37 @@
+# Using Increment functions and landmark point location...
+# Using insert...
+(base) and@and:~/RIDIR/Code/CGAL/RandomSegments2$ time ./random_segments -z 1000 -n 2112
+Inserting edges...
+Done! 2112 edges has been inserted.
+The arrangement size:
+   V = 512696,  E = 1019056,  F = 506362
+
+real	7m10.206s
+user	6m55.684s
+sys	0m14.487s
+
+# Using Increment functions and landmark point location...
+# Using insert_non_intersecting_curve...
+(base) and@and:~/RIDIR/Code/CGAL/RandomSegments2$ time ./random_segments -z 1000 -n 2112
+Inserting edges...
+Done! 2112 edges has been inserted.
+The arrangement size:
+   V = 4224,  E = 2112,  F = 1
+
+real	0m15.567s
+user	0m15.412s
+sys	0m0.156s
+
+# Using Aggregate functions...
+(base) and@and:~/RIDIR/Code/CGAL/RandomSegments$ time ./random_segments -f ~/Datasets/WKT/edges1M.wkt -n 2112
+Inserting edges...
+Done! 2112 edges has been read.
+Filename: /home/and/Datasets/WKT/edges1M.wkt N: 2112
+The arrangement size:
+   V = 527264,  E = 1048192,  F = 520931
+
+real	0m7.909s
+user	0m7.733s
+sys	0m0.176s
+
+

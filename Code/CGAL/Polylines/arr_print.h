@@ -1,6 +1,60 @@
 #ifndef _PRINT_ARR_H_
 #define _PRINT_ARR_H_
 
+typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
+typedef CGAL::Arr_segment_traits_2<Kernel>                Segment_traits_2;
+typedef CGAL::Arr_polyline_traits_2<Segment_traits_2>     Geom_traits_2;
+typedef Geom_traits_2::Curve_2                            Polyline_2;
+
+//-----------------------------------------------------------------------------
+// Print all vertices in WKT format.
+//
+template<class Arrangement>
+std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
+{
+  typename Arrangement::Ccb_halfedge_const_circulator  curr = circ;
+  typename Arrangement::Halfedge_const_handle          he;
+  std::stringstream ss;
+
+  ss << "POLYGON (("; //<< circ->source()->point();
+  do {
+    he = curr;
+    int n = he->curve().number_of_subcurves();
+    if( n > 1 ){
+      Polyline_2 poly = he->curve();
+
+      if(poly[0].left()  == he->source()->point() ||
+	 poly[0].right() == he->source()->point()){
+	for(int i = 0; i < n; i++){
+	  ss << poly[i].source() << " " << poly[i].target() << ", ";
+	}
+      } else {
+	for(int i = n - 1; i >= 0; i--){
+	  ss << poly[i].target() << " " << poly[i].source() << ", ";
+	}
+      }
+    } else {
+      ss << he->source()->point() << " " << he->target()->point() <<", ";      
+    }
+    ++curr;
+  } while (curr != circ);
+  ss.seekp(-2, std::ios_base::end);
+  ss << "))";
+
+  return ss.str();
+}
+
+//-----------------------------------------------------------------------------
+// Print the boundary description of an arrangement face in WKT format.
+//
+template<class Arrangement>
+std::string get_face_wkt (typename Arrangement::Face_const_handle f)
+{
+  // Print the outer boundary.
+  // + "\t" + f->data() 
+  return get_wkt<Arrangement> (f->outer_ccb()) + "\n";
+}
+
 //-----------------------------------------------------------------------------
 // Print all neighboring vertices to a given arrangement vertex.
 //

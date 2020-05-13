@@ -38,24 +38,19 @@ int main (int argc, char* argv[]){
   }
   typedef std::vector<Point_2> LineString;
   std::ifstream input(filename);
-  Segment_2 segment;
+  Segment_2 segments[n];
   Arrangement_2 arr;
 
   // Reading edges...
-  std::cout << "Reading edges..." << std::endl;
-  Landmarks_pl pl (arr);
-  pl.attach(arr);
-  int i = 1;
+  std::cout << "Inserting edges..." << std::endl;
+  int i = 0;
   do {
     LineString line;
     CGAL::read_linestring_WKT(input, line);
-    segment = Segment_2 (line[0], line[1]);
-    // Feeding the segments...
-    insert(arr, segment, pl);
-    i++;
-    std::cout << i << " edges have been inserted..." << std::endl;
+    segments[i++] = Segment_2 (line[0], line[1]);
   } while(input.good() && !input.eof() && i < n);
   input.close();
+  insert(arr, segments, segments + n);
   std::cout << "Done! " << n << " edges has been read." << std::endl;
   
   // Printing arrangement info...
