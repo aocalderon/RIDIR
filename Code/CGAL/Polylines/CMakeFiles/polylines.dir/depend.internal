@@ -143,6 +143,7 @@ CMakeFiles/polylines.dir/polylines.cpp.o
  /opt/CGAL-5.0.2/include/CGAL/GMP/Gmpzf_type.h
  /opt/CGAL-5.0.2/include/CGAL/GMPXX_arithmetic_kernel.h
  /opt/CGAL-5.0.2/include/CGAL/GMP_arithmetic_kernel.h
+ /opt/CGAL-5.0.2/include/CGAL/General_polygon_with_holes_2.h
  /opt/CGAL-5.0.2/include/CGAL/Get_arithmetic_kernel.h
  /opt/CGAL-5.0.2/include/CGAL/Gmp_coercion_traits.h
  /opt/CGAL-5.0.2/include/CGAL/Gmpfi.h
@@ -189,9 +190,17 @@ CMakeFiles/polylines.dir/polylines.cpp.o
  /opt/CGAL-5.0.2/include/CGAL/IO/Arrangement_2_reader.h
  /opt/CGAL-5.0.2/include/CGAL/IO/Arrangement_2_writer.h
  /opt/CGAL-5.0.2/include/CGAL/IO/Color.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/WKT.h
  /opt/CGAL-5.0.2/include/CGAL/IO/io.h
  /opt/CGAL-5.0.2/include/CGAL/IO/io_impl.h
  /opt/CGAL-5.0.2/include/CGAL/IO/io_tags.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/traits_linestring.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/traits_multilinestring.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/traits_multipoint.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/traits_multipolygon.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/traits_point.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/traits_point_3.h
+ /opt/CGAL-5.0.2/include/CGAL/IO/traits_polygon.h
  /opt/CGAL-5.0.2/include/CGAL/In_place_list.h
  /opt/CGAL-5.0.2/include/CGAL/Intersection_traits.h
  /opt/CGAL-5.0.2/include/CGAL/Intersection_traits_2.h
@@ -360,6 +369,16 @@ CMakeFiles/polylines.dir/polylines.cpp.o
  /opt/CGAL-5.0.2/include/CGAL/Plane_3.h
  /opt/CGAL-5.0.2/include/CGAL/Point_2.h
  /opt/CGAL-5.0.2/include/CGAL/Point_3.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2/Polygon_2_algorithms_impl.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2/Polygon_2_edge_circulator.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2/Polygon_2_edge_iterator.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2/Polygon_2_impl.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2/Polygon_2_simplicity.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2/Polygon_2_vertex_circulator.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2/polygon_assertions.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_2_algorithms.h
+ /opt/CGAL-5.0.2/include/CGAL/Polygon_with_holes_2.h
  /opt/CGAL-5.0.2/include/CGAL/Profile_counter.h
  /opt/CGAL-5.0.2/include/CGAL/Quotient.h
  /opt/CGAL-5.0.2/include/CGAL/Quotient_fwd.h
@@ -464,6 +483,7 @@ CMakeFiles/polylines.dir/polylines.cpp.o
  /opt/CGAL-5.0.2/include/CGAL/gmpxx_coercion_traits.h
  /opt/CGAL-5.0.2/include/CGAL/int.h
  /opt/CGAL-5.0.2/include/CGAL/internal/Exact_type_selector.h
+ /opt/CGAL-5.0.2/include/CGAL/internal/Geometry_container.h
  /opt/CGAL-5.0.2/include/CGAL/internal/Static_filters/Angle_3.h
  /opt/CGAL-5.0.2/include/CGAL/internal/Static_filters/Collinear_3.h
  /opt/CGAL-5.0.2/include/CGAL/internal/Static_filters/Compare_squared_radius_3.h
