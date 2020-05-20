@@ -19,11 +19,6 @@ typedef Traits_2::X_monotone_curve_2                      Segment_2;
 typedef CGAL::Arrangement_2<Traits_2>                     Arrangement_2;
 typedef CGAL::Arr_landmarks_point_location<Arrangement_2> Landmarks_pl;
 
-// Function to generate uniformly random double values between [0.0 - 1.0)...
-double doubleRand() {
-  return double(rand()) / (double(RAND_MAX) + 1.0);
-}
-
 int main (int argc, char* argv[]){
   // Setting variables...
   int z = 0; 
@@ -59,8 +54,10 @@ int main (int argc, char* argv[]){
     // double in [0, z). Each call to d(generator) generates a new random double...
     
     segment = Segment_2 ( Point_2(d(generator), d(generator)), Point_2(d(generator), d(generator)));
+    //std::cout << i << ". "<< segment << std::endl;
     
-    insert(arr, segment, landmark_pl);
+    //insert(arr, segment, landmark_pl);
+    insert_non_intersecting_curve(arr, segment, landmark_pl);
   }
   std::cout << "Done! " << n << " edges has been inserted." << std::endl;
   

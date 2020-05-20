@@ -1,0 +1,5 @@
+/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/edit_cache.dir
+/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/rebuild_cache.dir
+/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/cgal_check_build_system.dir
+/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/dcel.dir
+/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/ALL_CGAL_TARGETS.dir
