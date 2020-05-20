@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/random_segments.dir/random_segments.cpp.o"
-  "random_segments.pdb"
   "random_segments"
+  "random_segments.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
