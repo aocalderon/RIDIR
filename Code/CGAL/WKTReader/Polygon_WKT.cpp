@@ -6,11 +6,12 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Arr_linear_traits_2.h>
+#include <CGAL/Arr_segment_traits_2.h>
+#include <CGAL/Arr_polyline_traits_2.h>
 #include <CGAL/Arrangement_2.h>
 #include <CGAL/Arr_extended_dcel.h>
 #include <CGAL/Arr_overlay_2.h>
 #include <CGAL/Arr_default_overlay_traits.h>
-#include <CGAL/IO/WKT.h>
 
 #include <iostream>
 #include <fstream>
@@ -19,8 +20,6 @@
 
 #include "dcels.h"
 #include "arr_print.h"
-
-using namespace std;
 
 // Adding a timer function...
 #include <cstdlib>
@@ -48,12 +47,14 @@ struct Overlay_label{
 
 
 int main(int argc, char* argv[]) {
+  
   // General definitions...
-  typedef CGAL::Exact_predicates_exact_constructions_kernel   Kernel;
-  //typedef CGAL::Simple_cartesian<CGAL::Gmpq>                  Kernel;
-  typedef CGAL::Arr_linear_traits_2<Kernel>                   Traits_2;
-  typedef Traits_2::Point_2                                   Point_2;
-  typedef Traits_2::Segment_2                                 Segment_2;
+  typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
+  typedef CGAL::Arr_segment_traits_2<Kernel>                Segment_traits_2;
+  typedef CGAL::Arr_polyline_traits_2<Segment_traits_2>     Traits_2;
+  typedef Traits_2::Point_2                                 Point_2;
+  typedef Traits_2::Segment_2                               Segment_2;
+  typedef Traits_2::Curve_2                                 Polyline_2;
 
   // DCELs definitions...
   typedef CGAL::Arr_face_extended_dcel<Traits_2, string>      DcelA;
@@ -77,62 +78,38 @@ int main(int argc, char* argv[]) {
       exit(-1);
     }
 
-    cout << "Starting timer..." << endl;
-    int start = getMilliCount();
-
-    //-----------------------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------
     ifstream isA( argv[1] );
-    ArrangementA_2 arr1;
     list<Polygon> polys;
+    Traits_2 traits;
+    ArrangementA_2 arr1(&traits);
+    Traits_2::Construct_curve_2 polyline_construct = traits.construct_curve_2_object();
 
     // Reading WKT file...
+    std::cout << "Reading A polygons..." << std::endl;
     do {
       Polygon p;
       CGAL::read_polygon_WKT(isA, p);
       if(!p.outer_boundary().is_empty())
 	polys.push_back(p);
     } while(isA.good() && !isA.eof());
-    // Extracting segments...
+
+    // Inserting as polyline...
+    std::cout << "Inserting polygons..." << std::endl;
+    int start = getMilliCount();
+    int edges = 0;
     for(Polygon p : polys){
-      vector<Point_2> points;
+      std::vector<Point_2> points;
       for (vertexIt vi = p.outer_boundary().begin(); vi != p.outer_boundary().end(); ++vi){
 	points.push_back(*vi);
       }
       points.push_back(points[0]);
-      // Outer segments...
-      int n=0;
-      //cout << "Outer: " << endl;
-      for(int i = 0; i < points.size() - 1; ++i){
-	//cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
-	Point_2 p1 = points[i];
-	Point_2 p2 = points[i + 1];
-	Segment_2 s (p1, p2);
-	//cout << s << endl;
-	insert (arr1, s);
-      }
-      cout << "Polygon added. " << points.size() << " segments." << endl;
-      // Inner segments...
-      if(p.has_holes()){
-	//cout << "Hole(s): " << endl;
-	for (holeIt hit = p.holes_begin(); hit != p.holes_end(); ++hit){
-	  points.clear();
-	  for (vertexIt vi = (*hit).begin(); vi != (*hit).end(); ++vi){
-	    points.push_back(*vi);
-	  }
-	  points.push_back(points[0]);
-	  
-	  for(int i = 0; i < points.size() - 1; ++i){
-	    //cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
-	    Point_2 p1 = points[i];
-	    Point_2 p2 = points[i + 1];
-	    Segment_2 s (p1, p2);
-	    //cout << s << endl;
-	    insert (arr1, s);
-	  }
-	  cout << "Hole added. " << points.size() << " segments." << endl;
-	}
-      }
+      Polyline_2 lines = polyline_construct(points.begin(), points.end());
+      insert(arr1, lines);
+      //std::cout << "Polygon added. " << points.size() << " segments." << std::endl;
+      edges += points.size();
     }
+
     // Assigning face IDs...
     ArrangementA_2::Face_iterator ait;
     int n = 0;
@@ -143,60 +120,39 @@ int main(int argc, char* argv[]) {
       n++;
     }
     cout << "Done with arr1." << endl;
-    //-----------------------------------------------------------------------------------------------------------
+    int milliSecondsElapsed = getMilliSpan(start);
+    std::cout << "Time for A: " << milliSecondsElapsed / 1000.0 << " s." << std::endl;
+    //------------------------------------------------------------------------------------------------
 
     ifstream isB( argv[2] );
-    ArrangementA_2 arr2;
+    ArrangementB_2 arr2(&traits);
     polys.clear();
 
     // Reading WKT file...
+    std::cout << "Reading B polygons..." << std::endl;
     do {
       Polygon p;
       CGAL::read_polygon_WKT(isB, p);
       if(!p.outer_boundary().is_empty())
 	polys.push_back(p);
     } while(isB.good() && !isB.eof());
-    // Extracting segments...
+
+    // Inserting as polyline...
+    std::cout << "Inserting polygons..." << std::endl;
+    start = getMilliCount();
+    edges = 0;
     for(Polygon p : polys){
-      vector<Point_2> points;
+      std::vector<Point_2> points;
       for (vertexIt vi = p.outer_boundary().begin(); vi != p.outer_boundary().end(); ++vi){
 	points.push_back(*vi);
       }
       points.push_back(points[0]);
-      // Outer segments...
-      int n = 0;
-      //cout << "Outer: " << endl;
-      for(int i = 0; i < points.size() - 1; ++i){
-	//cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
-	Point_2 p1 = points[i];
-	Point_2 p2 = points[i + 1];
-	Segment_2 s (p1, p2);
-	//cout << s << endl;
-	insert (arr2, s);
-      }
-      cout << "Polygon added. " << points.size() << " segments." << endl;
-      // Inner segments...
-      if(p.has_holes()){
-	//cout << "Hole(s): " << endl;
-	for (holeIt hit = p.holes_begin(); hit != p.holes_end(); ++hit){
-	  points.clear();
-	  for (vertexIt vi = (*hit).begin(); vi != (*hit).end(); ++vi){
-	    points.push_back(*vi);
-	  }
-	  points.push_back(points[0]);
-	  
-	  for(int i = 0; i < points.size() - 1; ++i){
-	    //cout << "Segment " << n++ <<  " (" << points[i] << ", " << points[i + 1] << ")" << endl;
-	    Point_2 p1 = points[i];
-	    Point_2 p2 = points[i + 1];
-	    Segment_2 s (p1, p2);
-	    //cout << s << endl;
-	    insert (arr2, s);
-	  }
-	  cout << "Hole added: " << points.size() << " segments." << endl;
-	}
-      }
+      Polyline_2 lines = polyline_construct(points.begin(), points.end());
+      insert(arr2, lines);
+      //std::cout << "Polygon added. " << points.size() << " segments." << std::endl;
+      edges += points.size();
     }
+
     // Assigning face IDs...
     ArrangementB_2::Face_iterator bit;
     int m = 0;
@@ -206,16 +162,20 @@ int main(int argc, char* argv[]) {
       m++;
     }
     cout << "Done with arr2." << endl;
-    //-----------------------------------------------------------------------------------------------------------
+    milliSecondsElapsed = getMilliSpan(start);
+    std::cout << "Time for B: " << milliSecondsElapsed / 1000.0 << " s." << std::endl;
+    //------------------------------------------------------------------------------------------------
 
     // Compute the overlay of the two arrangements.
+    std::cout << "Computing overlay..." << std::endl;
+    start = getMilliCount();
     ArrangementRes_2 overlay_arr;
     Overlay_traits   overlay_traits;
 
     overlay (arr1, arr2, overlay_arr, overlay_traits);
 
-    int milliSecondsElapsed = getMilliSpan(start);
-    cout << "Total time: " << milliSecondsElapsed << endl;
+    milliSecondsElapsed = getMilliSpan(start);
+    std::cout << "Time for overlay: " << milliSecondsElapsed / 1000.0 << " s." << std::endl;
     
     // Go over the faces of the overlaid arrangement and their labels.
     ArrangementRes_2::Face_iterator  res_fit;
