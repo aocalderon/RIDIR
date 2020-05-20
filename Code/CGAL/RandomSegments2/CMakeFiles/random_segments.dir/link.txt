@@ -1,1 +1,1 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/random_segments.dir/random_segments.cpp.o  -o random_segments /usr/lib/x86_64-linux-gnu/libmpfr.so /usr/lib/x86_64-linux-gnu/libgmp.so 
+/opt/rh/devtoolset-7/root/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/random_segments.dir/random_segments.cpp.o  -o random_segments  -Wl,-rpath,/home/acald013/bin/lib /home/acald013/bin/lib/libmpfr.so /home/acald013/bin/lib/libgmp.so 
