@@ -13,6 +13,9 @@
 #include <CGAL/Arr_overlay_2.h>
 #include <CGAL/Arr_default_overlay_traits.h>
 
+#include <ctype.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -73,13 +76,30 @@ int main(int argc, char* argv[]) {
   typedef Polygon::Hole_iterator                              holeIt;
 
   {
-    if (argc < 3) {
-      cerr << "usage: " << argv[0] << " file1 file2" << endl;
-      exit(-1);
+    int debug = 0;
+    char* filename1;
+    char* filename2;
+    int c;
+    while ((c = getopt (argc, argv, "a:b:d")) != -1){
+      switch (c){
+      case 'd':
+	debug = 1;
+        break;
+      case 'a':
+	if(optarg) filename1 = optarg;
+        break;
+      case 'b':
+	if(optarg) filename2 = optarg; 
+        break;
+      case '?':
+        return 1;
+      default:
+	abort ();
+      }
     }
-
+    
     //-------------------------------------------------------------------------------------------------
-    ifstream isA( argv[1] );
+    ifstream isA( filename1 );
     list<Polygon> polys;
     Traits_2 traits;
     ArrangementA_2 arr1(&traits);
@@ -119,12 +139,13 @@ int main(int argc, char* argv[]) {
     
       n++;
     }
-    cout << "Done with arr1." << endl;
+    cout << "Done with A [" << edges << " edges]." << endl;
     int milliSecondsElapsed = getMilliSpan(start);
-    std::cout << "Time for A: " << milliSecondsElapsed / 1000.0 << " s." << std::endl;
+    double timeA = milliSecondsElapsed / 1000.0;
+    std::cout << "Time for A: " << timeA << " s." << std::endl;
     //------------------------------------------------------------------------------------------------
 
-    ifstream isB( argv[2] );
+    ifstream isB( filename2 );
     ArrangementB_2 arr2(&traits);
     polys.clear();
 
@@ -161,9 +182,10 @@ int main(int argc, char* argv[]) {
       bit->set_data(id);
       m++;
     }
-    cout << "Done with arr2." << endl;
+    cout << "Done with B [" << edges << " edges]." << endl;
     milliSecondsElapsed = getMilliSpan(start);
-    std::cout << "Time for B: " << milliSecondsElapsed / 1000.0 << " s." << std::endl;
+    double timeB = milliSecondsElapsed / 1000.0;
+    std::cout << "Time for B: " << timeB << " s." << std::endl;
     //------------------------------------------------------------------------------------------------
 
     // Compute the overlay of the two arrangements.
@@ -175,23 +197,29 @@ int main(int argc, char* argv[]) {
     overlay (arr1, arr2, overlay_arr, overlay_traits);
 
     milliSecondsElapsed = getMilliSpan(start);
-    std::cout << "Time for overlay: " << milliSecondsElapsed / 1000.0 << " s." << std::endl;
+    double timeO = milliSecondsElapsed / 1000.0;
+    std::cout << "Time for overlay: " << timeO << " s." << std::endl;
     
-    // Go over the faces of the overlaid arrangement and their labels.
-    ArrangementRes_2::Face_iterator  res_fit;
+    std::cout << "Total Time: " << timeA + timeB + timeO << " s." << std::endl;
 
-    ofstream wkt;
-    wkt.open ("faces.wkt");
-    cout << "Saving faces to faces.wkt..." << endl;
-    for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
-      if(!res_fit->is_unbounded()){
-	string w = get_face_wkt<ArrangementRes_2> (res_fit);
-	//cout << w;
-	wkt << w;
+    if(debug){
+      // Go over the faces of the overlaid arrangement and their labels.
+      ArrangementRes_2::Face_iterator  res_fit;
+      ofstream wkt;
+      wkt.open ("faces.wkt");
+      cout << "Saving faces to faces.wkt..." << endl;
+      int nfaces = 0;
+      for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
+	if(!res_fit->is_unbounded()){
+	  string w = get_face_wkt<ArrangementRes_2> (res_fit);
+	  //cout << w;
+	  wkt << w;
+	  nfaces++;
+	}
       }
+      wkt.close();
+      std::cout << "Done! " << nfaces << " faces saved." << std::endl;
     }
-    wkt.close();
-    cout << "Done!!!" << endl;
   }
   
   return 0;
