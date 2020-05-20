@@ -14,6 +14,23 @@
 
 #include "arr_print.h"
 
+// Adding a timer function...
+#include <cstdlib>
+#include <sys/timeb.h>
+int getMilliCount(){
+	timeb tb;
+	ftime(&tb);
+	int nCount = tb.millitm + (tb.time & 0xfffff) * 1000;
+	return nCount;
+}
+
+int getMilliSpan(int nTimeStart){
+	int nSpan = getMilliCount() - nTimeStart;
+	if(nSpan < 0)
+		nSpan += 0x100000 * 1000;
+	return nSpan;
+}
+
 // General definitions...
 typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
 typedef CGAL::Arr_segment_traits_2<Kernel>                Segment_traits_2;
@@ -38,6 +55,7 @@ int main(int argc, char* argv[]) {
   std::vector<Polygon> polys;
 
   // Reading WKT file...
+  std::cout << "Reading polygons..." << std::endl;
   do {
     Polygon p;
     CGAL::read_polygon_WKT(A, p);
@@ -46,6 +64,9 @@ int main(int argc, char* argv[]) {
   } while(A.good() && !A.eof());
 
   // Inserting as polyline...
+  std::cout << "Inserting polygons..." << std::endl;
+  int start = getMilliCount();
+  int edges = 0;
   for(Polygon p : polys){
     std::vector<Point_2> points;
     for (vertexIt vi = p.outer_boundary().begin(); vi != p.outer_boundary().end(); ++vi){
@@ -54,21 +75,22 @@ int main(int argc, char* argv[]) {
     points.push_back(points[0]);
     Polyline_2 lines = polyline_construct(points.begin(), points.end());
     insert(arr, lines);
-    std::cout << "Polygon added. " << points.size() << " segments." << std::endl;
+    //std::cout << "Polygon added. " << points.size() << " segments." << std::endl;
+    edges += points.size();
   }
+  int milliSecondsElapsed = getMilliSpan(start);
+  std::cout << "Total time: " << milliSecondsElapsed / 1000.0 << " s." << std::endl;
 
   //print_arrangement(arr);
   std::cout << "The arrangement size:" << std::endl
-            << "   V = " << arr.number_of_vertices()
-            << ",  E = " << arr.number_of_edges() 
-            << ",  F = " << arr.number_of_faces() << std::endl;
+            << "    Edges = " << edges << std::endl
+            << "    Faces = " << arr.number_of_faces() << std::endl;
 
   // Go over the faces of the overlaid arrangement and their labels.
   Arrangement_2::Face_iterator  res_fit;
 
   std::ofstream wkt;
   wkt.open ("faces.wkt");
-  std::cout << "The current faces are: " << std::endl;
   for (res_fit = arr.faces_begin(); res_fit != arr.faces_end(); ++res_fit){
     if(!res_fit->is_unbounded()){
       std::string w = get_face_wkt<Arrangement_2> (res_fit);
