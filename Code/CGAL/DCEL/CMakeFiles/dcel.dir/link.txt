@@ -1,1 +1,1 @@
-/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/dcel.dir/dcel.cpp.o  -o dcel /usr/lib/x86_64-linux-gnu/libmpfr.so /usr/lib/x86_64-linux-gnu/libgmp.so 
+/opt/rh/devtoolset-7/root/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/dcel.dir/dcel.cpp.o  -o dcel  -Wl,-rpath,/home/acald013/bin/lib /home/acald013/bin/lib/libmpfr.so /home/acald013/bin/lib/libgmp.so 

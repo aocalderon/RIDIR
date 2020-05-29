@@ -13,6 +13,24 @@ MASTER=yarn
 A=/user/acald013/Datasets/CA/cali2000_polygons6414.tsv
 B=/user/acald013/Datasets/CA/cali2010_polygons6414.tsv
 
+while getopts "p:e:c:" OPTION; do
+    case $OPTION in
+    p)
+        PARTITIONS=$OPTARG
+        ;;
+    e)
+	EXECUTORS=$OPTARG
+	;;
+    c)
+	CORES=$OPTARG
+	;;
+    *)
+        echo "Incorrect options provided"
+        exit 1
+        ;;
+    esac
+done
+
 spark-submit --files $LOG_FILE \
 	     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
 	     --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar \
