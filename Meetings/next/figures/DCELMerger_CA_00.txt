@@ -1,0 +1,897 @@
+2020-05-28 21:24:40,732|Starting session...
+2020-05-28 21:25:22,108|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 21:25:22,109|Starting session... Done!
+2020-05-28 21:28:43,735|DCELMerger|4506| 1| 9| 1024|Reading polygons A            |201.62
+2020-05-28 21:28:47,475|DCELMerger|4506| 1| 9| 1024|Reading polygons B            |  3.74
+2020-05-28 21:28:47,476|DEBUG|4506|Polygons in A|7028
+2020-05-28 21:28:47,476|DEBUG|4506|Polygons in B|8047
+2020-05-28 21:28:49,681|Saved /tmp/edgesA.wkt in 0.17s [7028 records].
+2020-05-28 21:28:52,620|Saved /tmp/edgesB.wkt in 0.88s [8047 records].
+2020-05-28 21:29:25,188|DCELMerger|4506| 1| 9| 1024|Partitioning edges            | 32.57
+2020-05-28 21:29:25,299|DEBUG|4506|Total number of partitions|2551
+2020-05-28 21:29:25,379|DEBUG|4506|Total number of edges in raw|3901521
+2020-05-28 21:29:29,467|DEBUG|4506|Total number of edges in spatial|3941937
+2020-05-28 21:29:29,643|Saved /tmp/edgesCells.wkt in 0.01s [2551 records].
+2020-05-28 21:29:56,827|DCELMerger|4506| 1| 9| 1024|Extracting A and B DCELs      | 27.18
+2020-05-28 21:30:03,708|Saved /tmp/edgesHA.wkt in 0.74s [1091170 records].
+2020-05-28 21:30:09,012|Saved /tmp/edgesFA.wkt in 0.27s [19836 records].
+2020-05-28 21:30:21,249|Saved /tmp/edgesHB.wkt in 4.88s [3000504 records].
+2020-05-28 21:30:28,632|Saved /tmp/edgesFB.wkt in 1.65s [21558 records].
+M: 2551...
+Z: 126...
+M: 2551...
+Z: 111...
+2020-05-28 21:30:59,339|DCELMerger|4506| 1| 9| 1024|Updating empty cells          | 30.70
+2020-05-28 21:31:05,477|Saved /tmp/edgesHAprime.wkt in 1.05s [1091170 records].
+2020-05-28 21:31:10,389|Saved /tmp/edgesFAprime.wkt in 0.26s [18065 records].
+2020-05-28 21:31:19,695|Saved /tmp/edgesHBprime.wkt in 2.35s [3000504 records].
+2020-05-28 21:31:25,923|Saved /tmp/edgesFBprime.wkt in 0.73s [19640 records].
+2020-05-28 21:32:09,172|DCELMerger|4506| 1| 9| 1024|Merging Halfedges             | 43.25
+2020-05-28 21:32:18,253|Saved /tmp/edgesFC.wkt in 1.21s [204315 records].
+2020-05-28 21:32:36,298|Saved /tmp/edgesHC.wkt in 7.82s [4613944 records].
+2020-05-28 21:32:47,709|DCELMerger|4506| 1| 9| 1024|Checking single-label faces   | 11.41
+2020-05-28 21:33:01,425|Saved /tmp/edgesFaces.wkt in 1.14s [66704 records].
+2020-05-28 21:33:20,816|Saved /tmp/edgesHedges.wkt in 8.44s [4613944 records].
+2020-05-28 21:33:59,802|Saved /tmp/edgesOpIntersection.wkt in 1.10s [41946 records].
+2020-05-28 21:33:59,802|DCELMerger|4506| 1| 9| 1024|Intersection                  | 38.98
+2020-05-28 21:34:16,996|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 21:34:16,997|DCELMerger|4506| 1| 9| 1024|Symmetric                     | 17.19
+2020-05-28 21:34:52,536|Saved /tmp/edgesOpUnion.wkt in 1.09s [42303 records].
+2020-05-28 21:34:52,537|DCELMerger|4506| 1| 9| 1024|Union                         | 35.54
+2020-05-28 21:35:10,123|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 21:35:10,124|DCELMerger|4506| 1| 9| 1024|Diff A                        | 17.58
+2020-05-28 21:35:27,397|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 21:35:27,397|DCELMerger|4506| 1| 9| 1024|Diff B                        | 17.27
+2020-05-28 21:35:27,397|Closing session...
+2020-05-28 21:35:27,601|Closing session... Done!
+2020-05-28 21:35:31,887|Starting session...
+2020-05-28 21:36:08,282|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 2 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 21:36:08,283|Starting session... Done!
+2020-05-28 21:38:23,193|DCELMerger|4507| 2| 9| 1024|Reading polygons A            |134.91
+2020-05-28 21:38:29,940|DCELMerger|4507| 2| 9| 1024|Reading polygons B            |  6.75
+2020-05-28 21:38:29,941|DEBUG|4507|Polygons in A|7028
+2020-05-28 21:38:29,941|DEBUG|4507|Polygons in B|8047
+2020-05-28 21:38:32,059|Saved /tmp/edgesA.wkt in 0.24s [7028 records].
+2020-05-28 21:38:34,594|Saved /tmp/edgesB.wkt in 0.80s [8047 records].
+2020-05-28 21:38:55,104|DCELMerger|4507| 2| 9| 1024|Partitioning edges            | 20.51
+2020-05-28 21:38:55,189|DEBUG|4507|Total number of partitions|2506
+2020-05-28 21:38:55,555|DEBUG|4507|Total number of edges in raw|3901521
+2020-05-28 21:38:57,687|DEBUG|4507|Total number of edges in spatial|3941440
+2020-05-28 21:38:57,847|Saved /tmp/edgesCells.wkt in 0.00s [2506 records].
+2020-05-28 21:39:13,851|DCELMerger|4507| 2| 9| 1024|Extracting A and B DCELs      | 16.00
+2020-05-28 21:39:17,889|Saved /tmp/edgesHA.wkt in 1.11s [1090132 records].
+2020-05-28 21:39:20,741|Saved /tmp/edgesFA.wkt in 0.19s [19688 records].
+2020-05-28 21:39:29,647|Saved /tmp/edgesHB.wkt in 4.94s [2999286 records].
+2020-05-28 21:39:33,265|Saved /tmp/edgesFB.wkt in 0.71s [21380 records].
+M: 2506...
+Z: 124...
+M: 2506...
+Z: 117...
+2020-05-28 21:39:49,936|DCELMerger|4507| 2| 9| 1024|Updating empty cells          | 16.67
+2020-05-28 21:39:54,043|Saved /tmp/edgesHAprime.wkt in 0.90s [1090132 records].
+2020-05-28 21:39:56,726|Saved /tmp/edgesFAprime.wkt in 0.25s [17918 records].
+2020-05-28 21:40:04,064|Saved /tmp/edgesHBprime.wkt in 2.98s [2999286 records].
+2020-05-28 21:40:07,395|Saved /tmp/edgesFBprime.wkt in 0.55s [19458 records].
+2020-05-28 21:40:26,676|DCELMerger|4507| 2| 9| 1024|Merging Halfedges             | 19.28
+2020-05-28 21:40:31,905|Saved /tmp/edgesFC.wkt in 1.40s [204011 records].
+2020-05-28 21:40:47,088|Saved /tmp/edgesHC.wkt in 9.60s [4612000 records].
+2020-05-28 21:40:53,137|DCELMerger|4507| 2| 9| 1024|Checking single-label faces   |  6.05
+2020-05-28 21:41:00,985|Saved /tmp/edgesFaces.wkt in 1.78s [66353 records].
+2020-05-28 21:41:13,330|Saved /tmp/edgesHedges.wkt in 7.36s [4612000 records].
+2020-05-28 21:41:36,650|Saved /tmp/edgesOpIntersection.wkt in 1.24s [41946 records].
+2020-05-28 21:41:36,650|DCELMerger|4507| 2| 9| 1024|Intersection                  | 23.31
+2020-05-28 21:41:45,744|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 21:41:45,745|DCELMerger|4507| 2| 9| 1024|Symmetric                     |  9.09
+2020-05-28 21:42:07,398|Saved /tmp/edgesOpUnion.wkt in 1.05s [42303 records].
+2020-05-28 21:42:07,398|DCELMerger|4507| 2| 9| 1024|Union                         | 21.65
+2020-05-28 21:42:16,976|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 21:42:16,977|DCELMerger|4507| 2| 9| 1024|Diff A                        |  9.57
+2020-05-28 21:42:26,174|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 21:42:26,174|DCELMerger|4507| 2| 9| 1024|Diff B                        |  9.20
+2020-05-28 21:42:26,174|Closing session...
+2020-05-28 21:42:26,760|Closing session... Done!
+2020-05-28 21:42:30,940|Starting session...
+2020-05-28 21:43:22,590|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 4 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 21:43:22,591|Starting session... Done!
+2020-05-28 21:43:32,450|DCELMerger|4508| 4| 9| 1024|Reading polygons A            |  9.85
+2020-05-28 21:43:42,606|DCELMerger|4508| 4| 9| 1024|Reading polygons B            | 10.16
+2020-05-28 21:43:42,608|DEBUG|4508|Polygons in A|7028
+2020-05-28 21:43:42,608|DEBUG|4508|Polygons in B|8047
+2020-05-28 21:43:44,494|Saved /tmp/edgesA.wkt in 0.22s [7028 records].
+2020-05-28 21:43:46,903|Saved /tmp/edgesB.wkt in 0.72s [8047 records].
+2020-05-28 21:44:00,183|DCELMerger|4508| 4| 9| 1024|Partitioning edges            | 13.28
+2020-05-28 21:44:00,276|DEBUG|4508|Total number of partitions|2581
+2020-05-28 21:44:00,382|DEBUG|4508|Total number of edges in raw|3901521
+2020-05-28 21:44:01,838|DEBUG|4508|Total number of edges in spatial|3942460
+2020-05-28 21:44:02,003|Saved /tmp/edgesCells.wkt in 0.00s [2581 records].
+2020-05-28 21:44:11,225|DCELMerger|4508| 4| 9| 1024|Extracting A and B DCELs      |  9.22
+2020-05-28 21:44:15,269|Saved /tmp/edgesHA.wkt in 1.12s [1092148 records].
+2020-05-28 21:44:17,209|Saved /tmp/edgesFA.wkt in 0.25s [20004 records].
+2020-05-28 21:44:22,201|Saved /tmp/edgesHB.wkt in 2.34s [3001500 records].
+2020-05-28 21:44:24,539|Saved /tmp/edgesFB.wkt in 0.52s [21729 records].
+M: 2581...
+Z: 126...
+M: 2581...
+Z: 108...
+2020-05-28 21:44:34,386|DCELMerger|4508| 4| 9| 1024|Updating empty cells          |  9.85
+2020-05-28 21:44:36,966|Saved /tmp/edgesHAprime.wkt in 0.92s [1092148 records].
+2020-05-28 21:44:38,769|Saved /tmp/edgesFAprime.wkt in 0.28s [18192 records].
+2020-05-28 21:44:43,418|Saved /tmp/edgesHBprime.wkt in 2.42s [3001500 records].
+2020-05-28 21:44:45,848|Saved /tmp/edgesFBprime.wkt in 0.77s [19766 records].
+2020-05-28 21:44:56,225|DCELMerger|4508| 4| 9| 1024|Merging Halfedges             | 10.38
+2020-05-28 21:44:59,702|Saved /tmp/edgesFC.wkt in 1.29s [204578 records].
+2020-05-28 21:45:12,436|Saved /tmp/edgesHC.wkt in 8.33s [4615540 records].
+2020-05-28 21:45:17,532|DCELMerger|4508| 4| 9| 1024|Checking single-label faces   |  5.09
+2020-05-28 21:45:22,174|Saved /tmp/edgesFaces.wkt in 0.98s [66946 records].
+2020-05-28 21:45:30,128|Saved /tmp/edgesHedges.wkt in 5.02s [4615540 records].
+2020-05-28 21:45:43,624|Saved /tmp/edgesOpIntersection.wkt in 0.98s [41946 records].
+2020-05-28 21:45:43,625|DCELMerger|4508| 4| 9| 1024|Intersection                  | 13.49
+2020-05-28 21:45:49,469|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 21:45:49,470|DCELMerger|4508| 4| 9| 1024|Symmetric                     |  5.84
+2020-05-28 21:46:03,329|Saved /tmp/edgesOpUnion.wkt in 1.30s [42303 records].
+2020-05-28 21:46:03,330|DCELMerger|4508| 4| 9| 1024|Union                         | 13.86
+2020-05-28 21:46:09,013|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 21:46:09,014|DCELMerger|4508| 4| 9| 1024|Diff A                        |  5.68
+2020-05-28 21:46:16,200|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 21:46:16,201|DCELMerger|4508| 4| 9| 1024|Diff B                        |  7.18
+2020-05-28 21:46:16,201|Closing session...
+2020-05-28 21:46:16,517|Closing session... Done!
+2020-05-28 21:46:20,591|Starting session...
+2020-05-28 21:46:56,206|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 8 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 21:46:56,206|Starting session... Done!
+2020-05-28 21:47:32,691|DCELMerger|4509| 8| 9| 1024|Reading polygons A            | 36.48
+2020-05-28 21:47:42,033|DCELMerger|4509| 8| 9| 1024|Reading polygons B            |  9.34
+2020-05-28 21:47:42,034|DEBUG|4509|Polygons in A|7028
+2020-05-28 21:47:42,035|DEBUG|4509|Polygons in B|8047
+2020-05-28 21:47:44,259|Saved /tmp/edgesA.wkt in 0.24s [7028 records].
+2020-05-28 21:47:46,612|Saved /tmp/edgesB.wkt in 0.74s [8047 records].
+2020-05-28 21:47:58,135|DCELMerger|4509| 8| 9| 1024|Partitioning edges            | 11.52
+2020-05-28 21:47:58,234|DEBUG|4509|Total number of partitions|2563
+2020-05-28 21:47:58,339|DEBUG|4509|Total number of edges in raw|3901521
+2020-05-28 21:47:59,625|DEBUG|4509|Total number of edges in spatial|3941965
+2020-05-28 21:47:59,787|Saved /tmp/edgesCells.wkt in 0.01s [2563 records].
+2020-05-28 21:48:04,742|DCELMerger|4509| 8| 9| 1024|Extracting A and B DCELs      |  4.95
+2020-05-28 21:48:07,169|Saved /tmp/edgesHA.wkt in 1.04s [1091266 records].
+2020-05-28 21:48:09,152|Saved /tmp/edgesFA.wkt in 0.23s [19863 records].
+2020-05-28 21:48:13,379|Saved /tmp/edgesHB.wkt in 2.51s [3000672 records].
+2020-05-28 21:48:15,134|Saved /tmp/edgesFB.wkt in 0.54s [21597 records].
+M: 2563...
+Z: 140...
+M: 2563...
+Z: 122...
+2020-05-28 21:48:21,798|DCELMerger|4509| 8| 9| 1024|Updating empty cells          |  6.66
+2020-05-28 21:48:23,522|Saved /tmp/edgesHAprime.wkt in 0.65s [1091266 records].
+2020-05-28 21:48:24,787|Saved /tmp/edgesFAprime.wkt in 0.25s [18078 records].
+2020-05-28 21:48:28,628|Saved /tmp/edgesHBprime.wkt in 2.19s [3000672 records].
+2020-05-28 21:48:30,596|Saved /tmp/edgesFBprime.wkt in 0.81s [19650 records].
+2020-05-28 21:48:35,951|DCELMerger|4509| 8| 9| 1024|Merging Halfedges             |  5.35
+2020-05-28 21:48:38,847|Saved /tmp/edgesFC.wkt in 1.31s [204329 records].
+2020-05-28 21:48:53,196|Saved /tmp/edgesHC.wkt in 11.43s [4614046 records].
+2020-05-28 21:48:55,078|DCELMerger|4509| 8| 9| 1024|Checking single-label faces   |  1.88
+2020-05-28 21:49:00,470|Saved /tmp/edgesFaces.wkt in 1.88s [66703 records].
+2020-05-28 21:49:10,959|Saved /tmp/edgesHedges.wkt in 7.78s [4614046 records].
+2020-05-28 21:49:21,096|Saved /tmp/edgesOpIntersection.wkt in 0.85s [41946 records].
+2020-05-28 21:49:21,096|DCELMerger|4509| 8| 9| 1024|Intersection                  | 10.13
+2020-05-28 21:49:25,669|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 21:49:25,669|DCELMerger|4509| 8| 9| 1024|Symmetric                     |  4.57
+2020-05-28 21:49:34,108|Saved /tmp/edgesOpUnion.wkt in 1.20s [42303 records].
+2020-05-28 21:49:34,108|DCELMerger|4509| 8| 9| 1024|Union                         |  8.44
+2020-05-28 21:49:37,931|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 21:49:37,931|DCELMerger|4509| 8| 9| 1024|Diff A                        |  3.82
+2020-05-28 21:49:41,833|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 21:49:41,834|DCELMerger|4509| 8| 9| 1024|Diff B                        |  3.90
+2020-05-28 21:49:41,834|Closing session...
+2020-05-28 21:49:42,077|Closing session... Done!
+2020-05-28 21:49:46,295|Starting session...
+Exception in thread "main" org.apache.spark.SparkException: Yarn application has already ended! It might have been killed or unable to launch application master.
+	at org.apache.spark.scheduler.cluster.YarnClientSchedulerBackend.waitForApplication(YarnClientSchedulerBackend.scala:89)
+	at org.apache.spark.scheduler.cluster.YarnClientSchedulerBackend.start(YarnClientSchedulerBackend.scala:63)
+	at org.apache.spark.scheduler.TaskSchedulerImpl.start(TaskSchedulerImpl.scala:164)
+	at org.apache.spark.SparkContext.<init>(SparkContext.scala:500)
+	at org.apache.spark.SparkContext$.getOrCreate(SparkContext.scala:2493)
+	at org.apache.spark.sql.SparkSession$Builder$$anonfun$7.apply(SparkSession.scala:934)
+	at org.apache.spark.sql.SparkSession$Builder$$anonfun$7.apply(SparkSession.scala:925)
+	at scala.Option.getOrElse(Option.scala:121)
+	at org.apache.spark.sql.SparkSession$Builder.getOrCreate(SparkSession.scala:925)
+	at DCELMerger$.main(DCELMerger.scala:142)
+	at DCELMerger.main(DCELMerger.scala)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.spark.deploy.JavaMainApplication.start(SparkApplication.scala:52)
+	at org.apache.spark.deploy.SparkSubmit$.org$apache$spark$deploy$SparkSubmit$$runMain(SparkSubmit.scala:904)
+	at org.apache.spark.deploy.SparkSubmit$.doRunMain$1(SparkSubmit.scala:198)
+	at org.apache.spark.deploy.SparkSubmit$.submit(SparkSubmit.scala:228)
+	at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:137)
+	at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+2020-05-28 21:51:54,452|Starting session...
+2020-05-28 21:52:59,880|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 2 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 21:52:59,880|Starting session... Done!
+2020-05-28 21:53:33,452|DCELMerger|4511| 2| 9| 1024|Reading polygons A            | 33.57
+2020-05-28 21:53:36,891|DCELMerger|4511| 2| 9| 1024|Reading polygons B            |  3.44
+2020-05-28 21:53:36,893|DEBUG|4511|Polygons in A|7028
+2020-05-28 21:53:36,893|DEBUG|4511|Polygons in B|8047
+2020-05-28 21:53:39,391|Saved /tmp/edgesA.wkt in 0.24s [7028 records].
+2020-05-28 21:53:42,216|Saved /tmp/edgesB.wkt in 0.75s [8047 records].
+2020-05-28 21:54:12,800|DCELMerger|4511| 2| 9| 1024|Partitioning edges            | 30.58
+2020-05-28 21:54:12,889|DEBUG|4511|Total number of partitions|2575
+2020-05-28 21:54:12,985|DEBUG|4511|Total number of edges in raw|3901521
+2020-05-28 21:54:17,132|DEBUG|4511|Total number of edges in spatial|3942122
+2020-05-28 21:54:17,307|Saved /tmp/edgesCells.wkt in 0.01s [2575 records].
+2020-05-28 21:54:47,335|DCELMerger|4511| 2| 9| 1024|Extracting A and B DCELs      | 30.03
+2020-05-28 21:54:53,420|Saved /tmp/edgesHA.wkt in 0.77s [1091632 records].
+2020-05-28 21:54:58,560|Saved /tmp/edgesFA.wkt in 0.25s [19929 records].
+2020-05-28 21:55:08,208|Saved /tmp/edgesHB.wkt in 2.36s [3000930 records].
+2020-05-28 21:55:14,975|Saved /tmp/edgesFB.wkt in 1.04s [21645 records].
+M: 2575...
+Z: 135...
+M: 2575...
+Z: 126...
+2020-05-28 21:55:45,004|DCELMerger|4511| 2| 9| 1024|Updating empty cells          | 30.03
+2020-05-28 21:55:51,009|Saved /tmp/edgesHAprime.wkt in 0.86s [1091632 records].
+2020-05-28 21:55:56,094|Saved /tmp/edgesFAprime.wkt in 0.25s [18137 records].
+2020-05-28 21:56:06,914|Saved /tmp/edgesHBprime.wkt in 3.62s [3000930 records].
+2020-05-28 21:56:13,413|Saved /tmp/edgesFBprime.wkt in 0.92s [19706 records].
+2020-05-28 21:56:47,473|DCELMerger|4511| 2| 9| 1024|Merging Halfedges             | 34.06
+2020-05-28 21:56:57,055|Saved /tmp/edgesFC.wkt in 1.43s [204427 records].
+2020-05-28 21:57:21,086|Saved /tmp/edgesHC.wkt in 4.58s [4614646 records].
+2020-05-28 21:57:32,860|DCELMerger|4511| 2| 9| 1024|Checking single-label faces   | 11.77
+2020-05-28 21:57:44,480|Saved /tmp/edgesFaces.wkt in 1.32s [66833 records].
+2020-05-28 21:57:58,558|Saved /tmp/edgesHedges.wkt in 5.06s [4614646 records].
+2020-05-28 21:58:30,901|Saved /tmp/edgesOpIntersection.wkt in 0.82s [41946 records].
+2020-05-28 21:58:30,901|DCELMerger|4511| 2| 9| 1024|Intersection                  | 32.33
+2020-05-28 21:58:45,273|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 21:58:45,273|DCELMerger|4511| 2| 9| 1024|Symmetric                     | 14.37
+2020-05-28 21:59:12,996|Saved /tmp/edgesOpUnion.wkt in 0.93s [42303 records].
+2020-05-28 21:59:12,996|DCELMerger|4511| 2| 9| 1024|Union                         | 27.72
+2020-05-28 21:59:27,430|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 21:59:27,430|DCELMerger|4511| 2| 9| 1024|Diff A                        | 14.43
+2020-05-28 21:59:41,070|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 21:59:41,070|DCELMerger|4511| 2| 9| 1024|Diff B                        | 13.64
+2020-05-28 21:59:41,070|Closing session...
+2020-05-28 21:59:41,307|Closing session... Done!
+2020-05-28 21:59:45,274|Starting session...
+2020-05-28 22:00:21,740|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 4 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:00:21,740|Starting session... Done!
+2020-05-28 22:00:36,053|DCELMerger|4512| 4| 9| 1024|Reading polygons A            | 14.31
+2020-05-28 22:00:42,226|DCELMerger|4512| 4| 9| 1024|Reading polygons B            |  6.17
+2020-05-28 22:00:42,229|DEBUG|4512|Polygons in A|7028
+2020-05-28 22:00:42,229|DEBUG|4512|Polygons in B|8047
+2020-05-28 22:00:44,499|Saved /tmp/edgesA.wkt in 0.23s [7028 records].
+2020-05-28 22:00:46,970|Saved /tmp/edgesB.wkt in 0.83s [8047 records].
+2020-05-28 22:01:02,630|DCELMerger|4512| 4| 9| 1024|Partitioning edges            | 15.66
+2020-05-28 22:01:02,721|DEBUG|4512|Total number of partitions|2623
+2020-05-28 22:01:02,956|DEBUG|4512|Total number of edges in raw|3901521
+2020-05-28 22:01:04,652|DEBUG|4512|Total number of edges in spatial|3942599
+2020-05-28 22:01:04,820|Saved /tmp/edgesCells.wkt in 0.00s [2623 records].
+2020-05-28 22:01:14,441|DCELMerger|4512| 4| 9| 1024|Extracting A and B DCELs      |  9.62
+2020-05-28 22:01:19,215|Saved /tmp/edgesHA.wkt in 1.15s [1092688 records].
+2020-05-28 22:01:21,647|Saved /tmp/edgesFA.wkt in 0.43s [20100 records].
+2020-05-28 22:01:27,232|Saved /tmp/edgesHB.wkt in 2.50s [3002070 records].
+2020-05-28 22:01:30,566|Saved /tmp/edgesFB.wkt in 1.05s [21830 records].
+M: 2623...
+Z: 136...
+M: 2623...
+Z: 121...
+2020-05-28 22:01:42,116|DCELMerger|4512| 4| 9| 1024|Updating empty cells          | 11.55
+2020-05-28 22:01:45,008|Saved /tmp/edgesHAprime.wkt in 0.94s [1092688 records].
+2020-05-28 22:01:47,137|Saved /tmp/edgesFAprime.wkt in 0.27s [18281 records].
+2020-05-28 22:01:52,998|Saved /tmp/edgesHBprime.wkt in 3.25s [3002070 records].
+2020-05-28 22:01:55,590|Saved /tmp/edgesFBprime.wkt in 0.55s [19843 records].
+2020-05-28 22:02:09,775|DCELMerger|4512| 4| 9| 1024|Merging Halfedges             | 14.18
+2020-05-28 22:02:13,909|Saved /tmp/edgesFC.wkt in 1.32s [204705 records].
+2020-05-28 22:02:26,694|Saved /tmp/edgesHC.wkt in 9.10s [4616398 records].
+2020-05-28 22:02:31,077|DCELMerger|4512| 4| 9| 1024|Checking single-label faces   |  4.38
+2020-05-28 22:02:36,999|Saved /tmp/edgesFaces.wkt in 1.32s [67127 records].
+2020-05-28 22:02:48,774|Saved /tmp/edgesHedges.wkt in 8.01s [4616398 records].
+2020-05-28 22:03:04,800|Saved /tmp/edgesOpIntersection.wkt in 0.81s [41946 records].
+2020-05-28 22:03:04,801|DCELMerger|4512| 4| 9| 1024|Intersection                  | 16.02
+2020-05-28 22:03:11,387|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 22:03:11,387|DCELMerger|4512| 4| 9| 1024|Symmetric                     |  6.58
+2020-05-28 22:03:27,435|Saved /tmp/edgesOpUnion.wkt in 0.86s [42303 records].
+2020-05-28 22:03:27,436|DCELMerger|4512| 4| 9| 1024|Union                         | 16.05
+2020-05-28 22:03:34,834|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 22:03:34,834|DCELMerger|4512| 4| 9| 1024|Diff A                        |  7.40
+2020-05-28 22:03:41,855|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 22:03:41,856|DCELMerger|4512| 4| 9| 1024|Diff B                        |  7.02
+2020-05-28 22:03:41,856|Closing session...
+2020-05-28 22:03:42,112|Closing session... Done!
+2020-05-28 22:03:46,202|Starting session...
+2020-05-28 22:04:21,812|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 8 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:04:21,812|Starting session... Done!
+2020-05-28 22:04:31,821|DCELMerger|4513| 8| 9| 1024|Reading polygons A            | 10.00
+2020-05-28 22:04:38,414|DCELMerger|4513| 8| 9| 1024|Reading polygons B            |  6.59
+2020-05-28 22:04:38,419|DEBUG|4513|Polygons in A|7028
+2020-05-28 22:04:38,419|DEBUG|4513|Polygons in B|8047
+2020-05-28 22:04:40,938|Saved /tmp/edgesA.wkt in 0.22s [7028 records].
+2020-05-28 22:04:43,331|Saved /tmp/edgesB.wkt in 1.00s [8047 records].
+2020-05-28 22:05:01,695|DCELMerger|4513| 8| 9| 1024|Partitioning edges            | 18.36
+2020-05-28 22:05:01,783|DEBUG|4513|Total number of partitions|2617
+2020-05-28 22:05:02,056|DEBUG|4513|Total number of edges in raw|3901521
+2020-05-28 22:05:03,928|DEBUG|4513|Total number of edges in spatial|3942082
+2020-05-28 22:05:04,106|Saved /tmp/edgesCells.wkt in 0.00s [2617 records].
+2020-05-28 22:05:15,668|DCELMerger|4513| 8| 9| 1024|Extracting A and B DCELs      | 11.56
+2020-05-28 22:05:19,114|Saved /tmp/edgesHA.wkt in 0.89s [1091908 records].
+2020-05-28 22:05:23,685|Saved /tmp/edgesFA.wkt in 0.25s [19960 records].
+2020-05-28 22:05:31,040|Saved /tmp/edgesHB.wkt in 2.38s [3001260 records].
+2020-05-28 22:05:34,474|Saved /tmp/edgesFB.wkt in 0.94s [21685 records].
+M: 2617...
+Z: 144...
+M: 2617...
+Z: 130...
+2020-05-28 22:05:47,245|DCELMerger|4513| 8| 9| 1024|Updating empty cells          | 12.76
+2020-05-28 22:05:50,361|Saved /tmp/edgesHAprime.wkt in 0.95s [1091908 records].
+2020-05-28 22:05:52,751|Saved /tmp/edgesFAprime.wkt in 0.36s [18157 records].
+2020-05-28 22:06:00,314|Saved /tmp/edgesHBprime.wkt in 4.61s [3001260 records].
+2020-05-28 22:06:03,312|Saved /tmp/edgesFBprime.wkt in 0.67s [19720 records].
+2020-05-28 22:06:17,676|DCELMerger|4513| 8| 9| 1024|Merging Halfedges             | 14.36
+2020-05-28 22:06:21,922|Saved /tmp/edgesFC.wkt in 1.20s [204449 records].
+2020-05-28 22:06:31,256|Saved /tmp/edgesHC.wkt in 4.75s [4614886 records].
+2020-05-28 22:06:36,403|DCELMerger|4513| 8| 9| 1024|Checking single-label faces   |  5.14
+2020-05-28 22:06:42,862|Saved /tmp/edgesFaces.wkt in 1.37s [66861 records].
+2020-05-28 22:06:57,075|Saved /tmp/edgesHedges.wkt in 9.90s [4614886 records].
+2020-05-28 22:07:15,516|Saved /tmp/edgesOpIntersection.wkt in 0.84s [41946 records].
+2020-05-28 22:07:15,516|DCELMerger|4513| 8| 9| 1024|Intersection                  | 18.43
+2020-05-28 22:07:22,852|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 22:07:22,852|DCELMerger|4513| 8| 9| 1024|Symmetric                     |  7.33
+2020-05-28 22:07:39,907|Saved /tmp/edgesOpUnion.wkt in 0.88s [42303 records].
+2020-05-28 22:07:39,908|DCELMerger|4513| 8| 9| 1024|Union                         | 17.05
+2020-05-28 22:07:50,558|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 22:07:50,558|DCELMerger|4513| 8| 9| 1024|Diff A                        | 10.65
+2020-05-28 22:07:56,711|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 22:07:56,711|DCELMerger|4513| 8| 9| 1024|Diff B                        |  6.15
+2020-05-28 22:07:56,711|Closing session...
+2020-05-28 22:07:57,473|Closing session... Done!
+2020-05-28 22:08:01,474|Starting session...
+2020-05-28 22:08:25,027|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:08:25,028|Starting session... Done!
+2020-05-28 22:08:34,526|DCELMerger|4514| 1| 9| 1024|Reading polygons A            |  9.49
+2020-05-28 22:08:38,096|DCELMerger|4514| 1| 9| 1024|Reading polygons B            |  3.57
+2020-05-28 22:08:38,101|DEBUG|4514|Polygons in A|7028
+2020-05-28 22:08:38,101|DEBUG|4514|Polygons in B|8047
+2020-05-28 22:08:40,754|Saved /tmp/edgesA.wkt in 0.23s [7028 records].
+2020-05-28 22:08:43,032|Saved /tmp/edgesB.wkt in 0.74s [8047 records].
+2020-05-28 22:09:16,006|DCELMerger|4514| 1| 9| 1024|Partitioning edges            | 32.97
+2020-05-28 22:09:16,099|DEBUG|4514|Total number of partitions|2632
+2020-05-28 22:09:16,174|DEBUG|4514|Total number of edges in raw|3901521
+2020-05-28 22:09:22,102|DEBUG|4514|Total number of edges in spatial|3942409
+2020-05-28 22:09:22,297|Saved /tmp/edgesCells.wkt in 0.00s [2632 records].
+2020-05-28 22:09:48,963|DCELMerger|4514| 1| 9| 1024|Extracting A and B DCELs      | 26.66
+2020-05-28 22:09:55,215|Saved /tmp/edgesHA.wkt in 0.85s [1092568 records].
+2020-05-28 22:10:00,462|Saved /tmp/edgesFA.wkt in 0.18s [20075 records].
+2020-05-28 22:10:10,914|Saved /tmp/edgesHB.wkt in 2.96s [3001758 records].
+2020-05-28 22:10:17,652|Saved /tmp/edgesFB.wkt in 0.85s [21773 records].
+M: 2632...
+Z: 142...
+M: 2632...
+Z: 127...
+2020-05-28 22:10:49,036|DCELMerger|4514| 1| 9| 1024|Updating empty cells          | 31.38
+2020-05-28 22:10:55,405|Saved /tmp/edgesHAprime.wkt in 1.00s [1092568 records].
+2020-05-28 22:11:00,566|Saved /tmp/edgesFAprime.wkt in 0.30s [18258 records].
+2020-05-28 22:11:12,049|Saved /tmp/edgesHBprime.wkt in 4.49s [3001758 records].
+2020-05-28 22:11:18,500|Saved /tmp/edgesFBprime.wkt in 0.50s [19805 records].
+2020-05-28 22:11:53,211|DCELMerger|4514| 1| 9| 1024|Merging Halfedges             | 34.71
+2020-05-28 22:12:03,773|Saved /tmp/edgesFC.wkt in 1.26s [204620 records].
+2020-05-28 22:12:26,665|Saved /tmp/edgesHC.wkt in 5.50s [4615924 records].
+2020-05-28 22:12:38,102|DCELMerger|4514| 1| 9| 1024|Checking single-label faces   | 11.43
+2020-05-28 22:12:50,334|Saved /tmp/edgesFaces.wkt in 1.23s [67062 records].
+2020-05-28 22:13:07,879|Saved /tmp/edgesHedges.wkt in 8.40s [4615924 records].
+2020-05-28 22:13:44,965|Saved /tmp/edgesOpIntersection.wkt in 1.37s [41946 records].
+2020-05-28 22:13:44,965|DCELMerger|4514| 1| 9| 1024|Intersection                  | 37.08
+2020-05-28 22:14:03,345|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 22:14:03,345|DCELMerger|4514| 1| 9| 1024|Symmetric                     | 18.38
+2020-05-28 22:14:40,462|Saved /tmp/edgesOpUnion.wkt in 1.64s [42303 records].
+2020-05-28 22:14:40,462|DCELMerger|4514| 1| 9| 1024|Union                         | 37.12
+2020-05-28 22:14:59,091|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 22:14:59,091|DCELMerger|4514| 1| 9| 1024|Diff A                        | 18.63
+2020-05-28 22:15:17,455|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 22:15:17,455|DCELMerger|4514| 1| 9| 1024|Diff B                        | 18.36
+2020-05-28 22:15:17,455|Closing session...
+2020-05-28 22:15:17,686|Closing session... Done!
+2020-05-28 22:15:21,718|Starting session...
+2020-05-28 22:15:57,381|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 2 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:15:57,382|Starting session... Done!
+2020-05-28 22:17:36,437|DCELMerger|4515| 2| 9| 1024|Reading polygons A            | 99.05
+2020-05-28 22:17:43,216|DCELMerger|4515| 2| 9| 1024|Reading polygons B            |  6.78
+2020-05-28 22:17:43,218|DEBUG|4515|Polygons in A|7028
+2020-05-28 22:17:43,218|DEBUG|4515|Polygons in B|8047
+2020-05-28 22:17:45,569|Saved /tmp/edgesA.wkt in 0.25s [7028 records].
+2020-05-28 22:17:48,026|Saved /tmp/edgesB.wkt in 0.71s [8047 records].
+2020-05-28 22:18:09,950|DCELMerger|4515| 2| 9| 1024|Partitioning edges            | 21.92
+2020-05-28 22:18:10,039|DEBUG|4515|Total number of partitions|2554
+2020-05-28 22:18:10,391|DEBUG|4515|Total number of edges in raw|3901521
+2020-05-28 22:18:12,874|DEBUG|4515|Total number of edges in spatial|3942168
+2020-05-28 22:18:13,043|Saved /tmp/edgesCells.wkt in 0.00s [2554 records].
+2020-05-28 22:18:27,861|DCELMerger|4515| 2| 9| 1024|Extracting A and B DCELs      | 14.82
+2020-05-28 22:18:34,261|Saved /tmp/edgesHA.wkt in 1.30s [1091500 records].
+2020-05-28 22:18:37,611|Saved /tmp/edgesFA.wkt in 0.61s [19915 records].
+2020-05-28 22:18:44,972|Saved /tmp/edgesHB.wkt in 2.61s [3000828 records].
+2020-05-28 22:18:49,109|Saved /tmp/edgesFB.wkt in 0.81s [21636 records].
+M: 2554...
+Z: 126...
+M: 2554...
+Z: 111...
+2020-05-28 22:19:04,889|DCELMerger|4515| 2| 9| 1024|Updating empty cells          | 15.78
+2020-05-28 22:19:08,873|Saved /tmp/edgesHAprime.wkt in 1.30s [1091500 records].
+2020-05-28 22:19:11,702|Saved /tmp/edgesFAprime.wkt in 0.27s [18126 records].
+2020-05-28 22:19:18,528|Saved /tmp/edgesHBprime.wkt in 3.03s [3000828 records].
+2020-05-28 22:19:22,523|Saved /tmp/edgesFBprime.wkt in 1.12s [19702 records].
+2020-05-28 22:19:40,831|DCELMerger|4515| 2| 9| 1024|Merging Halfedges             | 18.31
+2020-05-28 22:19:45,919|Saved /tmp/edgesFC.wkt in 1.17s [204427 records].
+2020-05-28 22:19:58,160|Saved /tmp/edgesHC.wkt in 7.19s [4614592 records].
+2020-05-28 22:20:04,523|DCELMerger|4515| 2| 9| 1024|Checking single-label faces   |  6.36
+2020-05-28 22:20:11,852|Saved /tmp/edgesFaces.wkt in 1.34s [66821 records].
+2020-05-28 22:20:26,056|Saved /tmp/edgesHedges.wkt in 9.20s [4614592 records].
+2020-05-28 22:20:47,771|Saved /tmp/edgesOpIntersection.wkt in 1.14s [41946 records].
+2020-05-28 22:20:47,772|DCELMerger|4515| 2| 9| 1024|Intersection                  | 21.71
+2020-05-28 22:20:57,152|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 22:20:57,152|DCELMerger|4515| 2| 9| 1024|Symmetric                     |  9.38
+2020-05-28 22:21:17,068|Saved /tmp/edgesOpUnion.wkt in 0.98s [42303 records].
+2020-05-28 22:21:17,068|DCELMerger|4515| 2| 9| 1024|Union                         | 19.92
+2020-05-28 22:21:26,179|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 22:21:26,179|DCELMerger|4515| 2| 9| 1024|Diff A                        |  9.11
+2020-05-28 22:21:36,593|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 22:21:36,593|DCELMerger|4515| 2| 9| 1024|Diff B                        | 10.41
+2020-05-28 22:21:36,593|Closing session...
+2020-05-28 22:21:37,010|Closing session... Done!
+2020-05-28 22:21:41,046|Starting session...
+2020-05-28 22:22:17,272|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 4 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:22:17,272|Starting session... Done!
+2020-05-28 22:22:35,042|DCELMerger|4516| 4| 9| 1024|Reading polygons A            | 17.76
+2020-05-28 22:22:41,953|DCELMerger|4516| 4| 9| 1024|Reading polygons B            |  6.91
+2020-05-28 22:22:41,955|DEBUG|4516|Polygons in A|7028
+2020-05-28 22:22:41,955|DEBUG|4516|Polygons in B|8047
+2020-05-28 22:22:44,339|Saved /tmp/edgesA.wkt in 0.20s [7028 records].
+2020-05-28 22:22:46,679|Saved /tmp/edgesB.wkt in 0.78s [8047 records].
+2020-05-28 22:23:03,331|DCELMerger|4516| 4| 9| 1024|Partitioning edges            | 16.65
+2020-05-28 22:23:03,421|DEBUG|4516|Total number of partitions|2632
+2020-05-28 22:23:03,741|DEBUG|4516|Total number of edges in raw|3901521
+2020-05-28 22:23:05,307|DEBUG|4516|Total number of edges in spatial|3942917
+2020-05-28 22:23:05,481|Saved /tmp/edgesCells.wkt in 0.01s [2632 records].
+2020-05-28 22:23:14,757|DCELMerger|4516| 4| 9| 1024|Extracting A and B DCELs      |  9.28
+2020-05-28 22:23:17,723|Saved /tmp/edgesHA.wkt in 0.78s [1093186 records].
+2020-05-28 22:23:19,880|Saved /tmp/edgesFA.wkt in 0.29s [20174 records].
+2020-05-28 22:23:24,562|Saved /tmp/edgesHB.wkt in 1.93s [3002652 records].
+2020-05-28 22:23:27,030|Saved /tmp/edgesFB.wkt in 0.57s [21918 records].
+M: 2632...
+Z: 129...
+M: 2632...
+Z: 113...
+2020-05-28 22:23:36,996|DCELMerger|4516| 4| 9| 1024|Updating empty cells          |  9.96
+2020-05-28 22:23:39,612|Saved /tmp/edgesHAprime.wkt in 0.92s [1093186 records].
+2020-05-28 22:23:41,494|Saved /tmp/edgesFAprime.wkt in 0.27s [18352 records].
+2020-05-28 22:23:48,162|Saved /tmp/edgesHBprime.wkt in 4.41s [3002652 records].
+2020-05-28 22:23:50,772|Saved /tmp/edgesFBprime.wkt in 0.85s [19940 records].
+2020-05-28 22:24:01,905|DCELMerger|4516| 4| 9| 1024|Merging Halfedges             | 11.13
+2020-05-28 22:24:05,752|Saved /tmp/edgesFC.wkt in 1.51s [204876 records].
+2020-05-28 22:24:16,067|Saved /tmp/edgesHC.wkt in 7.13s [4617430 records].
+2020-05-28 22:24:19,688|DCELMerger|4516| 4| 9| 1024|Checking single-label faces   |  3.62
+2020-05-28 22:24:25,439|Saved /tmp/edgesFaces.wkt in 1.33s [67288 records].
+2020-05-28 22:24:36,417|Saved /tmp/edgesHedges.wkt in 7.15s [4617430 records].
+2020-05-28 22:24:51,480|Saved /tmp/edgesOpIntersection.wkt in 1.00s [41946 records].
+2020-05-28 22:24:51,480|DCELMerger|4516| 4| 9| 1024|Intersection                  | 15.06
+2020-05-28 22:24:57,025|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 22:24:57,025|DCELMerger|4516| 4| 9| 1024|Symmetric                     |  5.54
+2020-05-28 22:25:08,566|Saved /tmp/edgesOpUnion.wkt in 1.03s [42303 records].
+2020-05-28 22:25:08,566|DCELMerger|4516| 4| 9| 1024|Union                         | 11.54
+2020-05-28 22:25:19,379|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 22:25:19,379|DCELMerger|4516| 4| 9| 1024|Diff A                        | 10.81
+2020-05-28 22:25:26,862|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 22:25:26,863|DCELMerger|4516| 4| 9| 1024|Diff B                        |  7.48
+2020-05-28 22:25:26,863|Closing session...
+2020-05-28 22:25:27,079|Closing session... Done!
+2020-05-28 22:25:31,314|Starting session...
+2020-05-28 22:27:06,842|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 8 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:27:06,843|Starting session... Done!
+2020-05-28 22:27:36,131|DCELMerger|4517| 8| 9| 1024|Reading polygons A            | 29.28
+2020-05-28 22:27:42,361|DCELMerger|4517| 8| 9| 1024|Reading polygons B            |  6.23
+2020-05-28 22:27:42,369|DEBUG|4517|Polygons in A|7028
+2020-05-28 22:27:42,369|DEBUG|4517|Polygons in B|8047
+2020-05-28 22:27:44,799|Saved /tmp/edgesA.wkt in 0.28s [7028 records].
+2020-05-28 22:27:47,360|Saved /tmp/edgesB.wkt in 0.86s [8047 records].
+2020-05-28 22:28:00,304|DCELMerger|4517| 8| 9| 1024|Partitioning edges            | 12.94
+2020-05-28 22:28:00,395|DEBUG|4517|Total number of partitions|2620
+2020-05-28 22:28:00,476|DEBUG|4517|Total number of edges in raw|3901521
+2020-05-28 22:28:02,009|DEBUG|4517|Total number of edges in spatial|3942485
+2020-05-28 22:28:02,188|Saved /tmp/edgesCells.wkt in 0.00s [2620 records].
+2020-05-28 22:28:07,762|DCELMerger|4517| 8| 9| 1024|Extracting A and B DCELs      |  5.57
+2020-05-28 22:28:10,539|Saved /tmp/edgesHA.wkt in 1.18s [1092490 records].
+2020-05-28 22:28:13,134|Saved /tmp/edgesFA.wkt in 0.25s [20064 records].
+2020-05-28 22:28:18,219|Saved /tmp/edgesHB.wkt in 3.05s [3001902 records].
+2020-05-28 22:28:20,687|Saved /tmp/edgesFB.wkt in 0.96s [21797 records].
+M: 2620...
+Z: 133...
+M: 2620...
+Z: 118...
+2020-05-28 22:28:29,706|DCELMerger|4517| 8| 9| 1024|Updating empty cells          |  9.02
+2020-05-28 22:28:32,262|Saved /tmp/edgesHAprime.wkt in 0.99s [1092490 records].
+2020-05-28 22:28:33,854|Saved /tmp/edgesFAprime.wkt in 0.25s [18270 records].
+2020-05-28 22:28:37,768|Saved /tmp/edgesHBprime.wkt in 2.01s [3001902 records].
+2020-05-28 22:28:40,026|Saved /tmp/edgesFBprime.wkt in 0.78s [19862 records].
+2020-05-28 22:28:46,833|DCELMerger|4517| 8| 9| 1024|Merging Halfedges             |  6.81
+2020-05-28 22:28:50,018|Saved /tmp/edgesFC.wkt in 1.30s [204655 records].
+2020-05-28 22:29:01,764|Saved /tmp/edgesHC.wkt in 9.36s [4616116 records].
+2020-05-28 22:29:04,093|DCELMerger|4517| 8| 9| 1024|Checking single-label faces   |  2.33
+2020-05-28 22:29:09,552|Saved /tmp/edgesFaces.wkt in 1.79s [67130 records].
+2020-05-28 22:29:16,526|Saved /tmp/edgesHedges.wkt in 4.44s [4616116 records].
+2020-05-28 22:29:25,843|Saved /tmp/edgesOpIntersection.wkt in 0.77s [41946 records].
+2020-05-28 22:29:25,844|DCELMerger|4517| 8| 9| 1024|Intersection                  |  9.31
+2020-05-28 22:29:31,238|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 22:29:31,238|DCELMerger|4517| 8| 9| 1024|Symmetric                     |  5.39
+2020-05-28 22:29:38,900|Saved /tmp/edgesOpUnion.wkt in 1.05s [42303 records].
+2020-05-28 22:29:38,901|DCELMerger|4517| 8| 9| 1024|Union                         |  7.66
+2020-05-28 22:29:43,291|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 22:29:43,291|DCELMerger|4517| 8| 9| 1024|Diff A                        |  4.39
+2020-05-28 22:29:47,829|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 22:29:47,829|DCELMerger|4517| 8| 9| 1024|Diff B                        |  4.54
+2020-05-28 22:29:47,829|Closing session...
+2020-05-28 22:29:48,086|Closing session... Done!
+2020-05-28 22:29:52,179|Starting session...
+2020-05-28 22:30:23,466|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:30:23,467|Starting session... Done!
+2020-05-28 22:30:32,864|DCELMerger|4518| 1| 9| 1024|Reading polygons A            |  9.39
+2020-05-28 22:30:36,437|DCELMerger|4518| 1| 9| 1024|Reading polygons B            |  3.57
+2020-05-28 22:30:36,438|DEBUG|4518|Polygons in A|7028
+2020-05-28 22:30:36,439|DEBUG|4518|Polygons in B|8047
+2020-05-28 22:30:38,350|Saved /tmp/edgesA.wkt in 0.18s [7028 records].
+2020-05-28 22:30:40,569|Saved /tmp/edgesB.wkt in 0.68s [8047 records].
+2020-05-28 22:31:17,390|DCELMerger|4518| 1| 9| 1024|Partitioning edges            | 36.82
+2020-05-28 22:31:17,497|DEBUG|4518|Total number of partitions|2551
+2020-05-28 22:31:17,585|DEBUG|4518|Total number of edges in raw|3901521
+2020-05-28 22:31:24,073|DEBUG|4518|Total number of edges in spatial|3942008
+2020-05-28 22:31:24,249|Saved /tmp/edgesCells.wkt in 0.01s [2551 records].
+2020-05-28 22:31:51,792|DCELMerger|4518| 1| 9| 1024|Extracting A and B DCELs      | 27.54
+2020-05-28 22:31:58,425|Saved /tmp/edgesHA.wkt in 0.92s [1091218 records].
+2020-05-28 22:32:03,556|Saved /tmp/edgesFA.wkt in 0.23s [19862 records].
+2020-05-28 22:32:12,610|Saved /tmp/edgesHB.wkt in 2.09s [3000618 records].
+2020-05-28 22:32:18,811|Saved /tmp/edgesFB.wkt in 0.68s [21595 records].
+M: 2551...
+Z: 122...
+M: 2551...
+Z: 110...
+2020-05-28 22:32:47,802|DCELMerger|4518| 1| 9| 1024|Updating empty cells          | 28.99
+2020-05-28 22:32:53,799|Saved /tmp/edgesHAprime.wkt in 0.89s [1091218 records].
+2020-05-28 22:32:58,837|Saved /tmp/edgesFAprime.wkt in 0.27s [18068 records].
+2020-05-28 22:33:10,189|Saved /tmp/edgesHBprime.wkt in 4.45s [3000618 records].
+2020-05-28 22:33:16,362|Saved /tmp/edgesFBprime.wkt in 0.80s [19650 records].
+2020-05-28 22:33:51,380|DCELMerger|4518| 1| 9| 1024|Merging Halfedges             | 35.02
+2020-05-28 22:34:00,844|Saved /tmp/edgesFC.wkt in 1.40s [204329 records].
+2020-05-28 22:34:30,034|Saved /tmp/edgesHC.wkt in 9.47s [4614022 records].
+2020-05-28 22:34:41,053|DCELMerger|4518| 1| 9| 1024|Checking single-label faces   | 11.02
+2020-05-28 22:34:53,513|Saved /tmp/edgesFaces.wkt in 1.14s [66712 records].
+2020-05-28 22:35:08,170|Saved /tmp/edgesHedges.wkt in 5.13s [4614022 records].
+2020-05-28 22:35:45,103|Saved /tmp/edgesOpIntersection.wkt in 1.51s [41946 records].
+2020-05-28 22:35:45,103|DCELMerger|4518| 1| 9| 1024|Intersection                  | 36.92
+2020-05-28 22:36:08,886|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 22:36:08,886|DCELMerger|4518| 1| 9| 1024|Symmetric                     | 23.78
+2020-05-28 22:36:42,183|Saved /tmp/edgesOpUnion.wkt in 0.90s [42303 records].
+2020-05-28 22:36:42,184|DCELMerger|4518| 1| 9| 1024|Union                         | 33.30
+2020-05-28 22:36:59,471|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 22:36:59,471|DCELMerger|4518| 1| 9| 1024|Diff A                        | 17.29
+2020-05-28 22:37:16,643|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 22:37:16,643|DCELMerger|4518| 1| 9| 1024|Diff B                        | 17.17
+2020-05-28 22:37:16,643|Closing session...
+2020-05-28 22:37:16,862|Closing session... Done!
+2020-05-28 22:37:20,968|Starting session...
+2020-05-28 22:37:57,066|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 2 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 22:37:57,067|Starting session... Done!
+2020-05-28 23:11:31,950|DCELMerger|4519| 2| 9| 1024|Reading polygons A            |2014.88
+2020-05-28 23:11:39,020|DCELMerger|4519| 2| 9| 1024|Reading polygons B            |  7.07
+2020-05-28 23:11:39,022|DEBUG|4519|Polygons in A|7028
+2020-05-28 23:11:39,022|DEBUG|4519|Polygons in B|8047
+2020-05-28 23:11:41,569|Saved /tmp/edgesA.wkt in 0.26s [7028 records].
+2020-05-28 23:11:43,864|Saved /tmp/edgesB.wkt in 0.53s [8047 records].
+2020-05-28 23:12:06,170|DCELMerger|4519| 2| 9| 1024|Partitioning edges            | 22.30
+2020-05-28 23:12:06,266|DEBUG|4519|Total number of partitions|2566
+2020-05-28 23:12:06,585|DEBUG|4519|Total number of edges in raw|3901521
+2020-05-28 23:12:08,796|DEBUG|4519|Total number of edges in spatial|3942074
+2020-05-28 23:12:08,971|Saved /tmp/edgesCells.wkt in 0.01s [2566 records].
+2020-05-28 23:12:24,305|DCELMerger|4519| 2| 9| 1024|Extracting A and B DCELs      | 15.33
+2020-05-28 23:12:28,199|Saved /tmp/edgesHA.wkt in 0.69s [1091470 records].
+2020-05-28 23:12:31,215|Saved /tmp/edgesFA.wkt in 0.26s [19884 records].
+2020-05-28 23:12:37,322|Saved /tmp/edgesHB.wkt in 2.26s [3000840 records].
+2020-05-28 23:12:41,192|Saved /tmp/edgesFB.wkt in 0.84s [21610 records].
+M: 2566...
+Z: 127...
+M: 2566...
+Z: 115...
+2020-05-28 23:12:57,344|DCELMerger|4519| 2| 9| 1024|Updating empty cells          | 16.15
+2020-05-28 23:13:01,035|Saved /tmp/edgesHAprime.wkt in 0.90s [1091470 records].
+2020-05-28 23:13:03,975|Saved /tmp/edgesFAprime.wkt in 0.26s [18094 records].
+2020-05-28 23:13:10,208|Saved /tmp/edgesHBprime.wkt in 2.51s [3000840 records].
+2020-05-28 23:13:13,997|Saved /tmp/edgesFBprime.wkt in 0.88s [19670 records].
+2020-05-28 23:13:31,447|DCELMerger|4519| 2| 9| 1024|Merging Halfedges             | 17.45
+2020-05-28 23:13:36,761|Saved /tmp/edgesFC.wkt in 1.25s [204368 records].
+2020-05-28 23:13:50,497|Saved /tmp/edgesHC.wkt in 8.33s [4614340 records].
+2020-05-28 23:14:00,508|DCELMerger|4519| 2| 9| 1024|Checking single-label faces   | 10.01
+2020-05-28 23:14:07,355|Saved /tmp/edgesFaces.wkt in 1.07s [66766 records].
+2020-05-28 23:14:17,619|Saved /tmp/edgesHedges.wkt in 4.97s [4614340 records].
+2020-05-28 23:14:43,338|Saved /tmp/edgesOpIntersection.wkt in 0.91s [41946 records].
+2020-05-28 23:14:43,338|DCELMerger|4519| 2| 9| 1024|Intersection                  | 25.70
+2020-05-28 23:14:53,698|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 23:14:53,698|DCELMerger|4519| 2| 9| 1024|Symmetric                     | 10.36
+2020-05-28 23:15:13,521|Saved /tmp/edgesOpUnion.wkt in 1.11s [42303 records].
+2020-05-28 23:15:13,521|DCELMerger|4519| 2| 9| 1024|Union                         | 19.82
+2020-05-28 23:15:22,619|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 23:15:22,619|DCELMerger|4519| 2| 9| 1024|Diff A                        |  9.09
+2020-05-28 23:15:33,848|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 23:15:33,849|DCELMerger|4519| 2| 9| 1024|Diff B                        | 11.23
+2020-05-28 23:15:33,849|Closing session...
+2020-05-28 23:15:34,287|Closing session... Done!
+2020-05-28 23:15:38,472|Starting session...
+2020-05-28 23:16:14,798|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 4 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 23:16:14,799|Starting session... Done!
+2020-05-28 23:16:35,534|DCELMerger|4520| 4| 9| 1024|Reading polygons A            | 20.73
+2020-05-28 23:16:42,023|DCELMerger|4520| 4| 9| 1024|Reading polygons B            |  6.49
+2020-05-28 23:16:42,025|DEBUG|4520|Polygons in A|7028
+2020-05-28 23:16:42,025|DEBUG|4520|Polygons in B|8047
+2020-05-28 23:16:44,751|Saved /tmp/edgesA.wkt in 0.23s [7028 records].
+2020-05-28 23:16:47,460|Saved /tmp/edgesB.wkt in 0.76s [8047 records].
+2020-05-28 23:17:04,421|DCELMerger|4520| 4| 9| 1024|Partitioning edges            | 16.96
+2020-05-28 23:17:04,506|DEBUG|4520|Total number of partitions|2578
+2020-05-28 23:17:04,578|DEBUG|4520|Total number of edges in raw|3901521
+2020-05-28 23:17:07,580|DEBUG|4520|Total number of edges in spatial|3942254
+2020-05-28 23:17:07,747|Saved /tmp/edgesCells.wkt in 0.01s [2578 records].
+2020-05-28 23:17:19,199|DCELMerger|4520| 4| 9| 1024|Extracting A and B DCELs      | 11.45
+2020-05-28 23:17:22,694|Saved /tmp/edgesHA.wkt in 0.91s [1091734 records].
+2020-05-28 23:17:26,515|Saved /tmp/edgesFA.wkt in 0.19s [19934 records].
+2020-05-28 23:17:34,517|Saved /tmp/edgesHB.wkt in 4.55s [3001248 records].
+2020-05-28 23:17:37,578|Saved /tmp/edgesFB.wkt in 0.64s [21686 records].
+M: 2578...
+Z: 134...
+M: 2578...
+Z: 115...
+2020-05-28 23:17:52,693|DCELMerger|4520| 4| 9| 1024|Updating empty cells          | 15.11
+2020-05-28 23:17:56,233|Saved /tmp/edgesHAprime.wkt in 1.30s [1091734 records].
+2020-05-28 23:17:58,543|Saved /tmp/edgesFAprime.wkt in 0.25s [18162 records].
+2020-05-28 23:18:04,621|Saved /tmp/edgesHBprime.wkt in 2.50s [3001248 records].
+2020-05-28 23:18:07,582|Saved /tmp/edgesFBprime.wkt in 0.53s [19740 records].
+2020-05-28 23:18:25,708|DCELMerger|4520| 4| 9| 1024|Merging Halfedges             | 18.12
+2020-05-28 23:18:29,893|Saved /tmp/edgesFC.wkt in 0.95s [204506 records].
+2020-05-28 23:18:39,048|Saved /tmp/edgesHC.wkt in 4.77s [4615102 records].
+2020-05-28 23:18:44,156|DCELMerger|4520| 4| 9| 1024|Checking single-label faces   |  5.10
+2020-05-28 23:18:50,197|Saved /tmp/edgesFaces.wkt in 1.01s [66866 records].
+2020-05-28 23:19:01,641|Saved /tmp/edgesHedges.wkt in 7.22s [4615102 records].
+2020-05-28 23:19:17,910|Saved /tmp/edgesOpIntersection.wkt in 1.16s [41946 records].
+2020-05-28 23:19:17,911|DCELMerger|4520| 4| 9| 1024|Intersection                  | 16.26
+2020-05-28 23:19:25,032|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 23:19:25,033|DCELMerger|4520| 4| 9| 1024|Symmetric                     |  7.12
+2020-05-28 23:19:38,538|Saved /tmp/edgesOpUnion.wkt in 0.92s [42303 records].
+2020-05-28 23:19:38,539|DCELMerger|4520| 4| 9| 1024|Union                         | 13.50
+2020-05-28 23:19:45,947|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 23:19:45,947|DCELMerger|4520| 4| 9| 1024|Diff A                        |  7.41
+2020-05-28 23:19:54,001|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 23:19:54,001|DCELMerger|4520| 4| 9| 1024|Diff B                        |  8.05
+2020-05-28 23:19:54,001|Closing session...
+2020-05-28 23:19:54,217|Closing session... Done!
+2020-05-28 23:19:58,298|Starting session...
+2020-05-28 23:20:25,330|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 8 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 23:20:25,331|Starting session... Done!
+2020-05-28 23:20:34,367|DCELMerger|4521| 8| 9| 1024|Reading polygons A            |  9.03
+2020-05-28 23:20:43,275|DCELMerger|4521| 8| 9| 1024|Reading polygons B            |  8.91
+2020-05-28 23:20:43,276|DEBUG|4521|Polygons in A|7028
+2020-05-28 23:20:43,277|DEBUG|4521|Polygons in B|8047
+2020-05-28 23:20:44,825|Saved /tmp/edgesA.wkt in 0.30s [7028 records].
+2020-05-28 23:20:47,368|Saved /tmp/edgesB.wkt in 0.69s [8047 records].
+2020-05-28 23:20:57,577|DCELMerger|4521| 8| 9| 1024|Partitioning edges            | 10.20
+2020-05-28 23:20:57,681|DEBUG|4521|Total number of partitions|2623
+2020-05-28 23:20:57,754|DEBUG|4521|Total number of edges in raw|3901521
+2020-05-28 23:20:58,990|DEBUG|4521|Total number of edges in spatial|3942434
+2020-05-28 23:20:59,159|Saved /tmp/edgesCells.wkt in 0.01s [2623 records].
+2020-05-28 23:21:03,867|DCELMerger|4521| 8| 9| 1024|Extracting A and B DCELs      |  4.71
+2020-05-28 23:21:06,471|Saved /tmp/edgesHA.wkt in 1.09s [1092412 records].
+2020-05-28 23:21:07,945|Saved /tmp/edgesFA.wkt in 0.30s [20046 records].
+2020-05-28 23:21:12,022|Saved /tmp/edgesHB.wkt in 2.35s [3001854 records].
+2020-05-28 23:21:14,104|Saved /tmp/edgesFB.wkt in 0.82s [21786 records].
+M: 2623...
+Z: 140...
+M: 2623...
+Z: 119...
+2020-05-28 23:21:21,181|DCELMerger|4521| 8| 9| 1024|Updating empty cells          |  7.08
+2020-05-28 23:21:23,679|Saved /tmp/edgesHAprime.wkt in 1.20s [1092412 records].
+2020-05-28 23:21:25,043|Saved /tmp/edgesFAprime.wkt in 0.27s [18233 records].
+2020-05-28 23:21:28,575|Saved /tmp/edgesHBprime.wkt in 1.87s [3001854 records].
+2020-05-28 23:21:30,559|Saved /tmp/edgesFBprime.wkt in 0.73s [19800 records].
+2020-05-28 23:21:36,180|DCELMerger|4521| 8| 9| 1024|Merging Halfedges             |  5.62
+2020-05-28 23:21:39,075|Saved /tmp/edgesFC.wkt in 1.28s [204625 records].
+2020-05-28 23:21:51,472|Saved /tmp/edgesHC.wkt in 10.24s [4615954 records].
+2020-05-28 23:21:54,180|DCELMerger|4521| 8| 9| 1024|Checking single-label faces   |  2.71
+2020-05-28 23:21:58,810|Saved /tmp/edgesFaces.wkt in 1.35s [66989 records].
+2020-05-28 23:22:08,378|Saved /tmp/edgesHedges.wkt in 4.74s [4615954 records].
+2020-05-28 23:22:16,948|Saved /tmp/edgesOpIntersection.wkt in 1.06s [41946 records].
+2020-05-28 23:22:16,949|DCELMerger|4521| 8| 9| 1024|Intersection                  |  8.56
+2020-05-28 23:22:21,196|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 23:22:21,196|DCELMerger|4521| 8| 9| 1024|Symmetric                     |  4.25
+2020-05-28 23:22:28,870|Saved /tmp/edgesOpUnion.wkt in 0.98s [42303 records].
+2020-05-28 23:22:28,871|DCELMerger|4521| 8| 9| 1024|Union                         |  7.67
+2020-05-28 23:22:33,177|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 23:22:33,177|DCELMerger|4521| 8| 9| 1024|Diff A                        |  4.31
+2020-05-28 23:22:37,023|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 23:22:37,023|DCELMerger|4521| 8| 9| 1024|Diff B                        |  3.84
+2020-05-28 23:22:37,023|Closing session...
+2020-05-28 23:22:37,229|Closing session... Done!
+2020-05-28 23:22:41,397|Starting session...
+2020-05-28 23:23:16,859|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 23:23:16,859|Starting session... Done!
+2020-05-28 23:44:33,659|DCELMerger|4522| 1| 9| 1024|Reading polygons A            |1276.80
+2020-05-28 23:44:37,195|DCELMerger|4522| 1| 9| 1024|Reading polygons B            |  3.54
+2020-05-28 23:44:37,197|DEBUG|4522|Polygons in A|7028
+2020-05-28 23:44:37,197|DEBUG|4522|Polygons in B|8047
+2020-05-28 23:44:39,542|Saved /tmp/edgesA.wkt in 0.24s [7028 records].
+2020-05-28 23:44:42,445|Saved /tmp/edgesB.wkt in 0.82s [8047 records].
+2020-05-28 23:45:13,085|DCELMerger|4522| 1| 9| 1024|Partitioning edges            | 30.64
+2020-05-28 23:45:13,176|DEBUG|4522|Total number of partitions|2551
+2020-05-28 23:45:13,257|DEBUG|4522|Total number of edges in raw|3901521
+2020-05-28 23:45:19,228|DEBUG|4522|Total number of edges in spatial|3941811
+2020-05-28 23:45:19,392|Saved /tmp/edgesCells.wkt in 0.01s [2551 records].
+2020-05-28 23:45:46,875|DCELMerger|4522| 1| 9| 1024|Extracting A and B DCELs      | 27.48
+2020-05-28 23:45:53,882|Saved /tmp/edgesHA.wkt in 1.15s [1090984 records].
+2020-05-28 23:45:58,891|Saved /tmp/edgesFA.wkt in 0.29s [19814 records].
+2020-05-28 23:46:08,257|Saved /tmp/edgesHB.wkt in 2.20s [3000366 records].
+2020-05-28 23:46:14,724|Saved /tmp/edgesFB.wkt in 0.82s [21544 records].
+M: 2551...
+Z: 134...
+M: 2551...
+Z: 120...
+2020-05-28 23:46:44,776|DCELMerger|4522| 1| 9| 1024|Updating empty cells          | 30.05
+2020-05-28 23:46:50,986|Saved /tmp/edgesHAprime.wkt in 0.93s [1090984 records].
+2020-05-28 23:46:56,099|Saved /tmp/edgesFAprime.wkt in 0.24s [18038 records].
+2020-05-28 23:47:05,725|Saved /tmp/edgesHBprime.wkt in 2.56s [3000366 records].
+2020-05-28 23:47:11,827|Saved /tmp/edgesFBprime.wkt in 0.53s [19604 records].
+2020-05-28 23:47:45,802|DCELMerger|4522| 1| 9| 1024|Merging Halfedges             | 33.97
+2020-05-28 23:47:55,243|Saved /tmp/edgesFC.wkt in 1.37s [204256 records].
+2020-05-28 23:48:22,034|Saved /tmp/edgesHC.wkt in 8.21s [4613584 records].
+2020-05-28 23:48:33,571|DCELMerger|4522| 1| 9| 1024|Checking single-label faces   | 11.53
+2020-05-28 23:48:49,019|Saved /tmp/edgesFaces.wkt in 3.28s [66629 records].
+2020-05-28 23:49:08,066|Saved /tmp/edgesHedges.wkt in 8.58s [4613584 records].
+2020-05-28 23:49:45,498|Saved /tmp/edgesOpIntersection.wkt in 1.17s [41946 records].
+2020-05-28 23:49:45,498|DCELMerger|4522| 1| 9| 1024|Intersection                  | 37.43
+2020-05-28 23:50:08,291|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-28 23:50:08,292|DCELMerger|4522| 1| 9| 1024|Symmetric                     | 22.79
+2020-05-28 23:50:42,526|Saved /tmp/edgesOpUnion.wkt in 1.32s [42303 records].
+2020-05-28 23:50:42,527|DCELMerger|4522| 1| 9| 1024|Union                         | 34.23
+2020-05-28 23:51:00,331|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 23:51:00,331|DCELMerger|4522| 1| 9| 1024|Diff A                        | 17.80
+2020-05-28 23:51:18,726|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 23:51:18,727|DCELMerger|4522| 1| 9| 1024|Diff B                        | 18.39
+2020-05-28 23:51:18,727|Closing session...
+2020-05-28 23:51:18,935|Closing session... Done!
+2020-05-28 23:51:23,061|Starting session...
+2020-05-28 23:51:59,597|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 2 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-28 23:51:59,597|Starting session... Done!
+2020-05-28 23:52:31,939|DCELMerger|4523| 2| 9| 1024|Reading polygons A            | 32.34
+2020-05-28 23:52:35,443|DCELMerger|4523| 2| 9| 1024|Reading polygons B            |  3.50
+2020-05-28 23:52:35,444|DEBUG|4523|Polygons in A|7028
+2020-05-28 23:52:35,444|DEBUG|4523|Polygons in B|8047
+2020-05-28 23:52:37,824|Saved /tmp/edgesA.wkt in 0.25s [7028 records].
+2020-05-28 23:52:40,572|Saved /tmp/edgesB.wkt in 0.69s [8047 records].
+2020-05-28 23:53:12,711|DCELMerger|4523| 2| 9| 1024|Partitioning edges            | 32.13
+2020-05-28 23:53:12,800|DEBUG|4523|Total number of partitions|2632
+2020-05-28 23:53:12,882|DEBUG|4523|Total number of edges in raw|3901521
+2020-05-28 23:53:17,426|DEBUG|4523|Total number of edges in spatial|3942622
+2020-05-28 23:53:17,592|Saved /tmp/edgesCells.wkt in 0.00s [2632 records].
+2020-05-28 23:53:45,339|DCELMerger|4523| 2| 9| 1024|Extracting A and B DCELs      | 27.75
+2020-05-28 23:53:52,254|Saved /tmp/edgesHA.wkt in 0.96s [1092814 records].
+2020-05-28 23:53:57,750|Saved /tmp/edgesFA.wkt in 0.25s [20110 records].
+2020-05-28 23:54:08,075|Saved /tmp/edgesHB.wkt in 2.71s [3002154 records].
+2020-05-28 23:54:14,736|Saved /tmp/edgesFB.wkt in 0.84s [21833 records].
+M: 2632...
+Z: 143...
+M: 2632...
+Z: 129...
+2020-05-28 23:54:45,913|DCELMerger|4523| 2| 9| 1024|Updating empty cells          | 31.17
+2020-05-28 23:54:52,178|Saved /tmp/edgesHAprime.wkt in 0.97s [1092814 records].
+2020-05-28 23:54:57,474|Saved /tmp/edgesFAprime.wkt in 0.25s [18283 records].
+2020-05-28 23:55:07,923|Saved /tmp/edgesHBprime.wkt in 3.26s [3002154 records].
+2020-05-28 23:55:14,251|Saved /tmp/edgesFBprime.wkt in 0.75s [19857 records].
+2020-05-28 23:55:48,754|DCELMerger|4523| 2| 9| 1024|Merging Halfedges             | 34.50
+2020-05-28 23:56:07,584|Saved /tmp/edgesFC.wkt in 1.39s [204716 records].
+2020-05-28 23:56:21,789|Saved /tmp/edgesHC.wkt in 4.42s [4616494 records].
+2020-05-28 23:56:33,058|DCELMerger|4523| 2| 9| 1024|Checking single-label faces   | 11.27
+2020-05-28 23:56:44,941|Saved /tmp/edgesFaces.wkt in 1.01s [67114 records].
+2020-05-28 23:56:58,349|Saved /tmp/edgesHedges.wkt in 4.19s [4616494 records].
+2020-05-28 23:57:36,346|Saved /tmp/edgesOpIntersection.wkt in 1.23s [41946 records].
+2020-05-28 23:57:36,347|DCELMerger|4523| 2| 9| 1024|Intersection                  | 37.99
+2020-05-28 23:57:56,007|Saved /tmp/edgesOpSymmetric.wkt in 0.02s [357 records].
+2020-05-28 23:57:56,008|DCELMerger|4523| 2| 9| 1024|Symmetric                     | 19.66
+2020-05-28 23:58:30,893|Saved /tmp/edgesOpUnion.wkt in 1.42s [42303 records].
+2020-05-28 23:58:30,894|DCELMerger|4523| 2| 9| 1024|Union                         | 34.88
+2020-05-28 23:58:49,891|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-28 23:58:49,891|DCELMerger|4523| 2| 9| 1024|Diff A                        | 19.00
+2020-05-28 23:59:07,999|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-28 23:59:07,999|DCELMerger|4523| 2| 9| 1024|Diff B                        | 18.10
+2020-05-28 23:59:07,999|Closing session...
+2020-05-28 23:59:08,266|Closing session... Done!
+2020-05-28 23:59:12,238|Starting session...
+2020-05-29 00:02:52,657|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 4 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-29 00:02:52,658|Starting session... Done!
+2020-05-29 00:03:02,320|DCELMerger|4524| 4| 9| 1024|Reading polygons A            |  9.66
+2020-05-29 00:03:08,423|DCELMerger|4524| 4| 9| 1024|Reading polygons B            |  6.10
+2020-05-29 00:03:08,425|DEBUG|4524|Polygons in A|7028
+2020-05-29 00:03:08,425|DEBUG|4524|Polygons in B|8047
+2020-05-29 00:03:10,058|Saved /tmp/edgesA.wkt in 0.27s [7028 records].
+2020-05-29 00:03:12,178|Saved /tmp/edgesB.wkt in 0.60s [8047 records].
+2020-05-29 00:03:27,419|DCELMerger|4524| 4| 9| 1024|Partitioning edges            | 15.24
+2020-05-29 00:03:27,521|DEBUG|4524|Total number of partitions|2590
+2020-05-29 00:03:27,916|DEBUG|4524|Total number of edges in raw|3901521
+2020-05-29 00:03:29,656|DEBUG|4524|Total number of edges in spatial|3942374
+2020-05-29 00:03:29,824|Saved /tmp/edgesCells.wkt in 0.00s [2590 records].
+2020-05-29 00:03:40,598|DCELMerger|4524| 4| 9| 1024|Extracting A and B DCELs      | 10.77
+2020-05-29 00:03:43,965|Saved /tmp/edgesHA.wkt in 1.02s [1092118 records].
+2020-05-29 00:03:47,745|Saved /tmp/edgesFA.wkt in 0.35s [19982 records].
+2020-05-29 00:03:52,802|Saved /tmp/edgesHB.wkt in 2.04s [3001458 records].
+2020-05-29 00:03:56,043|Saved /tmp/edgesFB.wkt in 0.98s [21705 records].
+M: 2590...
+Z: 133...
+M: 2590...
+Z: 119...
+2020-05-29 00:04:08,038|DCELMerger|4524| 4| 9| 1024|Updating empty cells          | 11.99
+2020-05-29 00:04:11,406|Saved /tmp/edgesHAprime.wkt in 1.31s [1092118 records].
+2020-05-29 00:04:13,619|Saved /tmp/edgesFAprime.wkt in 0.26s [18207 records].
+2020-05-29 00:04:18,905|Saved /tmp/edgesHBprime.wkt in 2.44s [3001458 records].
+2020-05-29 00:04:21,592|Saved /tmp/edgesFBprime.wkt in 0.51s [19782 records].
+2020-05-29 00:04:34,956|DCELMerger|4524| 4| 9| 1024|Merging Halfedges             | 13.36
+2020-05-29 00:04:39,203|Saved /tmp/edgesFC.wkt in 1.31s [204554 records].
+2020-05-29 00:04:50,301|Saved /tmp/edgesHC.wkt in 7.44s [4615474 records].
+2020-05-29 00:04:56,241|DCELMerger|4524| 4| 9| 1024|Checking single-label faces   |  5.94
+2020-05-29 00:05:01,457|Saved /tmp/edgesFaces.wkt in 0.90s [66976 records].
+2020-05-29 00:05:10,476|Saved /tmp/edgesHedges.wkt in 5.05s [4615474 records].
+2020-05-29 00:05:26,643|Saved /tmp/edgesOpIntersection.wkt in 1.26s [41946 records].
+2020-05-29 00:05:26,645|DCELMerger|4524| 4| 9| 1024|Intersection                  | 16.15
+2020-05-29 00:05:33,814|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-29 00:05:33,814|DCELMerger|4524| 4| 9| 1024|Symmetric                     |  7.17
+2020-05-29 00:05:50,268|Saved /tmp/edgesOpUnion.wkt in 2.18s [42303 records].
+2020-05-29 00:05:50,269|DCELMerger|4524| 4| 9| 1024|Union                         | 16.45
+2020-05-29 00:05:58,367|Saved /tmp/edgesOpDifferenceA.wkt in 0.01s [182 records].
+2020-05-29 00:05:58,367|DCELMerger|4524| 4| 9| 1024|Diff A                        |  8.10
+2020-05-29 00:06:06,760|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-29 00:06:06,761|DCELMerger|4524| 4| 9| 1024|Diff B                        |  8.39
+2020-05-29 00:06:06,761|Closing session...
+2020-05-29 00:06:06,991|Closing session... Done!
+2020-05-29 00:06:11,056|Starting session...
+2020-05-29 00:07:22,782|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 8 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /user/acald013/Datasets/CA/cali2000_polygons6414.tsv --offset1 2 --input2 /user/acald013/Datasets/CA/cali2010_polygons6414.tsv --offset2 2 --partitions 1024 --save --debug
+2020-05-29 00:07:22,782|Starting session... Done!
+2020-05-29 00:07:49,768|DCELMerger|4525| 8| 9| 1024|Reading polygons A            | 26.98
+2020-05-29 00:07:56,041|DCELMerger|4525| 8| 9| 1024|Reading polygons B            |  6.27
+2020-05-29 00:07:56,043|DEBUG|4525|Polygons in A|7028
+2020-05-29 00:07:56,043|DEBUG|4525|Polygons in B|8047
+2020-05-29 00:07:58,410|Saved /tmp/edgesA.wkt in 0.26s [7028 records].
+2020-05-29 00:08:00,439|Saved /tmp/edgesB.wkt in 0.66s [8047 records].
+2020-05-29 00:08:14,881|DCELMerger|4525| 8| 9| 1024|Partitioning edges            | 14.44
+2020-05-29 00:08:14,973|DEBUG|4525|Total number of partitions|2521
+2020-05-29 00:08:15,047|DEBUG|4525|Total number of edges in raw|3901521
+2020-05-29 00:08:16,712|DEBUG|4525|Total number of edges in spatial|3941636
+2020-05-29 00:08:16,872|Saved /tmp/edgesCells.wkt in 0.00s [2521 records].
+2020-05-29 00:08:26,880|DCELMerger|4525| 8| 9| 1024|Extracting A and B DCELs      | 10.01
+2020-05-29 00:08:30,367|Saved /tmp/edgesHA.wkt in 1.18s [1090516 records].
+2020-05-29 00:08:34,104|Saved /tmp/edgesFA.wkt in 0.27s [19737 records].
+2020-05-29 00:08:39,676|Saved /tmp/edgesHB.wkt in 2.85s [2999778 records].
+2020-05-29 00:08:43,106|Saved /tmp/edgesFB.wkt in 1.20s [21447 records].
+M: 2521...
+Z: 114...
+M: 2521...
+Z: 107...
+2020-05-29 00:08:54,158|DCELMerger|4525| 8| 9| 1024|Updating empty cells          | 11.04
+2020-05-29 00:08:56,946|Saved /tmp/edgesHAprime.wkt in 0.90s [1090516 records].
+2020-05-29 00:08:58,981|Saved /tmp/edgesFAprime.wkt in 0.28s [17970 records].
+2020-05-29 00:09:04,503|Saved /tmp/edgesHBprime.wkt in 2.91s [2999778 records].
+2020-05-29 00:09:07,303|Saved /tmp/edgesFBprime.wkt in 0.82s [19535 records].
+2020-05-29 00:09:20,458|DCELMerger|4525| 8| 9| 1024|Merging Halfedges             | 13.15
+2020-05-29 00:09:24,453|Saved /tmp/edgesFC.wkt in 1.31s [204116 records].
+2020-05-29 00:09:36,473|Saved /tmp/edgesHC.wkt in 8.36s [4612696 records].
+2020-05-29 00:09:40,542|DCELMerger|4525| 8| 9| 1024|Checking single-label faces   |  4.07
+2020-05-29 00:09:47,685|Saved /tmp/edgesFaces.wkt in 1.31s [66518 records].
+2020-05-29 00:09:59,006|Saved /tmp/edgesHedges.wkt in 7.58s [4612696 records].
+2020-05-29 00:10:14,475|Saved /tmp/edgesOpIntersection.wkt in 1.28s [41946 records].
+2020-05-29 00:10:14,476|DCELMerger|4525| 8| 9| 1024|Intersection                  | 15.46
+2020-05-29 00:10:20,111|Saved /tmp/edgesOpSymmetric.wkt in 0.01s [357 records].
+2020-05-29 00:10:20,111|DCELMerger|4525| 8| 9| 1024|Symmetric                     |  5.63
+2020-05-29 00:10:35,293|Saved /tmp/edgesOpUnion.wkt in 0.95s [42303 records].
+2020-05-29 00:10:35,294|DCELMerger|4525| 8| 9| 1024|Union                         | 15.18
+2020-05-29 00:10:41,300|Saved /tmp/edgesOpDifferenceA.wkt in 0.00s [182 records].
+2020-05-29 00:10:41,301|DCELMerger|4525| 8| 9| 1024|Diff A                        |  6.00
+2020-05-29 00:10:46,781|Saved /tmp/edgesOpDifferenceB.wkt in 0.01s [175 records].
+2020-05-29 00:10:46,781|DCELMerger|4525| 8| 9| 1024|Diff B                        |  5.48
+2020-05-29 00:10:46,781|Closing session...
+2020-05-29 00:10:46,994|Closing session... Done!
