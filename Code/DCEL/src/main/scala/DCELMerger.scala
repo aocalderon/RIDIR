@@ -148,13 +148,17 @@ object DCELMerger{
     val (appId, cores, executors) = if(local){
       val appId = config.get("spark.app.id")
       val cores = config.get("spark.master").split("\\[")(1).replace("]","").toInt
+      val command = System.getProperty("sun.java.command")
+      logger.info(s"${appId}|${command}")
+
       (appId, cores, 1)
     } else {
-      val command = System.getProperty("sun.java.command")
-      logger.info(command)
       val appId = config.get("spark.app.id").takeRight(4)
       val cores = config.get("spark.executor.cores").toInt
       val executors = config.get("spark.executor.instances").toInt
+      val command = System.getProperty("sun.java.command")
+      logger.info(s"${appId}|${command}")
+
       (appId, cores, executors)
     }
     implicit val settings = Settings(spark, params, config, startTime, appId, cores, executors)    
@@ -599,16 +603,7 @@ object DCELMerger{
           val hasHoles = dcel.faces.exists(!_.isCCW)
           if(hasHoles){
             val outers = dcel.faces.filter(_.isCCW)
-
-            //
-            //outers.foreach { f => println(s"Outer: ${f.getGeometry._1.toText()}\t${f.id}") }
-            //println( s"Outers: ${outers.map(_.id).mkString(" ")}" )
-
             val inners = dcel.faces.filter(!_.isCCW)
-
-            //
-            //inners.foreach { f => println(s"Inner: ${f.getGeometry._1.toText()}\t${f.id}") }
-            //println( s"Inners: ${inners.map(_.id).mkString(" ")}" )
 
             for{
               outer <- outers
@@ -618,10 +613,6 @@ object DCELMerger{
                 a.covers(b) && !a.equals(b)
               }
             } yield {
-
-              //
-              //println(s"Outer: ${outer.id} vs Inner: ${inner.id}")
-
               inner.id = outer.id
             }
             val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
@@ -632,10 +623,6 @@ object DCELMerger{
 
                 outer
               }.toVector
-
-            //
-            //println(s"Result -> Cell: $index Faces: ${faces.map(_.id).mkString(" ")}")
-            //faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}").foreach{println}
 
             Iterator( (dcel.copy(faces = faces), dcels._2, dcels._3) )
           } else {

@@ -28,12 +28,6 @@ object SingleLabelChecker{
       }
 
       val singleB = facesM.filter(_.id.substring(0,1) == "B")
-
-      //
-      if(index == 11){
-        println(s"singleB ${singleB.map(_.id).mkString(" ")}")
-      }
-
       val facesA = if(singleB.size > 0){
         Some(dcels._2.faces)
       } else {
@@ -42,18 +36,10 @@ object SingleLabelChecker{
 
       facesA match {
         case Some(faces) => {
-          //
-          if(index == 11){
-            println(s"facesA ${faces.map(_.id).mkString(" ")}")
-          }
-
           for{
             A <- faces
             B <- singleB if B.toPolygon().getInteriorPoint.coveredBy(A.toPolygon())
           } yield {
-            if(index == 11){
-              println(s"A: ${A.id} B: ${B.id}")
-            }
             B.id = parseId(A.id + "|" + B.id)
           }
         }

@@ -7,15 +7,21 @@ DMEMORY=12g
 EMEMORY=30g
 DEBUG=""
 SAVE=""
-SPARK_JARS=/home/acald013/Spark/2.4/jars/
-CLASS_JAR=/home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
-LOG_FILE=/home/acald013/Spark/2.4/conf/log4j.properties
+SPARK_JARS=$HOME/Spark/2.4/jars/
+CLASS_JAR=$HOME/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 MASTER=yarn
 
-A=/user/acald013/Datasets/CA/cali2000_polygons6414.tsv
-B=/user/acald013/Datasets/CA/cali2010_polygons6414.tsv
+#INPUT1=$HOME/Datasets/CA/cali2000_polygons6414.tsv
+#OFFSET1=2
+#INPUT2=$HOME/Datasets/CA/cali2010_polygons6414.tsv
+#OFFSET2=2
+INPUT1=$HOME/Datasets/WKT/PhiliA.wkt
+OFFSET1=0
+INPUT2=$HOME/Datasets/WKT/PhiliB.wkt
+OFFSET2=0
 
-while getopts "p:e:c:d:" OPTION; do
+while getopts "p:e:c:d:m" OPTION; do
     case $OPTION in
     p)
         PARTITIONS=$OPTARG
@@ -25,6 +31,9 @@ while getopts "p:e:c:d:" OPTION; do
 	;;
     c)
 	CORES=$OPTARG
+	;;
+    m)
+	MASTER="local[${CORES}]"
 	;;
     d)
 	DEBUG="--debug"
@@ -42,6 +51,6 @@ spark-submit --files $LOG_FILE \
 	     --master $MASTER --deploy-mode client \
 	     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
 	     --class DCELMerger $CLASS_JAR \
-	     --input1 $A --offset1 2 --input2 $B --offset2 2 \
+	     --input1 $INPUT1 --offset1 $OFFSET1 --input2 $INPUT2 --offset2 $OFFSET2 \
 	     --partitions $PARTITIONS $DEBUG 
 
