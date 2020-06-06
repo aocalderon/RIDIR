@@ -80,13 +80,12 @@ object CellManager{
     var R = new ListBuffer[Int]()
 
     //
-    println(s"M: ${M.size}...")
+    //println(s"M: ${M.size}...")
 
     val Z = M.filter{ case(index, size) => size == 0 }.map(_._1).toVector.sorted
 
     //
-    println(s"Z: ${Z.size}...")
-    
+    //println(s"Z: ${Z.size}...")
 
     Z.map{ index =>
       if(R.contains(index)){

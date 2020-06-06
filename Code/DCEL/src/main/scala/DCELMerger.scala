@@ -135,10 +135,11 @@ object DCELMerger{
 
     // Starting session...
     logger.info("Starting session...")
+    val appName = s"DCEL_P${partitions}"
     implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-        .appName("DCELMerger")
+        .appName(appName)
         .getOrCreate()
     import spark.implicits._
     val startTime = spark.sparkContext.startTime
@@ -156,8 +157,7 @@ object DCELMerger{
       val executors = config.get("spark.executor.instances").toInt
       (appId, cores, executors)
     }
-    implicit val settings = Settings(spark, params, config, startTime, appId, cores, executors)
-    
+    implicit val settings = Settings(spark, params, config, startTime, appId, cores, executors)    
     logger.info("Starting session... Done!")
 
     // Reading polygons...
@@ -217,12 +217,6 @@ object DCELMerger{
       log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
       log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
       save{"/tmp/edgesCells.wkt"}{
-        /*
-        edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
-          val cell = cells.get(index).get
-          List(s"${envelope2Polygon(cell.getEnvelope).toText()}\t${index}\t${partition.size}\n").toIterator
-        }.collect()
-         */
         grids.value.zipWithIndex.map{ case(g, i) => s"${g.toText()}\t$i\n" }
       }
     }
@@ -720,21 +714,22 @@ object DCELMerger{
     }
     
     def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[(String, Geometry)],
-      filename: String = "/tmp/overlay.wkt"){
-      dcel.flatMap{op}.filter{_._2.getArea > 0.0001}
+        filename: String = "/tmp/overlay.wkt"){
+
+      val results = dcel.flatMap{op}//.filter{_._2.getArea > 0.0001}
         .map{ case (id, geom) =>
           (id, geom.toText())
-        }.groupBy(_._1).filter(_._1 == "A14|B5").foreach{println}
+        }
+        .reduceByKey{ case(a, b) =>
+          mergePolygons(a, b)
+        }
+      results.cache()
+      logger.info(s"Overlay operation done! [${results.count()} results].")
 
-      save{filename}{
-        dcel.flatMap{op}.filter{_._2.getArea > 0.0001}
-          .map{ case (id, geom) =>
-            (id, geom.toText())
-          }
-          .reduceByKey{ case(a, b) =>
-            mergePolygons(a, b)
-          }
-          .map{ case(id, wkt) => s"$wkt\t$id\n" }.collect()
+      debug{
+        save{filename}{
+          results.map{ case(id, wkt) => s"$wkt\t$id\n" }.collect()
+        }
       }
     }
 
@@ -779,7 +774,6 @@ class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
   val custom:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-  val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
   verify()
 }
