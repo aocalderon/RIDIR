@@ -1,7 +1,7 @@
 require(tidyverse)
 
-log = enframe(readLines("ByIndexer.txt"))
-paramsPattern = "capacity|method"
+log = enframe(readLines("DCELMerger_CA_00.txt"))
+paramsPattern = "num-executors"
 getParams <- function(command){
   params = str_trim(str_split(command, "--")[[1]])
   params = params[grepl(paramsPattern, params)]
