@@ -554,7 +554,7 @@ object DCELMerger{
       }
     }
 
-    val dcels_prime = timer{"Merging Halfedges"}{
+    val dcels_prime = timer{"Merging DCELs"}{
       val dcels = dcelARDD.zipPartitions(dcelBRDD, preservesPartitioning=true){ (iterA, iterB) =>
         val dcelA = iterA.next() 
         val gA = dcelA.half_edges.map(hedge2gedge).toList

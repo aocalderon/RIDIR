@@ -2,17 +2,17 @@
 
 N=$1
 
-PARTITIONS=1024
-CORES=9
-EXECUTORS=12
-TCORES=$((CORES * EXECUTORS))
+#PARTITIONS=1024
+CORES=6
+EXECUTORS=1
+P=$((CORES * EXECUTORS))
 SCRIPT="DCELMerger_CA.sh"
 
 #ES=( 1 2 4 8 )
 
 for i in $(seq 1 $N); do
     #for e in "${ES[@]}"; do
-    for p in $(seq 1 20); do
-	./${SCRIPT} -p $((p * $TCORES)) -e $EXECUTORS -c $CORES
+    for x in $(seq 2 2 10); do
+	./${SCRIPT} -p $((x * $P)) -e $EXECUTORS -c $CORES -l
     done
 done    

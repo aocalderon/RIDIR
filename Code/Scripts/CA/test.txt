@@ -1,0 +1,550 @@
+2020-06-06 10:26:51,700|Starting session...
+2020-06-06 10:26:52,752|local-1591464412423|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 12
+2020-06-06 10:26:52,753|Starting session... Done!
+2020-06-06 10:26:56,120|DCELMerger|local-1591464412423| 1| 6|   12|Reading polygons A            |  3.36
+2020-06-06 10:26:56,412|DCELMerger|local-1591464412423| 1| 6|   12|Reading polygons B            |  0.29
+2020-06-06 10:26:57,741|DCELMerger|local-1591464412423| 1| 6|   12|Partitioning edges            |  1.33
+2020-06-06 10:26:58,775|DCELMerger|local-1591464412423| 1| 6|   12|Extracting A and B DCELs      |  1.02
+2020-06-06 10:26:59,480|DCELMerger|local-1591464412423| 1| 6|   12|Updating empty cells          |  0.70
+2020-06-06 10:27:00,786|DCELMerger|local-1591464412423| 1| 6|   12|Merging Halfedges             |  1.31
+2020-06-06 10:27:01,222|DCELMerger|local-1591464412423| 1| 6|   12|Checking single-label faces   |  0.43
+2020-06-06 10:27:01,957|Overlay operation done! [1761 results].
+2020-06-06 10:27:01,958|DCELMerger|local-1591464412423| 1| 6|   12|Intersection                  |  0.73
+2020-06-06 10:27:02,152|Overlay operation done! [123 results].
+2020-06-06 10:27:02,152|DCELMerger|local-1591464412423| 1| 6|   12|Symmetric                     |  0.19
+2020-06-06 10:27:02,576|Overlay operation done! [1884 results].
+2020-06-06 10:27:02,577|DCELMerger|local-1591464412423| 1| 6|   12|Union                         |  0.42
+2020-06-06 10:27:02,764|Overlay operation done! [58 results].
+2020-06-06 10:27:02,764|DCELMerger|local-1591464412423| 1| 6|   12|Diff A                        |  0.19
+2020-06-06 10:27:02,940|Overlay operation done! [65 results].
+2020-06-06 10:27:02,940|DCELMerger|local-1591464412423| 1| 6|   12|Diff B                        |  0.18
+2020-06-06 10:27:02,940|Closing session...
+2020-06-06 10:27:03,010|Closing session... Done!
+2020-06-06 10:27:04,706|Starting session...
+2020-06-06 10:27:05,715|local-1591464425370|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 24
+2020-06-06 10:27:05,717|Starting session... Done!
+2020-06-06 10:27:09,058|DCELMerger|local-1591464425370| 1| 6|   24|Reading polygons A            |  3.34
+2020-06-06 10:27:09,379|DCELMerger|local-1591464425370| 1| 6|   24|Reading polygons B            |  0.32
+2020-06-06 10:27:10,967|DCELMerger|local-1591464425370| 1| 6|   24|Partitioning edges            |  1.59
+2020-06-06 10:27:12,005|DCELMerger|local-1591464425370| 1| 6|   24|Extracting A and B DCELs      |  1.03
+2020-06-06 10:27:12,944|DCELMerger|local-1591464425370| 1| 6|   24|Updating empty cells          |  0.94
+2020-06-06 10:27:14,153|DCELMerger|local-1591464425370| 1| 6|   24|Merging Halfedges             |  1.21
+2020-06-06 10:27:14,645|DCELMerger|local-1591464425370| 1| 6|   24|Checking single-label faces   |  0.49
+2020-06-06 10:27:15,593|Overlay operation done! [1761 results].
+2020-06-06 10:27:15,594|DCELMerger|local-1591464425370| 1| 6|   24|Intersection                  |  0.94
+2020-06-06 10:27:15,966|Overlay operation done! [123 results].
+2020-06-06 10:27:15,967|DCELMerger|local-1591464425370| 1| 6|   24|Symmetric                     |  0.37
+2020-06-06 10:27:16,482|Overlay operation done! [1884 results].
+2020-06-06 10:27:16,482|DCELMerger|local-1591464425370| 1| 6|   24|Union                         |  0.52
+2020-06-06 10:27:16,828|Overlay operation done! [58 results].
+2020-06-06 10:27:16,828|DCELMerger|local-1591464425370| 1| 6|   24|Diff A                        |  0.35
+2020-06-06 10:27:17,119|Overlay operation done! [65 results].
+2020-06-06 10:27:17,119|DCELMerger|local-1591464425370| 1| 6|   24|Diff B                        |  0.29
+2020-06-06 10:27:17,119|Closing session...
+2020-06-06 10:27:17,179|Closing session... Done!
+2020-06-06 10:27:19,257|Starting session...
+2020-06-06 10:27:20,339|local-1591464439983|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 36
+2020-06-06 10:27:20,340|Starting session... Done!
+2020-06-06 10:27:24,234|DCELMerger|local-1591464439983| 1| 6|   36|Reading polygons A            |  3.89
+2020-06-06 10:27:24,635|DCELMerger|local-1591464439983| 1| 6|   36|Reading polygons B            |  0.40
+2020-06-06 10:27:27,590|DCELMerger|local-1591464439983| 1| 6|   36|Partitioning edges            |  2.95
+2020-06-06 10:27:29,658|DCELMerger|local-1591464439983| 1| 6|   36|Extracting A and B DCELs      |  2.05
+2020-06-06 10:27:33,226|DCELMerger|local-1591464439983| 1| 6|   36|Updating empty cells          |  3.57
+2020-06-06 10:27:34,927|DCELMerger|local-1591464439983| 1| 6|   36|Merging Halfedges             |  1.70
+2020-06-06 10:27:35,744|DCELMerger|local-1591464439983| 1| 6|   36|Checking single-label faces   |  0.82
+2020-06-06 10:27:37,854|Overlay operation done! [1761 results].
+2020-06-06 10:27:37,855|DCELMerger|local-1591464439983| 1| 6|   36|Intersection                  |  2.11
+2020-06-06 10:27:38,909|Overlay operation done! [123 results].
+2020-06-06 10:27:38,910|DCELMerger|local-1591464439983| 1| 6|   36|Symmetric                     |  1.05
+2020-06-06 10:27:40,778|Overlay operation done! [1884 results].
+2020-06-06 10:27:40,778|DCELMerger|local-1591464439983| 1| 6|   36|Union                         |  1.87
+2020-06-06 10:27:41,708|Overlay operation done! [58 results].
+2020-06-06 10:27:41,709|DCELMerger|local-1591464439983| 1| 6|   36|Diff A                        |  0.93
+2020-06-06 10:27:42,757|Overlay operation done! [65 results].
+2020-06-06 10:27:42,757|DCELMerger|local-1591464439983| 1| 6|   36|Diff B                        |  1.05
+2020-06-06 10:27:42,757|Closing session...
+2020-06-06 10:27:42,882|Closing session... Done!
+2020-06-06 10:27:47,015|Starting session...
+2020-06-06 10:27:50,054|local-1591464469066|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 48
+2020-06-06 10:27:50,056|Starting session... Done!
+2020-06-06 10:28:02,655|DCELMerger|local-1591464469066| 1| 6|   48|Reading polygons A            | 12.59
+2020-06-06 10:28:03,973|DCELMerger|local-1591464469066| 1| 6|   48|Reading polygons B            |  1.32
+2020-06-06 10:28:10,978|DCELMerger|local-1591464469066| 1| 6|   48|Partitioning edges            |  7.00
+2020-06-06 10:28:14,219|DCELMerger|local-1591464469066| 1| 6|   48|Extracting A and B DCELs      |  3.22
+2020-06-06 10:28:18,691|DCELMerger|local-1591464469066| 1| 6|   48|Updating empty cells          |  4.47
+2020-06-06 10:28:20,656|DCELMerger|local-1591464469066| 1| 6|   48|Merging Halfedges             |  1.96
+2020-06-06 10:28:21,570|DCELMerger|local-1591464469066| 1| 6|   48|Checking single-label faces   |  0.91
+2020-06-06 10:28:23,013|Overlay operation done! [1761 results].
+2020-06-06 10:28:23,015|DCELMerger|local-1591464469066| 1| 6|   48|Intersection                  |  1.44
+2020-06-06 10:28:24,145|Overlay operation done! [123 results].
+2020-06-06 10:28:24,146|DCELMerger|local-1591464469066| 1| 6|   48|Symmetric                     |  1.13
+2020-06-06 10:28:26,112|Overlay operation done! [1884 results].
+2020-06-06 10:28:26,112|DCELMerger|local-1591464469066| 1| 6|   48|Union                         |  1.97
+2020-06-06 10:28:27,650|Overlay operation done! [58 results].
+2020-06-06 10:28:27,652|DCELMerger|local-1591464469066| 1| 6|   48|Diff A                        |  1.54
+2020-06-06 10:28:28,670|Overlay operation done! [65 results].
+2020-06-06 10:28:28,670|DCELMerger|local-1591464469066| 1| 6|   48|Diff B                        |  1.02
+2020-06-06 10:28:28,670|Closing session...
+2020-06-06 10:28:28,717|Closing session... Done!
+2020-06-06 10:28:32,574|Starting session...
+2020-06-06 10:28:36,002|local-1591464514983|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 60
+2020-06-06 10:28:36,004|Starting session... Done!
+2020-06-06 10:28:42,513|DCELMerger|local-1591464514983| 1| 6|   60|Reading polygons A            |  6.50
+2020-06-06 10:28:42,847|DCELMerger|local-1591464514983| 1| 6|   60|Reading polygons B            |  0.33
+2020-06-06 10:28:46,474|DCELMerger|local-1591464514983| 1| 6|   60|Partitioning edges            |  3.63
+2020-06-06 10:28:49,200|DCELMerger|local-1591464514983| 1| 6|   60|Extracting A and B DCELs      |  2.69
+2020-06-06 10:28:51,566|DCELMerger|local-1591464514983| 1| 6|   60|Updating empty cells          |  2.37
+2020-06-06 10:28:53,164|DCELMerger|local-1591464514983| 1| 6|   60|Merging Halfedges             |  1.60
+2020-06-06 10:28:54,447|DCELMerger|local-1591464514983| 1| 6|   60|Checking single-label faces   |  1.28
+2020-06-06 10:28:57,203|Overlay operation done! [1761 results].
+2020-06-06 10:28:57,204|DCELMerger|local-1591464514983| 1| 6|   60|Intersection                  |  2.75
+2020-06-06 10:28:58,020|Overlay operation done! [123 results].
+2020-06-06 10:28:58,020|DCELMerger|local-1591464514983| 1| 6|   60|Symmetric                     |  0.82
+2020-06-06 10:28:58,946|Overlay operation done! [1884 results].
+2020-06-06 10:28:58,946|DCELMerger|local-1591464514983| 1| 6|   60|Union                         |  0.93
+2020-06-06 10:28:59,962|Overlay operation done! [58 results].
+2020-06-06 10:28:59,962|DCELMerger|local-1591464514983| 1| 6|   60|Diff A                        |  1.02
+2020-06-06 10:29:00,558|Overlay operation done! [65 results].
+2020-06-06 10:29:00,558|DCELMerger|local-1591464514983| 1| 6|   60|Diff B                        |  0.60
+2020-06-06 10:29:00,558|Closing session...
+2020-06-06 10:29:00,632|Closing session... Done!
+2020-06-06 10:53:46,399|Starting session...
+2020-06-06 10:53:47,408|local-1591466027056|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 12
+2020-06-06 10:53:47,409|Starting session... Done!
+2020-06-06 10:53:51,981|DCELMerger|local-1591466027056| 1| 6|   12|Reading polygons A            |  4.57
+2020-06-06 10:53:52,517|DCELMerger|local-1591466027056| 1| 6|   12|Reading polygons B            |  0.53
+2020-06-06 10:53:54,046|DCELMerger|local-1591466027056| 1| 6|   12|Partitioning edges            |  1.53
+2020-06-06 10:53:55,273|DCELMerger|local-1591466027056| 1| 6|   12|Extracting A and B DCELs      |  1.21
+2020-06-06 10:53:56,047|DCELMerger|local-1591466027056| 1| 6|   12|Updating empty cells          |  0.77
+2020-06-06 10:53:58,284|DCELMerger|local-1591466027056| 1| 6|   12|Merging Halfedges             |  2.24
+2020-06-06 10:53:59,550|DCELMerger|local-1591466027056| 1| 6|   12|Checking single-label faces   |  1.26
+2020-06-06 10:54:02,063|Overlay operation done! [1761 results].
+2020-06-06 10:54:02,065|DCELMerger|local-1591466027056| 1| 6|   12|Intersection                  |  2.50
+2020-06-06 10:54:02,690|Overlay operation done! [123 results].
+2020-06-06 10:54:02,691|DCELMerger|local-1591466027056| 1| 6|   12|Symmetric                     |  0.62
+2020-06-06 10:54:03,831|Overlay operation done! [1884 results].
+2020-06-06 10:54:03,831|DCELMerger|local-1591466027056| 1| 6|   12|Union                         |  1.14
+2020-06-06 10:54:04,400|Overlay operation done! [58 results].
+2020-06-06 10:54:04,400|DCELMerger|local-1591466027056| 1| 6|   12|Diff A                        |  0.57
+2020-06-06 10:54:05,044|Overlay operation done! [65 results].
+2020-06-06 10:54:05,044|DCELMerger|local-1591466027056| 1| 6|   12|Diff B                        |  0.64
+2020-06-06 10:54:05,044|Closing session...
+2020-06-06 10:54:05,384|Closing session... Done!
+2020-06-06 10:54:08,961|Starting session...
+2020-06-06 10:54:10,794|local-1591466050458|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 24
+2020-06-06 10:54:10,795|Starting session... Done!
+2020-06-06 10:54:15,631|DCELMerger|local-1591466050458| 1| 6|   24|Reading polygons A            |  4.83
+2020-06-06 10:54:15,944|DCELMerger|local-1591466050458| 1| 6|   24|Reading polygons B            |  0.31
+2020-06-06 10:54:17,385|DCELMerger|local-1591466050458| 1| 6|   24|Partitioning edges            |  1.44
+2020-06-06 10:54:18,660|DCELMerger|local-1591466050458| 1| 6|   24|Extracting A and B DCELs      |  1.26
+2020-06-06 10:54:19,815|DCELMerger|local-1591466050458| 1| 6|   24|Updating empty cells          |  1.15
+2020-06-06 10:54:20,658|DCELMerger|local-1591466050458| 1| 6|   24|Merging Halfedges             |  0.84
+2020-06-06 10:54:21,127|DCELMerger|local-1591466050458| 1| 6|   24|Checking single-label faces   |  0.47
+2020-06-06 10:54:22,417|Overlay operation done! [1761 results].
+2020-06-06 10:54:22,418|DCELMerger|local-1591466050458| 1| 6|   24|Intersection                  |  1.29
+2020-06-06 10:54:22,766|Overlay operation done! [123 results].
+2020-06-06 10:54:22,766|DCELMerger|local-1591466050458| 1| 6|   24|Symmetric                     |  0.35
+2020-06-06 10:54:23,325|Overlay operation done! [1884 results].
+2020-06-06 10:54:23,325|DCELMerger|local-1591466050458| 1| 6|   24|Union                         |  0.56
+2020-06-06 10:54:23,606|Overlay operation done! [58 results].
+2020-06-06 10:54:23,606|DCELMerger|local-1591466050458| 1| 6|   24|Diff A                        |  0.28
+2020-06-06 10:54:23,943|Overlay operation done! [65 results].
+2020-06-06 10:54:23,944|DCELMerger|local-1591466050458| 1| 6|   24|Diff B                        |  0.34
+2020-06-06 10:54:23,944|Closing session...
+2020-06-06 10:54:24,007|Closing session... Done!
+2020-06-06 10:54:25,622|Starting session...
+2020-06-06 10:54:26,552|local-1591466066246|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 36
+2020-06-06 10:54:26,553|Starting session... Done!
+2020-06-06 10:54:29,971|DCELMerger|local-1591466066246| 1| 6|   36|Reading polygons A            |  3.41
+2020-06-06 10:54:30,277|DCELMerger|local-1591466066246| 1| 6|   36|Reading polygons B            |  0.31
+2020-06-06 10:54:32,301|DCELMerger|local-1591466066246| 1| 6|   36|Partitioning edges            |  2.02
+2020-06-06 10:54:33,912|DCELMerger|local-1591466066246| 1| 6|   36|Extracting A and B DCELs      |  1.60
+2020-06-06 10:54:35,871|DCELMerger|local-1591466066246| 1| 6|   36|Updating empty cells          |  1.96
+2020-06-06 10:54:37,866|DCELMerger|local-1591466066246| 1| 6|   36|Merging Halfedges             |  1.99
+2020-06-06 10:54:38,403|DCELMerger|local-1591466066246| 1| 6|   36|Checking single-label faces   |  0.54
+2020-06-06 10:54:39,575|Overlay operation done! [1761 results].
+2020-06-06 10:54:39,576|DCELMerger|local-1591466066246| 1| 6|   36|Intersection                  |  1.17
+2020-06-06 10:54:40,028|Overlay operation done! [123 results].
+2020-06-06 10:54:40,029|DCELMerger|local-1591466066246| 1| 6|   36|Symmetric                     |  0.45
+2020-06-06 10:54:40,824|Overlay operation done! [1884 results].
+2020-06-06 10:54:40,825|DCELMerger|local-1591466066246| 1| 6|   36|Union                         |  0.80
+2020-06-06 10:54:41,714|Overlay operation done! [58 results].
+2020-06-06 10:54:41,715|DCELMerger|local-1591466066246| 1| 6|   36|Diff A                        |  0.89
+2020-06-06 10:54:42,476|Overlay operation done! [65 results].
+2020-06-06 10:54:42,476|DCELMerger|local-1591466066246| 1| 6|   36|Diff B                        |  0.76
+2020-06-06 10:54:42,476|Closing session...
+2020-06-06 10:54:42,535|Closing session... Done!
+2020-06-06 10:54:44,278|Starting session...
+2020-06-06 10:54:45,288|local-1591466084951|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 48
+2020-06-06 10:54:45,290|Starting session... Done!
+2020-06-06 10:54:49,592|DCELMerger|local-1591466084951| 1| 6|   48|Reading polygons A            |  4.30
+2020-06-06 10:54:49,894|DCELMerger|local-1591466084951| 1| 6|   48|Reading polygons B            |  0.30
+2020-06-06 10:54:52,147|DCELMerger|local-1591466084951| 1| 6|   48|Partitioning edges            |  2.25
+2020-06-06 10:54:54,202|DCELMerger|local-1591466084951| 1| 6|   48|Extracting A and B DCELs      |  2.04
+2020-06-06 10:54:56,706|DCELMerger|local-1591466084951| 1| 6|   48|Updating empty cells          |  2.49
+2020-06-06 10:54:57,992|DCELMerger|local-1591466084951| 1| 6|   48|Merging Halfedges             |  1.29
+2020-06-06 10:54:59,019|DCELMerger|local-1591466084951| 1| 6|   48|Checking single-label faces   |  1.03
+2020-06-06 10:55:01,174|Overlay operation done! [1761 results].
+2020-06-06 10:55:01,175|DCELMerger|local-1591466084951| 1| 6|   48|Intersection                  |  2.15
+2020-06-06 10:55:01,982|Overlay operation done! [123 results].
+2020-06-06 10:55:01,982|DCELMerger|local-1591466084951| 1| 6|   48|Symmetric                     |  0.81
+2020-06-06 10:55:03,006|Overlay operation done! [1884 results].
+2020-06-06 10:55:03,006|DCELMerger|local-1591466084951| 1| 6|   48|Union                         |  1.02
+2020-06-06 10:55:03,553|Overlay operation done! [58 results].
+2020-06-06 10:55:03,554|DCELMerger|local-1591466084951| 1| 6|   48|Diff A                        |  0.55
+2020-06-06 10:55:04,066|Overlay operation done! [65 results].
+2020-06-06 10:55:04,067|DCELMerger|local-1591466084951| 1| 6|   48|Diff B                        |  0.51
+2020-06-06 10:55:04,067|Closing session...
+2020-06-06 10:55:04,139|Closing session... Done!
+2020-06-06 10:55:05,919|Starting session...
+2020-06-06 10:55:06,936|local-1591466106600|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 60
+2020-06-06 10:55:06,937|Starting session... Done!
+2020-06-06 10:55:10,589|DCELMerger|local-1591466106600| 1| 6|   60|Reading polygons A            |  3.65
+2020-06-06 10:55:10,956|DCELMerger|local-1591466106600| 1| 6|   60|Reading polygons B            |  0.37
+2020-06-06 10:55:15,815|DCELMerger|local-1591466106600| 1| 6|   60|Partitioning edges            |  4.86
+2020-06-06 10:55:17,738|DCELMerger|local-1591466106600| 1| 6|   60|Extracting A and B DCELs      |  1.88
+2020-06-06 10:55:23,492|DCELMerger|local-1591466106600| 1| 6|   60|Updating empty cells          |  5.75
+2020-06-06 10:55:26,708|DCELMerger|local-1591466106600| 1| 6|   60|Merging Halfedges             |  3.21
+2020-06-06 10:55:27,942|DCELMerger|local-1591466106600| 1| 6|   60|Checking single-label faces   |  1.23
+2020-06-06 10:55:31,133|Overlay operation done! [1761 results].
+2020-06-06 10:55:31,134|DCELMerger|local-1591466106600| 1| 6|   60|Intersection                  |  3.19
+2020-06-06 10:55:31,783|Overlay operation done! [123 results].
+2020-06-06 10:55:31,783|DCELMerger|local-1591466106600| 1| 6|   60|Symmetric                     |  0.65
+2020-06-06 10:55:32,803|Overlay operation done! [1884 results].
+2020-06-06 10:55:32,803|DCELMerger|local-1591466106600| 1| 6|   60|Union                         |  1.02
+2020-06-06 10:55:33,491|Overlay operation done! [58 results].
+2020-06-06 10:55:33,491|DCELMerger|local-1591466106600| 1| 6|   60|Diff A                        |  0.69
+2020-06-06 10:55:34,252|Overlay operation done! [65 results].
+2020-06-06 10:55:34,252|DCELMerger|local-1591466106600| 1| 6|   60|Diff B                        |  0.76
+2020-06-06 10:55:34,253|Closing session...
+2020-06-06 10:55:34,304|Closing session... Done!
+2020-06-06 10:55:36,063|Starting session...
+2020-06-06 10:55:37,115|local-1591466136773|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 12
+2020-06-06 10:55:37,117|Starting session... Done!
+2020-06-06 10:55:40,607|DCELMerger|local-1591466136773| 1| 6|   12|Reading polygons A            |  3.49
+2020-06-06 10:55:40,949|DCELMerger|local-1591466136773| 1| 6|   12|Reading polygons B            |  0.34
+2020-06-06 10:55:42,693|DCELMerger|local-1591466136773| 1| 6|   12|Partitioning edges            |  1.74
+2020-06-06 10:55:45,286|DCELMerger|local-1591466136773| 1| 6|   12|Extracting A and B DCELs      |  2.58
+2020-06-06 10:55:46,262|DCELMerger|local-1591466136773| 1| 6|   12|Updating empty cells          |  0.97
+2020-06-06 10:55:47,689|DCELMerger|local-1591466136773| 1| 6|   12|Merging Halfedges             |  1.43
+2020-06-06 10:55:48,271|DCELMerger|local-1591466136773| 1| 6|   12|Checking single-label faces   |  0.58
+2020-06-06 10:55:49,214|Overlay operation done! [1761 results].
+2020-06-06 10:55:49,215|DCELMerger|local-1591466136773| 1| 6|   12|Intersection                  |  0.94
+2020-06-06 10:55:49,427|Overlay operation done! [123 results].
+2020-06-06 10:55:49,428|DCELMerger|local-1591466136773| 1| 6|   12|Symmetric                     |  0.21
+2020-06-06 10:55:50,014|Overlay operation done! [1884 results].
+2020-06-06 10:55:50,014|DCELMerger|local-1591466136773| 1| 6|   12|Union                         |  0.59
+2020-06-06 10:55:50,232|Overlay operation done! [58 results].
+2020-06-06 10:55:50,232|DCELMerger|local-1591466136773| 1| 6|   12|Diff A                        |  0.22
+2020-06-06 10:55:50,427|Overlay operation done! [65 results].
+2020-06-06 10:55:50,427|DCELMerger|local-1591466136773| 1| 6|   12|Diff B                        |  0.19
+2020-06-06 10:55:50,427|Closing session...
+2020-06-06 10:55:50,496|Closing session... Done!
+2020-06-06 10:55:52,339|Starting session...
+2020-06-06 10:55:53,364|local-1591466152993|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 24
+2020-06-06 10:55:53,366|Starting session... Done!
+2020-06-06 10:55:56,995|DCELMerger|local-1591466152993| 1| 6|   24|Reading polygons A            |  3.63
+2020-06-06 10:55:57,411|DCELMerger|local-1591466152993| 1| 6|   24|Reading polygons B            |  0.42
+2020-06-06 10:55:59,416|DCELMerger|local-1591466152993| 1| 6|   24|Partitioning edges            |  2.00
+2020-06-06 10:56:00,748|DCELMerger|local-1591466152993| 1| 6|   24|Extracting A and B DCELs      |  1.32
+2020-06-06 10:56:02,487|DCELMerger|local-1591466152993| 1| 6|   24|Updating empty cells          |  1.74
+2020-06-06 10:56:04,191|DCELMerger|local-1591466152993| 1| 6|   24|Merging Halfedges             |  1.70
+2020-06-06 10:56:04,761|DCELMerger|local-1591466152993| 1| 6|   24|Checking single-label faces   |  0.57
+2020-06-06 10:56:05,779|Overlay operation done! [1761 results].
+2020-06-06 10:56:05,780|DCELMerger|local-1591466152993| 1| 6|   24|Intersection                  |  1.02
+2020-06-06 10:56:06,160|Overlay operation done! [123 results].
+2020-06-06 10:56:06,160|DCELMerger|local-1591466152993| 1| 6|   24|Symmetric                     |  0.38
+2020-06-06 10:56:06,714|Overlay operation done! [1884 results].
+2020-06-06 10:56:06,714|DCELMerger|local-1591466152993| 1| 6|   24|Union                         |  0.55
+2020-06-06 10:56:07,045|Overlay operation done! [58 results].
+2020-06-06 10:56:07,045|DCELMerger|local-1591466152993| 1| 6|   24|Diff A                        |  0.33
+2020-06-06 10:56:07,388|Overlay operation done! [65 results].
+2020-06-06 10:56:07,388|DCELMerger|local-1591466152993| 1| 6|   24|Diff B                        |  0.34
+2020-06-06 10:56:07,388|Closing session...
+2020-06-06 10:56:07,459|Closing session... Done!
+2020-06-06 10:56:09,423|Starting session...
+2020-06-06 10:56:10,424|local-1591466170078|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 36
+2020-06-06 10:56:10,426|Starting session... Done!
+2020-06-06 10:56:14,445|DCELMerger|local-1591466170078| 1| 6|   36|Reading polygons A            |  4.02
+2020-06-06 10:56:14,816|DCELMerger|local-1591466170078| 1| 6|   36|Reading polygons B            |  0.37
+2020-06-06 10:56:17,153|DCELMerger|local-1591466170078| 1| 6|   36|Partitioning edges            |  2.34
+2020-06-06 10:56:18,542|DCELMerger|local-1591466170078| 1| 6|   36|Extracting A and B DCELs      |  1.38
+2020-06-06 10:56:20,126|DCELMerger|local-1591466170078| 1| 6|   36|Updating empty cells          |  1.58
+2020-06-06 10:56:22,224|DCELMerger|local-1591466170078| 1| 6|   36|Merging Halfedges             |  2.10
+2020-06-06 10:56:23,314|DCELMerger|local-1591466170078| 1| 6|   36|Checking single-label faces   |  1.09
+2020-06-06 10:56:25,594|Overlay operation done! [1761 results].
+2020-06-06 10:56:25,595|DCELMerger|local-1591466170078| 1| 6|   36|Intersection                  |  2.28
+2020-06-06 10:56:26,382|Overlay operation done! [123 results].
+2020-06-06 10:56:26,383|DCELMerger|local-1591466170078| 1| 6|   36|Symmetric                     |  0.79
+2020-06-06 10:56:27,853|Overlay operation done! [1884 results].
+2020-06-06 10:56:27,853|DCELMerger|local-1591466170078| 1| 6|   36|Union                         |  1.47
+2020-06-06 10:56:28,262|Overlay operation done! [58 results].
+2020-06-06 10:56:28,262|DCELMerger|local-1591466170078| 1| 6|   36|Diff A                        |  0.41
+2020-06-06 10:56:28,660|Overlay operation done! [65 results].
+2020-06-06 10:56:28,660|DCELMerger|local-1591466170078| 1| 6|   36|Diff B                        |  0.40
+2020-06-06 10:56:28,660|Closing session...
+2020-06-06 10:56:28,735|Closing session... Done!
+2020-06-06 10:56:30,550|Starting session...
+2020-06-06 10:56:31,678|local-1591466191300|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 48
+2020-06-06 10:56:31,680|Starting session... Done!
+2020-06-06 10:56:35,279|DCELMerger|local-1591466191300| 1| 6|   48|Reading polygons A            |  3.60
+2020-06-06 10:56:35,647|DCELMerger|local-1591466191300| 1| 6|   48|Reading polygons B            |  0.37
+2020-06-06 10:56:38,974|DCELMerger|local-1591466191300| 1| 6|   48|Partitioning edges            |  3.33
+2020-06-06 10:56:41,152|DCELMerger|local-1591466191300| 1| 6|   48|Extracting A and B DCELs      |  2.16
+2020-06-06 10:56:44,121|DCELMerger|local-1591466191300| 1| 6|   48|Updating empty cells          |  2.96
+2020-06-06 10:56:46,628|DCELMerger|local-1591466191300| 1| 6|   48|Merging Halfedges             |  2.50
+2020-06-06 10:56:48,139|DCELMerger|local-1591466191300| 1| 6|   48|Checking single-label faces   |  1.51
+2020-06-06 10:56:50,390|Overlay operation done! [1761 results].
+2020-06-06 10:56:50,391|DCELMerger|local-1591466191300| 1| 6|   48|Intersection                  |  2.24
+2020-06-06 10:56:51,484|Overlay operation done! [123 results].
+2020-06-06 10:56:51,485|DCELMerger|local-1591466191300| 1| 6|   48|Symmetric                     |  1.09
+2020-06-06 10:56:52,756|Overlay operation done! [1884 results].
+2020-06-06 10:56:52,757|DCELMerger|local-1591466191300| 1| 6|   48|Union                         |  1.27
+2020-06-06 10:56:53,544|Overlay operation done! [58 results].
+2020-06-06 10:56:53,544|DCELMerger|local-1591466191300| 1| 6|   48|Diff A                        |  0.79
+2020-06-06 10:56:54,476|Overlay operation done! [65 results].
+2020-06-06 10:56:54,477|DCELMerger|local-1591466191300| 1| 6|   48|Diff B                        |  0.93
+2020-06-06 10:56:54,477|Closing session...
+2020-06-06 10:56:54,579|Closing session... Done!
+2020-06-06 10:56:57,225|Starting session...
+2020-06-06 10:56:58,882|local-1591466218361|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 60
+2020-06-06 10:56:58,885|Starting session... Done!
+2020-06-06 10:57:04,967|DCELMerger|local-1591466218361| 1| 6|   60|Reading polygons A            |  6.08
+2020-06-06 10:57:05,519|DCELMerger|local-1591466218361| 1| 6|   60|Reading polygons B            |  0.55
+2020-06-06 10:57:08,920|DCELMerger|local-1591466218361| 1| 6|   60|Partitioning edges            |  3.40
+2020-06-06 10:57:10,857|DCELMerger|local-1591466218361| 1| 6|   60|Extracting A and B DCELs      |  1.92
+2020-06-06 10:57:13,455|DCELMerger|local-1591466218361| 1| 6|   60|Updating empty cells          |  2.60
+2020-06-06 10:57:15,199|DCELMerger|local-1591466218361| 1| 6|   60|Merging Halfedges             |  1.74
+2020-06-06 10:57:16,131|DCELMerger|local-1591466218361| 1| 6|   60|Checking single-label faces   |  0.93
+2020-06-06 10:57:19,068|Overlay operation done! [1761 results].
+2020-06-06 10:57:19,070|DCELMerger|local-1591466218361| 1| 6|   60|Intersection                  |  2.93
+2020-06-06 10:57:20,322|Overlay operation done! [123 results].
+2020-06-06 10:57:20,322|DCELMerger|local-1591466218361| 1| 6|   60|Symmetric                     |  1.25
+2020-06-06 10:57:21,922|Overlay operation done! [1884 results].
+2020-06-06 10:57:21,922|DCELMerger|local-1591466218361| 1| 6|   60|Union                         |  1.60
+2020-06-06 10:57:22,861|Overlay operation done! [58 results].
+2020-06-06 10:57:22,861|DCELMerger|local-1591466218361| 1| 6|   60|Diff A                        |  0.94
+2020-06-06 10:57:23,817|Overlay operation done! [65 results].
+2020-06-06 10:57:23,817|DCELMerger|local-1591466218361| 1| 6|   60|Diff B                        |  0.95
+2020-06-06 10:57:23,817|Closing session...
+2020-06-06 10:57:23,907|Closing session... Done!
+2020-06-06 10:57:26,665|Starting session...
+2020-06-06 10:57:28,347|local-1591466247804|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 12
+2020-06-06 10:57:28,351|Starting session... Done!
+2020-06-06 10:57:34,987|DCELMerger|local-1591466247804| 1| 6|   12|Reading polygons A            |  6.63
+2020-06-06 10:57:35,902|DCELMerger|local-1591466247804| 1| 6|   12|Reading polygons B            |  0.91
+2020-06-06 10:57:38,036|DCELMerger|local-1591466247804| 1| 6|   12|Partitioning edges            |  2.13
+2020-06-06 10:57:40,281|DCELMerger|local-1591466247804| 1| 6|   12|Extracting A and B DCELs      |  2.22
+2020-06-06 10:57:41,507|DCELMerger|local-1591466247804| 1| 6|   12|Updating empty cells          |  1.22
+2020-06-06 10:57:43,378|DCELMerger|local-1591466247804| 1| 6|   12|Merging Halfedges             |  1.87
+2020-06-06 10:57:44,287|DCELMerger|local-1591466247804| 1| 6|   12|Checking single-label faces   |  0.90
+2020-06-06 10:57:45,557|Overlay operation done! [1761 results].
+2020-06-06 10:57:45,558|DCELMerger|local-1591466247804| 1| 6|   12|Intersection                  |  1.27
+2020-06-06 10:57:45,892|Overlay operation done! [123 results].
+2020-06-06 10:57:45,892|DCELMerger|local-1591466247804| 1| 6|   12|Symmetric                     |  0.33
+2020-06-06 10:57:46,619|Overlay operation done! [1884 results].
+2020-06-06 10:57:46,619|DCELMerger|local-1591466247804| 1| 6|   12|Union                         |  0.73
+2020-06-06 10:57:46,930|Overlay operation done! [58 results].
+2020-06-06 10:57:46,930|DCELMerger|local-1591466247804| 1| 6|   12|Diff A                        |  0.31
+2020-06-06 10:57:47,260|Overlay operation done! [65 results].
+2020-06-06 10:57:47,260|DCELMerger|local-1591466247804| 1| 6|   12|Diff B                        |  0.33
+2020-06-06 10:57:47,260|Closing session...
+2020-06-06 10:57:47,339|Closing session... Done!
+2020-06-06 10:57:49,937|Starting session...
+2020-06-06 10:57:51,700|local-1591466271129|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 24
+2020-06-06 10:57:51,702|Starting session... Done!
+2020-06-06 10:57:57,526|DCELMerger|local-1591466271129| 1| 6|   24|Reading polygons A            |  5.82
+2020-06-06 10:57:58,103|DCELMerger|local-1591466271129| 1| 6|   24|Reading polygons B            |  0.57
+2020-06-06 10:58:00,669|DCELMerger|local-1591466271129| 1| 6|   24|Partitioning edges            |  2.56
+2020-06-06 10:58:02,729|DCELMerger|local-1591466271129| 1| 6|   24|Extracting A and B DCELs      |  2.04
+2020-06-06 10:58:04,302|DCELMerger|local-1591466271129| 1| 6|   24|Updating empty cells          |  1.57
+2020-06-06 10:58:06,031|DCELMerger|local-1591466271129| 1| 6|   24|Merging Halfedges             |  1.73
+2020-06-06 10:58:06,824|DCELMerger|local-1591466271129| 1| 6|   24|Checking single-label faces   |  0.79
+2020-06-06 10:58:08,460|Overlay operation done! [1761 results].
+2020-06-06 10:58:08,466|DCELMerger|local-1591466271129| 1| 6|   24|Intersection                  |  1.64
+2020-06-06 10:58:09,136|Overlay operation done! [123 results].
+2020-06-06 10:58:09,136|DCELMerger|local-1591466271129| 1| 6|   24|Symmetric                     |  0.67
+2020-06-06 10:58:10,071|Overlay operation done! [1884 results].
+2020-06-06 10:58:10,071|DCELMerger|local-1591466271129| 1| 6|   24|Union                         |  0.93
+2020-06-06 10:58:10,549|Overlay operation done! [58 results].
+2020-06-06 10:58:10,550|DCELMerger|local-1591466271129| 1| 6|   24|Diff A                        |  0.48
+2020-06-06 10:58:11,021|Overlay operation done! [65 results].
+2020-06-06 10:58:11,021|DCELMerger|local-1591466271129| 1| 6|   24|Diff B                        |  0.47
+2020-06-06 10:58:11,021|Closing session...
+2020-06-06 10:58:11,105|Closing session... Done!
+2020-06-06 10:58:14,083|Starting session...
+2020-06-06 10:58:16,380|local-1591466295255|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 36
+2020-06-06 10:58:16,384|Starting session... Done!
+2020-06-06 10:58:20,801|DCELMerger|local-1591466295255| 1| 6|   36|Reading polygons A            |  4.41
+2020-06-06 10:58:21,199|DCELMerger|local-1591466295255| 1| 6|   36|Reading polygons B            |  0.40
+2020-06-06 10:58:24,877|DCELMerger|local-1591466295255| 1| 6|   36|Partitioning edges            |  3.68
+2020-06-06 10:58:27,016|DCELMerger|local-1591466295255| 1| 6|   36|Extracting A and B DCELs      |  2.11
+2020-06-06 10:58:29,680|DCELMerger|local-1591466295255| 1| 6|   36|Updating empty cells          |  2.66
+2020-06-06 10:58:32,326|DCELMerger|local-1591466295255| 1| 6|   36|Merging Halfedges             |  2.65
+2020-06-06 10:58:33,216|DCELMerger|local-1591466295255| 1| 6|   36|Checking single-label faces   |  0.89
+2020-06-06 10:58:35,090|Overlay operation done! [1761 results].
+2020-06-06 10:58:35,091|DCELMerger|local-1591466295255| 1| 6|   36|Intersection                  |  1.87
+2020-06-06 10:58:35,930|Overlay operation done! [123 results].
+2020-06-06 10:58:35,930|DCELMerger|local-1591466295255| 1| 6|   36|Symmetric                     |  0.84
+2020-06-06 10:58:37,634|Overlay operation done! [1884 results].
+2020-06-06 10:58:37,634|DCELMerger|local-1591466295255| 1| 6|   36|Union                         |  1.70
+2020-06-06 10:58:38,945|Overlay operation done! [58 results].
+2020-06-06 10:58:38,945|DCELMerger|local-1591466295255| 1| 6|   36|Diff A                        |  1.31
+2020-06-06 10:58:39,498|Overlay operation done! [65 results].
+2020-06-06 10:58:39,498|DCELMerger|local-1591466295255| 1| 6|   36|Diff B                        |  0.55
+2020-06-06 10:58:39,498|Closing session...
+2020-06-06 10:58:39,555|Closing session... Done!
+2020-06-06 10:58:41,516|Starting session...
+2020-06-06 10:58:42,788|local-1591466322181|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 48
+2020-06-06 10:58:42,789|Starting session... Done!
+2020-06-06 10:58:46,420|DCELMerger|local-1591466322181| 1| 6|   48|Reading polygons A            |  3.63
+2020-06-06 10:58:46,721|DCELMerger|local-1591466322181| 1| 6|   48|Reading polygons B            |  0.30
+2020-06-06 10:58:48,791|DCELMerger|local-1591466322181| 1| 6|   48|Partitioning edges            |  2.07
+2020-06-06 10:58:50,264|DCELMerger|local-1591466322181| 1| 6|   48|Extracting A and B DCELs      |  1.46
+2020-06-06 10:58:52,435|DCELMerger|local-1591466322181| 1| 6|   48|Updating empty cells          |  2.17
+2020-06-06 10:58:53,918|DCELMerger|local-1591466322181| 1| 6|   48|Merging Halfedges             |  1.48
+2020-06-06 10:58:54,546|DCELMerger|local-1591466322181| 1| 6|   48|Checking single-label faces   |  0.63
+2020-06-06 10:58:56,056|Overlay operation done! [1761 results].
+2020-06-06 10:58:56,056|DCELMerger|local-1591466322181| 1| 6|   48|Intersection                  |  1.50
+2020-06-06 10:58:56,710|Overlay operation done! [123 results].
+2020-06-06 10:58:56,710|DCELMerger|local-1591466322181| 1| 6|   48|Symmetric                     |  0.65
+2020-06-06 10:58:57,643|Overlay operation done! [1884 results].
+2020-06-06 10:58:57,644|DCELMerger|local-1591466322181| 1| 6|   48|Union                         |  0.93
+2020-06-06 10:58:58,159|Overlay operation done! [58 results].
+2020-06-06 10:58:58,159|DCELMerger|local-1591466322181| 1| 6|   48|Diff A                        |  0.52
+2020-06-06 10:58:58,656|Overlay operation done! [65 results].
+2020-06-06 10:58:58,656|DCELMerger|local-1591466322181| 1| 6|   48|Diff B                        |  0.50
+2020-06-06 10:58:58,656|Closing session...
+2020-06-06 10:58:58,722|Closing session... Done!
+2020-06-06 10:59:01,066|Starting session...
+2020-06-06 10:59:02,382|local-1591466341757|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 60
+2020-06-06 10:59:02,383|Starting session... Done!
+2020-06-06 10:59:06,185|DCELMerger|local-1591466341757| 1| 6|   60|Reading polygons A            |  3.80
+2020-06-06 10:59:06,547|DCELMerger|local-1591466341757| 1| 6|   60|Reading polygons B            |  0.36
+2020-06-06 10:59:09,353|DCELMerger|local-1591466341757| 1| 6|   60|Partitioning edges            |  2.80
+2020-06-06 10:59:10,767|DCELMerger|local-1591466341757| 1| 6|   60|Extracting A and B DCELs      |  1.40
+2020-06-06 10:59:14,825|DCELMerger|local-1591466341757| 1| 6|   60|Updating empty cells          |  4.06
+2020-06-06 10:59:16,703|DCELMerger|local-1591466341757| 1| 6|   60|Merging Halfedges             |  1.87
+2020-06-06 10:59:17,729|DCELMerger|local-1591466341757| 1| 6|   60|Checking single-label faces   |  1.02
+2020-06-06 10:59:20,310|Overlay operation done! [1761 results].
+2020-06-06 10:59:20,312|DCELMerger|local-1591466341757| 1| 6|   60|Intersection                  |  2.58
+2020-06-06 10:59:21,542|Overlay operation done! [123 results].
+2020-06-06 10:59:21,542|DCELMerger|local-1591466341757| 1| 6|   60|Symmetric                     |  1.23
+2020-06-06 10:59:23,910|Overlay operation done! [1884 results].
+2020-06-06 10:59:23,910|DCELMerger|local-1591466341757| 1| 6|   60|Union                         |  2.37
+2020-06-06 10:59:25,528|Overlay operation done! [58 results].
+2020-06-06 10:59:25,528|DCELMerger|local-1591466341757| 1| 6|   60|Diff A                        |  1.62
+2020-06-06 10:59:27,125|Overlay operation done! [65 results].
+2020-06-06 10:59:27,126|DCELMerger|local-1591466341757| 1| 6|   60|Diff B                        |  1.59
+2020-06-06 10:59:27,126|Closing session...
+2020-06-06 10:59:27,319|Closing session... Done!
+2020-06-06 10:59:30,137|Starting session...
+2020-06-06 10:59:32,381|local-1591466371460|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 12
+2020-06-06 10:59:32,383|Starting session... Done!
+2020-06-06 10:59:39,309|DCELMerger|local-1591466371460| 1| 6|   12|Reading polygons A            |  6.92
+2020-06-06 10:59:40,413|DCELMerger|local-1591466371460| 1| 6|   12|Reading polygons B            |  1.10
+2020-06-06 10:59:42,613|DCELMerger|local-1591466371460| 1| 6|   12|Partitioning edges            |  2.20
+2020-06-06 10:59:44,576|DCELMerger|local-1591466371460| 1| 6|   12|Extracting A and B DCELs      |  1.95
+2020-06-06 10:59:45,900|DCELMerger|local-1591466371460| 1| 6|   12|Updating empty cells          |  1.32
+2020-06-06 10:59:47,588|DCELMerger|local-1591466371460| 1| 6|   12|Merging Halfedges             |  1.68
+2020-06-06 10:59:48,466|DCELMerger|local-1591466371460| 1| 6|   12|Checking single-label faces   |  0.88
+2020-06-06 10:59:49,764|Overlay operation done! [1761 results].
+2020-06-06 10:59:49,766|DCELMerger|local-1591466371460| 1| 6|   12|Intersection                  |  1.29
+2020-06-06 10:59:50,175|Overlay operation done! [123 results].
+2020-06-06 10:59:50,176|DCELMerger|local-1591466371460| 1| 6|   12|Symmetric                     |  0.41
+2020-06-06 10:59:50,817|Overlay operation done! [1884 results].
+2020-06-06 10:59:50,818|DCELMerger|local-1591466371460| 1| 6|   12|Union                         |  0.64
+2020-06-06 10:59:51,149|Overlay operation done! [58 results].
+2020-06-06 10:59:51,150|DCELMerger|local-1591466371460| 1| 6|   12|Diff A                        |  0.33
+2020-06-06 10:59:51,431|Overlay operation done! [65 results].
+2020-06-06 10:59:51,432|DCELMerger|local-1591466371460| 1| 6|   12|Diff B                        |  0.28
+2020-06-06 10:59:51,432|Closing session...
+2020-06-06 10:59:51,543|Closing session... Done!
+2020-06-06 10:59:54,567|Starting session...
+2020-06-06 10:59:56,487|local-1591466395740|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 24
+2020-06-06 10:59:56,488|Starting session... Done!
+2020-06-06 11:00:02,967|DCELMerger|local-1591466395740| 1| 6|   24|Reading polygons A            |  6.48
+2020-06-06 11:00:03,546|DCELMerger|local-1591466395740| 1| 6|   24|Reading polygons B            |  0.58
+2020-06-06 11:00:06,351|DCELMerger|local-1591466395740| 1| 6|   24|Partitioning edges            |  2.80
+2020-06-06 11:00:07,934|DCELMerger|local-1591466395740| 1| 6|   24|Extracting A and B DCELs      |  1.57
+2020-06-06 11:00:09,825|DCELMerger|local-1591466395740| 1| 6|   24|Updating empty cells          |  1.89
+2020-06-06 11:00:11,590|DCELMerger|local-1591466395740| 1| 6|   24|Merging Halfedges             |  1.76
+2020-06-06 11:00:12,436|DCELMerger|local-1591466395740| 1| 6|   24|Checking single-label faces   |  0.84
+2020-06-06 11:00:14,136|Overlay operation done! [1761 results].
+2020-06-06 11:00:14,137|DCELMerger|local-1591466395740| 1| 6|   24|Intersection                  |  1.70
+2020-06-06 11:00:14,761|Overlay operation done! [123 results].
+2020-06-06 11:00:14,761|DCELMerger|local-1591466395740| 1| 6|   24|Symmetric                     |  0.62
+2020-06-06 11:00:15,695|Overlay operation done! [1884 results].
+2020-06-06 11:00:15,696|DCELMerger|local-1591466395740| 1| 6|   24|Union                         |  0.93
+2020-06-06 11:00:16,224|Overlay operation done! [58 results].
+2020-06-06 11:00:16,225|DCELMerger|local-1591466395740| 1| 6|   24|Diff A                        |  0.53
+2020-06-06 11:00:16,740|Overlay operation done! [65 results].
+2020-06-06 11:00:16,740|DCELMerger|local-1591466395740| 1| 6|   24|Diff B                        |  0.51
+2020-06-06 11:00:16,741|Closing session...
+2020-06-06 11:00:16,837|Closing session... Done!
+2020-06-06 11:00:19,867|Starting session...
+2020-06-06 11:00:22,384|local-1591466421602|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 36
+2020-06-06 11:00:22,389|Starting session... Done!
+2020-06-06 11:00:29,302|DCELMerger|local-1591466421602| 1| 6|   36|Reading polygons A            |  6.90
+2020-06-06 11:00:29,831|DCELMerger|local-1591466421602| 1| 6|   36|Reading polygons B            |  0.53
+2020-06-06 11:00:32,909|DCELMerger|local-1591466421602| 1| 6|   36|Partitioning edges            |  3.08
+2020-06-06 11:00:35,105|DCELMerger|local-1591466421602| 1| 6|   36|Extracting A and B DCELs      |  2.18
+2020-06-06 11:00:37,151|DCELMerger|local-1591466421602| 1| 6|   36|Updating empty cells          |  2.05
+2020-06-06 11:00:38,964|DCELMerger|local-1591466421602| 1| 6|   36|Merging Halfedges             |  1.81
+2020-06-06 11:00:39,725|DCELMerger|local-1591466421602| 1| 6|   36|Checking single-label faces   |  0.76
+2020-06-06 11:00:41,482|Overlay operation done! [1761 results].
+2020-06-06 11:00:41,483|DCELMerger|local-1591466421602| 1| 6|   36|Intersection                  |  1.75
+2020-06-06 11:00:42,098|Overlay operation done! [123 results].
+2020-06-06 11:00:42,099|DCELMerger|local-1591466421602| 1| 6|   36|Symmetric                     |  0.62
+2020-06-06 11:00:43,510|Overlay operation done! [1884 results].
+2020-06-06 11:00:43,510|DCELMerger|local-1591466421602| 1| 6|   36|Union                         |  1.41
+2020-06-06 11:00:44,557|Overlay operation done! [58 results].
+2020-06-06 11:00:44,557|DCELMerger|local-1591466421602| 1| 6|   36|Diff A                        |  1.04
+2020-06-06 11:00:45,323|Overlay operation done! [65 results].
+2020-06-06 11:00:45,324|DCELMerger|local-1591466421602| 1| 6|   36|Diff B                        |  0.76
+2020-06-06 11:00:45,324|Closing session...
+2020-06-06 11:00:45,407|Closing session... Done!
+2020-06-06 11:00:48,297|Starting session...
+2020-06-06 11:00:50,074|local-1591466449517|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 48
+2020-06-06 11:00:50,077|Starting session... Done!
+2020-06-06 11:00:55,917|DCELMerger|local-1591466449517| 1| 6|   48|Reading polygons A            |  5.83
+2020-06-06 11:00:56,469|DCELMerger|local-1591466449517| 1| 6|   48|Reading polygons B            |  0.55
+2020-06-06 11:00:59,814|DCELMerger|local-1591466449517| 1| 6|   48|Partitioning edges            |  3.34
+2020-06-06 11:01:01,735|DCELMerger|local-1591466449517| 1| 6|   48|Extracting A and B DCELs      |  1.90
+2020-06-06 11:01:04,713|DCELMerger|local-1591466449517| 1| 6|   48|Updating empty cells          |  2.98
+2020-06-06 11:01:06,744|DCELMerger|local-1591466449517| 1| 6|   48|Merging Halfedges             |  2.03
+2020-06-06 11:01:07,651|DCELMerger|local-1591466449517| 1| 6|   48|Checking single-label faces   |  0.91
+2020-06-06 11:01:10,233|Overlay operation done! [1761 results].
+2020-06-06 11:01:10,233|DCELMerger|local-1591466449517| 1| 6|   48|Intersection                  |  2.57
+2020-06-06 11:01:11,444|Overlay operation done! [123 results].
+2020-06-06 11:01:11,444|DCELMerger|local-1591466449517| 1| 6|   48|Symmetric                     |  1.21
+2020-06-06 11:01:13,702|Overlay operation done! [1884 results].
+2020-06-06 11:01:13,703|DCELMerger|local-1591466449517| 1| 6|   48|Union                         |  2.26
+2020-06-06 11:01:14,449|Overlay operation done! [58 results].
+2020-06-06 11:01:14,449|DCELMerger|local-1591466449517| 1| 6|   48|Diff A                        |  0.75
+2020-06-06 11:01:14,963|Overlay operation done! [65 results].
+2020-06-06 11:01:14,963|DCELMerger|local-1591466449517| 1| 6|   48|Diff B                        |  0.51
+2020-06-06 11:01:14,963|Closing session...
+2020-06-06 11:01:15,025|Closing session... Done!
+2020-06-06 11:01:16,710|Starting session...
+2020-06-06 11:01:17,844|local-1591466477439|org.apache.spark.deploy.SparkSubmit --master local[6] --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/and/Spark/2.4/conf/log4j.properties --class DCELMerger --files /home/and/Spark/2.4/conf/log4j.properties --jars /home/and/Spark/2.4/jars/geospark-1.2.0.jar,/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 1 --executor-cores 6 --executor-memory 30g /home/and/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 /home/and/Datasets/WKT/PhiliA.wkt --offset1 0 --input2 /home/and/Datasets/WKT/PhiliB.wkt --offset2 0 --partitions 60
+2020-06-06 11:01:17,845|Starting session... Done!
+2020-06-06 11:01:21,160|DCELMerger|local-1591466477439| 1| 6|   60|Reading polygons A            |  3.31
+2020-06-06 11:01:21,479|DCELMerger|local-1591466477439| 1| 6|   60|Reading polygons B            |  0.32
+2020-06-06 11:01:24,261|DCELMerger|local-1591466477439| 1| 6|   60|Partitioning edges            |  2.78
+2020-06-06 11:01:25,506|DCELMerger|local-1591466477439| 1| 6|   60|Extracting A and B DCELs      |  1.23
+2020-06-06 11:01:27,664|DCELMerger|local-1591466477439| 1| 6|   60|Updating empty cells          |  2.16
+2020-06-06 11:01:28,877|DCELMerger|local-1591466477439| 1| 6|   60|Merging Halfedges             |  1.21
+2020-06-06 11:01:29,542|DCELMerger|local-1591466477439| 1| 6|   60|Checking single-label faces   |  0.66
+2020-06-06 11:01:31,058|Overlay operation done! [1761 results].
+2020-06-06 11:01:31,059|DCELMerger|local-1591466477439| 1| 6|   60|Intersection                  |  1.51
+2020-06-06 11:01:31,755|Overlay operation done! [123 results].
+2020-06-06 11:01:31,755|DCELMerger|local-1591466477439| 1| 6|   60|Symmetric                     |  0.70
+2020-06-06 11:01:32,838|Overlay operation done! [1884 results].
+2020-06-06 11:01:32,838|DCELMerger|local-1591466477439| 1| 6|   60|Union                         |  1.08
+2020-06-06 11:01:33,542|Overlay operation done! [58 results].
+2020-06-06 11:01:33,542|DCELMerger|local-1591466477439| 1| 6|   60|Diff A                        |  0.70
+2020-06-06 11:01:34,182|Overlay operation done! [65 results].
+2020-06-06 11:01:34,183|DCELMerger|local-1591466477439| 1| 6|   60|Diff B                        |  0.64
+2020-06-06 11:01:34,183|Closing session...
+2020-06-06 11:01:34,250|Closing session... Done!
