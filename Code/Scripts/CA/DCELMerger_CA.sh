@@ -21,7 +21,7 @@ OFFSET1=0
 INPUT2=$HOME/Datasets/WKT/PhiliB.wkt
 OFFSET2=0
 
-while getopts "p:e:c:d:m" OPTION; do
+while getopts "p:e:c:d:l" OPTION; do
     case $OPTION in
     p)
         PARTITIONS=$OPTARG
@@ -32,7 +32,7 @@ while getopts "p:e:c:d:m" OPTION; do
     c)
 	CORES=$OPTARG
 	;;
-    m)
+    l)
 	MASTER="local[${CORES}]"
 	;;
     d)
