@@ -80,7 +80,7 @@ object DCELMerger{
       val polygon = new WKTReader(geofactory).read(wkt)
       polygon.setUserData(userData.mkString("\t"))
       polygon.asInstanceOf[Polygon]
-    }.cache
+    }.repartition(1024).cache
     val nPolygons = polygons.count()
     (polygons, nPolygons)
   }
