@@ -1,5 +1,6 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
+#include <boost/tokenizer.hpp>
 #if BOOST_VERSION >= 105600 && (! defined(BOOST_GCC) || BOOST_GCC >= 40500)
 
 #include <CGAL/IO/WKT.h>
@@ -79,8 +80,9 @@ int main(int argc, char* argv[]) {
     int debug = 0;
     char* filename1;
     char* filename2;
+    char operation = 0;
     int c;
-    while ((c = getopt (argc, argv, "a:b:d")) != -1){
+    while ((c = getopt (argc, argv, "a:b:o:d")) != -1){
       switch (c){
       case 'd':
 	debug = 1;
@@ -91,13 +93,16 @@ int main(int argc, char* argv[]) {
       case 'b':
 	if(optarg) filename2 = optarg; 
         break;
+      case 'o':
+	if(optarg) operation = optarg[0]; 
+        break;
       case '?':
         return 1;
       default:
 	abort ();
       }
     }
-    
+
     //-------------------------------------------------------------------------------------------------
     ifstream isA( filename1 );
     list<Polygon> polys;
@@ -134,10 +139,12 @@ int main(int argc, char* argv[]) {
     ArrangementA_2::Face_iterator ait;
     int n = 0;
     for (ait = arr1.faces_begin(); ait != arr1.faces_end(); ++ait){
-      string id = "A" + boost::lexical_cast<string>(n);;
-      ait->set_data(id);
+      if(!ait->is_unbounded()){
+	string id = "A" + boost::lexical_cast<string>(n);
+	ait->set_data(id);
     
-      n++;
+	n++;
+      }
     }
     cout << "Done with A [" << edges << " edges]." << endl;
     int milliSecondsElapsed = getMilliSpan(start);
@@ -178,9 +185,11 @@ int main(int argc, char* argv[]) {
     ArrangementB_2::Face_iterator bit;
     int m = 0;
     for (bit = arr2.faces_begin(); bit != arr2.faces_end(); ++bit){
-      string id = "B" + boost::lexical_cast<string>(m);;
-      bit->set_data(id);
-      m++;
+      if(!bit->is_unbounded()){
+	string id = "B" + boost::lexical_cast<string>(m);;
+	bit->set_data(id);
+	m++;
+      }
     }
     cout << "Done with B [" << edges << " edges]." << endl;
     milliSecondsElapsed = getMilliSpan(start);
@@ -212,13 +221,165 @@ int main(int argc, char* argv[]) {
       for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
 	if(!res_fit->is_unbounded()){
 	  string w = get_face_wkt<ArrangementRes_2> (res_fit);
-	  //cout << w;
+	  std::cout << w;
 	  wkt << w;
 	  nfaces++;
 	}
       }
       wkt.close();
       std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+    }
+
+    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+    switch(operation){
+    case 'i':
+      {
+	string op = "Intersection";
+	std::cout << op << std::endl;
+	// Go over the faces of the overlaid arrangement and their labels.
+	ArrangementRes_2::Face_iterator f;
+	ofstream wkt;
+	wkt.open (op + ".wkt");
+	cout << "Saving faces to " + op + ".wkt..." << endl;
+	int nfaces = 0;
+	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	  if(!f->is_unbounded()){
+	    std::string data = f->data();
+	    boost::char_separator<char> sep("|");
+	    tokenizer tokens(data, sep);
+	    char nlabels = 0;
+	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+	      nlabels++;
+	    if(nlabels == 2){
+	      std::string w = get_face_wkt<ArrangementRes_2> (f);
+	      wkt << w;
+	      nfaces++;
+	    }
+	  }
+	}
+	wkt.close();
+	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	break;
+      }
+    case 'u':
+      {
+	string op = "Union";
+	std::cout << op << std::endl;
+	// Go over the faces of the overlaid arrangement and their labels.
+	ArrangementRes_2::Face_iterator f;
+	ofstream wkt;
+	wkt.open (op + ".wkt");
+	cout << "Saving faces to " + op + ".wkt..." << endl;
+	int nfaces = 0;
+	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	  if(!f->is_unbounded()){
+	    std::string data = f->data();
+	    boost::char_separator<char> sep("|");
+	    tokenizer tokens(data, sep);
+	    char nlabels = 0;
+	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+	      nlabels++;
+	    if(nlabels == 1 || nlabels == 2){
+	      std::string w = get_face_wkt<ArrangementRes_2> (f);
+	      wkt << w;
+	      nfaces++;
+	    }
+	  }
+	}
+	wkt.close();
+	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	break;
+      }
+    case 's':
+      {
+	string op = "Symmetric";
+	std::cout << op << std::endl;
+	// Go over the faces of the overlaid arrangement and their labels.
+	ArrangementRes_2::Face_iterator f;
+	ofstream wkt;
+	wkt.open (op + ".wkt");
+	cout << "Saving faces to " + op + ".wkt..." << endl;
+	int nfaces = 0;
+	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	  if(!f->is_unbounded()){
+	    std::string data = f->data();
+	    boost::char_separator<char> sep("|");
+	    tokenizer tokens(data, sep);
+	    char nlabels = 0;
+	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+	      nlabels++;
+	    if(nlabels == 1){
+	      std::string w = get_face_wkt<ArrangementRes_2> (f);
+	      wkt << w;
+	      nfaces++;
+	    }
+	  }
+	}
+	wkt.close();
+	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	break;
+      }
+    case 'a':
+      {
+	string op = "SymmetricA";
+	std::cout << op << std::endl;
+	// Go over the faces of the overlaid arrangement and their labels.
+	ArrangementRes_2::Face_iterator f;
+	ofstream wkt;
+	wkt.open (op + ".wkt");
+	cout << "Saving faces to " + op + ".wkt..." << endl;
+	int nfaces = 0;
+	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	  if(!f->is_unbounded()){
+	    std::string data = f->data();
+	    boost::char_separator<char> sep("|");
+	    tokenizer tokens(data, sep);
+	    char nlabels = 0;
+	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+	      nlabels++;
+	    if(nlabels == 1 && data.find('A') != std::string::npos){
+	      std::string w = get_face_wkt<ArrangementRes_2> (f);
+	      wkt << w;
+	      nfaces++;
+	    }
+	  }
+	}
+	wkt.close();
+	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	break;
+      }
+    case 'b':
+      {
+	string op = "SymmetricB";
+	std::cout << op << std::endl;
+	// Go over the faces of the overlaid arrangement and their labels.
+	ArrangementRes_2::Face_iterator f;
+	ofstream wkt;
+	wkt.open (op + ".wkt");
+	cout << "Saving faces to " + op + ".wkt..." << endl;
+	int nfaces = 0;
+	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	  if(!f->is_unbounded()){
+	    std::string data = f->data();
+	    boost::char_separator<char> sep("|");
+	    tokenizer tokens(data, sep);
+	    char nlabels = 0;
+	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+	      nlabels++;
+	    if(nlabels == 1 && data.find('B') != std::string::npos){
+	      std::string w = get_face_wkt<ArrangementRes_2> (f);
+	      wkt << w;
+	      nfaces++;
+	    }
+	  }
+	}
+	wkt.close();
+	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	break;
+      }
+    case 0:
+      std::cout << "No overlay operation has been selected." << std::endl;
+      break;
     }
   }
   
