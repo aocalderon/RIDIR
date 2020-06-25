@@ -97,6 +97,7 @@ int main(int argc, char* argv[]) {
 	if(optarg) operation = optarg[0]; 
         break;
       case '?':
+	std::cout << "./dcel -a <filename1> -b <filename2> [-o <operator>] [-d]" << std::endl;
         return 1;
       default:
 	abort ();

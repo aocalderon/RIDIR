@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/dcel.dir/dcel.cpp.o"
-  "dcel.pdb"
   "dcel"
+  "dcel.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
