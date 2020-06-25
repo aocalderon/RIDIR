@@ -265,7 +265,8 @@ int main(int argc, char* argv[]) {
 		nlabels++;
 	      if(nlabels == 2){
 		std::string w = get_face_wkt<ArrangementRes_2> (f);
-		wkt << w;
+		if(debug)
+		  wkt << w;
 		nfaces++;
 	      }
 	    }
@@ -294,7 +295,8 @@ int main(int argc, char* argv[]) {
 		nlabels++;
 	      if(nlabels == 1 || nlabels == 2){
 		std::string w = get_face_wkt<ArrangementRes_2> (f);
-		wkt << w;
+		if(debug)
+		  wkt << w;
 		nfaces++;
 	      }
 	    }
@@ -323,7 +325,8 @@ int main(int argc, char* argv[]) {
 		nlabels++;
 	      if(nlabels == 1){
 		std::string w = get_face_wkt<ArrangementRes_2> (f);
-		wkt << w;
+		if(debug)
+		  wkt << w;
 		nfaces++;
 	      }
 	    }
@@ -352,7 +355,8 @@ int main(int argc, char* argv[]) {
 		nlabels++;
 	      if(nlabels == 1 && data.find('A') != std::string::npos){
 		std::string w = get_face_wkt<ArrangementRes_2> (f);
-		wkt << w;
+		if(debug)
+		  wkt << w;
 		nfaces++;
 	      }
 	    }
@@ -381,7 +385,8 @@ int main(int argc, char* argv[]) {
 		nlabels++;
 	      if(nlabels == 1 && data.find('B') != std::string::npos){
 		std::string w = get_face_wkt<ArrangementRes_2> (f);
-		wkt << w;
+		if(debug)
+		  wkt << w;
 		nfaces++;
 	      }
 	    }
