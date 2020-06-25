@@ -4,19 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/acald013/RIDIR/Code/CGAL/DCEL/dcel.cpp" "/home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles/dcel.dir/dcel.cpp.o"
+  "/home/and/RIDIR/Code/CGAL/DCEL/dcel.cpp" "/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/dcel.dir/dcel.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
-# Preprocessor definitions for this target.
-set(CMAKE_TARGET_DEFINITIONS_CXX
-  "BOOST_ALL_NO_LIB"
-  )
-
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/home/acald013/bin/include"
-  "/home/acald013/opt/CGAL-5.0.2/include"
+  "/usr/include/x86_64-linux-gnu"
+  "/opt/CGAL-5.0.2/include"
   )
 
 # Targets to which this target links.

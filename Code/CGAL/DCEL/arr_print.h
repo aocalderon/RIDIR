@@ -52,7 +52,7 @@ std::string get_face_wkt (typename Arrangement::Face_const_handle f)
 {
   // Print the outer boundary.
   // + "\t" + f->data() 
-  return get_wkt<Arrangement> (f->outer_ccb()) + "\n";
+  return get_wkt<Arrangement> (f->outer_ccb()) + "\t" + f->data() + "\n";
 }
 
 //-----------------------------------------------------------------------------
