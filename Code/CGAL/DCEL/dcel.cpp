@@ -229,164 +229,176 @@ int main(int argc, char* argv[]) {
     }
 
     // Compute an overlay opeartion on the merged arrangement.
-    std::cout << "Computing overlay operation: ";
-    start = getMilliCount();
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-    switch(operation){
-    case 'i':
-      {
-	string op = "Intersection";
-	std::cout << op << std::endl;
-	// Go over the faces of the overlaid arrangement and their labels.
-	ArrangementRes_2::Face_iterator f;
-	ofstream wkt;
-	wkt.open (op + ".wkt");
-	cout << "Saving faces to " + op + ".wkt..." << endl;
-	int nfaces = 0;
-	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
-	  if(!f->is_unbounded()){
-	    std::string data = f->data();
-	    boost::char_separator<char> sep("|");
-	    tokenizer tokens(data, sep);
-	    char nlabels = 0;
-	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
-	      nlabels++;
-	    if(nlabels == 2){
-	      std::string w = get_face_wkt<ArrangementRes_2> (f);
-	      wkt << w;
-	      nfaces++;
-	    }
-	  }
-	}
-	wkt.close();
-	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
-	break;
-      }
-    case 'u':
-      {
-	string op = "Union";
-	std::cout << op << std::endl;
-	// Go over the faces of the overlaid arrangement and their labels.
-	ArrangementRes_2::Face_iterator f;
-	ofstream wkt;
-	wkt.open (op + ".wkt");
-	cout << "Saving faces to " + op + ".wkt..." << endl;
-	int nfaces = 0;
-	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
-	  if(!f->is_unbounded()){
-	    std::string data = f->data();
-	    boost::char_separator<char> sep("|");
-	    tokenizer tokens(data, sep);
-	    char nlabels = 0;
-	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
-	      nlabels++;
-	    if(nlabels == 1 || nlabels == 2){
-	      std::string w = get_face_wkt<ArrangementRes_2> (f);
-	      wkt << w;
-	      nfaces++;
-	    }
-	  }
-	}
-	wkt.close();
-	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
-	break;
-      }
-    case 's':
-      {
-	string op = "Symmetric";
-	std::cout << op << std::endl;
-	// Go over the faces of the overlaid arrangement and their labels.
-	ArrangementRes_2::Face_iterator f;
-	ofstream wkt;
-	wkt.open (op + ".wkt");
-	cout << "Saving faces to " + op + ".wkt..." << endl;
-	int nfaces = 0;
-	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
-	  if(!f->is_unbounded()){
-	    std::string data = f->data();
-	    boost::char_separator<char> sep("|");
-	    tokenizer tokens(data, sep);
-	    char nlabels = 0;
-	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
-	      nlabels++;
-	    if(nlabels == 1){
-	      std::string w = get_face_wkt<ArrangementRes_2> (f);
-	      wkt << w;
-	      nfaces++;
-	    }
-	  }
-	}
-	wkt.close();
-	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
-	break;
-      }
-    case 'a':
-      {
-	string op = "SymmetricA";
-	std::cout << op << std::endl;
-	// Go over the faces of the overlaid arrangement and their labels.
-	ArrangementRes_2::Face_iterator f;
-	ofstream wkt;
-	wkt.open (op + ".wkt");
-	cout << "Saving faces to " + op + ".wkt..." << endl;
-	int nfaces = 0;
-	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
-	  if(!f->is_unbounded()){
-	    std::string data = f->data();
-	    boost::char_separator<char> sep("|");
-	    tokenizer tokens(data, sep);
-	    char nlabels = 0;
-	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
-	      nlabels++;
-	    if(nlabels == 1 && data.find('A') != std::string::npos){
-	      std::string w = get_face_wkt<ArrangementRes_2> (f);
-	      wkt << w;
-	      nfaces++;
-	    }
-	  }
-	}
-	wkt.close();
-	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
-	break;
-      }
-    case 'b':
-      {
-	string op = "SymmetricB";
-	std::cout << op << std::endl;
-	// Go over the faces of the overlaid arrangement and their labels.
-	ArrangementRes_2::Face_iterator f;
-	ofstream wkt;
-	wkt.open (op + ".wkt");
-	cout << "Saving faces to " + op + ".wkt..." << endl;
-	int nfaces = 0;
-	for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
-	  if(!f->is_unbounded()){
-	    std::string data = f->data();
-	    boost::char_separator<char> sep("|");
-	    tokenizer tokens(data, sep);
-	    char nlabels = 0;
-	    for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
-	      nlabels++;
-	    if(nlabels == 1 && data.find('B') != std::string::npos){
-	      std::string w = get_face_wkt<ArrangementRes_2> (f);
-	      wkt << w;
-	      nfaces++;
-	    }
-	  }
-	}
-	wkt.close();
-	std::cout << "Done! " << nfaces << " faces saved." << std::endl;
-	break;
-      }
-    case 0:
-      std::cout << "No overlay operation has been selected." << std::endl;
-      break;
-    }
 
-    milliSecondsElapsed = getMilliSpan(start);
-    double timeOp = milliSecondsElapsed / 1000.0;
-    std::cout << "Time for overlay operator: " << timeOp << " s." << std::endl;
-    std::cout << "Total Time: " << timeA + timeB + timeO + timeOp << " s." << std::endl;
+    //
+    std::vector<char> opearations {
+				   'i',
+				   'u',
+				   's',
+				   'a',
+				   'b'};
+    //
+
+    for(char operation: opearations){
+      std::cout << "Computing overlay operation: ";
+      start = getMilliCount();
+
+      switch(operation){
+      case 'i':
+	{
+	  string op = "Intersection";
+	  std::cout << op << std::endl;
+	  // Go over the faces of the overlaid arrangement and their labels.
+	  ArrangementRes_2::Face_iterator f;
+	  ofstream wkt;
+	  wkt.open (op + ".wkt");
+	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  int nfaces = 0;
+	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	    if(!f->is_unbounded()){
+	      std::string data = f->data();
+	      boost::char_separator<char> sep("|");
+	      tokenizer tokens(data, sep);
+	      char nlabels = 0;
+	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+		nlabels++;
+	      if(nlabels == 2){
+		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		wkt << w;
+		nfaces++;
+	      }
+	    }
+	  }
+	  wkt.close();
+	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  break;
+	}
+      case 'u':
+	{
+	  string op = "Union";
+	  std::cout << op << std::endl;
+	  // Go over the faces of the overlaid arrangement and their labels.
+	  ArrangementRes_2::Face_iterator f;
+	  ofstream wkt;
+	  wkt.open (op + ".wkt");
+	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  int nfaces = 0;
+	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	    if(!f->is_unbounded()){
+	      std::string data = f->data();
+	      boost::char_separator<char> sep("|");
+	      tokenizer tokens(data, sep);
+	      char nlabels = 0;
+	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+		nlabels++;
+	      if(nlabels == 1 || nlabels == 2){
+		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		wkt << w;
+		nfaces++;
+	      }
+	    }
+	  }
+	  wkt.close();
+	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  break;
+	}
+      case 's':
+	{
+	  string op = "Symmetric";
+	  std::cout << op << std::endl;
+	  // Go over the faces of the overlaid arrangement and their labels.
+	  ArrangementRes_2::Face_iterator f;
+	  ofstream wkt;
+	  wkt.open (op + ".wkt");
+	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  int nfaces = 0;
+	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	    if(!f->is_unbounded()){
+	      std::string data = f->data();
+	      boost::char_separator<char> sep("|");
+	      tokenizer tokens(data, sep);
+	      char nlabels = 0;
+	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+		nlabels++;
+	      if(nlabels == 1){
+		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		wkt << w;
+		nfaces++;
+	      }
+	    }
+	  }
+	  wkt.close();
+	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  break;
+	}
+      case 'a':
+	{
+	  string op = "SymmetricA";
+	  std::cout << op << std::endl;
+	  // Go over the faces of the overlaid arrangement and their labels.
+	  ArrangementRes_2::Face_iterator f;
+	  ofstream wkt;
+	  wkt.open (op + ".wkt");
+	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  int nfaces = 0;
+	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	    if(!f->is_unbounded()){
+	      std::string data = f->data();
+	      boost::char_separator<char> sep("|");
+	      tokenizer tokens(data, sep);
+	      char nlabels = 0;
+	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+		nlabels++;
+	      if(nlabels == 1 && data.find('A') != std::string::npos){
+		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		wkt << w;
+		nfaces++;
+	      }
+	    }
+	  }
+	  wkt.close();
+	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  break;
+	}
+      case 'b':
+	{
+	  string op = "SymmetricB";
+	  std::cout << op << std::endl;
+	  // Go over the faces of the overlaid arrangement and their labels.
+	  ArrangementRes_2::Face_iterator f;
+	  ofstream wkt;
+	  wkt.open (op + ".wkt");
+	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  int nfaces = 0;
+	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
+	    if(!f->is_unbounded()){
+	      std::string data = f->data();
+	      boost::char_separator<char> sep("|");
+	      tokenizer tokens(data, sep);
+	      char nlabels = 0;
+	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+		nlabels++;
+	      if(nlabels == 1 && data.find('B') != std::string::npos){
+		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		wkt << w;
+		nfaces++;
+	      }
+	    }
+	  }
+	  wkt.close();
+	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  break;
+	}
+      case 0:
+	std::cout << "No overlay operation has been selected." << std::endl;
+	break;
+      }
+      milliSecondsElapsed = getMilliSpan(start);
+      double timeOp = milliSecondsElapsed / 1000.0;
+      std::cout << "Time for overlay operator: " << timeOp << " s." << std::endl;
+      std::cout << "Total Time: " << timeA + timeB + timeO + timeOp << " s." << std::endl;
+    }
     
   }
   
