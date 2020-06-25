@@ -210,8 +210,6 @@ int main(int argc, char* argv[]) {
     double timeO = milliSecondsElapsed / 1000.0;
     std::cout << "Time for overlay: " << timeO << " s." << std::endl;
     
-    std::cout << "Total Time: " << timeA + timeB + timeO << " s." << std::endl;
-
     if(debug){
       // Go over the faces of the overlaid arrangement and their labels.
       ArrangementRes_2::Face_iterator  res_fit;
@@ -222,7 +220,6 @@ int main(int argc, char* argv[]) {
       for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
 	if(!res_fit->is_unbounded()){
 	  string w = get_face_wkt<ArrangementRes_2> (res_fit);
-	  std::cout << w;
 	  wkt << w;
 	  nfaces++;
 	}
@@ -231,6 +228,9 @@ int main(int argc, char* argv[]) {
       std::cout << "Done! " << nfaces << " faces saved." << std::endl;
     }
 
+    // Compute an overlay opeartion on the merged arrangement.
+    std::cout << "Computing overlay operation: ";
+    start = getMilliCount();
     typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
     switch(operation){
     case 'i':
@@ -382,6 +382,12 @@ int main(int argc, char* argv[]) {
       std::cout << "No overlay operation has been selected." << std::endl;
       break;
     }
+
+    milliSecondsElapsed = getMilliSpan(start);
+    double timeOp = milliSecondsElapsed / 1000.0;
+    std::cout << "Time for overlay operator: " << timeOp << " s." << std::endl;
+    std::cout << "Total Time: " << timeA + timeB + timeO + timeOp << " s." << std::endl;
+    
   }
   
   return 0;
