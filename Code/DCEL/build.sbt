@@ -12,6 +12,7 @@ libraryDependencies += "org.datasyslab" % "JTSplus" % "0.1.4"
 libraryDependencies += "org.locationtech.jts" % "jts-core" % "1.16.1"
 libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.7.25"
 libraryDependencies += "org.rogach" % "scallop_2.11" % "2.1.3"
+libraryDependencies += "ch.cern.sparkmeasure" %% "spark-measure" % "0.16"
 
 libraryDependencies += "com.lihaoyi" % "ammonite" % "1.6.7" cross CrossVersion.full
 

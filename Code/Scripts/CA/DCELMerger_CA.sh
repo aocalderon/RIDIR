@@ -2,7 +2,7 @@
 
 PARTITIONS=1024
 EXECUTORS=12
-CORES=9
+CORES=8
 DMEMORY=12g
 EMEMORY=30g
 DEBUG=""
@@ -21,7 +21,7 @@ OFFSET2=2
 #INPUT2=$HOME/Datasets/WKT/PhiliB.wkt
 #OFFSET2=0
 
-while getopts "p:e:c:d:l" OPTION; do
+while getopts "p:e:c:dl" OPTION; do
     case $OPTION in
     p)
         PARTITIONS=$OPTARG
@@ -46,13 +46,14 @@ while getopts "p:e:c:d:l" OPTION; do
 done
 
 spark-submit \
+    --conf spark.scheduler.mode=FAIR \
     --conf spark.default.parallelism=${PARTITIONS} \
     --conf spark.locality.wait=1s \
     --conf spark.locality.wait.node=0s \
     --conf spark.locality.wait.rack=0s \
     --files $LOG_FILE \
     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
-    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar \
+    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
     --class DCELMerger $CLASS_JAR \
