@@ -8,13 +8,15 @@ import com.vividsolutions.jts.io.WKTReader
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.serializer.KryoSerializer
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{Row, Dataset, SparkSession}
+import org.apache.spark.sql.functions
 import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geospark.spatialPartitioning.quadtree.{QuadTreePartitioner, StandardQuadTree, QuadRectangle}
 import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
 import org.geotools.geometry.jts.GeometryClipper
+import ch.cern.sparkmeasure.TaskMetrics
 import org.rogach.scallop._
 import org.slf4j.{Logger, LoggerFactory}
 import DCELBuilder._
@@ -161,7 +163,15 @@ object DCELMerger{
 
       (appId, cores, executors)
     }
-    implicit val settings = Settings(spark, params, config, startTime, appId, cores, executors)    
+    implicit val settings = Settings(spark,
+      params, config, startTime, appId, cores, executors)
+    val metrics = TaskMetrics(spark)
+    def getPhaseMetrics(metrics: TaskMetrics, phaseName: String): Dataset[Row] = {
+      metrics.createTaskMetricsDF()
+        .withColumn("appId", functions.lit(appId))
+        .withColumn("phaseName", functions.lit(phaseName))
+        .orderBy("launchTime")
+    }    
     logger.info("Starting session... Done!")
 
     // Reading polygons...
@@ -225,9 +235,9 @@ object DCELMerger{
       }
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////
     // Functions
-    //////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////
     def transform(hedges: List[LineString], cell: Polygon, index: Int = -1): Vector[Half_edge] = {
         hedges.filter(line => line.coveredBy(cell)).flatMap{ segment =>
           val arr = segment.getUserData.toString().split("\t")
@@ -423,9 +433,9 @@ object DCELMerger{
     ////////////////////////////////////////////////////////////////////////////////////
     // main functions
     ////////////////////////////////////////////////////////////////////////////////////
-    def getLDCEL(h: Vector[Half_edge], index: Int, keepEmptyFaces: Boolean = false): LDCEL = {
+    def getLDCEL(h: Vector[Half_edge], i: Int, keepEmptyFaces: Boolean = false): LDCEL = {
       val vertices = getVerticesByV2(h.toIterator)
-      val pre = preprocess(vertices, index)
+      val pre = preprocess(vertices, i)
       val hedges = getHedges2(pre)
       val faces  = if(keepEmptyFaces){
         getFaces2(pre)
@@ -433,38 +443,42 @@ object DCELMerger{
         getFaces2(pre).filter(_.id.substring(0,1) != "F")
       }
 
-      LDCEL(0, vertices, hedges, faces, index)
+      LDCEL(0, vertices, hedges, faces, i)
     }
 
+    metrics.begin()
     val dcelsRDD = timer{"Extracting A and B DCELs"}{
-      val dcels = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edgesIt) =>
-        val edges = edgesIt.toVector
-        val gA = edges.filter(isA).map(edge2graphedge).toList
-        val gB = edges.filter(isB).map(edge2graphedge).toList
-        val cell = envelope2Polygon(cells(index).getEnvelope)
-        val gCellA = cell2gedges(cell)
-        val gCellB = cell2gedges(cell)
+      val dcels = edgesRDD.spatialPartitionedRDD.rdd
+        .mapPartitionsWithIndex{ case (index, edgesIt) =>
+          val edges = edgesIt.toVector
+          val gA = edges.filter(isA).map(edge2graphedge).toList
+          val gB = edges.filter(isB).map(edge2graphedge).toList
+          val cell = envelope2Polygon(cells(index).getEnvelope)
+          val gCellA = cell2gedges(cell)
+          val gCellB = cell2gedges(cell)
 
-        val Ah = SweepLine.getGraphEdgeIntersections(gA, gCellA).flatMap{_.getLineStrings}
-        val At = transform(Ah, cell)
-        val Am = merge(At)
-        val Ap = pair(Am)
-        val Af = filter(Ap)
-        val dcelA = getLDCEL(Af, index, true)
+          val Ah = SweepLine.getGraphEdgeIntersections(gA, gCellA).flatMap{_.getLineStrings}
+          val At = transform(Ah, cell)
+          val Am = merge(At)
+          val Ap = pair(Am)
+          val Af = filter(Ap)
+          val dcelA = getLDCEL(Af, index, true)
 
-        val Bh = SweepLine.getGraphEdgeIntersections(gB, gCellB).flatMap{_.getLineStrings}
-        val Bt = transform(Bh, cell)
-        val Bm = merge(Bt)
-        val Bp = pair(Bm)
-        val Bf = filter(Bp)
-        val dcelB = getLDCEL(Bf, index, true)
+          val Bh = SweepLine.getGraphEdgeIntersections(gB, gCellB).flatMap{_.getLineStrings}
+          val Bt = transform(Bh, cell)
+          val Bm = merge(Bt)
+          val Bp = pair(Bm)
+          val Bf = filter(Bp)
+          val dcelB = getLDCEL(Bf, index, true)
 
-        val r = (dcelA, dcelB)
-        Iterator(r)
-      }.cache
+          val r = (dcelA, dcelB)
+          Iterator(r)
+        }.cache
       val n = dcels.count()
       dcels
     }
+    metrics.end()
+    val phaseExtract = getPhaseMetrics(metrics, "Extract DCELs")
 
     debug{
       save{"/tmp/edgesHA.wkt"}{
@@ -554,6 +568,7 @@ object DCELMerger{
       }
     }
 
+    metrics.begin()
     val dcels_prime = timer{"Merging DCELs"}{
       val dcels = dcelARDD.zipPartitions(dcelBRDD, preservesPartitioning=true){ (iterA, iterB) =>
         val dcelA = iterA.next() 
@@ -575,6 +590,8 @@ object DCELMerger{
       dcels.count()
       dcels
     }
+    metrics.end()
+    val phaseMerge = getPhaseMetrics(metrics, "Merge DCELs")
 
     debug{
       save{s"/tmp/edgesFC.wkt"}{
@@ -740,6 +757,15 @@ object DCELMerger{
 
     // Closing session...
     logger.info("Closing session...")
+    debug{
+      val phases = phaseExtract.union(phaseMerge)
+      phases.repartition(1).write
+        .mode("overwrite")
+        .format("csv")
+        .option("delimiter", "\t")
+        .option("header", true)
+        .save("hdfs:///user/acald013/logs/sdcel")
+    }
     spark.close()
     logger.info("Closing session... Done!")
   }  
