@@ -94,44 +94,47 @@
   \end{frame}
 }
 
-\begin{frame}{Task histogram}{Top 100 tasks by duration\footnote{\tiny{click to enlarge}}...}
-  \centering
-  \href{https://www.cs.ucr.edu/~acald013/public/RIDIR/figures/TopTasksHist.pdf}{\includegraphics[scale=0.22]{figures/TopTasksHist.pdf}}
+\begin{frame}{Overlay operations}{CGAL implementation}
+    \begin{itemize}
+        \item  Extend the CGAL implementation to evaluate the overlay operators.
+        \item Run validations with Phili dataset.
+        \item Run experiments with CA dataset: 
+        \begin{itemize}
+            \item Cluster: 12 nodes, 8 cores each.
+            \item Average of 10 runs.
+        \end{itemize}
+        
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Node usage}
-  \centering
-    \includegraphics[scale=0.4]{figures/ForPlot}
-\end{frame}
-\begin{frame}{Node usage}
-  \centering
-    \includegraphics[scale=0.4]{figures/ForPlot2}
-\end{frame}
-
-\begin{frame}{Node usage}
+\begin{frame}{Experiment results}
     \centering
-    \begin{tabular}{l l}
-        \hline
-                        & n \\ \hline
-        Min.         & 1.00\\  
-        1st Qu.    & 8.00 \\ 
-        Median    & 8.00\\  
-        Mean       & 7.81 \\ 
-        3rd Qu.    & 8.00 \\
-        Max.        &12.00  \\ \hline
-    \end{tabular} \\
-    \vspace{0.5cm}
-    \begin{tabular}{c c c c c c c c c c c c}
-    1    & 2    & 3     & 4     & 5     & 6     & 7     & \textbf{8}     & 9    & 10    & 11    & 12 \\
-  658   & 362   & 221   & 201   & 147   & 163   & 171 & \textbf{31734}  & 2613   & 163    & 12     & 1 \\ 
-    \end{tabular}
+	\includegraphics[width=0.8\textwidth]{figures/ByOperators}
+\end{frame}
 
+\begin{frame}{Experiment results}
+    \centering
+    \begin{tabular}{l l l}
+        \hline
+        Implementation & Operator & Time[s] \\ \hline
+        CGAL	& Intersection	& 30.71 \\
+        SDCEL	& Intersection	& 4.05 \\
+        CGAL	& Union	& 26.92 \\
+        SDCEL	& Union	& 1.90 \\
+        CGAL	& Symmetric	& 0.38 \\
+        SDCEL	& Symmetric	& 0.42 \\
+        CGAL	& DiffA	& 0.22 \\
+        SDCEL	& DiffA	& 0.45 \\
+        CGAL	& DiffB	& 0.30 \\
+        SDCEL	& DiffB	& 0.40 \\ \hline
+    \end{tabular}
 \end{frame}
 
 \begin{frame}{What's next}
     \begin{itemize}
-        \item Work on the experimental plan
-        \item Work on new datasets (in progress)
+        \item Run additional tests on CA results.
+        \item Fix performance issues in SDCEL Symmetric operators.
+        \item Still working on load balance in the cluster.
     \end{itemize}
 \end{frame}
 
