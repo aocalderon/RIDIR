@@ -24,6 +24,13 @@ Code/Scala/RandomEdgeGenerator/.metals/*
 Code/Scala/RandomEdgeGenerator/.bloop/*
 Code/Scala/RandomEdgeGenerator/.ensime_cache/*
 
+Code/Scala/Test/target/*
+Code/Scala/Test/project/*
+Code/Scala/Test/.ensime
+Code/Scala/Test/.metals/*
+Code/Scala/Test/.bloop/*
+Code/Scala/Test/.ensime_cache/*
+
 Code/dyn4j/target/*
 Code/dyn4j/project/*
 Code/dyn4j/.ensime
