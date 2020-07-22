@@ -12,10 +12,10 @@ CLASS_JAR=$HOME/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 MASTER=yarn
 
-INPUT1=/user/acald013/Districts
+INPUT1=/user/acald013/RIDIR/US/districts
 OFFSET1=0
-INPUT2=/user/acald013/Datasets/CA/cali2010_polygons6414.tsv
-OFFSET2=2
+INPUT2=/user/acald013/RIDIR/US/buildings
+OFFSET2=0
 #INPUT1=$HOME/Datasets/WKT/PhiliA.wkt
 #OFFSET1=0
 #INPUT2=$HOME/Datasets/WKT/PhiliB.wkt
