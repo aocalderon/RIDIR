@@ -57,9 +57,8 @@ object Translate {
         val geom = reader.read(g.getString(0))
 
         (0 until geom.getNumGeometries).map{ i =>
-          geom.getGeometryN(i)
-        }.map{ geom =>
-          val polygonRaw = geom.asInstanceOf[Polygon]
+          val geomN = geom.getGeometryN(i)
+          val polygonRaw = geomN.asInstanceOf[Polygon]
           val nGeoms = polygonRaw.getNumGeometries
           val rings = polygonRaw.getExteriorRing +:
             (0 until polygonRaw.getNumInteriorRing).map{ i =>
@@ -90,7 +89,7 @@ object Translate {
             val outer = geofactory2.createLinearRing(lstRings.head)
             geofactory2.createPolygon(outer)
           }
-        }
+        }.filterNot(_.isEmpty())
       }
     }.cache()
     logger.info("Performing re-projection... Done!")

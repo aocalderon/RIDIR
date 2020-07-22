@@ -35,48 +35,31 @@ object Loader {
     val input = params.input()
     val partitions = params.partitions()
     val geometriesTXT = spark.read
-      .option("header", true).option("delimiter", "\t")
-      .csv(input).rdd.cache()
+      .option("header", true)
+      .csv(input)
+      .repartition(partitions)
+      .cache()
+    geometriesTXT.show()
     logger.info(s"Input polygons: ${geometriesTXT.count()}")
     logger.info(s"Reading ${params.input()}... Done!")
 
-    logger.info("Removing duplicates...")
-    val geometriesRaw = geometriesTXT.mapPartitions{ geoms =>
+    logger.info("Cleaning...")
+    val offset = params.offset()
+    val geometriesRaw = geometriesTXT.rdd.mapPartitions{ wkts =>
       val model = new PrecisionModel(1000)
       val geofactory = new GeometryFactory(model)
       val reader = new WKTReader(geofactory)
-      geoms.map{ g =>
-        val geom = reader.read(g.getString(0))
-        val polygonRaw = geom.asInstanceOf[Polygon]
-        val nGeoms = polygonRaw.getNumGeometries
-        val rings = polygonRaw.getExteriorRing +:
-          (0 until polygonRaw.getNumInteriorRing).map{ i =>
-            polygonRaw.getInteriorRingN(i)
+      wkts.flatMap{ wkt =>
+        val geoms = reader.read(wkt.getString(offset))
+          (0 until geoms.getNumGeometries).map{ n =>
+            val geom = geoms.getGeometryN(n)
+            geom.asInstanceOf[Polygon]
           }
-        val coords = rings.map{ ring =>
-          val arrCoords = ring.getCoordinates.zipWithIndex.groupBy(_._1).map{ tuple =>
-            val coord = tuple._1
-            val index = tuple._2.map(_._2).sorted.head
-            (index, coord)
-          }.toList.sortBy(_._1).map(_._2).toArray
-          if(arrCoords.length < 3){
-            Array.empty[Coordinate]
-          } else {
-            arrCoords :+ arrCoords.head
-          }
-        }
-        if(coords.length > 1){
-          val outer = geofactory.createLinearRing(coords.head)
-          val inners = coords.tail.map(geofactory.createLinearRing).toArray
-          geofactory.createPolygon(outer, inners)
-        } else {
-          val outer = geofactory.createLinearRing(coords.head)
-          geofactory.createPolygon(outer)
-        }
       }
     }.cache()
-    logger.info("Removing duplicates... Done!")
-    logger.info(s"Output polygons: ${geometriesRaw.count}")
+    logger.info("Cleaning... Done!")
+    geometriesRaw.map(_.toText()).toDF().show()
+    logger.info(s"Output polygons: ${geometriesRaw.count()}")
 
     
     logger.info(s"Saving to ${params.output()}...")
@@ -111,7 +94,8 @@ object Loader {
 class LoaderConf(args: Seq[String]) extends ScallopConf(args) {
   val input: ScallopOption[String] = opt[String]  (required = true)
   val output: ScallopOption[String] = opt[String]  (required = true)
-  val partitions: ScallopOption[Int] = opt[Int] (default = Some(960))
+  val offset: ScallopOption[Int] = opt[Int] (default = Some(0))
+  val partitions: ScallopOption[Int] = opt[Int] (default = Some(1080))
 
   verify()
 }
