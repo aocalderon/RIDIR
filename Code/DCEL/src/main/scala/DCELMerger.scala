@@ -25,7 +25,7 @@ import SingleLabelChecker._
 
 object DCELMerger{
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
-  private val model: PrecisionModel = new PrecisionModel(10000)
+  private val model: PrecisionModel = new PrecisionModel(1000)
   val geofactory: GeometryFactory = new GeometryFactory(model);
   val precision: Double = 1 / model.getScale
 
@@ -82,7 +82,7 @@ object DCELMerger{
       val polygon = new WKTReader(geofactory).read(wkt)
       polygon.setUserData(userData.mkString("\t"))
       polygon.asInstanceOf[Polygon]
-    }.repartition(1024).cache
+    }.cache
     val nPolygons = polygons.count()
     (polygons, nPolygons)
   }
@@ -200,7 +200,9 @@ object DCELMerger{
     // Partitioning edges...
     val (edgesRDD, nEdgesRDD, cells, quadtree) = timer{"Partitioning edges"}{
       val edgesA = getEdges(polygonsA)
+      logger.info(s"Edges in A: ${edgesA.count()}")
       val edgesB = getEdges(polygonsB)
+      logger.info(s"Edges in B: ${edgesB.count()}")
       val edges = edgesA.union(edgesB)
       val (edgesRDD, quadtree: StandardQuadTree[LineString]) = if(params.custom()){
         val (edgesRDD, boundary) = setSpatialRDD(edges)
@@ -225,14 +227,27 @@ object DCELMerger{
         cells.toSeq.sortBy(_._1).map{ case (i,q) => envelope2Polygon(q.getEnvelope)}
       }
   
-
-    debug{
-      log(f"Total number of partitions|${cells.size}")
-      log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
-      log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
-      save{"/tmp/edgesCells.wkt"}{
-        grids.value.zipWithIndex.map{ case(g, i) => s"${g.toText()}\t$i\n" }
-      }
+    log(f"Total number of partitions|${cells.size}")
+    log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
+    log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
+    save{"/tmp/edgesCells.wkt"}{
+      grids.value.zipWithIndex.map{ case(g, i) => s"${g.toText()}\t$i\n" }
+    }
+    save{"/tmp/envelope.tsv"}{
+      val boundary = edgesRDD.boundary()
+      val wkt = envelope2Polygon(boundary).toText()
+      Array(wkt)
+    }
+    save{"/tmp/quadtree.tsv"}{
+      val rectangles = quadtree.getLeafZones.asScala
+        .map(leaf => leaf.partitionId -> leaf)
+        .toMap
+      edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, it) =>
+        val id = rectangles(index).lineage
+        val n = it.size
+        val tuple = (id, n)
+        Iterator(s"${id}\t${n}\n")
+      }.collect()
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -479,7 +494,13 @@ object DCELMerger{
     }
     metrics.end()
     val phaseExtract = getPhaseMetrics(metrics, "Extract DCELs")
-
+    phaseExtract.repartition(1).write
+      .mode("overwrite")
+      .format("csv")
+      .option("delimiter", "\t")
+      .option("header", true)
+      .save("hdfs:///user/acald013/logs/sdcel")
+/*
     debug{
       save{"/tmp/edgesHA.wkt"}{
         dcelsRDD.map(_._1).flatMap{ dcel =>
@@ -502,11 +523,15 @@ object DCELMerger{
         }.collect()
       }
     }
-
+ */
 
     // Calling methods in CellManager.scala
     val (dcelARDD, dcelBRDD) = timer{"Updating empty cells"}{
-      val dcelARDD = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree, cells)
+      logger.info("Starting CellManager...")
+      val dcelARDD0 = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree, cells, "A")
+      logger.info("Starting CellManager... Done!")
+
+      val dcelARDD = dcelARDD0
         .mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
           val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
@@ -524,7 +549,7 @@ object DCELMerger{
         }
         .cache()
       dcelARDD.count()
-      val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree, cells)
+      val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree, cells, "B")
         .mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
           val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
@@ -544,7 +569,7 @@ object DCELMerger{
       dcelBRDD.count()
       (dcelARDD, dcelBRDD)
     }
-
+/*
     debug{
       save{"/tmp/edgesHAprime.wkt"}{
         dcelARDD.flatMap{ dcel =>
@@ -567,7 +592,7 @@ object DCELMerger{
         }.collect()
       }
     }
-
+ 
     metrics.begin()
     val dcels_prime = timer{"Merging DCELs"}{
       val dcels = dcelARDD.zipPartitions(dcelBRDD, preservesPartitioning=true){ (iterA, iterB) =>
@@ -754,10 +779,11 @@ object DCELMerger{
     timer{"Diff B"}{
       overlapOp(dcel, differenceB, s"${output_path}OpDifferenceB.wkt")
     }
-
+ */
     // Closing session...
     logger.info("Closing session...")
     debug{
+      /*
       val phases = phaseExtract.union(phaseMerge)
       phases.repartition(1).write
         .mode("overwrite")
@@ -765,6 +791,7 @@ object DCELMerger{
         .option("delimiter", "\t")
         .option("header", true)
         .save("hdfs:///user/acald013/logs/sdcel")
+       */
     }
     spark.close()
     logger.info("Closing session... Done!")

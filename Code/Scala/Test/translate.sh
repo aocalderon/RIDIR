@@ -10,10 +10,10 @@ CLASS_NAME="Translate"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 
 THE_MASTER="yarn"
-THE_INPUT="hdfs:///user/acald013/WKT/provinces"
-THE_OUTPUT="hdfs:///user/acald013/WKT/provinces2"
+THE_INPUT="hdfs:///user/acald013/tmp/level2.csv"
+THE_OUTPUT="hdfs:///user/acald013/gadm/level2"
 THE_PARTITIONS=1080
-THE_SOURCE="EPSG:3857"
+THE_SOURCE="EPSG:4326"
 THE_TARGET="EPSG:3857"
 
 while getopts "i:o:p:s:t:l" OPTION; do
