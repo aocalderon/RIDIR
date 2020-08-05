@@ -166,6 +166,34 @@ object CellManager{
     f.write(content.mkString(""))
     f.close
   }
+  def mergeCells(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
+    lineage: String): edu.ucr.dblab.StandardQuadTree[LineString] = {
+
+    val quadIds = lineage.map(_.toInt - 48)
+    val levels = quadIds.length
+    var current = quadtree
+    for(quadId <- quadIds.slice(0, levels - 1)){
+      val children = current.getRegions
+      current = children(quadId)
+    }
+    current.setRegions(null)
+    val new_lineage = quadIds.slice(0, levels - 1).mkString("")
+    current.setLineage(new_lineage)
+
+    quadtree
+  }
+  def cleanQuadtree(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
+    M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[LineString] = {
+
+    val X = M.filter(_._2 == 0).map(_._1).toSet
+    quadtree.getLeafZones.asScala
+      .filter(leaf => X.contains(leaf.partitionId))
+      .map(_.lineage)
+    
+
+    ???
+  }
+
   def getNextCellWithEdges2(M: Map[Int, Int], quadtree: edu.ucr.dblab.StandardQuadTree[LineString], grids: Map[Int, edu.ucr.dblab.QuadRectangle]): List[(Int, Int, Point)] = {
     val cells = grids.map{ grid =>
       val id = grid._2.partitionId.toInt

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PARTITIONS=1024
+PARTITIONS=1080
 EXECUTORS=12
-CORES=8
+CORES=9
 DMEMORY=12g
 EMEMORY=30g
 DEBUG=""
@@ -12,9 +12,9 @@ CLASS_JAR=$HOME/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 MASTER=yarn
 
-INPUT1=/user/acald013/Districts
+INPUT1=/user/acald013/gadm/level1
 OFFSET1=0
-INPUT2=/user/acald013/Provinces
+INPUT2=/user/acald013/gadm/level2
 OFFSET2=0
 #INPUT1=$HOME/Datasets/WKT/PhiliA.wkt
 #OFFSET1=0
@@ -45,12 +45,12 @@ while getopts "p:e:c:dl" OPTION; do
     esac
 done
 
+#    --conf spark.scheduler.mode=FAIR \
+#    --conf spark.locality.wait=1s \
+#    --conf spark.locality.wait.node=0s \
+#    --conf spark.locality.wait.rack=0s \
 spark-submit \
-    --conf spark.scheduler.mode=FAIR \
     --conf spark.default.parallelism=${PARTITIONS} \
-    --conf spark.locality.wait=1s \
-    --conf spark.locality.wait.node=0s \
-    --conf spark.locality.wait.rack=0s \
     --files $LOG_FILE \
     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
     --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \

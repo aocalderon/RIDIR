@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PARTITIONS=1024
+PARTITIONS=1080
 EXECUTORS=12
-CORES=8
+CORES=9
 DMEMORY=12g
 EMEMORY=30g
 DEBUG=""
@@ -12,9 +12,9 @@ CLASS_JAR=$HOME/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 MASTER=yarn
 
-INPUT1=/user/acald013/RIDIR/US/districts
+INPUT1=/user/acald013/WKT/provinces
 OFFSET1=0
-INPUT2=/user/acald013/RIDIR/US/buildings
+INPUT2=/user/acald013/tmp/bsample.csv
 OFFSET2=0
 #INPUT1=$HOME/Datasets/WKT/PhiliA.wkt
 #OFFSET1=0
