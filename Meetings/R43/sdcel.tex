@@ -94,25 +94,44 @@
   \end{frame}
 }
 
-\begin{frame}{gadm dataset}
-    \begin{itemize}
-        \item Level 1 (States) and level 2 (Counties) globally.
-        \item 110K and 170K polygons.
-        \item 1.0G and 1.2G.
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Cells}
+\begin{frame}{Task histogram}{Top 100 tasks by duration\footnote{\tiny{click to enlarge}}...}
   \centering
-    \includegraphics[width=\textwidth]{figures/gadm_grid}
+  \href{https://www.cs.ucr.edu/~acald013/public/RIDIR/figures/TopTasksHist.pdf}{\includegraphics[scale=0.22]{figures/TopTasksHist.pdf}}
 \end{frame}
 
-\begin{frame}{DCEL construction}
+\begin{frame}{Node usage}
+  \centering
+    \includegraphics[scale=0.4]{figures/ForPlot}
+\end{frame}
+\begin{frame}{Node usage}
+  \centering
+    \includegraphics[scale=0.4]{figures/ForPlot2}
+\end{frame}
+
+\begin{frame}{Node usage}
+    \centering
+    \begin{tabular}{l l}
+        \hline
+                        & n \\ \hline
+        Min.         & 1.00\\  
+        1st Qu.    & 8.00 \\ 
+        Median    & 8.00\\  
+        Mean       & 7.81 \\ 
+        3rd Qu.    & 8.00 \\
+        Max.        &12.00  \\ \hline
+    \end{tabular} \\
+    \vspace{0.5cm}
+    \begin{tabular}{c c c c c c c c c c c c}
+    1    & 2    & 3     & 4     & 5     & 6     & 7     & \textbf{8}     & 9    & 10    & 11    & 12 \\
+  658   & 362   & 221   & 201   & 147   & 163   & 171 & \textbf{31734}  & 2613   & 163    & 12     & 1 \\ 
+    \end{tabular}
+
+\end{frame}
+
+\begin{frame}{What's next}
     \begin{itemize}
-        \item Partitioning (12583 cells) in $\approx$121s. 
-        \item 37.6M (level 1) and 54M (level 2) edges processed.
-        \item DCEL A in $\approx$ 123s.
-        \item DCEL B in $\approx$ 132s.
+        \item Work on the experimental plan
+        \item Work on new datasets (in progress)
     \end{itemize}
 \end{frame}
 
