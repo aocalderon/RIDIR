@@ -39,7 +39,10 @@ object CellManagerTest {
     val grids = quadtree.getLeafZones.asScala.map{ leaf =>
       leaf.partitionId.toInt -> leaf
     }.toMap
-    getNextCellWithEdges2(M: Map[Int, Int], quadtree: StandardQuadTree[LineString], grids: Map[Int, QuadRectangle])
+
+    cleanQuadtree(quadtree, M)
+
+    //getNextCellWithEdges2(M: Map[Int, Int], quadtree: StandardQuadTree[LineString], grids: Map[Int, QuadRectangle])
 
   }
 }

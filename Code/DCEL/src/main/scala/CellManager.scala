@@ -166,6 +166,52 @@ object CellManager{
     f.write(content.mkString(""))
     f.close
   }
+  def mergeCells(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
+    lineage: String): edu.ucr.dblab.StandardQuadTree[LineString] = {
+
+    val quadIds = lineage.map(_.toInt - 48)
+    val levels = quadIds.length
+    var current = quadtree
+    for(quadId <- quadIds.slice(0, levels - 1)){
+      val children = current.getRegions
+      current = children(quadId)
+    }
+    current.setRegions(null)
+    val new_lineage = quadIds.slice(0, levels - 1).mkString("")
+    current.setLineage(new_lineage)
+
+    quadtree
+  }
+  def cleanQuadtree(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
+    M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[LineString] = {
+
+    val X = M.filter(_._2 == 0).map(_._1).toSet
+    val emptyCells = quadtree.getLeafZones.asScala
+      .filter(leaf => X.contains(leaf.partitionId))
+
+    emptyCells
+      .map{ cell =>
+        val parent_lineage = cell.lineage.reverse.tail.reverse
+        (parent_lineage, cell)
+      }
+      .groupBy(_._1)
+      .map{ case(parent, cells) =>
+        val children = cells.map(_._2).toList
+
+        (parent, children.length, children)
+      }
+      .filter(_._2 == 4)
+      .map(x => s"${x._1}\t${x._3.map(_.partitionId).mkString(" ")}")
+      .foreach{println}
+
+    save2("/tmp/edgesECells.wkt",
+      emptyCells.map{leaf =>
+        s"${envelope2Polygon(leaf.getEnvelope)}\t${leaf.partitionId}\t${leaf.lineage}\n"
+      }
+    )
+    quadtree
+  }
+
   def getNextCellWithEdges2(M: Map[Int, Int], quadtree: edu.ucr.dblab.StandardQuadTree[LineString], grids: Map[Int, edu.ucr.dblab.QuadRectangle]): List[(Int, Int, Point)] = {
     val cells = grids.map{ grid =>
       val id = grid._2.partitionId.toInt
