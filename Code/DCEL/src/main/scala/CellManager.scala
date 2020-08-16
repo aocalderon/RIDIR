@@ -7,6 +7,7 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
 import DCELMerger.{timer, geofactory, precision, logger}
 import DCELBuilder.save
+import scala.annotation.tailrec
 
 case class Cell(id: Int, lineage: String, envelope: Envelope, ids: List[Int] = List.empty[Int])
 
@@ -160,36 +161,10 @@ object CellManager{
 
   ///////////
   import scala.collection.mutable.HashSet
-  import java.io.PrintWriter
-  def save2(filename: String, content: Seq[String]): Unit = {
-    val f = new PrintWriter(filename)
-    f.write(content.mkString(""))
-    f.close
-  }
-  def mergeCells(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
-    lineage: String): edu.ucr.dblab.StandardQuadTree[LineString] = {
 
-    val quadIds = lineage.map(_.toInt - 48)
-    val levels = quadIds.length
-    var current = quadtree
-    for(quadId <- quadIds.slice(0, levels - 1)){
-      val children = current.getRegions
-      current = children(quadId)
-    }
-    current.setRegions(null)
-    val new_lineage = quadIds.slice(0, levels - 1).mkString("")
-    current.setLineage(new_lineage)
-
-    quadtree
-  }
-  def cleanQuadtree(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
-    M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[LineString] = {
-
-    val X = M.filter(_._2 == 0).map(_._1).toSet
-    val emptyCells = quadtree.getLeafZones.asScala
-      .filter(leaf => X.contains(leaf.partitionId))
-
-    emptyCells
+  def groupByLineage(emptyCells: Vector[edu.ucr.dblab.QuadRectangle]):
+      (Vector[edu.ucr.dblab.QuadRectangle], Vector[edu.ucr.dblab.QuadRectangle])= {
+    val E = emptyCells
       .map{ cell =>
         val parent_lineage = cell.lineage.reverse.tail.reverse
         (parent_lineage, cell)
@@ -200,16 +175,75 @@ object CellManager{
 
         (parent, children.length, children)
       }
-      .filter(_._2 == 4)
-      .map(x => s"${x._1}\t${x._3.map(_.partitionId).mkString(" ")}")
-      .foreach{println}
 
-    save2("/tmp/edgesECells.wkt",
-      emptyCells.map{leaf =>
-        s"${envelope2Polygon(leaf.getEnvelope)}\t${leaf.partitionId}\t${leaf.lineage}\n"
+    val K = E.filter(_._2 != 4)
+      .flatMap(_._3)
+      .toVector
+
+    val M = E.filter(_._2 == 4)
+      .toVector
+      .map{ children =>
+        val lineage = children._1
+        val envelope = children._3.map(_.getEnvelope)
+          .reduce{ (a, b) =>
+            a.expandToInclude(b)
+            a
+          }
+        val rectangle = new edu.ucr.dblab.QuadRectangle(envelope)
+        rectangle.lineage = lineage
+        rectangle
       }
-    )
-    quadtree
+
+    (M, K)
+  }
+
+  @tailrec
+  def mergeEmptyCells(empties: Map[Int, Vector[edu.ucr.dblab.QuadRectangle]],
+    levels: List[Int],
+    previous: Vector[edu.ucr.dblab.QuadRectangle],
+    accum: Vector[edu.ucr.dblab.QuadRectangle]): Vector[edu.ucr.dblab.QuadRectangle] = {
+
+    levels match {
+      case Nil => accum
+      case level :: tail => {
+        val current = empties(level)
+        val E = current ++ previous
+        val X = groupByLineage(E)
+        val M = X._1
+        val K = X._2
+
+        mergeEmptyCells(empties, levels.tail, M, K ++ accum)
+      }      
+    }
+  }
+
+  def cleanQuadtree(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
+    M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[LineString] = {
+
+    val X = M.filter(_._2 == 0).map(_._1).toSet
+    val emptyCells = quadtree.getLeafZones.asScala
+      .filter(leaf => X.contains(leaf.partitionId))
+
+    val empties = emptyCells.map(cell => (cell.lineage.length(), cell))
+      .groupBy(_._1)
+      .map(g => g._1 -> g._2.map(_._2).toVector)
+      .withDefaultValue(Vector.empty[edu.ucr.dblab.QuadRectangle])
+
+    val levels = (1 to empties.keys.max).toList.reverse
+    
+    val previous = Vector.empty[edu.ucr.dblab.QuadRectangle]
+    val accum = Vector.empty[edu.ucr.dblab.QuadRectangle]
+
+    val emptyCells_prime = mergeEmptyCells(empties, levels, previous, accum)
+
+    val Y = M.filter(_._2 == 1).map(_._1).toSet
+    val nonemptyCells = quadtree.getLeafZones.asScala
+      .filter(leaf => Y.contains(leaf.partitionId))
+
+    val boundary = quadtree.getZone().getEnvelope()
+    val lineages = (nonemptyCells ++ emptyCells_prime).map(_.lineage).toList
+
+    Quadtree.create[LineString](boundary, lineages) 
   }
 
   def getNextCellWithEdges2(M: Map[Int, Int], quadtree: edu.ucr.dblab.StandardQuadTree[LineString], grids: Map[Int, edu.ucr.dblab.QuadRectangle]): List[(Int, Int, Point)] = {
@@ -222,15 +256,12 @@ object CellManager{
 
     //
     println(s"M: ${M.size}...")
-    save2("/tmp/M.tsv", M.toList.map(z => s"${z._1}\t${z._2}\n"))
 
     //val Z = M.filter{ case(index, size) => size == 0 }.map(_._1).toVector.sorted
     val X = M.filter(_._2 == 0).map(_._1).toVector.sorted
     val Y = M.filter(_._2 == 1).map(_._1).toSet
 
     //    
-    save2("/tmp/X.tsv", X.map(z => s"$z\n"))
-    save2("/tmp/Y.tsv", Y.toList.sorted.map(z => s"$z\n"))
     println(s"X: ${Y.size}...")
 
     var i = 0
@@ -296,25 +327,6 @@ object CellManager{
             println(s"New Cell: $new_cell")
             cellList.remove(cellList.size - 4, 4)
             cellList += new_cell
-
-            /*
-            val quads = cellList.takeRight(4).sortBy(_.lineage)
-            val parent_pos = quads.head.lineage.takeRight(2).head
-            println(s"Parent position: $parent_pos")
-            val new_c_pos = parent_pos match {
-              case '0' => '3'
-              case '1' => '2'
-              case '2' => '1'
-              case '3' => '0'
-              case _ => ' '
-            }
-            println(s"New C position: $new_c_pos")
-            cellList.remove(cellList.size - 4, 4)
-            cellList = cellList ++ quads.filter(_.lineage.last != new_c_pos)
-            val c_prime = quads.filter(_.lineage.last == new_c_pos).head
-            val l_prime = c_prime.lineage
-            cellList += c_prime.copy(lineage = l_prime.substring(0, l_prime.size - 1))
-             */
           }
         }
         for(cell <- cellList){

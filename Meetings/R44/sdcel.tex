@@ -94,31 +94,26 @@
   \end{frame}
 }
 
-\begin{frame}{Level 1}
-  \centering
-    \includegraphics[width=\textwidth]{figures/level1}
-\end{frame}
-\begin{frame}{Level 2}
-  \centering
-    \includegraphics[width=\textwidth]{figures/level2}
-\end{frame}
-
-\begin{frame}{Common grid}{with empty cells}
-  \centering
-    \includegraphics[width=\textwidth]{figures/common}
-\end{frame}
-\begin{frame}{Common grid}{after merging empty cells}
-  \centering
-    \includegraphics[width=\textwidth]{figures/solution}
+\begin{frame}{gadm dataset}
+    \begin{itemize}
+        \item Level 1 (States) and level 2 (Counties) globally.
+        \item 110K and 170K polygons.
+        \item 1.0G and 1.2G.
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Validation}
+\begin{frame}{Cells}
   \centering
-    \includegraphics[width=\textwidth]{figures/gridDemo}
+    \includegraphics[width=\textwidth]{figures/gadm_grid}
 \end{frame}
-\begin{frame}{Validation}
-  \centering
-    \includegraphics[width=\textwidth]{figures/resultDemo}
+
+\begin{frame}{DCEL construction}
+    \begin{itemize}
+        \item Partitioning (12583 cells) in $\approx$121s. 
+        \item 37.6M (level 1) and 54M (level 2) edges processed.
+        \item DCEL A in $\approx$ 123s.
+        \item DCEL B in $\approx$ 132s.
+    \end{itemize}
 \end{frame}
 
 \end{document}
