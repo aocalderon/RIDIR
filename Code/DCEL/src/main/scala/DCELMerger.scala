@@ -549,6 +549,7 @@ object DCELMerger{
         }
         .cache()
       dcelARDD.count()
+      
       val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree, cells, "B")
         .mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
