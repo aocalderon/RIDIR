@@ -13,6 +13,7 @@ object CellManagerTest {
     val f = new PrintWriter(filename)
     f.write(content.mkString(""))
     f.close
+    println(s"${filename} saved [${content.size} records].")
   }
 
   def main(args: Array[String]): Unit = {
@@ -45,21 +46,24 @@ object CellManagerTest {
 
     val clean = cleanQuadtree(quadtree, M)
 
-    val f = new PrintWriter(params.output())
+    val ecells = getNextCellWithEdges2(M, clean)
+
+
     val cleanWKT = clean.getLeafZones.asScala.map{ leaf =>
       s"${envelope2Polygon(leaf.getEnvelope())}\t${leaf.partitionId}\n"
     }
-    f.write(cleanWKT.mkString(""))
-    f.close
-    println(s"${params.output()} saved [${cleanWKT.length} records].")
+    save2("/tmp/edgesOutput.wkt", cleanWKT)
 
-    val i = new PrintWriter("/tmp/edgesInput.wkt")
-    val quadtreeWKT = quadtree.getLeafZones.asScala.map{ leaf =>
-      s"${envelope2Polygon(leaf.getEnvelope())}\t${leaf.partitionId}\n"
+    val quadtreeWKT = for{
+      q <- quadtree.getLeafZones.asScala.map{ leaf =>
+        (leaf.partitionId.toInt, envelope2Polygon(leaf.getEnvelope()), leaf.lineage)
+      }.toList
+      m <- M.toList if(m._1 == q._1)
+        } yield {
+      s"${q._2}\t${q._1}\t${q._3}\t${m._2}\n"
     }
-    i.write(quadtreeWKT.mkString(""))
-    i.close
-    println(s"/tmp/edgesInput.wkt saved [${quadtreeWKT.length} records].")
+    save2("/tmp/edgesInput.wkt", quadtreeWKT)
+
   }
 }
 
@@ -67,7 +71,6 @@ class CMTConf(args: Seq[String]) extends ScallopConf(args) {
   val input: ScallopOption[String] = opt[String] (required = true)
   val boundary: ScallopOption[String] = opt[String] (required = true)
   val map: ScallopOption[String] = opt[String] (required = true)
-  val output: ScallopOption[String] = opt[String](default = Some("/tmp/edgesOutput.wkt"))
 
   verify()
 }

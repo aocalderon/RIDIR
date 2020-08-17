@@ -3,7 +3,7 @@
 PARTITIONS=1080
 EXECUTORS=12
 CORES=9
-DMEMORY=12g
+DMEMORY=30g
 EMEMORY=30g
 DEBUG=""
 SAVE=""
@@ -11,6 +11,7 @@ SPARK_JARS=$HOME/Spark/2.4/jars/
 CLASS_JAR=$HOME/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 MASTER=yarn
+PARALLELISM=$((CORES * EXECUTORS * 10))
 
 INPUT1=/user/acald013/gadm/level1
 OFFSET1=0
@@ -50,13 +51,14 @@ done
 #    --conf spark.locality.wait.node=0s \
 #    --conf spark.locality.wait.rack=0s \
 spark-submit \
-    --conf spark.default.parallelism=${PARTITIONS} \
-    --files $LOG_FILE \
-    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
-    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
-    --master $MASTER --deploy-mode client \
-    --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
-    --class DCELMerger $CLASS_JAR \
-    --input1 $INPUT1 --offset1 $OFFSET1 --input2 $INPUT2 --offset2 $OFFSET2 \
-    --partitions $PARTITIONS $DEBUG 
+     --files $LOG_FILE \
+     --conf spark.default.parallelism=${PARALLELISM} \
+     --conf spark.driver.maxResultSize=2g \
+     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+     --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
+     --master $MASTER --deploy-mode client \
+     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
+     --class DCELMerger $CLASS_JAR \
+     --input1 $INPUT1 --offset1 $OFFSET1 --input2 $INPUT2 --offset2 $OFFSET2 \
+     --partitions $PARTITIONS $DEBUG 
 

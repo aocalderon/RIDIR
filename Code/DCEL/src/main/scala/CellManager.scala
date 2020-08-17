@@ -217,8 +217,8 @@ object CellManager{
     }
   }
 
-  def cleanQuadtree(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
-    M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[LineString] = {
+  def cleanQuadtree[T](quadtree: edu.ucr.dblab.StandardQuadTree[T],
+    M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[T] = {
 
     val X = M.filter(_._2 == 0).map(_._1).toSet
     val emptyCells = quadtree.getLeafZones.asScala
@@ -243,29 +243,27 @@ object CellManager{
     val boundary = quadtree.getZone().getEnvelope()
     val lineages = (nonemptyCells ++ emptyCells_prime).map(_.lineage).toList
 
-    Quadtree.create[LineString](boundary, lineages) 
+    Quadtree.create[T](boundary, lineages) 
   }
 
-  def getNextCellWithEdges2(M: Map[Int, Int], quadtree: edu.ucr.dblab.StandardQuadTree[LineString], grids: Map[Int, edu.ucr.dblab.QuadRectangle]): List[(Int, Int, Point)] = {
-    val cells = grids.map{ grid =>
-      val id = grid._2.partitionId.toInt
-      grid._1 -> Cell(id, grid._2.lineage, grid._2.getEnvelope, List(id))
+  def getNextCellWithEdges2(M: Map[Int, Int], quadtree: edu.ucr.dblab.StandardQuadTree[LineString]): List[(Int, Int, Point)] = {
+    val cells = quadtree.getLeafZones.asScala.map{ cell =>
+      val id = cell.partitionId.toInt
+      id -> Cell(id, cell.lineage, cell.getEnvelope, List(id))
     }.toMap
     var result = new ListBuffer[(Int, Int, Point)]()
     var R = new HashSet[Int]()
 
+    val X = M.filter(_._2 == 1).map(_._1).toVector.sorted
+    //val Y = M.filter(_._2 == 0).map(_._1).toSet
+
     //
-    println(s"M: ${M.size}...")
+    logger.info(s"M: ${M.size}")
+    logger.info(s"X: ${X.size}")
+    //
 
-    //val Z = M.filter{ case(index, size) => size == 0 }.map(_._1).toVector.sorted
-    val X = M.filter(_._2 == 0).map(_._1).toVector.sorted
-    val Y = M.filter(_._2 == 1).map(_._1).toSet
-
-    //    
-    println(s"X: ${Y.size}...")
-
-    var i = 0
-    var n = 30
+    //val n = Int.MaxValue
+    val n = 1583
     X.map{ index =>
       if(R.contains(index)){
       } else {
@@ -275,31 +273,31 @@ object CellManager{
         cellList += cells(index)
         var done = false
         while(!done){
-          if(i < n)
-            i = i + 1
-          else
-            System.exit(0)
 
           cellList = cellList.distinct
           val c = cellList.last
 
           //
           println(cellList.map(_.id).mkString(" "))
+          //
 
           val (ncells, corner) = getCellsAtCorner2(quadtree, c)
 
           //
-          println(s"$i ${c.id} => IDs: ${ncells.map(_.id).mkString(" ")} Corner: ${corner.toText()}")
+          println(s"${c.id} => IDs: ${ncells.map(_.id).mkString(" ")} Corner: ${corner.toText()}")
+          //
 
           val ncells_prime = ncells.map(c => (c, M(c.id))).filter(_._2 != 0)
 
           //
           ncells_prime.foreach(println)
+          //
 
           val hasEdges = if(ncells_prime.size == 0) None else Some(ncells_prime.head._1)
 
           //
           println(hasEdges)
+          //
 
           done = hasEdges match {
             case Some(cell) => {
@@ -313,21 +311,13 @@ object CellManager{
           if(!done){
             cellList ++= ncells
           }
-          if(!done && cellList.takeRight(4).map(_.lineage.size).distinct.size == 1){
-            //
-            val quads2 = cellList.takeRight(4)
-            val new_envelope = quads2.map(_.envelope).reduce{ (a, b) =>
-              a.expandToInclude(b)
-              a
-            }
-            val lineage = quads2.head.lineage
-            val new_lineage = lineage.slice(0, lineage.size - 1)
-            val new_ids = quads2.flatMap(_.ids).toList.sorted
-            val new_cell = Cell(new_ids.head, new_lineage, new_envelope, new_ids)
-            println(s"New Cell: $new_cell")
-            cellList.remove(cellList.size - 4, 4)
-            cellList += new_cell
-          }
+
+          //
+          logger.info(s"$index")
+          if(index >= n)
+            System.exit(0)
+          //
+          
         }
         for(cell <- cellList){
           R = R ++ cell.ids
@@ -357,6 +347,90 @@ object CellManager{
         Cell(id, q.lineage, q.getEnvelope, List(id))
       }.sortBy(_.lineage.size).toList
     (cells, corner)
+  }
+  def updateCellsWithoutId2(dcelRDD: RDD[LDCEL],
+    previous_quadtree: StandardQuadTree[LineString],
+    label: String = "A",
+    debug: Boolean = false): RDD[LDCEL] = {
+
+    val leafs = previous_quadtree.getLeafZones.asScala.toList
+    val grids = leafs.map(leaf => leaf.partitionId.toInt -> leaf).toMap
+    val lineages = leafs.map(_.lineage).sorted
+    val boundary = previous_quadtree.getZone.getEnvelope
+    val quad = Quadtree.create[LineString](boundary, lineages)
+    val M = getEmptyCells(dcelRDD, grids)
+    val quadtree = cleanQuadtree(quad, M)
+
+    if(debug){
+      save{s"/tmp/M${label}.tsv"}{
+        M.map(m => s"${m._1}\t${m._2}\n").toSeq
+      }
+      save{s"/tmp/quadtree.tsv"}{
+        previous_quadtree.getLeafZones.asScala.map{ leaf =>
+          s"${leaf.lineage}\t${leaf.partitionId}\n"
+        }.toList.sorted
+      }
+      save{s"/tmp/boundary.tsv"}{
+        val boundary = envelope2Polygon(quadtree.getZone.getEnvelope).toText
+        List(s"$boundary\n")
+      }
+    }
+
+    logger.info("getNextCellWithEdges...")
+    val ecells = getNextCellWithEdges2(M, quadtree)
+    logger.info("getNextCellWithEdges... Done!")
+
+    val fcells = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
+      val dcel = iter.next()
+      val r = if(ecells.map(_._2).contains(index)){
+        val ecs = ecells.filter(_._2 == index).map{ e =>
+          val id = e._1
+          val corner = e._3.getEnvelopeInternal
+          corner.expandBy(precision)
+          (id, envelope2Polygon(corner))
+        }
+        val fcs = dcel.faces.map{ f =>
+          val id = f.id
+          val face = f.getGeometry._1
+          (id, face)
+        }
+        
+        for{
+          ecell <- ecs
+          // Query which face it intersects...
+          fcell <- fcs if fcell._2.intersects(ecell._2)
+        } yield {
+          (ecell._1, fcell._1)
+        }
+      } else {
+        Vector.empty[(Int, String)]
+      }
+      r.toIterator
+    }.collect().filter(_._2.substring(0, 1) != "F")
+
+    val dcelRDD_prime = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
+      val dcel = iter.next()
+      if(fcells.map(_._1).contains(index)){
+        val cell = fcells.filter(_._1 == index)
+        val id = cell.head._2
+        
+        dcel.faces.filter(_.isCellFace).map{ f =>
+          f.id = id
+          f.getHedges.foreach(_.id = id)
+          f
+        }
+        val d = LDCEL(index, dcel.vertices, dcel.half_edges, dcel.faces, dcel.index)
+
+        Iterator(d)
+      } else {
+        // prune empty faces...
+        val faces = dcel.faces.filter(_.id.substring(0, 1) != "F")
+        val d = LDCEL(index, dcel.vertices, dcel.half_edges, faces, dcel.index)
+        Iterator(d)
+      }
+    }
+
+    dcelRDD_prime
   }
   ////////////////
 
