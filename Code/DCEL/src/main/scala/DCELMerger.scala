@@ -527,9 +527,13 @@ object DCELMerger{
 
     // Calling methods in CellManager.scala
     val (dcelARDD, dcelBRDD) = timer{"Updating empty cells"}{
+
+      ////
       logger.info("Starting CellManager...")
-      val dcelARDD0 = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree, cells, "A")
+      val dcelARDD0 = updateCellsWithoutId2(dcelsRDD.map{_._1}, quadtree,
+        label = "A", debug = true)
       logger.info("Starting CellManager... Done!")
+      ////
 
       val dcelARDD = dcelARDD0
         .mapPartitionsWithIndex{ case(index, iter) =>
@@ -549,9 +553,15 @@ object DCELMerger{
         }
         .cache()
       dcelARDD.count()
-      
-      val dcelBRDD = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree, cells, "B")
-        .mapPartitionsWithIndex{ case(index, iter) =>
+
+      ////
+      logger.info("Starting CellManager...")
+      val dcelBRDD0 = updateCellsWithoutId2(dcelsRDD.map{_._2}, quadtree,
+        label = "B", debug = true)
+      logger.info("Starting CellManager... Done!")
+      ////
+
+      val dcelBRDD = dcelBRDD0.mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
           val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
             .map{ case (id, f) =>
