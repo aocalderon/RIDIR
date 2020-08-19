@@ -1,3 +1,4 @@
+import scala.collection.immutable.HashMap
 import scala.collection.JavaConverters._
 import com.vividsolutions.jts.geom.{Envelope, Coordinate, LineString}
 import com.vividsolutions.jts.geom.GeometryFactory
@@ -6,7 +7,8 @@ import org.rogach.scallop._
 import scala.io.Source
 import java.io.PrintWriter
 import edu.ucr.dblab.{StandardQuadTree, QuadRectangle}
-import CellManager._
+import DCELMerger.envelope2polygon
+import CellManager2._
 
 object CellManagerTest {
   def save2(filename: String, content: Seq[String]): Unit = {
@@ -27,50 +29,69 @@ object CellManagerTest {
     boundaryBuffer.close
     val boundary = reader.read(boundaryWKT).getEnvelopeInternal
 
-    // Reading lineages file...
-    val lineagesBuffer = Source.fromFile(params.input())
+    // Reading quadtree file...
+    val lineagesBuffer = Source.fromFile(params.quadtree())
     val lineages = lineagesBuffer.getLines.map{ line =>
         val arr = line.split("\t")
         arr(0)
       }.toList
     lineagesBuffer.close
 
-    // Reading map file...
-    val MBuffer = Source.fromFile(params.map())
-    val M = MBuffer.getLines.map{ line =>
-      val arr = line.split("\t")
-      (arr(0).toInt -> arr(1).toInt)
-    }.toMap
-
     val quadtree = Quadtree.create[LineString](boundary, lineages)
 
-    val clean = cleanQuadtree(quadtree, M)
+    // Reading empty cells file...
+    val EBuffer = Source.fromFile(params.empties())
+    val E = EBuffer.getLines.map{ line =>
+      val arr = line.split("\t")
+      arr(0)
+    }.toSet
 
-    val ecells = getNextCellWithEdges2(M, clean)
+    // Getting the empty and non-empty cell sets...
+    val X = quadtree.getLeafZones.asScala.map{ leaf =>
+      val cell = Cell(leaf.partitionId.toInt, leaf.lineage, leaf.getEnvelope)
+      cell.lineage -> cell
+    }.toList.partition{ cell => E.contains(cell._1)}
 
+    val empties = HashMap(X._1:_*)
+    val nonempties = HashMap(X._2:_*)
 
-    val cleanWKT = clean.getLeafZones.asScala.map{ leaf =>
-      s"${envelope2Polygon(leaf.getEnvelope())}\t${leaf.partitionId}\n"
-    }
-    save2("/tmp/edgesOutput.wkt", cleanWKT)
+    // Cleaning the quadtree...
+    val (quadtree_prime, empties_prime) = cleanQuadtreeTester(quadtree, empties, nonempties)
 
-    val quadtreeWKT = for{
-      q <- quadtree.getLeafZones.asScala.map{ leaf =>
-        (leaf.partitionId.toInt, envelope2Polygon(leaf.getEnvelope()), leaf.lineage)
-      }.toList
-      m <- M.toList if(m._1 == q._1)
-        } yield {
-      s"${q._2}\t${q._1}\t${q._3}\t${m._2}\n"
-    }
+    // Printing data...
+    val empties_primeTSV = empties_prime.values.map(e => e.lineage + "\n").toList
+    save2("/tmp/empties_prime.tsv", empties_primeTSV)
+
+    val quadtree_primeWKT = quadtree_prime.getLeafZones.asScala.map{ leaf =>
+      Cell(leaf.partitionId.toInt, leaf.lineage, leaf.getEnvelope)
+    }.map{ cell =>
+      val E = empties_prime.values.map(_.lineage).toSet
+      val isEmpty = E.contains(cell.lineage)
+      s"${envelope2polygon(cell.boundary)}\t${cell.id}\t${cell.lineage}\t${isEmpty}\n"
+    }    
+    save2("/tmp/edgesOutput.wkt", quadtree_primeWKT)
+
+    val quadtreeWKT = quadtree.getLeafZones.asScala.map{ leaf =>
+      Cell(leaf.partitionId.toInt, leaf.lineage, leaf.getEnvelope)
+    }.map{ cell =>
+      val isEmpty = E.contains(cell.lineage)
+      s"${envelope2polygon(cell.boundary)}\t${cell.id}\t${cell.lineage}\t${isEmpty}\n"
+    }    
     save2("/tmp/edgesInput.wkt", quadtreeWKT)
+
+    val closestCells = getClosestCell(quadtree_prime, empties_prime, debug = true)
+
+    closestCells.foreach{println}
+
+    updateCellsWithoutIdTest(dcelRDD, original_quadtree)
 
   }
 }
 
 class CMTConf(args: Seq[String]) extends ScallopConf(args) {
-  val input: ScallopOption[String] = opt[String] (required = true)
+  val quadtree: ScallopOption[String] = opt[String] (required = true)
   val boundary: ScallopOption[String] = opt[String] (required = true)
-  val map: ScallopOption[String] = opt[String] (required = true)
+  val empties:  ScallopOption[String] = opt[String] (required = true)
 
   verify()
 }

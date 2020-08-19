@@ -20,7 +20,7 @@ import ch.cern.sparkmeasure.TaskMetrics
 import org.rogach.scallop._
 import org.slf4j.{Logger, LoggerFactory}
 import DCELBuilder._
-import CellManager._
+import CellManager2._
 import SingleLabelChecker._
 
 object DCELMerger{
@@ -31,6 +31,8 @@ object DCELMerger{
 
   case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf,
     startTime: Long, appId: String, cores: Int, executors: Int)
+
+  def clocktime = System.currentTimeMillis()
 
   def timer[A](msg: String)(code: => A)(implicit settings: Settings): A = {
     val start = clocktime
@@ -58,6 +60,28 @@ object DCELMerger{
 
   def log(msg: String)(implicit settings: Settings): Unit = {
     logger.info(f"DEBUG|${settings.appId}|$msg")
+  }
+
+  def save(filename: String)(content: Seq[String]): Unit = {
+    val start = clocktime
+    val f = new java.io.PrintWriter(filename)
+    f.write(content.mkString(""))
+    f.close
+    val end = clocktime
+    val time = "%.2f".format((end - start) / 1000.0)
+    logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
+  }
+
+  def envelope2polygon(e: Envelope): Polygon = {
+    val minX = e.getMinX()
+    val minY = e.getMinY()
+    val maxX = e.getMaxX()
+    val maxY = e.getMaxY()
+    val p1 = new Coordinate(minX, minY)
+    val p2 = new Coordinate(maxX, minY)
+    val p3 = new Coordinate(maxX, maxY)
+    val p4 = new Coordinate(minX, maxY)
+    geofactory.createPolygon(Array(p1,p2,p3,p4,p1))
   }
 
   def readPolygonsA(implicit settings: Settings): (RDD[Polygon], Long) = {
@@ -224,7 +248,7 @@ object DCELMerger{
     }
     val grids = spark.sparkContext
       .broadcast{
-        cells.toSeq.sortBy(_._1).map{ case (i,q) => envelope2Polygon(q.getEnvelope)}
+        cells.toSeq.sortBy(_._1).map{ case (i,q) => envelope2polygon(q.getEnvelope)}
       }
   
     log(f"Total number of partitions|${cells.size}")
@@ -235,7 +259,7 @@ object DCELMerger{
     }
     save{"/tmp/envelope.tsv"}{
       val boundary = edgesRDD.boundary()
-      val wkt = envelope2Polygon(boundary).toText()
+      val wkt = envelope2polygon(boundary).toText()
       Array(wkt)
     }
     save{"/tmp/quadtree.tsv"}{
@@ -385,7 +409,7 @@ object DCELMerger{
     }
 
     def preprocess(vertices: Vector[Vertex], index: Int): Vector[(Face, Vector[Half_edge])] = {
-      val cell = envelope2Polygon(cells(index).getEnvelope)
+      val cell = envelope2polygon(cells(index).getEnvelope)
       getHedgesList(vertices).zipWithIndex.map{ case(hedges, i) =>
         val id = parseIds(hedges.map(_.id), i)
         
@@ -468,7 +492,7 @@ object DCELMerger{
           val edges = edgesIt.toVector
           val gA = edges.filter(isA).map(edge2graphedge).toList
           val gB = edges.filter(isB).map(edge2graphedge).toList
-          val cell = envelope2Polygon(cells(index).getEnvelope)
+          val cell = envelope2polygon(cells(index).getEnvelope)
           val gCellA = cell2gedges(cell)
           val gCellB = cell2gedges(cell)
 
@@ -530,7 +554,7 @@ object DCELMerger{
 
       ////
       logger.info("Starting CellManager...")
-      val dcelARDD0 = updateCellsWithoutId2(dcelsRDD.map{_._1}, quadtree,
+      val dcelARDD0 = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree,
         label = "A", debug = true)
       logger.info("Starting CellManager... Done!")
       ////
@@ -556,7 +580,7 @@ object DCELMerger{
 
       ////
       logger.info("Starting CellManager...")
-      val dcelBRDD0 = updateCellsWithoutId2(dcelsRDD.map{_._2}, quadtree,
+      val dcelBRDD0 = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree,
         label = "B", debug = true)
       logger.info("Starting CellManager... Done!")
       ////

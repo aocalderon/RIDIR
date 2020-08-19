@@ -14,7 +14,7 @@ import org.datasyslab.geospark.spatialPartitioning.quadtree.{QuadTreePartitioner
 import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
 import org.rogach.scallop._
 import org.slf4j.{Logger, LoggerFactory}
-import DCELBuilder.save
+import DCELMerger.save
 import CellManager.envelope2Polygon
 
 case class Settings(params: SplitterConf, spark: SparkSession)
