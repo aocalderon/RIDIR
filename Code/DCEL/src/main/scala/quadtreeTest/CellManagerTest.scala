@@ -83,8 +83,6 @@ object CellManagerTest {
 
     closestCells.foreach{println}
 
-    updateCellsWithoutIdTest(dcelRDD, original_quadtree)
-
   }
 }
 
