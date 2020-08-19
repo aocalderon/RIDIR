@@ -19,6 +19,7 @@ import org.geotools.geometry.jts.GeometryClipper
 import scala.collection.JavaConverters._
 
 import DCELMerger.geofactory
+import DCELMerger.{save, envelope2polygon}
 import CellManager.envelope2Polygon
 
 object DCELBuilder {
@@ -53,16 +54,6 @@ object DCELBuilder {
     if(settings.params.debug()){
       code
     }
-  }
-
-  def save(filename: String)(content: Seq[String]): Unit = {
-    val start = clocktime
-    val f = new java.io.PrintWriter(filename)
-    f.write(content.mkString(""))
-    f.close
-    val end = clocktime
-    val time = "%.2f".format((end - start) / 1000.0)
-    logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
   }
 
   def getRings(polygon: Polygon): List[Array[Coordinate]] = {

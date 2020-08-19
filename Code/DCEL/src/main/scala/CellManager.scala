@@ -5,13 +5,13 @@ import com.vividsolutions.jts.geom.{Envelope, Coordinate, Point, LineString, Pol
 import com.vividsolutions.jts.io.WKTReader
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
-import DCELMerger.{timer, geofactory, precision, logger}
-import DCELBuilder.save
+import DCELMerger.{geofactory, precision, logger}
+import DCELMerger.{timer, save}
 import scala.annotation.tailrec
 
-case class Cell(id: Int, lineage: String, envelope: Envelope, ids: List[Int] = List.empty[Int])
 
 object CellManager{
+  case class Cell(id: Int, lineage: String, envelope: Envelope, ids: List[Int] = List.empty[Int])
 
   def envelope2Polygon(e: Envelope): Polygon = {
     val minX = e.getMinX()
@@ -219,7 +219,7 @@ object CellManager{
 
   def cleanQuadtree[T](quadtree: edu.ucr.dblab.StandardQuadTree[T],
     M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[T] = {
-
+    
     val X = M.filter(_._2 == 0).map(_._1).toSet
     val emptyCells = quadtree.getLeafZones.asScala
       .filter(leaf => X.contains(leaf.partitionId))
