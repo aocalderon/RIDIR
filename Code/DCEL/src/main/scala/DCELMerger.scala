@@ -254,24 +254,27 @@ object DCELMerger{
     log(f"Total number of partitions|${cells.size}")
     log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
     log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
-    save{"/tmp/edgesCells.wkt"}{
-      grids.value.zipWithIndex.map{ case(g, i) => s"${g.toText()}\t$i\n" }
-    }
-    save{"/tmp/envelope.tsv"}{
-      val boundary = edgesRDD.boundary()
-      val wkt = envelope2polygon(boundary).toText()
-      Array(wkt)
-    }
-    save{"/tmp/quadtree.tsv"}{
-      val rectangles = quadtree.getLeafZones.asScala
-        .map(leaf => leaf.partitionId -> leaf)
-        .toMap
-      edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, it) =>
-        val id = rectangles(index).lineage
-        val n = it.size
-        val tuple = (id, n)
-        Iterator(s"${id}\t${n}\n")
-      }.collect()
+
+    debug{
+      save{"/tmp/edgesCells.wkt"}{
+        grids.value.zipWithIndex.map{ case(g, i) => s"${g.toText()}\t$i\n" }
+      }
+      save{"/tmp/envelope.tsv"}{
+        val boundary = edgesRDD.boundary()
+        val wkt = envelope2polygon(boundary).toText()
+        Array(wkt)
+      }
+      save{"/tmp/quadtree.tsv"}{
+        val rectangles = quadtree.getLeafZones.asScala
+          .map(leaf => leaf.partitionId -> leaf)
+          .toMap
+        edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, it) =>
+          val id = rectangles(index).lineage
+          val n = it.size
+          val tuple = (id, n)
+          Iterator(s"${id}\t${n}\n")
+        }.collect()
+      }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////
@@ -555,7 +558,7 @@ object DCELMerger{
       ////
       logger.info("Starting CellManager...")
       val dcelARDD0 = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree,
-        label = "A", debug = true)
+        label = "A", debug = false)
       logger.info("Starting CellManager... Done!")
       ////
 
@@ -581,7 +584,7 @@ object DCELMerger{
       ////
       logger.info("Starting CellManager...")
       val dcelBRDD0 = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree,
-        label = "B", debug = true)
+        label = "B", debug = false)
       logger.info("Starting CellManager... Done!")
       ////
 
@@ -604,7 +607,7 @@ object DCELMerger{
       dcelBRDD.count()
       (dcelARDD, dcelBRDD)
     }
-/*
+
     debug{
       save{"/tmp/edgesHAprime.wkt"}{
         dcelARDD.flatMap{ dcel =>
@@ -669,7 +672,8 @@ object DCELMerger{
         }.collect()
       }
     }
-
+    
+/*
     // Calling methods in SingleLabelChecker...
     val dcels = timer{"Checking single-label faces"}{
       val dcels0 = dcels_prime
@@ -744,9 +748,9 @@ object DCELMerger{
       }
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
     // overlay functions
-    //////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
 
     def mergePolygons(a: String, b:String): String = {
       val reader = new WKTReader(geofactory)
@@ -815,6 +819,7 @@ object DCELMerger{
       overlapOp(dcel, differenceB, s"${output_path}OpDifferenceB.wkt")
     }
  */
+
     // Closing session...
     logger.info("Closing session...")
     debug{
