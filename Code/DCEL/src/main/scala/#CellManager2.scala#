@@ -387,7 +387,6 @@ object CellManager2{
     val dcelRDD_prime = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
       val dcel = iter.next()
       val lineage = mapIndexLineage(index)
-      //if(fcells.map(_._1).contains(lineage)){
       if(checkLinage(lineage, lineageList)){  
         val cell = fcells.filter(_._1 == lineage)
         val id = cell.head._2
