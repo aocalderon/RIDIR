@@ -1,4 +1,5 @@
 import org.apache.spark.rdd.RDD
+import DCELMerger.logger
 
 object SingleLabelChecker{
   def parseId(id: String): String = id.split("\\|").distinct.sorted.mkString("|")
@@ -19,7 +20,19 @@ object SingleLabelChecker{
         case Some(faces) => {
           for{
             B <- faces
-            A <- singleA if A.toPolygon().getInteriorPoint.coveredBy(B.toPolygon())
+            A <- singleA if {
+              try{
+                A.toPolygon().getInteriorPoint.coveredBy(B.toPolygon())
+              } catch{
+                case e: com.vividsolutions.jts.geom.TopologyException => {
+                  val wktA = A.toPolygon.toText()
+                  val wktB = B.toPolygon.toText()
+                  logger.info(s"Face A:\n $wktA \n")
+                  logger.info(s"Face B:\n $wktB \n")
+                  false
+                }
+              }
+            }
           } yield {
             A.id = parseId(A.id + "|" + B.id)
           }
@@ -38,7 +51,19 @@ object SingleLabelChecker{
         case Some(faces) => {
           for{
             A <- faces
-            B <- singleB if B.toPolygon().getInteriorPoint.coveredBy(A.toPolygon())
+            B <- singleB if {
+              try{
+                B.toPolygon().getInteriorPoint.coveredBy(A.toPolygon())
+              } catch{
+                case e: com.vividsolutions.jts.geom.TopologyException => {
+                  val wktA = A.toPolygon.toText()
+                  val wktB = B.toPolygon.toText()
+                  logger.info(s"Face A:\n $wktA \n")
+                  logger.info(s"Face B:\n $wktB \n")
+                  false
+                }
+              }
+            }
           } yield {
             B.id = parseId(A.id + "|" + B.id)
           }

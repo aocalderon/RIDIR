@@ -1,7 +1,8 @@
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import com.vividsolutions.jts.algorithm.CGAlgorithms
-import com.vividsolutions.jts.geom.{Coordinate, Envelope, Geometry, LineString, LinearRing, Point, Polygon}
+import com.vividsolutions.jts.geom.{Coordinate, Envelope, Geometry}
+import com.vividsolutions.jts.geom.{LineString, LinearRing, Point, Polygon}
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence
 import com.vividsolutions.jts.io.WKTReader
@@ -13,7 +14,7 @@ import org.apache.spark.sql.functions
 import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geospark.spatialPartitioning.quadtree.{QuadTreePartitioner, StandardQuadTree, QuadRectangle}
+import org.datasyslab.geospark.spatialPartitioning.quadtree._
 import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
 import org.geotools.geometry.jts.GeometryClipper
 import ch.cern.sparkmeasure.TaskMetrics
@@ -672,8 +673,31 @@ object DCELMerger{
         }.collect()
       }
     }
+
+    /**********************************************************************/
+    logger.info("Saving merge dcel and quadtree...")
+    val faceRDD = dcels_prime.mapPartitionsWithIndex{ case(index, iter) =>
+      val dcels = iter.next()
+      val dcel = dcels._1
+
+      dcel.faces.map{ face =>
+        val id = face.id
+        val wkt = face.getGeometry._1.toText
+
+        s"$wkt\t$id\t$index"
+      }.toIterator
+    }
+    faceRDD.toDF().write
+      .mode(org.apache.spark.sql.SaveMode.Overwrite)
+      .text("tmp/faces")
+
+    save{"/tmp/quadtree.lin"}{
+      quadtree.getLeafZones.asScala.map(_.lineage + "\n")
+    }
+    logger.info("Saving merge dcel and quadtree... Done!")
+    /**********************************************************************/
+
     
-/*
     // Calling methods in SingleLabelChecker...
     val dcels = timer{"Checking single-label faces"}{
       val dcels0 = dcels_prime
@@ -689,9 +713,19 @@ object DCELMerger{
             for{
               outer <- outers
               inner <- inners if {
-                val a = outer.toPolygon()
-                val b = inner.toPolygon()
-                a.covers(b) && !a.equals(b)
+                try{
+                  val a = outer.toPolygon()
+                  val b = inner.toPolygon()
+                  a.covers(b) && !a.equals(b)
+                } catch{
+                  case e: com.vividsolutions.jts.geom.TopologyException => {
+                    val wktA = outer.toPolygon.toText()
+                    val wktB = inner.toPolygon.toText()
+                    logger.info(s"Outers:\n $wktA \n")
+                    logger.info(s"Inners:\n $wktB \n")
+                    false
+                  }
+                }
               }
             } yield {
               inner.id = outer.id
@@ -818,7 +852,7 @@ object DCELMerger{
     timer{"Diff B"}{
       overlapOp(dcel, differenceB, s"${output_path}OpDifferenceB.wkt")
     }
- */
+    
 
     // Closing session...
     logger.info("Closing session...")
