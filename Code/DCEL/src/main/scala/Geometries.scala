@@ -9,6 +9,7 @@ import com.vividsolutions.jts.algorithm.CGAlgorithms
 import com.vividsolutions.jts.io.WKTReader
 
 import DCELMerger.geofactory
+import DCELMerger.logger
 
 class GraphEdge(pts: Array[Coordinate], hedge: Half_edge) extends com.vividsolutions.jts.geomgraph.Edge(pts) {
 
@@ -525,8 +526,18 @@ case class Face(label: String, cell: Int) extends Ordered[Face]{
         inner <- polys
       } yield (outer, inner)
 
-      val partial = pairs.filter{ case (outer, inner) => inner.coveredBy(outer) }
-        .groupBy(_._1).mapValues(_.map(_._2))
+      val partial = pairs.filter{ case (outer, inner) =>
+        try{
+          inner.coveredBy(outer)
+        } catch {
+          case e: com.vividsolutions.jts.geom.TopologyException => {
+            val wkt1 = outer.toText
+            val wkt2 = inner.toText
+            logger.info(s"$wkt1\t$wkt2\n")
+            false
+          }
+        }
+      }.groupBy(_._1).mapValues(_.map(_._2))
       val diff = partial.values.flatMap(_.tail).toSet
       val result = partial.filterKeys(partial.keySet.diff(diff)).values
 
