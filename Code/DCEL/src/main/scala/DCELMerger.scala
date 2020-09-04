@@ -609,6 +609,48 @@ object DCELMerger{
       (dcelARDD, dcelBRDD)
     }
 
+    /****************************************************************************/
+    dcelARDD.mapPartitionsWithIndex{ case(index, iter) =>
+      val dcel = iter.next()
+
+      dcel.faces.map{ face =>
+        val id = face.id
+        val isF = id.substring(0,1) == "F"
+        val polys = face.getPolygons
+        val n = polys.length
+
+        if(n > 1 & !isF){
+          val wkts = polys.map{_.toText}.mkString("|")
+          s"$index\t$id\t$n\t$wkts"
+        } else {
+          ""
+        }
+      }.toIterator
+    }.toDF().write
+      .mode(org.apache.spark.sql.SaveMode.Overwrite)
+      .text("tmp/facesA")
+
+    dcelBRDD.mapPartitionsWithIndex{ case(index, iter) =>
+      val dcel = iter.next()
+
+      dcel.faces.map{ face =>
+        val id = face.id
+        val isF = id.substring(0,1) == "F"
+        val polys = face.getPolygons
+        val n = polys.length
+
+        if(n > 1 & !isF){
+          val wkts = polys.map{_.toText}.mkString("|")
+          s"$index\t$id\t$n\t$wkts"
+        } else {
+          ""
+        }
+      }.toIterator
+    }.toDF().write
+      .mode(org.apache.spark.sql.SaveMode.Overwrite)
+      .text("tmp/facesB")
+    /****************************************************************************/    
+
     debug{
       save{"/tmp/edgesHAprime.wkt"}{
         dcelARDD.flatMap{ dcel =>

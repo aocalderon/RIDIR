@@ -18,43 +18,9 @@ import org.datasyslab.geosparkviz.sql.utils.GeoSparkVizRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geospark.spatialPartitioning.quadtree._
 import org.slf4j.{Logger, LoggerFactory}
-import SingleLabelChecker._
 
-object SingleLabelCheckerTest{
-  case class FaceT(face: Polygon, id: String, pid: Int = -1)
-
-  def parseId(id: String): String = id.split("\\|").distinct.sorted.mkString("|")
-
-  def checkSingleLabels(faces: RDD[FaceT])
-      (implicit logger: Logger): RDD[(FaceT, FaceT)] = {
-    faces.mapPartitionsWithIndex{ case(index, iter) =>
-      val facesList = iter.toList
-      val merged  = facesList.filter(_.id.contains("|"))
-      val singles = facesList.filterNot(_.id.contains("|"))
-      val singleA = singles.filter(_.id.substring(0,1) == "A")
-      val singleB = singles.filter(_.id.substring(0,1) == "B")
-
-      val facesA = for{
-        A <- singleA
-        B <- singleB union merged if {
-          A.face.coveredBy(B.face)
-        }
-      } yield {
-        (A, B)
-      }
-      
-      val facesB = for{
-        B <- singleB
-        A <- singleA union merged if {
-          B.face.coveredBy(A.face)
-        }
-      } yield {
-        (B, A)
-      }
-
-      (facesA union facesB).toIterator
-    }
-  }
+object FaceTester{
+  case class FacePartition(pid: Int, id: String, face: Vector[Polygon])
 
   def main(args: Array[String]): Unit = {
     implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -75,21 +41,34 @@ object SingleLabelCheckerTest{
     logger.info("Starting session... Done!")
 
     logger.info("Reading data...")
-    val input = "tmp/faces"
+    val input = "tmp/facesA"
     val parts = (s"hdfs dfs -ls ${input}/part*" #| "tail -n 1" !!)
       .split("/").reverse.head.split("-")(1).toInt
     val partitions = parts + 1
-    val facesRDD = spark.read.text(input).rdd.map{ row =>
-      val arr = row.getString(0).split("\t")
-      val reader = new WKTReader(geofactory)
-      val face = reader.read(arr(0)).asInstanceOf[Polygon]
-      val id = arr(1)
-      val pid = arr(2).toInt
+    val facesRDD = spark.read.text(input).rdd
+      .filter(_.getString(0) != "")
+      .map{ row =>
+        val line = row.getString(0)
+        
+        val arr = line.split("\t")
+        val pid = arr(0).toInt
+        val id = arr(1)
+        val n = arr(2).toInt
+        val reader = new WKTReader(geofactory)
+        val facePolygons = arr(3).split("\\|").map{ wkt =>
+          try{
+            reader.read(wkt).asInstanceOf[Polygon]
+          } catch {
+            case e: com.vividsolutions.jts.io.ParseException =>{
+              println(s"$wkt\t$pid\t$id")
+              geofactory.createPolygon(Array.empty[Coordinate])
+            }
+          }
+        }.toVector
 
-      (pid, FaceT(face, id, pid))
-    }.partitionBy(new SimplePartitioner(partitions))
+        (pid, FacePartition(pid, id, facePolygons))
+      }.partitionBy(new SimplePartitioner(partitions))
       .map(_._2)
-      .filter(_.face.isValid)
       .cache()
     logger.info("Reading data... Done!")
     val nPartitions = facesRDD.getNumPartitions
@@ -97,23 +76,20 @@ object SingleLabelCheckerTest{
     val nFacesRDD = facesRDD.count()
     logger.info(s"Number of records: $nFacesRDD")
 
-    val toCheck = checkSingleLabels(facesRDD).cache()
-    val nToCheck = toCheck.count
-
-    logger.info(s"Records to check: $nToCheck")
-
+    val f = new java.io.PrintWriter("/tmp/edgesALabels.wkt")
+    val wkt = facesRDD.map{ face =>
+      val n = face.id.split("\\|").length
+      (n, face)
+    }.filter(_._1 > 1).flatMap{ case(n, face) =>
+        face.face.map{ f =>
+          val wkt = f.toText
+          s"$wkt\t${face.pid}\t${face.id}\n"
+        }
+    }.collect.mkString("")
+    f.write(wkt)
+    f.close
+    
     spark.close()
   }
 }
 
-class SimplePartitioner[V](partitions: Int) extends org.apache.spark.Partitioner {
-  def getPartition(key: Any): Int = {
-    val k = key.asInstanceOf[Int]
-    // `k` is assumed to go continuously from 0 to elements-1.
-    return k
-  }
-
-  def numPartitions(): Int = {
-    return partitions
-  }
-}

@@ -97,10 +97,9 @@ object SingleLabelCheckerTest{
     val nFacesRDD = facesRDD.count()
     logger.info(s"Number of records: $nFacesRDD")
 
-    val toCheck = checkSingleLabels(facesRDD).cache()
-    val nToCheck = toCheck.count
-
-    logger.info(s"Records to check: $nToCheck")
+    //val toCheck = checkSingleLabels(facesRDD).cache()
+    //val nToCheck = toCheck.count
+    //logger.info(s"Records to check: $nToCheck")
 
     spark.close()
   }
