@@ -531,20 +531,24 @@ case class Face(label: String, cell: Int) extends Ordered[Face]{
           inner.coveredBy(outer)
         } catch {
           case e: com.vividsolutions.jts.geom.TopologyException => {
-            val wkt1 = outer.toText
-            val wkt2 = inner.toText
-            logger.info(s"$wkt1\t$wkt2\n")
             false
           }
         }
       }.groupBy(_._1).mapValues(_.map(_._2))
+      // Set of inner polygons...
       val diff = partial.values.flatMap(_.tail).toSet
       val result = partial.filterKeys(partial.keySet.diff(diff)).values
 
       val polygons = result.map{ row =>
         val outerPoly = row.head
         val innerPolys = geofactory.createMultiPolygon(row.tail.toArray)
-        outerPoly.difference(innerPolys).asInstanceOf[Polygon]
+        try{
+          outerPoly.difference(innerPolys).asInstanceOf[Polygon]
+        } catch {
+          case e: com.vividsolutions.jts.geom.TopologyException => {
+            geofactory.createPolygon(Array.empty[Coordinate])
+          }
+        }        
       }
 
       polygons.size match {
