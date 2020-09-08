@@ -26,31 +26,16 @@ import SingleLabelChecker._
 import Quadtree.create
 import DCELMerger._
 
-object DCELTester {
+object DCELTester2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val model: PrecisionModel = new PrecisionModel(1000)
   val geofactory: GeometryFactory = new GeometryFactory(model);
   val precision: Double = 1 / model.getScale
 
-  case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf,
-    startTime: Long, appId: String, cores: Int, executors: Int)
-
   def main(args: Array[String]) = {
-    val params     = new DCELMergerConf(args)
-    val input1     = params.input1()
-    val offset1    = params.offset1()
-    val input2     = params.input2()
-    val offset2    = params.offset2()
-    val partitions = params.partitions()
-    val gridType   = params.grid() match {
-      case "EQUALTREE" => GridType.EQUALGRID
-      case "QUADTREE"  => GridType.QUADTREE
-      case "KDBTREE"   => GridType.KDBTREE
-    }
-
     // Starting session...
     logger.info("Starting session...")
-    val appName = s"DCEL_P${partitions}"
+    val appName = "DCELTester2"
     implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
@@ -59,32 +44,8 @@ object DCELTester {
     import spark.implicits._
     val startTime = spark.sparkContext.startTime
     val config = spark.sparkContext.getConf
-    val local = config.get("spark.master").contains("local")
-    val (appId, cores, executors) = if(local){
-      val appId = config.get("spark.app.id")
-      val cores = config.get("spark.master").split("\\[")(1).replace("]","").toInt
-      val command = System.getProperty("sun.java.command")
-      logger.info(s"${appId}|${command}")
-
-      (appId, cores, 1)
-    } else {
-      val appId = config.get("spark.app.id").takeRight(4)
-      val cores = config.get("spark.executor.cores").toInt
-      val executors = config.get("spark.executor.instances").toInt
-      val command = System.getProperty("sun.java.command")
-      logger.info(s"${appId}|${command}")
-
-      (appId, cores, executors)
-    }
-    implicit val settings = Settings(spark,
-      params, config, startTime, appId, cores, executors)
-    val metrics = TaskMetrics(spark)
-    def getPhaseMetrics(metrics: TaskMetrics, phaseName: String): Dataset[Row] = {
-      metrics.createTaskMetricsDF()
-        .withColumn("appId", functions.lit(appId))
-        .withColumn("phaseName", functions.lit(phaseName))
-        .orderBy("launchTime")
-    }    
+    val appId: String = config.get("spark.app.id")
+    logger.info(s"${appId}|${System.getProperty("sun.java.command")}")
     logger.info("Starting session... Done!")
 
     import scala.io.Source
@@ -104,7 +65,6 @@ object DCELTester {
       
       (id -> (lineage, polygon))
     }.toMap
-    val npartitions = quads.keys.toList.length
     val quadtree = Quadtree.create(boundary, quads.values.map(_._1).toList)
 
     val cells = quadtree.getLeafZones.asScala.map{ cell =>
@@ -121,44 +81,39 @@ object DCELTester {
         cells.toSeq.sortBy(_._1).map{ case (i,q) => envelope2polygon(q.getEnvelope)}
       }
     
-    
-    val edgesRDD = spark.read.textFile("file:///tmp/edgesSample.wkt").rdd
+    val edgesRDD_prime = spark.read.textFile(s"file://${path}/sample.tsv").rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
         lines.map{ line =>
           val arr = line.split("\t")
           val pid = arr(0).toInt
-          val id = arr(1)
-          val data = s"$id\t${arr(2)}\t${arr(3)}\t${arr(4)}"
+          val data = s"${arr(1)}\t${arr(2)}\t${arr(3)}\t${arr(4)}"
           val edge = reader.read(arr(5)).asInstanceOf[LineString]
           edge.setUserData(data)
 
-          (id, pid, edge)
+          (pid, edge)
         }
-    }
-      .filter(_._1.substring(0,1) == "A")
-      .map{ case(id, pid, edge) => (pid, edge)}
-      .filter{ case(pid, edge) => pid >= 480 && pid <=489 }
-      .partitionBy(new SimplePartitioner(npartitions))
-      .map(_._2).persist()
+    }.cache()
+
+    val pid2index = edgesRDD_prime.map(_._1).collect
+      .distinct.zipWithIndex.map{ case(pid, index) => pid -> index}.toMap
+    val index2pid = edgesRDD_prime.map(_._1).collect
+      .distinct.zipWithIndex.map{ case(pid, index) => index -> pid}.toMap
+    val npartitions = pid2index.keys.toList.length
+    val edgesRDD = edgesRDD_prime.map{ case(pid, edge) =>
+      (pid2index(pid), edge)
+    }.partitionBy(new SimplePartitioner(npartitions))
+      .map(_._2).cache()
     val nEdgesRDD = edgesRDD.count()
 
     logger.info(s"Total edges: $nEdgesRDD")
-
-    save{"/tmp/edgesSample.wkt"}{
-      edgesRDD.mapPartitionsWithIndex{ (index, edges) =>
-        edges.map{ edge =>
-          val data = edge.getUserData
-          val wkt = edge.toText
-          s"$index\t$data\t$wkt\n"
-        }
-      }.collect
-    }
+    logger.info(s"Total partitions: ${edgesRDD.getNumPartitions}")
 
     val dcels = edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
       val edges = edgesIt.toVector
       val gA = edges.map(edge2graphedge).toList
-      val cell = envelope2polygon(cells(index).getEnvelope)
+      val pid = index2pid(index)
+      val cell = envelope2polygon(cells(pid).getEnvelope)
       val gCellA = cell2gedges(cell)
 
       val Ah = SweepLine.getGraphEdgeIntersections(gA, gCellA).flatMap{_.getLineStrings}
@@ -176,20 +131,14 @@ object DCELTester {
     println(n)
     save{"/tmp/edgesFaces.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcels) =>
-        val query = "0123"
-        val sample = cells(index).lineage
-        if(sample.length >= query.length && sample.substring(0,4) == query){
-          val dcel = dcels.next
+        val dcel = dcels.next
 
-          dcel._2.faces.filter(_.id.substring(0, 1) != "F").map{ face =>
-            val id = face.id
-            val wkt = face.toPolygon.toText
+        dcel._2.faces.filter(_.id.substring(0, 1) != "F").map{ face =>
+          val id = face.id
+          val wkt = face.toPolygon.toText
 
-            s"$wkt\t$id\t$index\n"
-          }.toIterator
-        } else {
-          List.empty[String].toIterator
-        }
+          s"$wkt\t$id\t$index\n"
+        }.toIterator
       }.collect
     }
  

@@ -26,7 +26,7 @@ import SingleLabelChecker._
 import Quadtree.create
 import DCELMerger._
 
-object DCELTester {
+object DCELTester2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
   private val model: PrecisionModel = new PrecisionModel(1000)
   val geofactory: GeometryFactory = new GeometryFactory(model);
@@ -121,8 +121,7 @@ object DCELTester {
         cells.toSeq.sortBy(_._1).map{ case (i,q) => envelope2polygon(q.getEnvelope)}
       }
     
-    
-    val edgesRDD = spark.read.textFile("file:///tmp/edgesSample.wkt").rdd
+    val edgesRDD = spark.read.textFile(s"file://${path}/sample.tsv").rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
         lines.map{ line =>
