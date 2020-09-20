@@ -27,8 +27,8 @@ import SingleLabelChecker._
 
 object DCELMerger{
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
-  private val model: PrecisionModel = new PrecisionModel(1000)
-  val geofactory: GeometryFactory = new GeometryFactory(model);
+  implicit val model: PrecisionModel = new PrecisionModel(1000)
+  implicit val geofactory: GeometryFactory = new GeometryFactory(model);
   val precision: Double = 1 / model.getScale
 
   case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf,
@@ -86,6 +86,15 @@ object DCELMerger{
     geofactory.createPolygon(Array(p1,p2,p3,p4,p1))
   }
 
+  def roundEnvelope(envelope: Envelope, scale: Double = 100.0): Envelope = {
+    val e = round(envelope.getMinX, scale)
+    val w = round(envelope.getMaxX, scale)
+    val s = round(envelope.getMinY, scale)
+    val n = round(envelope.getMaxY, scale)
+    new Envelope(e, w, s, n)
+  }
+  private def round(number: Double, scale: Double): Double = Math.round(number * scale) / scale;
+  
   def readPolygonsA(implicit settings: Settings): (RDD[Polygon], Long) = {
     val input  = settings.params.input1()
     val offset = settings.params.offset1()
@@ -490,6 +499,8 @@ object DCELMerger{
         Iterator(s"$wkt\t$lineage\t$index\n")
       }.collect()
     }
+
+    /*****************************************************************************/
     edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case(index, edges) =>
       edges.map{ edge =>
         val data = edge.getUserData         // polygon_id, ring_id, order, hasHoles

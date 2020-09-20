@@ -54,7 +54,7 @@ done
 spark-submit \
      --files $LOG_FILE \
      --conf spark.default.parallelism=${PARALLELISM} \
-     --conf spark.driver.maxResultSize=2g \
+     --conf spark.driver.maxResultSize=4g \
      --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
      --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
      --master $MASTER --deploy-mode client \

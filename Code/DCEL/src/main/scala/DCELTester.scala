@@ -32,6 +32,15 @@ object DCELTester {
   val geofactory: GeometryFactory = new GeometryFactory(model);
   val precision: Double = 1 / model.getScale
 
+  def roundEnvelope(envelope: Envelope, scale: Double = 100.0): Envelope = {
+    val e = round(envelope.getMinX, scale)
+    val w = round(envelope.getMaxX, scale)
+    val s = round(envelope.getMinY, scale)
+    val n = round(envelope.getMaxY, scale)
+    new Envelope(e, w, s, n)
+  }
+  private def round(number: Double, scale: Double): Double = Math.round(number * scale) / scale;
+
   case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf,
     startTime: Long, appId: String, cores: Int, executors: Int)
 
@@ -110,7 +119,7 @@ object DCELTester {
     val cells = quadtree.getLeafZones.asScala.map{ cell =>
       val id = cell.partitionId.toInt
       val lineage = cell.lineage
-      val envelope = cell.getEnvelope
+      val envelope = roundEnvelope(cell.getEnvelope)
       val r = new org.datasyslab.geospark.spatialPartitioning.quadtree.QuadRectangle(envelope)
       r.lineage = lineage
       r.partitionId = id
@@ -122,7 +131,7 @@ object DCELTester {
       }
     
     
-    val edgesRDD = spark.read.textFile("file:///tmp/edgesSample.wkt").rdd
+    val edgesRDD = spark.read.textFile("tmp/edges").rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
         lines.map{ line =>
@@ -138,13 +147,13 @@ object DCELTester {
     }
       .filter(_._1.substring(0,1) == "A")
       .map{ case(id, pid, edge) => (pid, edge)}
-      .filter{ case(pid, edge) => pid >= 480 && pid <=489 }
+      //.filter{ case(pid, edge) => pid == 351 }
       .partitionBy(new SimplePartitioner(npartitions))
       .map(_._2).persist()
     val nEdgesRDD = edgesRDD.count()
 
     logger.info(s"Total edges: $nEdgesRDD")
-
+    /*
     save{"/tmp/edgesSample.wkt"}{
       edgesRDD.mapPartitionsWithIndex{ (index, edges) =>
         edges.map{ edge =>
@@ -154,7 +163,7 @@ object DCELTester {
         }
       }.collect
     }
-
+     */
     val dcels = edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
       val edges = edgesIt.toVector
       val gA = edges.map(edge2graphedge).toList
@@ -176,9 +185,9 @@ object DCELTester {
     println(n)
     save{"/tmp/edgesFaces.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcels) =>
-        val query = "0123"
+        val query = "012"
         val sample = cells(index).lineage
-        if(sample.length >= query.length && sample.substring(0,4) == query){
+        if(sample.length >= query.length && sample.substring(0, query.length) == query){
           val dcel = dcels.next
 
           dcel._2.faces.filter(_.id.substring(0, 1) != "F").map{ face =>

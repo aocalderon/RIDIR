@@ -29,9 +29,9 @@ import DCELMerger._
 object DCELTester2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
-  def round(number: Double, scale: Double = 1000.0): Double =
+  def round(number: Double, scale: Double): Double =
     Math.round(number * scale) / scale;
-  def roundEnvelope(envelope: Envelope, scale: Double = 1000.0): Envelope = {
+  def roundEnvelope(envelope: Envelope, scale: Double = 100.0): Envelope = {
     val e = round(envelope.getMinX, scale)
     val w = round(envelope.getMaxX, scale)
     val s = round(envelope.getMinY, scale)
@@ -56,7 +56,7 @@ object DCELTester2 {
     logger.info("Starting session... Done!")
 
     import scala.io.Source
-    val model = new PrecisionModel(1000)
+    val model = new PrecisionModel(100)
     val geofactory = new GeometryFactory(model);
     val reader = new WKTReader(geofactory)
     val home = System.getProperty("user.home")
@@ -68,7 +68,6 @@ object DCELTester2 {
 
     val quadtreeBuff = Source.fromFile(s"${path}/quadtree.wkt")
     val quads = quadtreeBuff.getLines.map{ line =>
-      val model = new PrecisionModel(1000)
       val geofactory = new GeometryFactory(model);
       val arr = line.split("\t")
       val polygon = reader.read(arr(0))
@@ -193,10 +192,8 @@ object DCELTester2 {
       dcels.mapPartitionsWithIndex{ (index, dcels) =>
         val dcel = dcels.next
 
-        dcel._3.map{ wkt =>
-          //val coords = x.getCoordinates
-          //val n = coords.length
-          //val wkt = geofactory.createLineString(coords)
+        dcel._3.map{ coord =>
+          val wkt = geofactory.createPoint(coord)
 
           s"$wkt\n"          
         }.toIterator
