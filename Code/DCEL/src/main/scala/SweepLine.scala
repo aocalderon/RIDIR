@@ -8,13 +8,8 @@ import scala.collection.JavaConverters._
 
 object SweepLine{
 
-  def getEdgesOnCell(edges: Vector[LineString], cell: Envelope, precision: Double = 0.001)
+  def getEdgesOnCell(edges: Vector[LineString], cell: Envelope, precision: Double = 0.01)
       : Vector[Coordinate] = {
-
-    println
-    println(edges.length)
-    println
-    println(envelope2polygon(cell).toText)
 
     cell.expandBy(-precision)
     val edgesList = edges.filter{ edge =>
@@ -23,7 +18,12 @@ object SweepLine{
       new com.vividsolutions.jts.geomgraph.Edge(linestring.getCoordinates)
     }.asJava
 
-    cell.expandBy(precision)
+    println
+    edgesList.asScala.foreach{println}
+    println
+    println(envelope2polygon(cell).toText)
+
+    //cell.expandBy(precision)
     val e = cell.getMaxX
     val w = cell.getMinX
     val n = cell.getMaxY
@@ -41,8 +41,6 @@ object SweepLine{
 
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
-    val model = new PrecisionModel(1000) 
-    lineIntersector.setPrecisionModel(model)
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
     sweepline.computeIntersections(edgesList, cellList, segmentIntersector)
