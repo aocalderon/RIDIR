@@ -7,7 +7,7 @@ EMEMORY=30g
 
 SPARK_JARS=$HOME/Spark/2.4/jars/
 CLASS_JAR=$HOME/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar
-CLASS_NAME="DCELPartitioner"
+CLASS_NAME="DCELMerger2"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 MASTER=local[10]
 

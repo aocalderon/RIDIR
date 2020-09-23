@@ -56,8 +56,8 @@ object DCELTester2 {
     logger.info("Starting session... Done!")
 
     import scala.io.Source
-    val model = new PrecisionModel(100)
-    val geofactory = new GeometryFactory(model);
+    implicit val model = new PrecisionModel(1000)
+    implicit val geofactory = new GeometryFactory(model);
     val reader = new WKTReader(geofactory)
     val home = System.getProperty("user.home")
     val path = s"${home}/RIDIR/Code/Scripts/gadm"
@@ -121,84 +121,6 @@ object DCELTester2 {
 
     logger.info(s"Total edges: $nEdgesRDD")
     logger.info(s"Total partitions: ${edgesRDD.getNumPartitions}")
-
-    val dcels = edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
-      val edges = edgesIt.toVector
-      val gA = edges.map(edge2graphedge).toList
-      val pid = index2pid(index)
-      val cell = envelope2polygon(cells(pid).getEnvelope)
-      val gCellA = cell2gedges(cell)
-      val cellEnvelope = cell.getEnvelopeInternal
-
-      val edgesA = SweepLine.getEdgesOnCell(edges, cellEnvelope)
-      edgesA.foreach{println}
-
-      val Ah = SweepLine.getGraphEdgeIntersections(gA, gCellA).flatMap{_.getLineStrings}
-      val At = transform(Ah, cell)
-      val Am = merge(At)
-      val Ap = pair(Am)
-      val Af = filter(Ap)
-      val dcelA = getLDCEL(Af, index, cells, grids, true)
-
-      val r = (index, dcelA, edgesA)
-      Iterator(r)
-    }.cache
-    val n = dcels.count()
-
-    save{"/tmp/edgesEdges.wkt"}{
-      edgesRDD.map{ edge =>
-        val wkt = edge.toText
-        val data = edge.getUserData
-
-        s"$wkt\t$data\n"
-      }.collect
-    }
-    save{"/tmp/edgesFaces.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcels) =>
-        val dcel = dcels.next
-
-        dcel._2.faces.filter(_.id.substring(0, 1) != "F").map{ face =>
-          val id = face.id
-          val wkt = face.toPolygon.toText
-
-          s"$wkt\t$id\t$index\n"
-        }.toIterator
-      }.collect
-    }
-    save{"/tmp/edgesHedges.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcels) =>
-        val dcel = dcels.next
-
-        dcel._2.half_edges.map{ hedge =>
-          val id = hedge.id
-          val wkt = hedge.toLineString.toText
-
-          s"$wkt\t$id\t$index\n"
-        }.toIterator
-      }.collect
-    }
-    save{"/tmp/edgesVertices.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcels) =>
-        val dcel = dcels.next
-
-        dcel._2.vertices.map{ vertex =>
-          val wkt = vertex.toWKT
-
-          s"$wkt\t$index\n"
-        }.toIterator
-      }.collect
-    }
-    save{"/tmp/edgesAh.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcels) =>
-        val dcel = dcels.next
-
-        dcel._3.map{ coord =>
-          val wkt = geofactory.createPoint(coord)
-
-          s"$wkt\n"          
-        }.toIterator
-      }.collect
-    }
     
     spark.close
   }

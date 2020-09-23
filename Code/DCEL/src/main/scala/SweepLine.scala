@@ -3,53 +3,89 @@ import com.vividsolutions.jts.algorithm.RobustLineIntersector
 import com.vividsolutions.jts.geom.{PrecisionModel, Envelope, Coordinate}
 import com.vividsolutions.jts.geom.GeometryFactory
 import com.vividsolutions.jts.geomgraph.EdgeIntersection
-import com.vividsolutions.jts.geom.{LineString, Polygon}
+import com.vividsolutions.jts.geom.{LinearRing, LineString, Polygon}
 import scala.collection.JavaConverters._
 
 object SweepLine{
 
-  def getEdgesOnCell(edges: Vector[LineString], cell: Envelope, precision: Double = 0.01)
-      : Vector[Coordinate] = {
+  def getEdgesOnCell(outerEdges: Vector[LineString], mbr: LinearRing)
+    (implicit geofactory: GeometryFactory)
+      : Vector[LineString] = {
 
-    cell.expandBy(-precision)
-    val edgesList = edges.filter{ edge =>
-      edge.getCoordinates.exists(coord => !cell.contains(coord))
-    }.map{ linestring =>
+    val edgesList = outerEdges.map{ linestring =>
       new com.vividsolutions.jts.geomgraph.Edge(linestring.getCoordinates)
     }.asJava
 
-    println
-    edgesList.asScala.foreach{println}
-    println
-    println(envelope2polygon(cell).toText)
-
-    //cell.expandBy(precision)
-    val e = cell.getMaxX
-    val w = cell.getMinX
-    val n = cell.getMaxY
-    val s = cell.getMinY
-    val EN = new Coordinate(e, n)
-    val WN = new Coordinate(w, n)
-    val ES = new Coordinate(e, s)
-    val WS = new Coordinate(w, s)
-
-    val W = new com.vividsolutions.jts.geomgraph.Edge(Array(WN, WS))
-    val S = new com.vividsolutions.jts.geomgraph.Edge(Array(WS, ES))
-    val E = new com.vividsolutions.jts.geomgraph.Edge(Array(ES, EN))
-    val N = new com.vividsolutions.jts.geomgraph.Edge(Array(EN, WN))
-    val cellList = List(W,S,E,N).asJava
+    val mbrList = mbr.getCoordinates.zip(mbr.getCoordinates.tail)
+      .toList.map{ case(p1, p2) =>
+        new com.vividsolutions.jts.geomgraph.Edge(Array(p1, p2))
+      }.asJava
 
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
-    sweepline.computeIntersections(edgesList, cellList, segmentIntersector)
- 
-    cellList.asScala.flatMap{ edge =>
-      edge.getEdgeIntersectionList.iterator.asScala.map{ i =>
+    sweepline.computeIntersections(edgesList, mbrList, segmentIntersector)
+
+    val edgesOnCell = mbrList.asScala.flatMap{ edge =>
+      val extremes = edge.getCoordinates
+      val start = extremes(0)
+      val end = extremes(1)
+      val inners = edge.getEdgeIntersectionList.iterator.asScala.map{ i =>
         i.asInstanceOf[EdgeIntersection].getCoordinate
+      }.toArray
+
+      val coords = start +: inners :+ end
+      coords.zip(coords.tail).map{ case(p1, p2) =>
+        val edge = geofactory.createLineString(Array(p1, p2))
+        edge.setUserData(EdgeData("F",0,0,false))
+        edge
       }
     }.toVector
+
+    val outerEdgesMap = outerEdges.map{ edge => edge.getCoordinates -> edge }.toMap
+    val envelope = mbr.getEnvelopeInternal
+    val edgesInsideCell = edgesList.asScala.flatMap{ edge =>
+      val extremes = edge.getCoordinates
+      val data = outerEdgesMap(extremes).getUserData
+      val start = extremes(0)
+      val end = extremes(1)
+
+      val eiList = edge.getEdgeIntersectionList.iterator.asScala.toList
+      if(eiList.length == 1){
+        val intersection = eiList.head.asInstanceOf[EdgeIntersection].getCoordinate
+        val coords = {
+          if(start != intersection &&
+            end != intersection &&
+            envelope.contains(start) &&
+            !envelope.contains(end)) Array(start, intersection)
+          else if(start != intersection &&
+            end != intersection &&
+            !envelope.contains(start) &&
+            envelope.contains(end)) Array(intersection, end)
+          else if(start == intersection &&
+            envelope.contains(end)) Array(intersection, end)
+          else if(end == intersection &&
+            envelope.contains(start)) Array(start, intersection)
+          else Array.empty[Coordinate]
+        }
+        val segment = geofactory.createLineString(coords)
+        segment.setUserData(data)
+        Vector(segment)
+      } else {
+        val eiList = edge.getEdgeIntersectionList
+        eiList.addEndpoints()
+        val coords = eiList.iterator.asScala.toArray
+          .map(_.asInstanceOf[EdgeIntersection].getCoordinate)
+        coords.zip(coords.tail).foreach{ case(p1, p2) =>
+          val wkt = geofactory.createLineString(Array(p1,p2)).toText
+          //println(wkt)
+        }
+        Vector.empty[LineString]
+      }
+    }.toVector
+
+    edgesOnCell union edgesInsideCell
   }
 
   def edge2wkt(edge: com.vividsolutions.jts.geomgraph.Edge): String = {
@@ -114,18 +150,19 @@ object SweepLine{
   def main(args: Array[String]) = {
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
-    val model = new PrecisionModel(1000)
+    implicit val model = new PrecisionModel(1000)
+    implicit val geofactory = new GeometryFactory(model)
+    val precision = 1.0 / model.getScale
     lineIntersector.setPrecisionModel(model)
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
     
     import scala.io.Source
     import com.vividsolutions.jts.io.WKTReader
-    val geofactory = new GeometryFactory(model)
     val reader = new WKTReader(geofactory)
     val home = System.getProperty("user.home")
 
     /********************************************************************/
-    val edgesBuff = Source.fromFile(s"${home}/RIDIR/Code/Scripts/gadm/edges2.wkt")
+    val edgesBuff = Source.fromFile(s"${home}/RIDIR/Code/Scripts/gadm/edges.wkt")
     val edges = edgesBuff.getLines.map{ line =>
       val arr = line.split("\t")
       val linestring = reader.read(arr(0)).asInstanceOf[LineString]
@@ -136,13 +173,13 @@ object SweepLine{
     edgesBuff.close
     val cellBuff = Source.fromFile(s"${home}/RIDIR/Code/Scripts/gadm/cell.wkt")
     val cellEnvelope = cellBuff.getLines.map{ line =>
-      val cell = reader.read(line)
-      cell.getEnvelopeInternal
+      val ring = reader.read(line).asInstanceOf[Polygon]
+      geofactory.createLinearRing(ring.getCoordinates)
     }.toList.head
     cellBuff.close
 
-    val edgesA = SweepLine.getEdgesOnCell(edges, cellEnvelope)
-    edgesA.foreach{println}
+    val edgesOnCell = SweepLine.getEdgesOnCell(edges, cellEnvelope)
+    edgesOnCell.foreach{println}
 
   }
 }
