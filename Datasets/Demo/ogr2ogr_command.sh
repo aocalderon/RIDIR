@@ -1,0 +1,1 @@
+ogr2ogr -s_srs EPSG:4326 -t_srs EPSG:3857 -f CSV "/vsistdout/" -sql "SELECT * FROM 'polygons'" iceland.gpkg -lco "GEOMETRY=AS_WKT" -lco "SEPARATOR=TAB" --config OGR_WKT_PRECISION 10 | sed 's/"//g'| cut -f1
