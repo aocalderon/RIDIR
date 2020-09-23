@@ -94,19 +94,25 @@
   \end{frame}
 }
 
-\begin{frame}{Dealing with problems with precision...}
+\begin{frame}{Fixing empty cells bug...}
     \begin{itemize}
-     \item The problems with the labeling reveals to be related with the precision of the Quadtree:
-     \begin{itemize}
-      \item The precision of the cells from the Quadtree is much higher than the precision of the input edges.
-      \item Solved by forcing the reduction of the precision prior to the partitioning of the edges.
-     \end{itemize}
+     \item Finally fix bug during empty cell procedure.
+     \item Integrate the solution to the previous code.
+     \item Perform validation.
+     \item Running experiments to evalueate DCEL's creation and merging.
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Results}
+  \centering
+    \includegraphics[width=\textwidth]{figures/nohup}
 \end{frame}
 
 \begin{frame}{What is next...}
     \begin{itemize}
-     \item Having some problems with my code.  I am dealing with precision on many parts.  Currently cleaning my code to set precision in just one (central) place.
+     \item Check a bug during face polygon creation.
+     \item Evaluate the overlay operations.
+     \item Check possible bottlenecks during internal stage performance.
     \end{itemize}
 \end{frame}
 
