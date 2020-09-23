@@ -1,4 +1,6 @@
 import scala.collection.JavaConverters._
+import scala.io.Source
+import sys.process._
 import com.vividsolutions.jts.geom.{Coordinate, Envelope}
 import com.vividsolutions.jts.geom.{LineString, Polygon}
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
@@ -13,8 +15,12 @@ import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
 import edu.ucr.dblab.quadtree._
 
-object DCELPartitioner{
+import DCELMerger.{cell2gedges, transform, merge, pair, filter, getLDCEL}
+
+object DCELMerger2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
+
+  case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean)
 
   def main(args: Array[String]) = {
     // Starting session...
@@ -27,39 +33,61 @@ object DCELPartitioner{
     implicit val model = new PrecisionModel(1000)
     implicit val geofactory = new GeometryFactory(model)
     //val input = "gadm/level1"
-    val input = "tmp/polyDemo.wkt"
-    val partitions = 4
+    val input = "tmp/edgesDemo"
+    val home = System.getProperty("user.home")
+    val path = s"${home}/RIDIR/Code/Scripts/gadm"
     val precision = 1.0 / model.getScale
     logger.info(s"Using $precision precision.")
     logger.info("Starting session... Done!")
 
     // Reading data...
-    val edgesRaw = spark.read.textFile(input).rdd.zipWithUniqueId
+    val parts = (s"hdfs dfs -ls ${input}/part*" #| "tail -n 1" !!)
+      .split("/").reverse.head.split("-")(1).toInt
+    val partitions = parts + 1
+    val edgesRDD = spark.read.textFile(input).rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
-        lines.flatMap{ case(wkt, id) =>
-          val polygon = reader.read(wkt).asInstanceOf[Polygon]
-          getLineStrings(polygon, id)
+        lines.map{ line =>
+          val arr = line.split("\t")
+          val wkt = arr(0)
+          val partitionId = arr(1).toInt
+          val polygonId = arr(2).toInt
+          val ringId = arr(3).toInt
+          val edgeId = arr(4).toInt
+          val isHole = arr(5).toBoolean
+          val edge = reader.read(wkt).asInstanceOf[LineString]
+          val data = EdgeData(polygonId, ringId, edgeId, isHole)
+          edge.setUserData(data)
+          (partitionId, edge)
         }.toIterator
-      }.persist()
-    val nEdgesRDD = edgesRaw.count()
-    val edgesRDD = new SpatialRDD[LineString]()
-    edgesRDD.setRawSpatialRDD(edgesRaw)
-    edgesRDD.analyze()
+      }.partitionBy(new SimplePartitioner(partitions))
+      .map(_._2).persist()
+    val nEdgesRDD = edgesRDD.count()
 
-    //
-    val fc = new FractionCalculator()
-    val fraction = fc.getFraction(partitions, nEdgesRDD)
-    logger.info(s"Fraction: ${fraction}")
-    val samples = edgesRaw.sample(false, fraction, 42)
-      .map(_.getEnvelopeInternal).collect().toList.asJava
-    val partitioning = new QuadtreePartitioning(samples,
-      edgesRDD.boundary(), partitions)
-    val quadtree = partitioning.getPartitionTree()
-    quadtree.assignPartitionLineage()
-    val partitioner = new QuadTreePartitioner(quadtree)
-    edgesRDD.spatialPartitioning(partitioner)
-    val edges = edgesRDD.spatialPartitionedRDD.rdd.persist()
+    // Reading quadtree...
+    val quadtreeBuff = Source.fromFile(s"${path}/quadtree.wkt")
+    val quads = quadtreeBuff.getLines.map{ line =>
+      val arr = line.split("\t")
+      val reader = new WKTReader(geofactory)
+      val envelope = reader.read(arr(0)).getEnvelopeInternal
+      val minX = envelope.getMinX
+      val maxX = envelope.getMaxX
+      val minY = envelope.getMinY
+      val maxY = envelope.getMaxY
+      val lineage = arr(2)
+      
+      (lineage, (minX, maxX, minY, maxY))
+    }.toList
+    val lineages = quads.map(_._1)
+    val stats = quads.map(_._2)
+    val boundary = new Envelope(
+      stats.map(_._1).min,
+      stats.map(_._2).max,
+      stats.map(_._3).min,
+      stats.map(_._4).max
+    )
+    val quadtree = Quadtree.create(boundary, lineages)
+    quadtreeBuff.close
 
     // Getting cells...
     case class Cell(id: Int, lineage: String, mbr: Polygon)
@@ -79,18 +107,39 @@ object DCELPartitioner{
         s"$wkt\t$id\t$lineage\n"
       }.toList
     }
-    
-    // Saving to HDFS...
-    val sample = edges.mapPartitionsWithIndex{ (index, edgesIt) =>
-      edgesIt.map{ edge =>
-        val wkt = edge.toText
-        val data = edge.getUserData
 
-        s"$wkt\t$index\t$data"
-      }
-    }.toDF.write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text("tmp/edgesDemo")
+    // Getting LDCELs...
+    val dcels = edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
+      val edges = edgesIt.toVector
+      val cell = cells(index).mbr
+
+      val edgesOnCell = SweepLine.getEdgesOnCell(edges, cell)
+
+      val r = (index, edgesOnCell, edges)
+      Iterator(r)
+    }.cache
+    val n = dcels.count()
+
+    println(n)
+    save{"/tmp/edgesI.wkt"}{
+      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+        val dcel = dcelsIt.next
+        dcel._2.map{ edge =>
+          val wkt = edge.toText
+          s"$wkt\t$index\n"
+        }.toIterator
+      }.collect
+    }
+    
+    save{"/tmp/edgesE.wkt"}{
+      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+        val dcel = dcelsIt.next
+        dcel._3.map{ edge =>
+          val wkt = edge.toText
+          s"$wkt\t$index\n"
+        }.toIterator
+      }.collect
+    }
 
     spark.close
   }

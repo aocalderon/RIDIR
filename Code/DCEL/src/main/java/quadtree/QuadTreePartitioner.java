@@ -67,7 +67,7 @@ public class QuadTreePartitioner extends SpatialPartitioner
             if (point != null && !(new HalfOpenRectangle(rectangle.getEnvelope())).contains(point)) {
                 continue;
             }
-
+	    
             result.add(new Tuple2(rectangle.partitionId, spatialObject));
         }
 
