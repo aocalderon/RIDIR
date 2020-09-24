@@ -20,7 +20,6 @@ import scala.collection.JavaConverters._
 
 import DCELMerger.geofactory
 import DCELMerger.{save, envelope2polygon}
-import CellManager.envelope2Polygon
 
 object DCELBuilder {
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -213,7 +212,7 @@ object DCELBuilder {
   
   def getSegments(edgesRDD: SpatialRDD[LineString], cells: Map[Int, QuadRectangle]): RDD[LineString] = {
     val segments = edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, edges) =>
-      val cell = envelope2Polygon(cells.get(index).get.getEnvelope)
+      val cell = envelope2polygon(cells.get(index).get.getEnvelope)
       val g1 = edges.map(edge2graphedge).toList
       val g2 = linestring2graphedge(cell.getExteriorRing, "*")
 
@@ -437,7 +436,7 @@ object DCELBuilder {
       save{"/tmp/edgesCells.wkt"}{
         edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case (index, partition) =>
           val cell = cells.get(index).get
-          List(s"${index}\t${envelope2Polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
+          List(s"${index}\t${envelope2polygon(cell.getEnvelope)}\t${partition.size}\n").toIterator
         }.collect()
       }
 

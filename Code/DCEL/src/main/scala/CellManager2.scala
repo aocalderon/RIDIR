@@ -1,8 +1,9 @@
 import DCELMerger.{geofactory, precision, logger}
 import DCELMerger.{envelope2polygon, save}
-import org.datasyslab.geospark.spatialPartitioning.quadtree.{StandardQuadTree, QuadRectangle}
+//import org.datasyslab.geospark.spatialPartitioning.quadtree.{StandardQuadTree, QuadRectangle}
+import edu.ucr.dblab.quadtree._
 import org.apache.spark.rdd.RDD
-import com.vividsolutions.jts.geom.{Envelope, Coordinate, Point, LineString, Polygon}
+import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate, Point, LineString, Polygon}
 import com.vividsolutions.jts.io.WKTReader
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashMap
@@ -65,7 +66,7 @@ object CellManager2{
 
   // Divide the quadtree's cells if they are 'empty' or not...
   def divideEmptyAndNonEmptyCells(dcelRDD: RDD[LDCEL],
-    quadtree: StandardQuadTree[LineString]):
+    quadtree: StandardQuadTree[_ <: Geometry]):
       (HashMap[String, Cell], HashMap[String, Cell]) = {
 
     val cells = quadtree.getLeafZones.asScala.map{ leaf =>
@@ -148,7 +149,7 @@ object CellManager2{
   def cleanQuadtree[T](original_quadtree: StandardQuadTree[T],
     empties: HashMap[String, Cell],
     nonempties: HashMap[String, Cell]):
-      (edu.ucr.dblab.StandardQuadTree[T], HashMap[String, Cell]) = {
+      (edu.ucr.dblab.quadtree.StandardQuadTree[T], HashMap[String, Cell]) = {
 
     val emptiesByLevel = empties.values.map(cell => (cell.lineage.length(), cell))
       .groupBy(_._1)
@@ -167,15 +168,15 @@ object CellManager2{
     val lineages = (nonempties.values ++ empties_prime.values)
       .map(_.lineage).toList.sorted
 
-    val quadtree_prime = Quadtree.create[T](boundary, lineages)
+    val quadtree_prime = edu.ucr.dblab.quadtree.Quadtree.create[T](boundary, lineages)
 
     (quadtree_prime, empties_prime)
   }
 
-  def cleanQuadtreeTester[T](original_quadtree: edu.ucr.dblab.StandardQuadTree[T],
+  def cleanQuadtreeTester[T](original_quadtree: edu.ucr.dblab.quadtree.StandardQuadTree[T],
     empties: HashMap[String, Cell],
     nonempties: HashMap[String, Cell]):
-      (edu.ucr.dblab.StandardQuadTree[T], HashMap[String, Cell]) = {
+      (edu.ucr.dblab.quadtree.StandardQuadTree[T], HashMap[String, Cell]) = {
 
     val emptiesByLevel = empties.values.map(cell => (cell.lineage.length(), cell))
       .groupBy(_._1)
@@ -194,13 +195,13 @@ object CellManager2{
     val lineages = (nonempties.values ++ empties_prime.values)
       .map(_.lineage).toList.sorted
 
-    val quadtree_prime = Quadtree.create[T](boundary, lineages)
+    val quadtree_prime = edu.ucr.dblab.quadtree.Quadtree.create[T](boundary, lineages)
 
     (quadtree_prime, empties_prime)
   }
 
   def getClosestCell(
-    quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
+    quadtree: edu.ucr.dblab.quadtree.StandardQuadTree[_ <: Geometry],
     empties: HashMap[String, Cell],
     debug: Boolean = false): Vector[ClosestCell] = {
 
@@ -280,7 +281,7 @@ object CellManager2{
     closestCellList.toVector
   }
 
-  def getCellsAtCorner(quadtree: edu.ucr.dblab.StandardQuadTree[LineString],
+  def getCellsAtCorner(quadtree: edu.ucr.dblab.quadtree.StandardQuadTree[_ <: Geometry],
     c: Cell): (List[Cell], Point) = {
 
     val region = c.lineage.takeRight(1).toInt
@@ -294,7 +295,7 @@ object CellManager2{
     val corner = geofactory.createPoint(new Coordinate(x, y))
     val envelope = corner.getEnvelopeInternal
     envelope.expandBy(precision)
-    val cells = quadtree.findZones(new edu.ucr.dblab.QuadRectangle(envelope)).asScala
+    val cells = quadtree.findZones(new edu.ucr.dblab.quadtree.QuadRectangle(envelope)).asScala
       .filterNot(_.lineage == c.lineage)
       .map{ q =>
         val id = q.partitionId.toInt
@@ -304,142 +305,149 @@ object CellManager2{
   }
 
   def updateCellsWithoutId(dcelRDD: RDD[LDCEL],
-    original_quadtree: StandardQuadTree[LineString],
+    original_quadtree: StandardQuadTree[_ <: Geometry],
     label: String = "A",
     debug: Boolean = false): RDD[LDCEL] = {
 
     val leafs = original_quadtree.getLeafZones.asScala.toList
     val lineages = leafs.map(_.lineage).sorted
     val boundary = original_quadtree.getZone.getEnvelope
-    val quad = Quadtree.create[LineString](boundary, lineages)
+    val quad = edu.ucr.dblab.quadtree.Quadtree.create[LineString](boundary, lineages)
     val (empties, nonempties) = divideEmptyAndNonEmptyCells(dcelRDD, original_quadtree)
 
-    if(debug){
-      save{s"/tmp/empties${label}.tsv"}{
-        empties.values.map(m => s"${m.lineage}\n").toSeq
-      }
-      save{s"/tmp/quadtree.tsv"}{
-        original_quadtree.getLeafZones.asScala.map{ leaf =>
-          s"${leaf.lineage}\t${leaf.partitionId}\n"
-        }.toList.sorted
-      }
-      save{s"/tmp/boundary.tsv"}{
-        val boundary = envelope2polygon(original_quadtree.getZone.getEnvelope).toText
-        List(s"$boundary\n")
-      }
-    }
-
-    val (quadtree_prime, empties_prime) = cleanQuadtree(original_quadtree,
-      empties, nonempties)
-
-    logger.info("getClosestCell...")
-    val closestList = getClosestCell(quadtree_prime, empties_prime)
-    logger.info("getClosestCell... Done!")
-
-    val closestLineages = closestList.map(_.closest).toSet
-    val mapIndexLineage = original_quadtree.getLeafZones.asScala
-      .map(e => e.partitionId.toInt -> e.lineage).toMap
-
-    val fcells = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-      val lineage = mapIndexLineage(index)
-
-      if(closestLineages.contains(lineage)){
-        // Collect the face's id and its geometry... 
-        val faces = dcel.faces.map{ face =>
-          (face.id, face.getGeometry._1)
+    if(empties.isEmpty){
+      logger.info("No empty cells...")
+      dcelRDD
+    } else {
+      if(debug){
+        save{s"/tmp/empties${label}.tsv"}{
+          empties.values.map(m => s"${m.lineage}\n").toSeq
         }
-        // Collect the cell's lineage and its geometry...
-        val cells = closestList.filter(_.closest == lineage).map{ cell =>
-          val envelope = cell.point.getEnvelopeInternal
-          envelope.expandBy(precision) // Expand the reference point a little bit...
-          (cell.lineage, envelope2polygon(envelope))
+        save{s"/tmp/quadtree.tsv"}{
+          original_quadtree.getLeafZones.asScala.map{ leaf =>
+            s"${leaf.lineage}\t${leaf.partitionId}\n"
+          }.toList.sorted
         }
-
-        // Match the cell's lineage and its face's id...
-        val r = for{
-          c <- cells
-          // Query which face the reference point intersects...
-          f <- faces if f._2.intersects(c._2)
-        } yield {
-          (c._1, f._1)
+        save{s"/tmp/boundary.tsv"}{
+          val boundary = envelope2polygon(original_quadtree.getZone.getEnvelope).toText
+          List(s"$boundary\n")
         }
-        r.toIterator
-      } else {
-        Vector.empty[(String, String)].toIterator
       }
-    }.collect().filter(_._2.substring(0, 1) != "F")
 
-    // Helper function to check in a lineage is an extension of an element
-    // in a list of lineages...
-    def checkLinage(lineage: String, lineageList: List[String]): Boolean = {
-      lineageList.map{ l =>
-        if(lineage.size < l.size){
+      val (quadtree_prime, empties_prime) = cleanQuadtree(original_quadtree,
+        empties, nonempties)
+
+      val closestList = getClosestCell(quadtree_prime, empties_prime)
+
+      val closestLineages = closestList.map(_.closest).toSet
+      val mapIndexLineage = original_quadtree.getLeafZones.asScala
+        .map(e => e.partitionId.toInt -> e.lineage).toMap
+
+      val fcells = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
+        val dcel = iter.next()
+        val lineage = mapIndexLineage(index)
+
+        if(closestLineages.contains(lineage)){
+          // Collect the face's id and its geometry...
+          val faces = dcel.faces.map{ face =>
+            (face.id, face.getGeometry._1)
+          }
+          // Collect the cell's lineage and its geometry...
+          val cells = closestList.filter(_.closest == lineage).map{ cell =>
+            val envelope = cell.point.getEnvelopeInternal
+            envelope.expandBy(precision) // Expand the reference point a little bit...
+              (cell.lineage, envelope2polygon(envelope))
+          }
+
+          // Match the cell's lineage and its face's id...
+          val r = for{
+            c <- cells
+            // Query which face the reference point intersects...
+            f <- faces if f._2.intersects(c._2)
+          } yield {
+            (c._1, f._1)
+          }
+          r.toIterator
+        } else {
+          Vector.empty[(String, String)].toIterator
+        }
+      }.collect().filter(f => f._2.substring(0, 1) != "F")
+
+      // Helper function to check in a lineage is an extension of an element
+      // in a list of lineages...
+      def checkLinage(lineage: String, lineageList: List[String]): Boolean = {
+        if(lineageList.isEmpty){
           false
         } else {
-          l == lineage.substring(0, l.size)
+          lineageList.map{ l =>
+            if(lineage.size < l.size){
+              false
+            } else {
+              l == lineage.substring(0, l.size)
+            }
+          }.reduce(_ | _)
         }
-      }.reduce(_ | _)
-    }
-    val lineageList = fcells.map(_._1).toList
+      }
+      val lineageList = fcells.map(_._1).toList
 
-    // Re-visit partitions with empty cells and update them...
-    val dcelRDD_prime = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-      val lineage = mapIndexLineage(index)
-      if(checkLinage(lineage, lineageList)){  
-        val cell = fcells.filter(_._1 == lineage)
-        val id = cell.head._2
-        
-        dcel.faces.filter(_.isCellFace).map{ f =>
-          f.id = id
-          f.getHedges.foreach(_.id = id)
-          f
-        }
-        val d = LDCEL(index, dcel.vertices, dcel.half_edges, dcel.faces, dcel.index)
+      // Re-visit partitions with empty cells and update them...
+      val dcelRDD_prime = dcelRDD.mapPartitionsWithIndex{ case(index, iter) =>
+        val dcel = iter.next()
+        val lineage = mapIndexLineage(index)
+        if(checkLinage(lineage, lineageList)){
+          val cell = fcells.filter(_._1 == lineage)
+          val id = cell.head._2
+          
+          dcel.faces.filter(_.isCellFace).map{ f =>
+            f.id = id
+            f.getHedges.foreach(_.id = id)
+            f
+          }
+          val d = LDCEL(index, dcel.vertices, dcel.half_edges, dcel.faces, dcel.index)
 
-        Iterator(d)
-      } else {
-        // prune empty faces...
-        val faces = dcel.faces.filter(_.id.substring(0, 1) != "F")
-        val d = LDCEL(index, dcel.vertices, dcel.half_edges, faces, dcel.index)
-        Iterator(d)
-      }
-    }
-    
-    /*************************************************************************************/
-    if(debug){
-      save{"/tmp/edgesQuadtree.wkt"}{
-        original_quadtree.getLeafZones.asScala.map{ leaf =>
-          s"${envelope2polygon(leaf.getEnvelope)}\t${leaf.partitionId}\tL${leaf.lineage}\n"
+          Iterator(d)
+        } else {
+          // prune empty faces...
+          val faces = dcel.faces.filter(_.id.substring(0, 1) != "F")
+          val d = LDCEL(index, dcel.vertices, dcel.half_edges, faces, dcel.index)
+          Iterator(d)
         }
       }
-      save{s"/tmp/edgesEmpty${label}.wkt"}{
-        empties.values.map{ e =>
-          s"${envelope2polygon(e.boundary)}\t${e.id}\tL${e.lineage}\n"
-        }.toList
-      }
-      save{s"/tmp/edgesNonEmpty${label}.wkt"}{
-        nonempties.values.map{ e =>
-          s"${envelope2polygon(e.boundary)}\t${e.id}\tL${e.lineage}\n"
-        }.toList
-      }
-      save{s"/tmp/edgesQuadtreePrime${label}.wkt"}{
-        quadtree_prime.getLeafZones.asScala.map{ leaf =>
-          s"${envelope2polygon(leaf.getEnvelope)}\t${leaf.partitionId}\tL${leaf.lineage}\n"
+      
+      /*************************************************************************************/
+      if(debug){
+        save{"/tmp/edgesQuadtree.wkt"}{
+          original_quadtree.getLeafZones.asScala.map{ leaf =>
+            s"${envelope2polygon(leaf.getEnvelope)}\t${leaf.partitionId}\tL${leaf.lineage}\n"
+          }
+        }
+        save{s"/tmp/edgesEmpty${label}.wkt"}{
+          empties.values.map{ e =>
+            s"${envelope2polygon(e.boundary)}\t${e.id}\tL${e.lineage}\n"
+          }.toList
+        }
+        save{s"/tmp/edgesNonEmpty${label}.wkt"}{
+          nonempties.values.map{ e =>
+            s"${envelope2polygon(e.boundary)}\t${e.id}\tL${e.lineage}\n"
+          }.toList
+        }
+        save{s"/tmp/edgesQuadtreePrime${label}.wkt"}{
+          quadtree_prime.getLeafZones.asScala.map{ leaf =>
+            s"${envelope2polygon(leaf.getEnvelope)}\t${leaf.partitionId}\tL${leaf.lineage}\n"
+          }
+        }
+        save{s"/tmp/edgesEmptiesPrime${label}.wkt"}{
+          empties_prime.values.map{ e =>
+            s"${envelope2polygon(e.boundary)}\t${e.id}\tL${e.lineage}\n"
+          }.toList
+        }
+        save{s"/tmp/mapLineageFid${label}.tsv"}{
+          fcells.map(f => s"L${f._1}\t${f._2}\n")
         }
       }
-      save{s"/tmp/edgesEmptiesPrime${label}.wkt"}{
-        empties_prime.values.map{ e =>
-          s"${envelope2polygon(e.boundary)}\t${e.id}\tL${e.lineage}\n"
-        }.toList
-      }
-      save{s"/tmp/mapLineageFid${label}.tsv"}{
-        fcells.map(f => s"L${f._1}\t${f._2}\n")
-      }
-    }
-    /*************************************************************************************/
+      /*************************************************************************************/
 
-    dcelRDD
-  } 
+      dcelRDD_prime
+    }
+  }
 }

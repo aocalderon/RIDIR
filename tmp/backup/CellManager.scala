@@ -1,10 +1,10 @@
-import org.datasyslab.geospark.spatialPartitioning.quadtree.{StandardQuadTree, QuadRectangle}
 import org.apache.spark.rdd.RDD
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import com.vividsolutions.jts.geom.{Envelope, Coordinate, Point, LineString, Polygon}
 import com.vividsolutions.jts.io.WKTReader
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
+import edu.ucr.dblab.quadtree._
 import DCELMerger.{geofactory, precision, logger}
 import DCELMerger.{timer, save}
 import scala.annotation.tailrec
@@ -76,7 +76,10 @@ object CellManager{
     (cells, corner)
   }
 
-  def getNextCellWithEdges(M: Map[Int, Int], quadtree: StandardQuadTree[LineString], grids: Map[Int, QuadRectangle], label: String = "A"): List[(Int, Int, Point)] = {
+  def getNextCellWithEdges(M: Map[Int, Int],
+    quadtree: edu.ucr.dblab.quadtree.StandardQuadTree[LineString],
+    grids: Map[Int, edu.ucr.dblab.quadtree.QuadRectangle], label: String = "A"):
+      List[(Int, Int, Point)] = {
     val cells = grids.map(grid => grid._1 -> Cell(grid._2.partitionId.toInt, grid._2.lineage, grid._2.getEnvelope)).toMap
     var result = new ListBuffer[(Int, Int, Point)]()
     var R = new ListBuffer[Int]()
@@ -162,8 +165,9 @@ object CellManager{
   ///////////
   import scala.collection.mutable.HashSet
 
-  def groupByLineage(emptyCells: Vector[edu.ucr.dblab.QuadRectangle]):
-      (Vector[edu.ucr.dblab.QuadRectangle], Vector[edu.ucr.dblab.QuadRectangle])= {
+  def groupByLineage(emptyCells: Vector[edu.ucr.dblab.quadtree.QuadRectangle]):
+      (Vector[edu.ucr.dblab.quadtree.QuadRectangle],
+        Vector[edu.ucr.dblab.quadtree.QuadRectangle])= {
     val E = emptyCells
       .map{ cell =>
         val parent_lineage = cell.lineage.reverse.tail.reverse
@@ -189,7 +193,7 @@ object CellManager{
             a.expandToInclude(b)
             a
           }
-        val rectangle = new edu.ucr.dblab.QuadRectangle(envelope)
+        val rectangle = new edu.ucr.dblab.quadtree.QuadRectangle(envelope)
         rectangle.lineage = lineage
         rectangle
       }
@@ -198,10 +202,10 @@ object CellManager{
   }
 
   @tailrec
-  def mergeEmptyCells(empties: Map[Int, Vector[edu.ucr.dblab.QuadRectangle]],
+  def mergeEmptyCells(empties: Map[Int, Vector[edu.ucr.dblab.quadtree.QuadRectangle]],
     levels: List[Int],
-    previous: Vector[edu.ucr.dblab.QuadRectangle],
-    accum: Vector[edu.ucr.dblab.QuadRectangle]): Vector[edu.ucr.dblab.QuadRectangle] = {
+    previous: Vector[edu.ucr.dblab.quadtree.QuadRectangle],
+    accum: Vector[edu.ucr.dblab.quadtree.QuadRectangle]): Vector[edu.ucr.dblab.quadtree.QuadRectangle] = {
 
     levels match {
       case Nil => accum
@@ -217,8 +221,8 @@ object CellManager{
     }
   }
 
-  def cleanQuadtree[T](quadtree: edu.ucr.dblab.StandardQuadTree[T],
-    M: Map[Int, Int]): edu.ucr.dblab.StandardQuadTree[T] = {
+  def cleanQuadtree[T](quadtree: edu.ucr.dblab.quadtree.StandardQuadTree[T],
+    M: Map[Int, Int]): edu.ucr.dblab.quadtree.StandardQuadTree[T] = {
     
     val X = M.filter(_._2 == 0).map(_._1).toSet
     val emptyCells = quadtree.getLeafZones.asScala
@@ -227,12 +231,12 @@ object CellManager{
     val empties = emptyCells.map(cell => (cell.lineage.length(), cell))
       .groupBy(_._1)
       .map(g => g._1 -> g._2.map(_._2).toVector)
-      .withDefaultValue(Vector.empty[edu.ucr.dblab.QuadRectangle])
+      .withDefaultValue(Vector.empty[edu.ucr.dblab.quadtree.QuadRectangle])
 
     val levels = (1 to empties.keys.max).toList.reverse
     
-    val previous = Vector.empty[edu.ucr.dblab.QuadRectangle]
-    val accum = Vector.empty[edu.ucr.dblab.QuadRectangle]
+    val previous = Vector.empty[edu.ucr.dblab.quadtree.QuadRectangle]
+    val accum = Vector.empty[edu.ucr.dblab.quadtree.QuadRectangle]
 
     val emptyCells_prime = mergeEmptyCells(empties, levels, previous, accum)
 
@@ -243,7 +247,7 @@ object CellManager{
     val boundary = quadtree.getZone().getEnvelope()
     val lineages = (nonemptyCells ++ emptyCells_prime).map(_.lineage).toList
 
-    Quadtree.create[T](boundary, lineages) 
+    edu.ucr.dblab.quadtree.Quadtree.create[T](boundary, lineages) 
   }
 
   def getNextCellWithEdges2(M: Map[Int, Int], quadtree: edu.ucr.dblab.StandardQuadTree[LineString]): List[(Int, Int, Point)] = {
@@ -357,7 +361,7 @@ object CellManager{
     val grids = leafs.map(leaf => leaf.partitionId.toInt -> leaf).toMap
     val lineages = leafs.map(_.lineage).sorted
     val boundary = previous_quadtree.getZone.getEnvelope
-    val quad = Quadtree.create[LineString](boundary, lineages)
+    val quad = edu.ucr.dblab.quadtree.Quadtree.create[LineString](boundary, lineages)
     val M = getEmptyCells(dcelRDD, grids)
     val quadtree = cleanQuadtree(quad, M)
 

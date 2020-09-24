@@ -15,8 +15,7 @@ import org.apache.spark.sql.functions
 import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geospark.spatialPartitioning.quadtree._
-import org.datasyslab.geospark.spatialPartitioning.{KDBTree, KDBTreePartitioner}
+import edu.ucr.dblab.quadtree._
 import org.geotools.geometry.jts.GeometryClipper
 import ch.cern.sparkmeasure.TaskMetrics
 import org.rogach.scallop._
@@ -32,7 +31,7 @@ object DCELMerger{
   val precision: Double = 1 / model.getScale
 
   case class Settings(spark: SparkSession, params: DCELMergerConf, conf: SparkConf,
-    startTime: Long, appId: String, cores: Int, executors: Int)
+    startTime: Long, appId: String)
 
   def clocktime = System.currentTimeMillis()
 
@@ -43,12 +42,9 @@ object DCELMerger{
 
     val tick = (end - settings.startTime) / 1e3
     val time = (end - start) / 1e3
-    val partitions = settings.params.partitions()
 
     val appId = settings.appId
-    val cores = settings.cores
-    val executors = settings.executors
-    val log = f"DCELMerger|$appId|$executors%2d|$cores%2d|$partitions%5d|$msg%-30s|$time%6.2f"
+    val log = f"DCELMerger|$appId|$msg%-30s|$time%6.2f"
     logger.info(log)
 
     result
@@ -399,24 +395,21 @@ object DCELMerger{
     val startTime = spark.sparkContext.startTime
     val config = spark.sparkContext.getConf
     val local = config.get("spark.master").contains("local")
-    val (appId, cores, executors) = if(local){
+    val appId = if(local){
       val appId = config.get("spark.app.id")
-      val cores = config.get("spark.master").split("\\[")(1).replace("]","").toInt
       val command = System.getProperty("sun.java.command")
       logger.info(s"${appId}|${command}")
 
-      (appId, cores, 1)
+      appId
     } else {
       val appId = config.get("spark.app.id").takeRight(4)
-      val cores = config.get("spark.executor.cores").toInt
-      val executors = config.get("spark.executor.instances").toInt
       val command = System.getProperty("sun.java.command")
       logger.info(s"${appId}|${command}")
 
-      (appId, cores, executors)
+      appId
     }
     implicit val settings = Settings(spark,
-      params, config, startTime, appId, cores, executors)
+      params, config, startTime, appId)
     val metrics = TaskMetrics(spark)
     def getPhaseMetrics(metrics: TaskMetrics, phaseName: String): Dataset[Row] = {
       metrics.createTaskMetricsDF()
@@ -456,20 +449,23 @@ object DCELMerger{
       val edgesB = getEdges(polygonsB)
       logger.info(s"Edges in B: ${edgesB.count()}")
       val edges = edgesA.union(edgesB)
-      val (edgesRDD, quadtree: StandardQuadTree[LineString]) = if(params.custom()){
-        val (edgesRDD, boundary) = setSpatialRDD(edges)
-        val qtree = getQuadTree(edges, boundary)
-        val partitioner = new QuadTreePartitioner(qtree)
-        edgesRDD.spatialPartitioning(partitioner)
-        (edgesRDD, qtree)
-      } else {
-        val (edgesRDD, boundary) = setSpatialRDD(edges)
-        edgesRDD.spatialPartitioning(GridType.QUADTREE, params.partitions())
-        val qtree = edgesRDD.partitionTree.asInstanceOf[StandardQuadTree[LineString]]
-        qtree.assignPartitionLineage()
-        (edgesRDD, qtree)
-      }
-      val cells = quadtree.getLeafZones.asScala.map(cell => (cell.partitionId.toInt -> cell)).toMap
+      val nEdges = edges.count
+
+      val (edgesRDD, boundary) = setSpatialRDD(edges)
+      val fc = new FractionCalculator()
+      val fraction = fc.getFraction(partitions, nEdges)
+      debug{ logger.info(s"Fraction: ${fraction}") }
+      val samples = edges.sample(false, fraction, 54)
+        .map(_.getEnvelopeInternal).collect().toList.asJava
+      val partitioning = new QuadtreePartitioning(samples,
+        boundary.getEnvelope, partitions)
+      val quadtree = partitioning.getPartitionTree()
+      quadtree.assignPartitionLineage()
+      val partitioner = new QuadTreePartitioner(quadtree)
+      edgesRDD.spatialPartitioning(partitioner)
+      
+      val cells = quadtree.getLeafZones.asScala
+        .map(cell => (cell.partitionId.toInt -> cell)).toMap
       edgesRDD.spatialPartitionedRDD.rdd.cache
       val nEdgesRDD = edgesRDD.spatialPartitionedRDD.rdd.count()
       (edgesRDD, nEdgesRDD, cells, quadtree)
@@ -479,27 +475,27 @@ object DCELMerger{
         cells.toSeq.sortBy(_._1).map{ case (i,q) => envelope2polygon(q.getEnvelope)}
       }
   
-    log(f"Total number of partitions|${cells.size}")
-    log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
-    log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
+    debug{
+      log(f"Total number of partitions|${cells.size}")
+      log(f"Total number of edges in raw|${edgesRDD.rawSpatialRDD.count()}")
+      log(f"Total number of edges in spatial|${edgesRDD.spatialPartitionedRDD.count()}")
 
-    
-    save{"/tmp/envelope.wkt"}{
-      val boundary = edgesRDD.boundary()
-      val wkt = envelope2polygon(boundary).toText()
-      Array(wkt)
+      save{"/tmp/envelope.wkt"}{
+        val boundary = edgesRDD.boundary()
+        val wkt = envelope2polygon(boundary).toText()
+        Array(wkt)
+      }
+      save{"/tmp/quadtree.wkt"}{
+        val cells = quadtree.getLeafZones.asScala
+          .map(leaf => leaf.partitionId -> leaf)
+          .toMap
+        edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, it) =>
+          val lineage = cells(index).lineage
+          val wkt = envelope2polygon(cells(index).getEnvelope).toText
+          Iterator(s"$wkt\t$lineage\t$index\n")
+        }.collect()
+      }
     }
-    save{"/tmp/quadtree.wkt"}{
-      val cells = quadtree.getLeafZones.asScala
-        .map(leaf => leaf.partitionId -> leaf)
-        .toMap
-      edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ (index, it) =>
-        val lineage = cells(index).lineage
-        val wkt = envelope2polygon(cells(index).getEnvelope).toText
-        Iterator(s"$wkt\t$lineage\t$index\n")
-      }.collect()
-    }
-
     /*****************************************************************************/
     edgesRDD.spatialPartitionedRDD.rdd.mapPartitionsWithIndex{ case(index, edges) =>
       edges.map{ edge =>
@@ -545,69 +541,12 @@ object DCELMerger{
       dcels
     }
     metrics.end()
-    val phaseExtract = getPhaseMetrics(metrics, "Extract DCELs")
-    phaseExtract.repartition(1).write
-      .mode("overwrite")
-      .format("csv")
-      .option("delimiter", "\t")
-      .option("header", true)
-      .save("hdfs:///user/acald013/logs/sdcel")
-
-    /******************************************************/
-    dcelsRDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-
-      dcel._1.faces.map{ face =>
-        val id = face.id
-        val arr = id.split("\\|").filter(_.substring(0,1) != "F")
-        val n = arr.length
-        val polys = face.getPolygons
-        val wkts = polys.map{_.toText}.mkString("|")
-
-        (id, n, wkts)
-      }.toIterator
-    }.filter(_._2 > 1)
-      .map{ case(id, n, wkts) => s"$id\t$n\t$wkts"}
-      .toDF().write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text("tmp/A_prime")
-    /******************************************************/
     
-/*
-    debug{
-      save{"/tmp/edgesHA.wkt"}{
-        dcelsRDD.map(_._1).flatMap{ dcel =>
-          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.index}\n")
-        }.collect()
-      }
-      save{"/tmp/edgesFA.wkt"}{
-        dcelsRDD.map(_._1).flatMap{ dcel =>
-          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.index}\t${f.isCellBorder(grids)}\n")
-        }.collect()
-      }
-      save{"/tmp/edgesHB.wkt"}{
-        dcelsRDD.map(_._2).flatMap{ dcel =>
-          dcel.half_edges.map(h => s"${h.toLineString.toText()}\t${h.id}\t${dcel.index}\n")
-        }.collect()
-      }
-      save{"/tmp/edgesFB.wkt"}{
-        dcelsRDD.map(_._2).flatMap{ dcel =>
-          dcel.faces.map(f => s"${f.getGeometry._1.toText()}\t${f.id}\t${dcel.index}\t${f.isCellBorder(grids)}\n")
-        }.collect()
-      }
-    }
- */
-
     // Calling methods in CellManager.scala
     val (dcelARDD, dcelBRDD) = timer{"Updating empty cells"}{
 
-      ////
-      logger.info("Starting CellManager...")
       val dcelARDD0 = updateCellsWithoutId(dcelsRDD.map{_._1}, quadtree,
         label = "A", debug = false)
-      logger.info("Starting CellManager... Done!")
-      ////
-
       val dcelARDD = dcelARDD0
         .mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
@@ -627,13 +566,8 @@ object DCELMerger{
         .cache()
       dcelARDD.count()
 
-      ////
-      logger.info("Starting CellManager...")
       val dcelBRDD0 = updateCellsWithoutId(dcelsRDD.map{_._2}, quadtree,
         label = "B", debug = false)
-      logger.info("Starting CellManager... Done!")
-      ////
-
       val dcelBRDD = dcelBRDD0.mapPartitionsWithIndex{ case(index, iter) =>
           val dcel = iter.next()
           val faces = dcel.faces.groupBy(_.id) // Grouping multi-parts
@@ -653,48 +587,6 @@ object DCELMerger{
       dcelBRDD.count()
       (dcelARDD, dcelBRDD)
     }
-
-    /****************************************************************************/
-    dcelARDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-
-      dcel.faces.map{ face =>
-        val id = face.id
-        val isF = id.substring(0,1) == "F"
-        val polys = face.getPolygons
-        val n = polys.length
-
-        if(n > 1 & !isF){
-          val wkts = polys.map{_.toText}.mkString("|")
-          s"$index\t$id\t$n\t$wkts"
-        } else {
-          ""
-        }
-      }.toIterator
-    }.toDF().write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text("tmp/facesA")
-
-    dcelBRDD.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcel = iter.next()
-
-      dcel.faces.map{ face =>
-        val id = face.id
-        val isF = id.substring(0,1) == "F"
-        val polys = face.getPolygons
-        val n = polys.length
-
-        if(n > 1 & !isF){
-          val wkts = polys.map{_.toText}.mkString("|")
-          s"$index\t$id\t$n\t$wkts"
-        } else {
-          ""
-        }
-      }.toIterator
-    }.toDF().write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text("tmp/facesB")
-    /****************************************************************************/    
 
     debug{
       save{"/tmp/edgesHAprime.wkt"}{
@@ -760,30 +652,6 @@ object DCELMerger{
         }.collect()
       }
     }
-
-    /**********************************************************************/
-    logger.info("Saving merge dcel and quadtree...")
-    val faceRDD = dcels_prime.mapPartitionsWithIndex{ case(index, iter) =>
-      val dcels = iter.next()
-      val dcel = dcels._1
-
-      dcel.faces.map{ face =>
-        val id = face.id
-        val wkt = face.getGeometry._1.toText
-
-        s"$wkt\t$id\t$index"
-      }.toIterator
-    }
-    faceRDD.toDF().write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text("tmp/faces")
-
-    save{"/tmp/quadtree.lin"}{
-      quadtree.getLeafZones.asScala.map(_.lineage + "\n")
-    }
-    logger.info("Saving merge dcel and quadtree... Done!")
-    /**********************************************************************/
-
     
     // Calling methods in SingleLabelChecker...
     val dcels = timer{"Checking single-label faces"}{
@@ -881,7 +749,6 @@ object DCELMerger{
       else if(pb.getArea < 0.001 || pb.getArea.isNaN()) a
       else{
         geofactory.createGeometryCollection(Array(pa, pb)).buffer(0.0).toText()
-       // pa.union(pb).toText()
       }
     }
 
@@ -901,59 +768,47 @@ object DCELMerger{
     def differenceB(dcel: LDCEL): Vector[(String, Geometry)] = {
       symmetricDifference(dcel).filter(_._1.substring(0, 1) == "B")
     }
-    
+
     def overlapOp(dcel: RDD[LDCEL], op: (LDCEL) => Vector[(String, Geometry)],
-        filename: String = "/tmp/overlay.wkt"){
+        output_name: String){
 
-      val results = dcel.flatMap{op}//.filter{_._2.getArea > 0.0001}
-        .map{ case (id, geom) =>
-          (id, geom.toText())
-        }
-        .reduceByKey{ case(a, b) =>
-          mergePolygons(a, b)
-        }
+      val results = dcel.flatMap{op}
+        .map{ case (id, geom) => (id, geom.toText()) }
+        .reduceByKey{ case(a, b) => mergePolygons(a, b) }
       results.cache()
-      logger.info(s"Overlay operation done! [${results.count()} results].")
 
-      debug{
-        save{filename}{
-          results.map{ case(id, wkt) => s"$wkt\t$id\n" }.collect()
+      if(local){
+        save{s"${output_name}.wkt"}{
+          results.map{case(id, wkt) => s"$wkt\t$id\n" }.collect
         }
+      } else {
+        results.map{case(id, wkt) => s"$wkt\t$id" }.toDS
+          .write.text(output_name)
+        logger.info(s"Saved operation at ${output_name} [${results.count()} results].")
       }
     }
 
-    val output_path = "/tmp/edges"
+    val output_path = params.output()
     val dcel = dcels.map(_._1).cache()
     timer{"Intersection"}{
-      overlapOp(dcel, intersection, s"${output_path}OpIntersection.wkt")
+      overlapOp(dcel, intersection, s"${output_path}/OpIntersection")
     }
     timer{"Symmetric"}{
-      overlapOp(dcel, symmetricDifference, s"${output_path}OpSymmetric.wkt")
+      overlapOp(dcel, symmetricDifference, s"${output_path}/OpSymmetric")
     }
     timer{"Union"}{
-      overlapOp(dcel, union, s"${output_path}OpUnion.wkt")
+      overlapOp(dcel, union, s"${output_path}/OpUnion")
     }
     timer{"Diff A"}{
-      overlapOp(dcel, differenceA, s"${output_path}OpDifferenceA.wkt")
+      overlapOp(dcel, differenceA, s"${output_path}/OpDifferenceA")
     }
     timer{"Diff B"}{
-      overlapOp(dcel, differenceB, s"${output_path}OpDifferenceB.wkt")
+      overlapOp(dcel, differenceB, s"${output_path}/OpDifferenceB")
     }
     
 
     // Closing session...
     logger.info("Closing session...")
-    debug{
-      /*
-      val phases = phaseExtract.union(phaseMerge)
-      phases.repartition(1).write
-        .mode("overwrite")
-        .format("csv")
-        .option("delimiter", "\t")
-        .option("header", true)
-        .save("hdfs:///user/acald013/logs/sdcel")
-       */
-    }
     spark.close()
     logger.info("Closing session... Done!")
   }  
@@ -975,6 +830,8 @@ class DCELMergerConf(args: Seq[String]) extends ScallopConf(args) {
   val custom:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val output:      ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
+  
 
   verify()
 }

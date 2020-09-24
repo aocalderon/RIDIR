@@ -18,8 +18,9 @@ INPUT1=Datasets/Phili/phili_2000_2272.wkt
 OFFSET1=2
 INPUT2=Datasets/Phili/phili_2010_2272.wkt
 OFFSET2=2
+OUTPUT_PATH="/tmp/"
 
-while getopts "p:e:c:dl" OPTION; do
+while getopts "p:e:c:o:dl" OPTION; do
     case $OPTION in
     p)
         PARTITIONS=$OPTARG
@@ -31,7 +32,10 @@ while getopts "p:e:c:dl" OPTION; do
 	CORES=$OPTARG
 	;;
     l)
-	MASTER="local[${CORES}]"
+	MASTER="local[*]"
+	;;
+    o)
+	OUTPUT_PATH=$OPTARG
 	;;
     d)
 	DEBUG="--debug"
@@ -52,5 +56,5 @@ spark-submit \
      --master $MASTER --deploy-mode client \
      --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
      --class $CLASS_NAME $CLASS_JAR \
-     --input1 $INPUT1 --offset1 $OFFSET1 --input2 $INPUT2 --offset2 $OFFSET2 \
+     --input1 $INPUT1 --offset1 $OFFSET1 --input2 $INPUT2 --offset2 $OFFSET2 --output $OUTPUT_PATH \
      --partitions $PARTITIONS $DEBUG 
