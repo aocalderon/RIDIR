@@ -1,3 +1,5 @@
+package edu.ucr.dblab.sdcel
+
 import com.vividsolutions.jts.geomgraph.index.{SimpleMCSweepLineIntersector, SegmentIntersector}
 import com.vividsolutions.jts.algorithm.RobustLineIntersector
 import com.vividsolutions.jts.geom.{PrecisionModel, Envelope, Coordinate}
@@ -7,7 +9,7 @@ import com.vividsolutions.jts.geom.{LinearRing, LineString, Polygon}
 import scala.collection.JavaConverters._
 import edu.ucr.dblab.sdcel.geometries.EdgeData
 
-object SweepLine{
+object SweepLine2 {
 
   def getEdgesOnCell(outerEdges: Vector[LineString], mbr: LinearRing)
     (implicit geofactory: GeometryFactory)
@@ -74,14 +76,6 @@ object SweepLine{
         segment.setUserData(data)
         Vector(segment)
       } else {
-        val eiList = edge.getEdgeIntersectionList
-        eiList.addEndpoints()
-        val coords = eiList.iterator.asScala.toArray
-          .map(_.asInstanceOf[EdgeIntersection].getCoordinate)
-        coords.zip(coords.tail).foreach{ case(p1, p2) =>
-          val wkt = geofactory.createLineString(Array(p1,p2)).toText
-          //println(wkt)
-        }
         Vector.empty[LineString]
       }
     }.toVector

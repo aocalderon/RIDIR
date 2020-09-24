@@ -1,3 +1,5 @@
+package edu.ucr.dblab.sdcel
+
 import scala.collection.JavaConverters._
 import scala.io.Source
 import sys.process._
@@ -13,17 +15,14 @@ import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
-import edu.ucr.dblab.quadtree._
+import edu.ucr.dblab.sdcel.quadtree._
+import edu.ucr.dblab.sdcel.geometries._
 
-import DCELMerger.{cell2gedges, transform, merge, pair, filter, getLDCEL}
-
-case class EdgeData(polygonId: String, ringId: Int, edgeId: Int, isHole: Boolean){
-  override def toString: String = s"$polygonId\t$ringId\t$edgeId\t$isHole"
-}
-case class Cell(id: Int, lineage: String, mbr: LinearRing)
 
 object DCELMerger2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
+
+  case class Cell(id: Int, lineage: String, mbr: LinearRing)
 
   def main(args: Array[String]) = {
     // Starting session...
@@ -124,7 +123,7 @@ object DCELMerger2 {
         cell.intersects(edge)
       }
 
-      val edgesOnCell = SweepLine.getEdgesOnCell(outerEdges.toVector, cell)
+      val edgesOnCell = SweepLine2.getEdgesOnCell(outerEdges.toVector, cell)
 
       val r = (index, edgesOnCell, innerEdges)
       Iterator(r)
@@ -157,7 +156,45 @@ object DCELMerger2 {
     spark.close
   }
 
-  def getLineStrings(polygon: Polygon, polygon_id: Long)(implicit geofactory: GeometryFactory): List[LineString] = {
+  // NEED TEST THIS!!!
+  def getVertices(hedges: Vector[Half_edge])
+    (implicit geofactory: GeometryFactory): Iterable[Vertex] = {
+    val origMap = hedges.map(h => (h.orig, (h.angleAtOrig, h)))
+    val destMap = hedges.map(h => (h.dest, (h.angleAtDest, h)))
+
+    (origMap union destMap)
+      .groupBy(_._1).map{ case(vertex, hList) =>
+        val hedges = hList.map(_._2).groupBy(_._1).flatMap{ case(angle, hList) =>
+          val hedgesByAngle = hList.map(_._2)
+          hedgesByAngle.size match {
+            case 2 => {
+              val h1 = hedgesByAngle.head
+              val h2 = hedgesByAngle.last
+              h1.twin = h2
+              h2.twin = h1 
+              List(h1, h2)
+            }
+            case 1 => {
+              val h1 = hedgesByAngle.head
+              val h2 = h1.reverse
+              h1.twin = h2
+              h2.twin = h1 
+              List(h1, h2)
+            }
+            case _ => {
+              // can't happen
+              List.empty[Half_edge]
+            }
+          }
+        }
+        vertex.setHedges(hedges.toList)
+        vertex
+      }
+  }
+
+  def getLineStrings(polygon: Polygon, polygon_id: Long)
+    (implicit geofactory: GeometryFactory): List[LineString] = {
+
     getRings(polygon).zipWithIndex
       .flatMap{ case(ring, ring_id) =>
         ring.zip(ring.tail).zipWithIndex.map{ case(pair, order) =>
