@@ -39,7 +39,7 @@ object SweepLine{
       val coords = start +: inners :+ end
       coords.zip(coords.tail).map{ case(p1, p2) =>
         val edge = geofactory.createLineString(Array(p1, p2))
-        edge.setUserData(EdgeData("F",0,0,false))
+        edge.setUserData(EdgeData(-1,0,0,false))
         edge
       }
     }.toVector

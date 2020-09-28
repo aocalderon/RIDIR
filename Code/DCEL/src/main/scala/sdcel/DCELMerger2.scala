@@ -34,18 +34,23 @@ object DCELMerger2 {
     import spark.implicits._
     implicit val model = new PrecisionModel(1000)
     implicit val geofactory = new GeometryFactory(model)
-    //val input = "gadm/level1"
-    val input = "tmp/edgesDemo"
+    val precision = 1.0 / model.getScale
+    val params = new Params(args)
+    val input = params.input1()
+    val local = params.local()
     val home = System.getProperty("user.home")
     val path = s"${home}/RIDIR/Code/Scripts/gadm"
-    val precision = 1.0 / model.getScale
     logger.info(s"Using $precision precision.")
     logger.info("Starting session... Done!")
 
     // Reading data...
-    val parts = (s"hdfs dfs -ls ${input}/part*" #| "tail -n 1" !!)
+    val partitions = if(local){
+      params.partitions()
+    } else {
+      val parts = (s"hdfs dfs -ls ${input}/part*" #| "tail -n 1" !!)
       .split("/").reverse.head.split("-")(1).toInt
-    val partitions = parts + 1
+      parts + 1
+    }
     val edgesRDD = spark.read.textFile(input).rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
@@ -53,7 +58,7 @@ object DCELMerger2 {
           val arr = line.split("\t")
           val wkt = arr(0)
           val partitionId = arr(1).toInt
-          val polygonId = arr(2)
+          val polygonId = arr(2).toInt
           val ringId = arr(3).toInt
           val edgeId = arr(4).toInt
           val isHole = arr(5).toBoolean
@@ -65,6 +70,7 @@ object DCELMerger2 {
       }.partitionBy(new SimplePartitioner(partitions))
       .map(_._2).persist()
     val nEdgesRDD = edgesRDD.count()
+    logger.info("Reading file done!")
 
     // Reading quadtree...
     val quadtreeBuff = Source.fromFile(s"${path}/quadtree.wkt")
@@ -88,12 +94,7 @@ object DCELMerger2 {
       stats.map(_._3).min,
       stats.map(_._4).max
     )
-    println(envelope2polygon(boundary).toText)
-    println()
     val quadtree = Quadtree.create(boundary, lineages)
-    quadtree.getLeafZones.asScala.foreach{ leaf =>
-      println(envelope2polygon(roundEnvelope(leaf.getEnvelope)).toText)
-    }
     quadtreeBuff.close
 
     // Getting cells...
@@ -124,31 +125,35 @@ object DCELMerger2 {
       }
 
       val edgesOnCell = SweepLine2.getEdgesOnCell(outerEdges.toVector, cell)
+      val vertices = getVertices(edgesOnCell.map(eoc => Half_edge(eoc)), index)
+      val outerHedges = vertices.flatMap{ vertex =>
+        vertex.getIncidentHedges
+      }
 
-      val r = (index, edgesOnCell, innerEdges)
+      val r = (index, outerHedges, vertices)
       Iterator(r)
     }.cache
     val n = dcels.count()
+    logger.info("Getting LDCELs done!")
 
-    println(n)
-    save{"/tmp/edgesT.wkt"}{
+    save{"/tmp/edgesH.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
-        dcel._2.map{ edge =>
-          val data = edge.getUserData.asInstanceOf[EdgeData].toString
-          val wkt = edge.toText
-          s"$wkt\t$index\t$data\n"
+        dcel._2.filter(_.data.polygonId >= 0).map{ hedge =>
+          val wkt = hedge.wkt
+          val pid = hedge.data.polygonId
+          val eid = hedge.data.edgeId
+          s"$wkt\t$pid\t$eid\t$index\n"
         }.toIterator
       }.collect
     }
     
-    save{"/tmp/edgesI.wkt"}{
+    save{"/tmp/edgesV.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
-        dcel._3.map{ edge =>
-          val data = edge.getUserData.asInstanceOf[EdgeData].toString
-          val wkt = edge.toText
-          s"$wkt\t$index\t$data\n"
+        dcel._3.map{ vertex =>
+          val wkt = vertex.toPoint.toText
+          s"$wkt\t$index\n"
         }.toIterator
       }.collect
     }
@@ -156,13 +161,12 @@ object DCELMerger2 {
     spark.close
   }
 
-  // NEED TEST THIS!!!
-  def getVertices(hedges: Vector[Half_edge])
+  def getVertices(hedges: Vector[Half_edge], index: Int = -1)
     (implicit geofactory: GeometryFactory): Iterable[Vertex] = {
     val origMap = hedges.map(h => (h.orig, (h.angleAtOrig, h)))
     val destMap = hedges.map(h => (h.dest, (h.angleAtDest, h)))
 
-    (origMap union destMap)
+    val vertices = (origMap union destMap)
       .groupBy(_._1).map{ case(vertex, hList) =>
         val hedges = hList.map(_._2).groupBy(_._1).flatMap{ case(angle, hList) =>
           val hedgesByAngle = hList.map(_._2)
@@ -170,16 +174,16 @@ object DCELMerger2 {
             case 2 => {
               val h1 = hedgesByAngle.head
               val h2 = hedgesByAngle.last
-              h1.twin = h2
-              h2.twin = h1 
+              //h1.twin = h2
+              //h2.twin = h1 
               List(h1, h2)
             }
             case 1 => {
               val h1 = hedgesByAngle.head
-              val h2 = h1.reverse
-              h1.twin = h2
-              h2.twin = h1 
-              List(h1, h2)
+              //val h2 = h1.reverse
+              //h1.twin = h2
+              //h2.twin = h1 
+              List(h1/*, h2*/)
             }
             case _ => {
               // can't happen
@@ -187,9 +191,29 @@ object DCELMerger2 {
             }
           }
         }
-        vertex.setHedges(hedges.toList)
-        vertex
+        vertex.copy(hedges = hedges.toList)
       }
+    /*
+    vertices.foreach{ vertex =>
+      val sortedIncidents = vertex.getIncidentHedges
+      val size = sortedIncidents.size
+
+      if(index == 14) println(s"Size: $size")
+      for(i <- 0 until (size - 1)){
+        val current = sortedIncidents(i)
+        val next    = sortedIncidents(i + 1)
+        if(index == 14) println(s"Current: $current Next: $next")
+        current.next = next.twin
+        current.next.prev = current
+      }
+      val current = sortedIncidents(size - 1)
+      val next    = sortedIncidents(0)
+      if(index == 14) println(s"Current: $current Next: ${next.twin}")
+      current.next = next.twin
+      current.next.prev = current
+    }
+     */
+    vertices
   }
 
   def getLineStrings(polygon: Polygon, polygon_id: Long)

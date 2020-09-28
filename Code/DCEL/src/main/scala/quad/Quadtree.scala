@@ -3,9 +3,10 @@ package edu.ucr.dblab.quadtree
 import com.vividsolutions.jts.geom.Envelope
 
 object Quadtree {  
-  def create[T](boundary: Envelope, lineages: List[String]): StandardQuadTree[T] = {
+  def create[T](boundary: Envelope, lineages: List[String]):
+      edu.ucr.dblab.quadtree.StandardQuadTree[T] = {
     val maxLevel = lineages.map(_.size).max
-    val quadtree = new StandardQuadTree[T](new QuadRectangle(boundary), 0, 1, maxLevel)
+    val quadtree = new edu.ucr.dblab.quadtree.StandardQuadTree[T](new edu.ucr.dblab.quadtree.QuadRectangle(boundary), 0, 1, maxLevel)
     quadtree.split()
     for(lineage <- lineages.sorted){
       val arr = lineage.map(_.toInt - 48)
