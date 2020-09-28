@@ -83,9 +83,6 @@ public class StandardQuadTree<T> implements Serializable {
     }
 
     public StandardQuadTree<T>[] getRegions(){
-	if(this.regions == null){
-	    regions = new StandardQuadTree[4];
-	}
 	return regions;
     }
 
