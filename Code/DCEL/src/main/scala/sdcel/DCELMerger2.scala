@@ -124,13 +124,15 @@ object DCELMerger2 {
         cell.intersects(edge)
       }
 
+      val h = SweepLine2.getEdgesOnCell2(outerEdges.toVector, cell)
+
       val edgesOnCell = SweepLine2.getEdgesOnCell(outerEdges.toVector, cell)
       val vertices = getVertices(edgesOnCell.map(eoc => Half_edge(eoc)), index)
       val outerHedges = vertices.flatMap{ vertex =>
         vertex.getIncidentHedges
       }
 
-      val r = (index, outerHedges, vertices)
+      val r = (index, h, vertices)
       Iterator(r)
     }.cache
     val n = dcels.count()
@@ -139,11 +141,10 @@ object DCELMerger2 {
     save{"/tmp/edgesH.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
-        dcel._2.filter(_.data.polygonId >= 0).map{ hedge =>
-          val wkt = hedge.wkt
-          val pid = hedge.data.polygonId
-          val eid = hedge.data.edgeId
-          s"$wkt\t$pid\t$eid\t$index\n"
+        dcel._2.map{ hedge =>
+          val wkt = hedge.toText
+          val id = hedge.getUserData.asInstanceOf[Int]
+          s"$wkt\t$id\t$index\n"
         }.toIterator
       }.collect
     }
