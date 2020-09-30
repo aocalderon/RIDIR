@@ -44,7 +44,7 @@ case class Half_edge(edge: LineString) {
     @tailrec
     def getNextsTailrec(hedges: List[Half_edge]): List[Half_edge] = {
       val next = hedges.last.next
-      println(s"C:${hedges.last} -> ${next}")
+      print(s"${hedges.last.data.edgeId}->${next.data.edgeId} ")
       if( next == null || next == hedges.head){
         hedges
       } else {
