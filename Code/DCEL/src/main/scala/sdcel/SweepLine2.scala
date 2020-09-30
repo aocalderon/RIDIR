@@ -9,7 +9,8 @@ import com.vividsolutions.jts.geomgraph.EdgeIntersection
 import com.vividsolutions.jts.geom.{LinearRing, LineString, Polygon, Point}
 import com.vividsolutions.jts.geomgraph.Edge
 import scala.collection.JavaConverters._
-import edu.ucr.dblab.sdcel.geometries.EdgeData
+import scala.annotation.tailrec
+import edu.ucr.dblab.sdcel.geometries.{Vertex, Half_edge, EdgeData}
 
 object SweepLine2 {
   def getEdgesOnCell(outerEdges: Vector[LineString], mbr: LinearRing)
@@ -85,7 +86,7 @@ object SweepLine2 {
   }
 
   def getEdgesTouchingCell(outerEdges: Vector[LineString], mbr: LinearRing)
-    (implicit geofactory: GeometryFactory): Vector[LineString] = {
+    (implicit geofactory: GeometryFactory): List[List[Half_edge]] = {
 
     val edgesList = outerEdges.map{ linestring =>
       new com.vividsolutions.jts.geomgraph.Edge(linestring.getCoordinates)
@@ -102,9 +103,80 @@ object SweepLine2 {
     sweepline.computeIntersections(edgesList, mbrList, segmentIntersector)
 
     val edgesOn = getEdgesOn(mbrList, mbr)
-    val (edgesIn, edgesOut) = getEdgesTouch(edgesList, outerEdges, mbr)
+    val edgesInOut = getEdgesTouch(edgesList, outerEdges, mbr)
 
-    ???
+    getHedges(edgesOn, edgesInOut)
+  }
+
+  private def getHedges(edgesOn: Vector[LineString],
+    edgesInOut: Vector[(LineString,LineString)]): List[List[Half_edge]] = {
+
+    val hOn = edgesOn.map(on => Half_edge(on))
+    hOn.zip(hOn.tail).foreach{ case(h1, h2) => h1.next = h2 }
+    hOn.last.next = hOn.head
+
+    val (hedges1, hInOut) = edgesInOut.map{ case(in, out) =>
+      val hin = Half_edge(in)
+      val hout = Half_edge(out)
+
+      (hin, hout)
+    }.partition{ case(i, o) => i.dest == o.orig}
+
+    val hMap = hInOut.map( hio => hio._1.dest -> hio ).toMap
+    val hedges2 = getHedgesOnCell(hOn.head, hMap, List.empty[List[Half_edge]])
+
+    hedges1.map{ case(i, o) => List(i, o)}.toList ++ hedges2
+  }
+
+  @tailrec
+  private def getHedgesOnCell(h: Half_edge,
+    hMap: Map[Vertex, (Half_edge, Half_edge)],
+    hedges: List[List[Half_edge]]): List[List[Half_edge]] = {
+
+    if(hMap.isEmpty){
+      hedges
+    } else {
+      val (hStart, hIn, hOut) = findNextOn(h, hMap)
+      val hEnd = findNextOut(hStart, hOut)
+      val inners = getStartEnd(hStart, hEnd, List.empty[Half_edge])
+      val hInInnersOut = hIn +: inners :+ hOut
+      val new_hMap = hMap - hIn.dest
+      getHedgesOnCell(hEnd, new_hMap, hedges :+ hInInnersOut)
+    }
+  }
+
+  @tailrec
+  private def getStartEnd(start: Half_edge, end: Half_edge,
+    inner: List[Half_edge]): List[Half_edge] = {
+
+    if(start == end){
+      inner :+ end
+    } else {
+      getStartEnd(start.next, end, start +: inner)
+    }
+  }
+
+  @tailrec
+  private def findNextOn(h: Half_edge,
+    hMap: Map[Vertex, (Half_edge, Half_edge)]): (Half_edge, Half_edge, Half_edge) = {
+
+    // DEBUG INFINITE LOOP...
+    println(h)
+    if(hMap.keySet.contains(h.orig)){
+      val (hin, hout) = hMap(h.orig)
+      (h, hin, hout)
+    } else {
+      findNextOn(h.next, hMap)
+    }
+  }
+
+  @tailrec
+  private def findNextOut(h: Half_edge, hout: Half_edge): Half_edge = {
+    if(h.dest == hout.orig){
+      h
+    } else {
+      findNextOut(h.next, hout)
+    }
   }
 
   private def getEdgesOn(mbrList: java.util.List[Edge], mbr: LinearRing)
@@ -117,20 +189,20 @@ object SweepLine2 {
       }.toArray
 
       start +: inners
-    }.toVector :+ mbr.getCoordinates.head
+    }.toVector
 
     verticesOnCell.zip(verticesOnCell.tail).zipWithIndex.map{ case(coords, id) =>
       val p1 = coords._1
       val p2 = coords._2
       val segment = geofactory.createLineString(Array(p1, p2))
-      segment.setUserData(id)
+      segment.setUserData(EdgeData(-1,0,id,false))
       segment
     }
   }
 
   private def getEdgesTouch(edgesList: java.util.List[Edge],
     outerEdges: Vector[LineString], mbr: LinearRing)
-    (implicit geofactory: GeometryFactory): (Vector[LineString], Vector[LineString]) = {
+    (implicit geofactory: GeometryFactory): Vector[(LineString,LineString)] = {
 
     case class T(coords: Array[Coordinate], data: EdgeData, isIn: Boolean)
     val outerEdgesMap = outerEdges.map{ edge => edge.getCoordinates -> edge }.toMap
@@ -162,9 +234,12 @@ object SweepLine2 {
     }.filterNot(_.coords.isEmpty).map{ t =>
         val segment = geofactory.createLineString(t.coords)
         segment.setUserData(t.data)
-        (t.isIn, segment)
+        (t.isIn, t.data.polygonId, segment)
     }.partition(_._1)
 
-    (edgesTouchIn.map(_._2).toVector, edgesTouchOut.map(_._2).toVector)
+    val in = edgesTouchIn.sortBy(_._2).map(_._3)
+    val out = edgesTouchOut.sortBy(_._2).map(_._3)
+
+    in.zip(out).toVector
   }
 }

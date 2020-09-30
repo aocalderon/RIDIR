@@ -124,7 +124,7 @@ object DCELMerger2 {
         cell.intersects(edge)
       }
 
-      val h = SweepLine2.getEdgesOnCell2(outerEdges.toVector, cell)
+      val h = SweepLine2.getEdgesTouchingCell(outerEdges.toVector, cell)
 
       val edgesOnCell = SweepLine2.getEdgesOnCell(outerEdges.toVector, cell)
       val vertices = getVertices(edgesOnCell.map(eoc => Half_edge(eoc)), index)
@@ -141,10 +141,10 @@ object DCELMerger2 {
     save{"/tmp/edgesH.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
-        dcel._2.map{ hedge =>
-          val wkt = hedge.toText
-          val id = hedge.getUserData.asInstanceOf[Int]
-          s"$wkt\t$id\t$index\n"
+        dcel._2.map{ hList =>
+          val coords = (hList.head.v1 +: hList.map{_.v2}).toArray
+          val wkt = geofactory.createLineString(coords)
+          s"$wkt\t$index\n"
         }.toIterator
       }.collect
     }
