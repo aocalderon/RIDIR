@@ -85,6 +85,87 @@ object SweepLine2 {
     edgesOnCell union edgesInsideCell
   }
 
+  /****************************************************************************************/
+
+  object Mode  extends Enumeration {
+    type Mode = Value
+    val On, In, Out = Value
+  }
+  import Mode._
+
+  case class ConnectedIntersection(coord: Coordinate,
+    hins: List[Half_edge] = List.empty[Half_edge],
+    houts: List[Half_edge] = List.empty[Half_edge]){
+
+    var next: ConnectedIntersection = null
+  }
+
+  case class Intersection(coord: Coordinate, hedge: Half_edge, mode: Mode)
+
+  def getHedgesTouchingCell(outerEdges: Vector[LineString], mbr: LinearRing,
+    index: Int = -1)
+    (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
+
+    val edgesList = outerEdges.map{ linestring =>
+      new com.vividsolutions.jts.geomgraph.Edge(linestring.getCoordinates)
+    }.asJava
+
+    val mbrList = mbr.getCoordinates.zip(mbr.getCoordinates.tail).toList.map{case(p1, p2) =>
+      new com.vividsolutions.jts.geomgraph.Edge(Array(p1, p2))
+    }.asJava
+
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    lineIntersector.setMakePrecise(geofactory.getPrecisionModel)
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+
+    sweepline.computeIntersections(edgesList, mbrList, segmentIntersector)
+
+    // Getting list of the intersections (coordinates) on cell...
+    val iOn = getCoordsOn(mbrList).map{ con =>
+      val hempty = Half_edge(null)
+      Intersection(con, hempty, Mode.On) // we will not need hempty later...
+    }
+
+    // Getting hedges coming to the cell (in) and leaving the cell (out)...
+    val (edgesIn, edgesOut) = getEdgesTouch(edgesList, outerEdges, mbr)
+    val iIn = edgesIn.map{ edge =>
+      val hin = Half_edge(edge)
+      Intersection(hin.v2, hin, Mode.In) // hin comes to the cell at coord v2...
+    }
+    val iOut = edgesIn.map{ edge =>
+      val hout = Half_edge(edge)
+      Intersection(hout.v1, hout, Mode.Out) // hout leaves the cell at coord v1... 
+    }
+
+    // Grouping hedges in and out by their coordinate intersections...
+    val intersections = iOn union iIn union iOut
+    val ring = intersections.groupBy(_.coord).map{ case(coord, inters) =>
+      val hins  = inters.filter(_.mode == In).map(_.hedge).toList
+      val houts = inters.filter(_.mode == Out).map(_.hedge).toList
+
+      ConnectedIntersection(coord, hins, houts)
+    }
+    // Creating the circular linked list over the coordinate intersections...
+    ring.zip(ring.tail).foreach{ case(c1, c2) => c1.next = c2}
+    ring.last.next = ring.head
+
+    ???
+  }
+  // Getting list of coordinates which intersect the cell...
+  private def getCoordsOn(mbrList: java.util.List[Edge]): Vector[Coordinate] = {
+    mbrList.asScala.flatMap{ edge =>
+      val start = edge.getCoordinates.head
+      val inners = edge.getEdgeIntersectionList.iterator.asScala.map{ i =>
+        i.asInstanceOf[EdgeIntersection].getCoordinate
+      }.toVector
+
+      start +: inners 
+    }.toVector
+  }
+  
+  /****************************************************************************************/
+
   def getEdgesTouchingCell(outerEdges: Vector[LineString], mbr: LinearRing, index: Int = -1)
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
 
@@ -113,7 +194,6 @@ object SweepLine2 {
     l
   }
 
-  case class VertexConnected(v: Vertex, next: Vertex)
   private def getHedges(edgesOn: Vector[LineString],
     edgesIn: Vector[LineString],
     edgesOut: Vector[LineString], index: Int = -1): Vector[List[Half_edge]] = {
@@ -121,8 +201,6 @@ object SweepLine2 {
     val hOn = edgesOn.map(on => Half_edge(on))
     hOn.zip(hOn.tail).foreach{ case(h1, h2) => h1.next = h2 }
     hOn.last.next = hOn.head
-    // CHANGE THIS PART TO A VERTEX CONNECTED LIST...
-    val vOn = hOn.map(h => _.orig)
 
     val hins = edgesIn.map(h => Half_edge(h))
     val houts = edgesOut.map(h => Half_edge(h))
