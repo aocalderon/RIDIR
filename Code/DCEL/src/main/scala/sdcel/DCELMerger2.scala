@@ -18,7 +18,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 
-
 object DCELMerger2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
@@ -124,7 +123,8 @@ object DCELMerger2 {
         cell.intersects(edge)
       }
 
-      val h = SweepLine2.getEdgesTouchingCell(outerEdges.toVector, cell)
+      println(index)
+      val h = SweepLine2.getEdgesTouchingCell(outerEdges.toVector, cell, index)
 
       val edgesOnCell = SweepLine2.getEdgesOnCell(outerEdges.toVector, cell)
       val vertices = getVertices(edgesOnCell.map(eoc => Half_edge(eoc)), index)
@@ -143,8 +143,10 @@ object DCELMerger2 {
         val dcel = dcelsIt.next
         dcel._2.map{ hList =>
           val coords = (hList.head.v1 +: hList.map{_.v2}).toArray
-          val wkt = geofactory.createLineString(coords)
-          s"$wkt\t$index\n"
+          val wkt = geofactory.createLineString(coords).toText
+          val pid = hList.head.data.polygonId
+          
+          s"$wkt\t$pid\t$index\n"
         }.toIterator
       }.collect
     }
