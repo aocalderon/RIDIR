@@ -87,17 +87,21 @@ object SweepLine2 {
 
   /****************************************************************************************/
 
+  import scala.collection.mutable.Queue
   object Mode  extends Enumeration {
     type Mode = Value
     val On, In, Out = Value
   }
   import Mode._
 
-  case class ConnectedIntersection(coord: Coordinate,
-    hins: List[Half_edge] = List.empty[Half_edge],
-    houts: List[Half_edge] = List.empty[Half_edge]){
+  case class ConnectedIntersection(id: Int, coord: Coordinate,
+    hins: Queue[Half_edge] = Queue.empty[Half_edge],
+    houts: Queue[Half_edge] = Queue.empty[Half_edge]){
 
     var next: ConnectedIntersection = null
+
+    def getHin: Half_edge = hins.dequeue()
+    
   }
 
   case class Intersection(coord: Coordinate, hedge: Half_edge, mode: Mode)
@@ -122,18 +126,17 @@ object SweepLine2 {
     sweepline.computeIntersections(edgesList, mbrList, segmentIntersector)
 
     // Getting list of the intersections (coordinates) on cell...
-    val iOn = getCoordsOn(mbrList).map{ con =>
-      val hempty = Half_edge(null)
-      Intersection(con, hempty, Mode.On) // we will not need hempty later...
+    val iOn = getEdgesOn(mbrList).map{ edge =>
+      val hon = Half_edge(edge)
+      Intersection(hon.v1, hon, Mode.On) // we collect the origen of the edges on cell...
     }
-
     // Getting hedges coming to the cell (in) and leaving the cell (out)...
     val (edgesIn, edgesOut) = getEdgesTouch(edgesList, outerEdges, mbr)
     val iIn = edgesIn.map{ edge =>
       val hin = Half_edge(edge)
       Intersection(hin.v2, hin, Mode.In) // hin comes to the cell at coord v2...
     }
-    val iOut = edgesIn.map{ edge =>
+    val iOut = edgesOut.map{ edge =>
       val hout = Half_edge(edge)
       Intersection(hout.v1, hout, Mode.Out) // hout leaves the cell at coord v1... 
     }
@@ -141,27 +144,90 @@ object SweepLine2 {
     // Grouping hedges in and out by their coordinate intersections...
     val intersections = iOn union iIn union iOut
     val ring = intersections.groupBy(_.coord).map{ case(coord, inters) =>
-      val hins  = inters.filter(_.mode == In).map(_.hedge).toList
-      val houts = inters.filter(_.mode == Out).map(_.hedge).toList
+      val id = inters.filter(_.mode == On).head.hedge.data.edgeId
+      val hins = new Queue[Half_edge]
+      hins ++= inters.filter(_.mode == In).map(_.hedge)
+      val houts = new Queue[Half_edge]
+      houts ++= inters.filter(_.mode == Out).map(_.hedge).toList
 
-      ConnectedIntersection(coord, hins, houts)
-    }
+      ConnectedIntersection(id, coord, hins, houts)
+    }.toList.sortBy(_.id)
+    
     // Creating the circular linked list over the coordinate intersections...
     ring.zip(ring.tail).foreach{ case(c1, c2) => c1.next = c2}
     ring.last.next = ring.head
 
-    ???
+    // Finding the number of half-edges involved...
+    val n = ring.filter(!_.hins.isEmpty).size
+    
+    // Extracting the list of half-edges...
+    getHedgesList(0, n, ring.head, Vector.empty[List[Half_edge]])
+  }
+  @tailrec
+  private def getHedgesList(i: Int, n: Int, head: ConnectedIntersection, 
+    v: Vector[List[Half_edge]])
+    (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
+    if(i == n){
+      v
+    } else {
+      val (start, hin) = nextIn(head)
+      val hList = collectHedgesUntilNextOut(start, hin)
+      getHedgesList(i + 1, n, head, v :+ hList)
+    }
   }
   // Getting list of coordinates which intersect the cell...
-  private def getCoordsOn(mbrList: java.util.List[Edge]): Vector[Coordinate] = {
-    mbrList.asScala.flatMap{ edge =>
+  private def getEdgesOn(mbrList: java.util.List[Edge])
+      (implicit geofactory: GeometryFactory): Vector[LineString] = {
+    val coords = mbrList.asScala.flatMap{ edge =>
       val start = edge.getCoordinates.head
       val inners = edge.getEdgeIntersectionList.iterator.asScala.map{ i =>
         i.asInstanceOf[EdgeIntersection].getCoordinate
       }.toVector
 
-      start +: inners 
-    }.toVector
+      start +: inners
+    }.toVector :+ mbrList.asScala.last.getCoordinates.last // Adding last coordinate...
+    coords.zip(coords.tail).zipWithIndex.map{ case(pair, id) =>
+      val p1 = pair._1
+      val p2 = pair._2
+      val segment = geofactory.createLineString(Array(p1, p2))
+      segment.setUserData(EdgeData(-1,0,id,false))
+      segment
+    }
+    
+  }
+  @tailrec
+  private def nextIn(i: ConnectedIntersection): (ConnectedIntersection, Half_edge) = {
+    if(!i.hins.isEmpty) (i, i.hins.dequeue) else nextIn(i.next)
+  }
+  private def collectHedgesUntilNextOut(i: ConnectedIntersection,
+    start: Half_edge)
+    (implicit geofactory: GeometryFactory): List[Half_edge] = {
+
+    @tailrec
+    def nextOut(i: ConnectedIntersection, pid: Int,
+      iList: List[ConnectedIntersection]): (List[ConnectedIntersection], Half_edge) = {
+      if(i.houts.map(_.data.polygonId).contains(pid)){
+        val hout = i.houts.dequeueFirst(_.data.polygonId == pid).get
+        (iList :+ i, hout)
+      } else nextOut(i.next, pid, iList :+ i)
+    }
+
+    val pid = start.data.polygonId
+    val rid = start.data.ringId
+    val isHole = start.data.isHole
+    val (iList, end) = nextOut(i, pid, List.empty[ConnectedIntersection])
+    if(iList.isEmpty){
+      List(start, end)
+    } else {
+      val hedges = iList.zip(iList.tail).map{ case(i1, i2) =>
+        val c1 = i1.coord
+        val c2 = i2.coord
+        val edge = geofactory.createLineString(Array(c1, c2))
+        edge.setUserData(EdgeData(pid,rid,i1.id, isHole))
+        Half_edge(edge)
+      }
+      start +: hedges :+ end
+    }
   }
   
   /****************************************************************************************/

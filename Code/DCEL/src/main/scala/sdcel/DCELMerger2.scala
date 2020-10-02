@@ -123,8 +123,8 @@ object DCELMerger2 {
         cell.intersects(edge)
       }
 
-      println(index)
-      val h = SweepLine2.getEdgesTouchingCell(outerEdges.toVector, cell, index)
+      //println(index)
+      val h = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell, index)
 
       val edgesOnCell = SweepLine2.getEdgesOnCell(outerEdges.toVector, cell)
       val vertices = getVertices(edgesOnCell.map(eoc => Half_edge(eoc)), index)
