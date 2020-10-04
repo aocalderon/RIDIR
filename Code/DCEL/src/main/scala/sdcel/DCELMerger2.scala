@@ -123,16 +123,24 @@ object DCELMerger2 {
         cell.intersects(edge)
       }
 
-      //println(index)
-      val h = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell, index)
-
-      val edgesOnCell = SweepLine2.getEdgesOnCell(outerEdges.toVector, cell)
-      val vertices = getVertices(edgesOnCell.map(eoc => Half_edge(eoc)), index)
-      val outerHedges = vertices.flatMap{ vertex =>
-        vertex.getIncidentHedges
+      println(index)
+      val h = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
+      val v = h.flatMap{_.flatMap{_.edge.getCoordinates}}.distinct
+      //SweepLine2.getHedgesInsideCell(innerEdges.toVector)
+      val hedges = innerEdges.map(Half_edge).toList
+      val pairs = for{
+        h1 <- hedges
+        h2 <- hedges if{
+          h1.orig == h2.dest &&
+          h1.dest == h2.orig &&
+          h1.data.polygonId < h2.data.polygonId
+        }
+      } yield {
+        h1.twin = h2
+        h2.twin = h1
       }
 
-      val r = (index, h, vertices)
+      val r = (index, h, hedges, v)
       Iterator(r)
     }.cache
     val n = dcels.count()
@@ -150,73 +158,30 @@ object DCELMerger2 {
         }.toIterator
       }.collect
     }
+    save{"/tmp/edgesH.wkt"}{
+      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+        val dcel = dcelsIt.next
+        dcel._3.map{ h =>
+          val wkt = h.wkt
+          val pid = h.data.polygonId
+          val twin = if(h.twin == null) -1 else h.twin.data.polygonId
+          
+          s"$wkt\t$pid\t$twin\t$index\n"
+        }.toIterator
+      }.collect
+    }
     
     save{"/tmp/edgesV.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
-        dcel._3.map{ vertex =>
-          val wkt = vertex.toPoint.toText
+        dcel._4.map{ coord =>
+          val wkt = geofactory.createPoint(coord).toText
           s"$wkt\t$index\n"
         }.toIterator
       }.collect
     }
 
     spark.close
-  }
-
-  def getVertices(hedges: Vector[Half_edge], index: Int = -1)
-    (implicit geofactory: GeometryFactory): Iterable[Vertex] = {
-    val origMap = hedges.map(h => (h.orig, (h.angleAtOrig, h)))
-    val destMap = hedges.map(h => (h.dest, (h.angleAtDest, h)))
-
-    val vertices = (origMap union destMap)
-      .groupBy(_._1).map{ case(vertex, hList) =>
-        val hedges = hList.map(_._2).groupBy(_._1).flatMap{ case(angle, hList) =>
-          val hedgesByAngle = hList.map(_._2)
-          hedgesByAngle.size match {
-            case 2 => {
-              val h1 = hedgesByAngle.head
-              val h2 = hedgesByAngle.last
-              //h1.twin = h2
-              //h2.twin = h1 
-              List(h1, h2)
-            }
-            case 1 => {
-              val h1 = hedgesByAngle.head
-              //val h2 = h1.reverse
-              //h1.twin = h2
-              //h2.twin = h1 
-              List(h1/*, h2*/)
-            }
-            case _ => {
-              // can't happen
-              List.empty[Half_edge]
-            }
-          }
-        }
-        vertex.copy(hedges = hedges.toList)
-      }
-    /*
-    vertices.foreach{ vertex =>
-      val sortedIncidents = vertex.getIncidentHedges
-      val size = sortedIncidents.size
-
-      if(index == 14) println(s"Size: $size")
-      for(i <- 0 until (size - 1)){
-        val current = sortedIncidents(i)
-        val next    = sortedIncidents(i + 1)
-        if(index == 14) println(s"Current: $current Next: $next")
-        current.next = next.twin
-        current.next.prev = current
-      }
-      val current = sortedIncidents(size - 1)
-      val next    = sortedIncidents(0)
-      if(index == 14) println(s"Current: $current Next: ${next.twin}")
-      current.next = next.twin
-      current.next.prev = current
-    }
-     */
-    vertices
   }
 
   def getLineStrings(polygon: Polygon, polygon_id: Long)
