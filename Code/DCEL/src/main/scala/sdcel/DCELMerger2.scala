@@ -124,64 +124,75 @@ object DCELMerger2 {
       }
 
       println(index)
-      val h = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
-      val v = h.flatMap{_.flatMap{_.edge.getCoordinates}}.distinct
-      //SweepLine2.getHedgesInsideCell(innerEdges.toVector)
-      val hedges = innerEdges.map(Half_edge).toList
-      val pairs = for{
-        h1 <- hedges
-        h2 <- hedges if{
-          h1.orig == h2.dest &&
-          h1.dest == h2.orig &&
-          h1.data.polygonId < h2.data.polygonId
-        }
+      val outer = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
+      val inner = SweepLine2.getHedgesInsideCell(innerEdges.toVector, index)
+
+      val (closedInner, openInner) = inner.partition{ h =>
+        h.head.orig == h.last.dest
+      }
+      closedInner.foreach{ hedges =>
+        hedges.last.next = hedges.head
+      }
+      val openInnerWithZero = openInner.filter{_.exists(_.data.edgeId == 0)}
+      for{
+        open1 <- openInnerWithZero
+        open2 <- openInner if open1.head.data.polygonId == open2.head.data.polygonId
       } yield {
-        h1.twin = h2
-        h2.twin = h1
+        if(open2.last.dest == open1.head.orig){
+          open2.last.next = open1.head
+        }
       }
 
-      val r = (index, h, hedges, v)
+      for{
+        out <- outer
+        in  <- openInner if out.head.orig == in.last.dest
+      } yield {
+        in.last.next = out.head
+      }
+      for{
+        out <- outer
+        in  <- openInner if out.last.dest == in.head.orig
+      } yield {
+        out.last.next = in.head
+      }
+
+      val r = (index, outer, openInner)
       Iterator(r)
     }.cache
     val n = dcels.count()
     logger.info("Getting LDCELs done!")
 
-    save{"/tmp/edgesH.wkt"}{
+    save{"/tmp/edgesHin.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
-        dcel._2.map{ hList =>
-          val coords = (hList.head.v1 +: hList.map{_.v2}).toArray
-          val wkt = geofactory.createLineString(coords).toText
-          val pid = hList.head.data.polygonId
+        dcel._2.map{ h =>
+          val wkt = makeWKT(h) //h.head.getNextsAsWKT
+          val pid = h.head.data.polygonId
+          val eid = h.head.data.edgeId
           
-          s"$wkt\t$pid\t$index\n"
+          s"$wkt\t$pid:$eid\t$index\n"
         }.toIterator
       }.collect
     }
-    save{"/tmp/edgesH.wkt"}{
+    save{"/tmp/edgesHout.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
         dcel._3.map{ h =>
-          val wkt = h.wkt
-          val pid = h.data.polygonId
-          val twin = if(h.twin == null) -1 else h.twin.data.polygonId
+          val wkt = makeWKT(h) //h.head.getNexts
+          val pid = h.head.data.polygonId
+          val eid = h.head.data.edgeId
           
-          s"$wkt\t$pid\t$twin\t$index\n"
+          s"$wkt\t$pid:$eid\t$index\n"
         }.toIterator
       }.collect
     }
     
-    save{"/tmp/edgesV.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
-        val dcel = dcelsIt.next
-        dcel._4.map{ coord =>
-          val wkt = geofactory.createPoint(coord).toText
-          s"$wkt\t$index\n"
-        }.toIterator
-      }.collect
-    }
-
     spark.close
+  }
+
+  def makeWKT(hedges: List[Half_edge])(implicit geofactory: GeometryFactory): String = {
+    val coords = hedges.map{_.v1} :+ hedges.last.v2
+    geofactory.createLineString(coords.toArray).toText
   }
 
   def getLineStrings(polygon: Polygon, polygon_id: Long)

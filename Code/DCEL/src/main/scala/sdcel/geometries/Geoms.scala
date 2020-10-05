@@ -43,16 +43,21 @@ case class Half_edge(edge: LineString) {
   def getNexts: List[Half_edge] = {
     @tailrec
     def getNextsTailrec(hedges: List[Half_edge]): List[Half_edge] = {
+      print(s"${hedges.last.data.polygonId}:${hedges.last.data.edgeId} ")
       val next = hedges.last.next
-      print(s"${hedges.last.data.edgeId}->${next.data.edgeId} ")
       if( next == null || next == hedges.head){
         hedges
       } else {
         getNextsTailrec(hedges :+ next)
       }
     }
-    val l = getNextsTailrec(List(this))
-    l
+    getNextsTailrec(List(this))
+  }
+
+  def getNextsAsWKT(implicit geofactory: GeometryFactory): String = {
+    val hedges = getNexts
+    val coords = hedges.map{_.v1} :+ hedges.last.v2
+    geofactory.createLineString(coords.toArray).toText
   }
 }
 

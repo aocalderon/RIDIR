@@ -19,22 +19,33 @@ object SweepLine2 {
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
     val innerHedges = innerEdges.map( inner => Half_edge(inner))
 
-    var arr = new scala.collection.mutable.ListBuffer[Half_edge]()
-    val hins = innerHedges.groupBy{_.data.polygonId}.map{ case(pid, hedges) =>
-      arr.clear
-      val h = hedges.sortBy(_.data.edgeId)
-      h.zip(h.tail).foreach{ case(h1, h2) =>
-        if(h1.data.edgeId + 1 == h2.data.edgeId){
-          h1.next = h2
-        } else {
-          arr += h2
-        }
-      }
-      h.head +: arr.toList
+    val hins = innerHedges.groupBy{_.data.polygonId}.flatMap{ case(pid, hedges_prime) =>
+      val hedges = hedges_prime.sortBy(_.data.edgeId).toList
+      getLineSegments(hedges.tail, List(hedges.head), Vector.empty[List[Half_edge]])
+    }.toVector
+    hins.foreach{ hin =>
+      hin.zip(hin.tail).foreach{case(h1, h2) => h1.next = h2}
     }
-    hins.map{_.map{h => s"${h.data.polygonId}:${h.data.edgeId}"}}.foreach{println}
+    hins
+  }
+  @tailrec
+  private def getLineSegments(hedges: List[Half_edge], segment: List[Half_edge],
+    segments: Vector[List[Half_edge]]): Vector[List[Half_edge]] = {
 
-    Vector.empty[List[Half_edge]]
+    hedges match {
+      case Nil => segments :+ segment
+      case head +: tail => {
+        val (new_current, new_segments) = {
+          val prev = segment.last.data.edgeId + 1
+          val next = head.data.edgeId
+          if( prev == next ){
+            (segment :+ head, segments)
+          }
+          else (List(head), segments :+ segment)
+        }
+        getLineSegments(tail, new_current, new_segments)
+      }
+    }
   }
 
   /* For those half-edges which touch the cell */
@@ -108,7 +119,12 @@ object SweepLine2 {
     val n = ring.filter(!_.hins.isEmpty).size
     
     // Extracting the list of half-edges...
-    getHedgesList(0, n, ring.head, Vector.empty[List[Half_edge]])
+    val houts = getHedgesList(0, n, ring.head, Vector.empty[List[Half_edge]])
+    houts.foreach{ hout =>
+      hout.zip(hout.tail).foreach{case(h1, h2) => h1.next = h2}
+    }
+
+    houts
   }
 
   @tailrec
