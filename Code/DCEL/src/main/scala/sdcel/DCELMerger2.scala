@@ -126,47 +126,22 @@ object DCELMerger2 {
       println(index)
       val outer = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
       val inner = SweepLine2.getHedgesInsideCell(innerEdges.toVector, index)
+      val h = SweepLine2.merge(outer, inner)
+      //if(index == 14)
+        //h.map(_.getNextsAsWKT).foreach{println}
+     
 
-      val (closedInner, openInner) = inner.partition{ h =>
-        h.head.orig == h.last.dest
-      }
-      closedInner.foreach{ hedges =>
-        hedges.last.next = hedges.head
-      }
-      val openInnerWithZero = openInner.filter{_.exists(_.data.edgeId == 0)}
-      for{
-        open1 <- openInnerWithZero
-        open2 <- openInner if open1.head.data.polygonId == open2.head.data.polygonId
-      } yield {
-        if(open2.last.dest == open1.head.orig){
-          open2.last.next = open1.head
-        }
-      }
-
-      for{
-        out <- outer
-        in  <- openInner if out.head.orig == in.last.dest
-      } yield {
-        in.last.next = out.head
-      }
-      for{
-        out <- outer
-        in  <- openInner if out.last.dest == in.head.orig
-      } yield {
-        out.last.next = in.head
-      }
-
-      val r = (index, outer, openInner)
+      val r = (index, outer, inner, h)
       Iterator(r)
     }.cache
     val n = dcels.count()
     logger.info("Getting LDCELs done!")
 
-    save{"/tmp/edgesHin.wkt"}{
+    save{"/tmp/edgesHout.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
         dcel._2.map{ h =>
-          val wkt = makeWKT(h) //h.head.getNextsAsWKT
+          val wkt = makeWKT(h) 
           val pid = h.head.data.polygonId
           val eid = h.head.data.edgeId
           
@@ -174,15 +149,24 @@ object DCELMerger2 {
         }.toIterator
       }.collect
     }
-    save{"/tmp/edgesHout.wkt"}{
+    save{"/tmp/edgesHin.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
         dcel._3.map{ h =>
-          val wkt = makeWKT(h) //h.head.getNexts
+          val wkt = makeWKT(h) 
           val pid = h.head.data.polygonId
           val eid = h.head.data.edgeId
           
           s"$wkt\t$pid:$eid\t$index\n"
+        }.toIterator
+      }.collect
+    }
+    save{"/tmp/edgesV.wkt"}{
+      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+        val dcel = dcelsIt.next
+        dcel._4.zipWithIndex.map{ case(v, id) =>
+          val wkt = v.getNextsAsWKT //geofactory.createPoint(v).toText
+          s"$wkt\t$id\t$index\n"
         }.toIterator
       }.collect
     }

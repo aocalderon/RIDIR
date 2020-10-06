@@ -13,7 +13,7 @@ import scala.annotation.tailrec
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, EdgeData}
 import scala.collection.mutable.Queue
 
-object SweepLine2 {
+object SweepLine2 {  
   /* For those half-edges which do not touch the cell */
   def getHedgesInsideCell(innerEdges: Vector[LineString], index: Int = -1)
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
@@ -106,7 +106,7 @@ object SweepLine2 {
       val hins = new Queue[Half_edge]
       hins ++= inters.filter(_.mode == In).map(_.hedge)
       val houts = new Queue[Half_edge]
-      houts ++= inters.filter(_.mode == Out).map(_.hedge).toList
+      houts ++= inters.filter(_.mode == Out).map(_.hedge)
 
       ConnectedIntersection(id, coord, hins, houts)
     }.toList.sortBy(_.id)
@@ -259,5 +259,38 @@ object SweepLine2 {
     val out = edgesTouchOut.map(_._2).toVector
 
     (in, out)
+  }
+
+  /* */
+  case class Segment(hedges: List[Half_edge]){
+    val first = hedges.head
+    val last = hedges.last
+    val polygonId = first.data.polygonId
+    val segmentId = first.data.edgeId
+
+    override def toString = s"${polygonId}:${segmentId} "
+  }
+
+  def merge(outer: Vector[List[Half_edge]]
+    , inner: Vector[List[Half_edge]]): Vector[Half_edge] = {
+
+    val areConnected = (s1: Segment, s2: Segment) => {
+      if(s1.last.dest == s2.first.orig){
+        print(s"Connect $s1 to $s2, ")
+        Segment(s1.hedges ++ s2.hedges)
+      } else {
+        println(s"\nStart a new segment at $s2")
+        s2
+      }      
+    }
+    val segments = outer.union(inner).map(Segment)
+    val byPolygon = segments.groupBy(_.polygonId)
+
+    byPolygon.values.map{ s =>
+      if(s.size > 1) println
+      s.sortBy(_.segmentId).reduceLeft(areConnected)
+    }
+
+    Vector.empty[Half_edge]
   }
 }
