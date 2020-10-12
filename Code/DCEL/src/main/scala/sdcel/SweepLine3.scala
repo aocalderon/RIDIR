@@ -12,13 +12,19 @@ import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, EdgeData}
 import scala.collection.mutable.Queue
+import org.geotools.geometry.jts.GeometryClipper
 
-object SweepLine2 {  
+object SweepLine3 {  
   /* For those half-edges which do not touch the cell */
-  def getHedgesInsideCell(innerEdges: Vector[LineString], index: Int = -1)
+  def getHedgesInsideCell(edges: Vector[LineString], mbr: LinearRing, index: Int = -1)
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
-    val innerHedges = innerEdges.map( inner => Half_edge(inner))
 
+    val clipper = new GeometryClipper(mbr.getEnvelopeInternal)
+    val innerHedges = edges.map{ edge =>
+      val clipped = clipper.clip(edge, true).asInstanceOf[LineString]
+      clipped.setUserData(edge.getUserData)
+      Half_edge(clipped)
+    }
     val hins = innerHedges.groupBy{_.data.polygonId}.flatMap{ case(pid, hedges_prime) =>
       val hedges = hedges_prime.sortBy(_.data.edgeId).toList
       getLineSegments(hedges.tail, List(hedges.head), Vector.empty[List[Half_edge]])
@@ -63,13 +69,15 @@ object SweepLine2 {
   }
 
   case class Intersection(coord: Coordinate, hedge: Half_edge, mode: Mode)
+  case class HEdge(coords: Array[Coordinate], h: Half_edge) extends Edge(coords)
 
-  def getHedgesTouchingCell(outerEdges: Vector[LineString], mbr: LinearRing,
+  def getHedgesTouchingCell(outerHedges: Vector[Half_edge], mbr: LinearRing,
     index: Int = -1)
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
 
-    val edgesList = outerEdges.map{ linestring =>
-      new com.vividsolutions.jts.geomgraph.Edge(linestring.getCoordinates)
+    val hedgesList = outerHedges.map{ h =>
+      val pts = Array(h.v1, h.v2)
+      HEdge(pts, h)
     }.asJava
 
     val mbrList = mbr.getCoordinates.zip(mbr.getCoordinates.tail).toList.map{case(p1, p2) =>
@@ -81,21 +89,18 @@ object SweepLine2 {
     lineIntersector.setMakePrecise(geofactory.getPrecisionModel)
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
-    sweepline.computeIntersections(edgesList, mbrList, segmentIntersector)
+    sweepline.computeIntersections(hedgesList, mbrList, segmentIntersector)
 
     // Getting list of the intersections (coordinates) on cell...
-    val iOn = getEdgesOn(mbrList).map{ edge =>
-      val hon = Half_edge(edge)
+    val iOn = getEdgesOn(mbrList).map{ hon =>
       Intersection(hon.v1, hon, Mode.On) // we collect the origen of the edges on cell...
     }
     // Getting hedges coming to the cell (in) and leaving the cell (out)...
-    val (edgesIn, edgesOut) = getEdgesTouch(edgesList, outerEdges, mbr)
-    val iIn = edgesIn.map{ edge =>
-      val hin = Half_edge(edge)
+    val (hedgesIn, hedgesOut) = getEdgesTouch(hedgesList, mbr)
+    val iIn = hedgesIn.map{ hin =>
       Intersection(hin.v2, hin, Mode.In) // hin comes to the cell at coord v2...
     }
-    val iOut = edgesOut.map{ edge =>
-      val hout = Half_edge(edge)
+    val iOut = hedgesOut.map{ hout =>
       Intersection(hout.v1, hout, Mode.Out) // hout leaves the cell at coord v1... 
     }
 
@@ -142,7 +147,7 @@ object SweepLine2 {
 
   // Getting list of coordinates which intersect the cell...
   private def getEdgesOn(mbrList: java.util.List[Edge])
-      (implicit geofactory: GeometryFactory): Vector[LineString] = {
+      (implicit geofactory: GeometryFactory): Vector[Half_edge] = {
     val coords = mbrList.asScala.flatMap{ edge =>
       val start = edge.getCoordinates.head
       val inners = edge.getEdgeIntersectionList.iterator.asScala.map{ i =>
@@ -151,14 +156,15 @@ object SweepLine2 {
 
       start +: inners
     }.toVector :+ mbrList.asScala.last.getCoordinates.last // Adding last coordinate...
-    coords.zip(coords.tail).zipWithIndex.map{ case(pair, id) =>
+    val hon = coords.zip(coords.tail).zipWithIndex.map{ case(pair, id) =>
       val p1 = pair._1
       val p2 = pair._2
       val segment = geofactory.createLineString(Array(p1, p2))
       segment.setUserData(EdgeData(-1,0,id,false))
-      segment
+      Half_edge(segment)
     }
-    
+    hon.zip(hon.tail).foreach{ case(h1, h2) => h1.next = h2 }
+    hon
   }
 
   @tailrec
@@ -218,41 +224,41 @@ object SweepLine2 {
     }
   }
 
-  private def getEdgesTouch(edgesList: java.util.List[Edge],
-    outerEdges: Vector[LineString], mbr: LinearRing)
-    (implicit geofactory: GeometryFactory): (Vector[LineString],Vector[LineString])  = {
+  private def getEdgesTouch(hedgesList: java.util.List[HEdge], mbr: LinearRing)
+    (implicit geofactory: GeometryFactory): (Vector[Half_edge],Vector[Half_edge])  = {
 
-    case class T(coords: Array[Coordinate], data: EdgeData, isIn: Boolean)
-    val outerEdgesMap = outerEdges.map{ edge => edge.getCoordinates -> edge }.toMap
+    case class T(coords: Array[Coordinate], h: Half_edge, isIn: Boolean)
     val envelope = mbr.getEnvelopeInternal
-    val (edgesTouchIn, edgesTouchOut) = edgesList.asScala.map{ edge =>
-      val extremes = edge.getCoordinates
-      val data = outerEdgesMap(extremes).getUserData.asInstanceOf[EdgeData]
+    val (edgesTouchIn, edgesTouchOut) = hedgesList.asScala.map{ hedge =>
+      val extremes = hedge.getCoordinates
+      val h = hedge.h
       val start = extremes(0)
       val end = extremes(1)
 
-      val eiList = edge.getEdgeIntersectionList.iterator.asScala.toList
+      val eiList = hedge.getEdgeIntersectionList.iterator.asScala.toList
       if(eiList.length == 1){
         val intersection = eiList.head.asInstanceOf[EdgeIntersection].getCoordinate
         if(start != intersection && end != intersection &&
           envelope.contains(start) && !envelope.contains(end))
-          T(Array(start, intersection), data, true)
+          T(Array(start, intersection), h, true)
         else if(start != intersection && end != intersection &&
           !envelope.contains(start) && envelope.contains(end))
-          T(Array(intersection, end), data, false)
+          T(Array(intersection, end), h, false)
         else if(end == intersection && envelope.contains(start))
-          T(Array(start, intersection), data, true)
+          T(Array(start, intersection), h, true)
         else if(start == intersection && envelope.contains(end))
-          T(Array(intersection, end), data, false)
+          T(Array(intersection, end), h, false)
         else
-          T(Array.empty[Coordinate], data, false)
+          T(Array.empty[Coordinate], h, false)
       } else {
-        T(Array.empty[Coordinate], data, false)
+        T(Array.empty[Coordinate], h, false)
       }
     }.filterNot(_.coords.isEmpty).map{ t =>
-        val segment = geofactory.createLineString(t.coords)
-        segment.setUserData(t.data)
-        (t.isIn, segment)
+      val l = geofactory.createLineString(t.coords)
+      l.setUserData(t.h.data)
+      val h = t.h.copy(l)
+      h.next = t.h.next
+      (t.isIn, h)
     }.partition(_._1)
 
     val in = edgesTouchIn.map(_._2).toVector
@@ -266,82 +272,31 @@ object SweepLine2 {
     val first = hedges.head
     val last = hedges.last
     val polygonId = first.data.polygonId
-    val startId = first.data.edgeId
-    val endId = last.data.edgeId
+    val segmentId = first.data.edgeId
 
-    override def toString = s"${polygonId}:${startId}:${endId} "
-
-    def wkt(implicit geofactory: GeometryFactory): String = {
-      val coords = hedges.map{_.v1} :+ hedges.last.v2
-      geofactory.createLineString(coords.toArray).toText
-    }
-  }
-
-  def merge2(outer: Vector[List[Half_edge]]
-    , inner: Vector[List[Half_edge]])
-      (implicit geofactory: GeometryFactory): Vector[Half_edge] = {
-
-    val sOut = outer.map(Segment)
-    val sIn_prime  = inner
-      .filter(in => in.last.v2 != in.head.v1)
-      .map(Segment)
-
-    val inA = sIn_prime.map(s => (s.first.v1, s))
-    val inB = sIn_prime.map(s => (s.last.v2, s))
-    val sIn = inA.union(inB).groupBy(_._1).map(_._2).filter(_.size > 1).map{ pair =>
-      val spair = pair.map(_._2).sortBy(_.startId)
-      val s0 = spair(0)
-      val sl = spair(1)
-      sl.last.next = s0.first
-      Segment(sl.hedges ++ s0.hedges)
-    }.toVector
-
-    val out1 = sOut.map(out => (out.first.v1, out.first))
-    val in2  = sIn.map(in   => (in.last.v2,  in.last))
-    out1.union(in2).groupBy(_._1).map(_._2).filter(_.size > 1).foreach{ pair =>
-      val hpair = pair.map(_._2).sortBy(_.data.edgeId)
-      hpair(0).next = hpair(1)
-    }
-
-    val out2 = sOut.map(out => (out.last.v2, out.first))
-    val in1  = sIn.map(in  => (in.first.v1, in.last))
-    out2.union(in1).groupBy(_._1).map(_._2).filter(_.size > 1).foreach{ pair =>
-      val hpair = pair.map(_._2).sortBy(_.data.edgeId)
-      hpair(0).next = hpair(1)
-    }
-
-    sIn.map{_.first}.groupBy(_.data.polygonId).map(_._2.head).toVector
-
-    //sIn
+    override def toString = s"${polygonId}:${segmentId} "
   }
 
   def merge(outer: Vector[List[Half_edge]]
-    , inner: Vector[List[Half_edge]])
-      (implicit geofactory: GeometryFactory): Vector[Half_edge] = {
+    , inner: Vector[List[Half_edge]]): Vector[Half_edge] = {
 
+    val areConnected = (s1: Segment, s2: Segment) => {
+      if(s1.last.dest == s2.first.orig){
+        print(s"Connect $s1 to $s2, ")
+        Segment(s1.hedges ++ s2.hedges)
+      } else {
+        println(s"\nStart a new segment at $s2")
+        s2
+      }      
+    }
     val segments = outer.union(inner).map(Segment)
+    val byPolygon = segments.groupBy(_.polygonId)
 
-    scanSegments(segments.head, segments.tail.toList)
+    byPolygon.values.map{ s =>
+      if(s.size > 1) println
+      s.sortBy(_.segmentId).reduceLeft(areConnected)
+    }
 
     Vector.empty[Half_edge]
-  }
-  @tailrec
-  private def scanSegments(s1: Segment, S: List[Segment])
-      (implicit geofactory: GeometryFactory): Unit = {
-    if(S.isEmpty){
-
-    } else {
-      val A = if(!S.exists(_.last.dest == s1.first.orig)){
-        println(s1.wkt)
-        (S.head, S.tail)
-      } else {
-        val p = S.partition(_.last.dest == s1.first.orig)
-        val s2 = p._1.head
-        val tail = p._2
-        val s = Segment(s1.hedges ++ s2.hedges)
-        (s, tail)
-      }
-      scanSegments(A._1, A._2)
-    }
   }
 }
