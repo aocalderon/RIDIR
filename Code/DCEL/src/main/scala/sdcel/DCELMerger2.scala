@@ -118,18 +118,18 @@ object DCELMerger2 {
     val dcels = edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
       val cell = cells(index).mbr
       val envelope = cell.getEnvelopeInternal
-      
-      val (outerEdges, innerEdges) = edgesIt.partition{ edge =>
+
+      val edges = edgesIt.toVector
+      println(index)
+
+      val (outerEdges, innerEdges) = edges.partition{ edge =>
         cell.intersects(edge)
       }
 
-      println(index)
       val outer = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
       val inner = SweepLine2.getHedgesInsideCell(innerEdges.toVector, index)
-      val h = SweepLine2.merge(outer, inner)
-      //if(index == 14)
-        //h.map(_.getNextsAsWKT).foreach{println}
-     
+
+      val h = SweepLine2.merge2(outer, inner)
 
       val r = (index, outer, inner, h)
       Iterator(r)
@@ -143,9 +143,10 @@ object DCELMerger2 {
         dcel._2.map{ h =>
           val wkt = makeWKT(h) 
           val pid = h.head.data.polygonId
-          val eid = h.head.data.edgeId
+          val start = h.head.data.edgeId
+          val end = h.last.data.edgeId
           
-          s"$wkt\t$pid:$eid\t$index\n"
+          s"$wkt\t$pid:$start:$end\t$index\n"
         }.toIterator
       }.collect
     }
@@ -155,13 +156,15 @@ object DCELMerger2 {
         dcel._3.map{ h =>
           val wkt = makeWKT(h) 
           val pid = h.head.data.polygonId
-          val eid = h.head.data.edgeId
+          val start = h.head.data.edgeId
+          val end = h.last.data.edgeId
           
-          s"$wkt\t$pid:$eid\t$index\n"
+          s"$wkt\t$pid:$start:$end\t$index\n"
         }.toIterator
       }.collect
     }
-    save{"/tmp/edgesV.wkt"}{
+    
+    save{"/tmp/edgesH.wkt"}{
       dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
         val dcel = dcelsIt.next
         dcel._4.zipWithIndex.map{ case(v, id) =>
@@ -170,7 +173,7 @@ object DCELMerger2 {
         }.toIterator
       }.collect
     }
-    
+     
     spark.close
   }
 

@@ -266,82 +266,31 @@ object SweepLine2 {
     val first = hedges.head
     val last = hedges.last
     val polygonId = first.data.polygonId
-    val startId = first.data.edgeId
-    val endId = last.data.edgeId
+    val segmentId = first.data.edgeId
 
-    override def toString = s"${polygonId}:${startId}:${endId} "
-
-    def wkt(implicit geofactory: GeometryFactory): String = {
-      val coords = hedges.map{_.v1} :+ hedges.last.v2
-      geofactory.createLineString(coords.toArray).toText
-    }
-  }
-
-  def merge2(outer: Vector[List[Half_edge]]
-    , inner: Vector[List[Half_edge]])
-      (implicit geofactory: GeometryFactory): Vector[Half_edge] = {
-
-    val sOut = outer.map(Segment)
-    val sIn_prime  = inner
-      .filter(in => in.last.v2 != in.head.v1)
-      .map(Segment)
-
-    val inA = sIn_prime.map(s => (s.first.v1, s))
-    val inB = sIn_prime.map(s => (s.last.v2, s))
-    val sIn = inA.union(inB).groupBy(_._1).map(_._2).filter(_.size > 1).map{ pair =>
-      val spair = pair.map(_._2).sortBy(_.startId)
-      val s0 = spair(0)
-      val sl = spair(1)
-      sl.last.next = s0.first
-      Segment(sl.hedges ++ s0.hedges)
-    }.toVector
-
-    val out1 = sOut.map(out => (out.first.v1, out.first))
-    val in2  = sIn.map(in   => (in.last.v2,  in.last))
-    out1.union(in2).groupBy(_._1).map(_._2).filter(_.size > 1).foreach{ pair =>
-      val hpair = pair.map(_._2).sortBy(_.data.edgeId)
-      hpair(0).next = hpair(1)
-    }
-
-    val out2 = sOut.map(out => (out.last.v2, out.first))
-    val in1  = sIn.map(in  => (in.first.v1, in.last))
-    out2.union(in1).groupBy(_._1).map(_._2).filter(_.size > 1).foreach{ pair =>
-      val hpair = pair.map(_._2).sortBy(_.data.edgeId)
-      hpair(0).next = hpair(1)
-    }
-
-    sIn.map{_.first}.groupBy(_.data.polygonId).map(_._2.head).toVector
-
-    //sIn
+    override def toString = s"${polygonId}:${segmentId} "
   }
 
   def merge(outer: Vector[List[Half_edge]]
-    , inner: Vector[List[Half_edge]])
-      (implicit geofactory: GeometryFactory): Vector[Half_edge] = {
+    , inner: Vector[List[Half_edge]]): Vector[Half_edge] = {
 
+    val areConnected = (s1: Segment, s2: Segment) => {
+      if(s1.last.dest == s2.first.orig){
+        print(s"Connect $s1 to $s2, ")
+        Segment(s1.hedges ++ s2.hedges)
+      } else {
+        println(s"\nStart a new segment at $s2")
+        s2
+      }      
+    }
     val segments = outer.union(inner).map(Segment)
+    val byPolygon = segments.groupBy(_.polygonId)
 
-    scanSegments(segments.head, segments.tail.toList)
+    byPolygon.values.map{ s =>
+      if(s.size > 1) println
+      s.sortBy(_.segmentId).reduceLeft(areConnected)
+    }
 
     Vector.empty[Half_edge]
-  }
-  @tailrec
-  private def scanSegments(s1: Segment, S: List[Segment])
-      (implicit geofactory: GeometryFactory): Unit = {
-    if(S.isEmpty){
-
-    } else {
-      val A = if(!S.exists(_.last.dest == s1.first.orig)){
-        println(s1.wkt)
-        (S.head, S.tail)
-      } else {
-        val p = S.partition(_.last.dest == s1.first.orig)
-        val s2 = p._1.head
-        val tail = p._2
-        val s = Segment(s1.hedges ++ s2.hedges)
-        (s, tail)
-      }
-      scanSegments(A._1, A._2)
-    }
   }
 }

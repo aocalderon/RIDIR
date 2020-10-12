@@ -1,0 +1,45 @@
+import $ivy.`org.datasyslab:geospark:1.2.0`
+
+import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel, LineString, Coordinate}
+import com.vividsolutions.jts.operation.linemerge.LineMerger
+
+import collection.JavaConverters._
+
+val model = new PrecisionModel(1000)
+val geofactory = new GeometryFactory(model)
+
+val a = new Coordinate(0,0)
+val b = new Coordinate(0,1)
+val c = new Coordinate(1,2)
+val d = new Coordinate(2,2)
+val e = new Coordinate(3,1)
+val f = new Coordinate(3,0)
+
+val g = new Coordinate(4,0)
+val h = new Coordinate(4,1)
+val i = new Coordinate(4,2)
+val j = new Coordinate(5,1)
+val k = new Coordinate(5,0)
+
+val s1 = geofactory.createLineString(Array(b,a,f,e))
+val s2 = geofactory.createLineString(Array(e,d,c,b))
+
+val s3 = geofactory.createLineString(Array(h,g,k,j))
+val s4 = geofactory.createLineString(Array(j,i,h))
+
+val s = List(s2,s4,s3,s1)
+
+s.map{_.toText}.foreach(println)
+
+val merger = new LineMerger()
+
+s.foreach{merger.add}
+
+merger.getMergedLineStrings().asScala.foreach{println}
+
+//val u = s.reduce{ (a, b) => a.union(b)}
+
+//(0 until u.getNumGeometries).map{ i => u.getGeometryN(i).toText}.foreach{println}
+
+
+
