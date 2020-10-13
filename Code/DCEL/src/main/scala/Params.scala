@@ -3,6 +3,7 @@ package edu.ucr.dblab.sdcel
 import org.rogach.scallop._
 
 class Params(args: Seq[String]) extends ScallopConf(args) {
+  val scale:       ScallopOption[Int]     = opt[Int]     (default = Some(1000))
   val input1:      ScallopOption[String]  = opt[String]  (required = true)
   val offset1:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
