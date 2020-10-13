@@ -10,7 +10,7 @@ import com.vividsolutions.jts.geom.{LinearRing, LineString}
 import com.vividsolutions.jts.geomgraph.Edge
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, EdgeData}
+import edu.ucr.dblab.sdcel.geometries.{Segment, Half_edge, EdgeData}
 import scala.collection.mutable.Queue
 
 object SweepLine2 {  
@@ -19,14 +19,10 @@ object SweepLine2 {
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
     val innerHedges = innerEdges.map( inner => Half_edge(inner))
 
-    val hins = innerHedges.groupBy{_.data.polygonId}.flatMap{ case(pid, hedges_prime) =>
+    innerHedges.groupBy{_.data.polygonId}.flatMap{ case(pid, hedges_prime) =>
       val hedges = hedges_prime.sortBy(_.data.edgeId).toList
       getLineSegments(hedges.tail, List(hedges.head), Vector.empty[List[Half_edge]])
     }.toVector
-    hins.foreach{ hin =>
-      hin.zip(hin.tail).foreach{case(h1, h2) => h1.next = h2}
-    }
-    hins
   }
   @tailrec
   private def getLineSegments(hedges: List[Half_edge], segment: List[Half_edge],
@@ -119,12 +115,7 @@ object SweepLine2 {
     val n = ring.filter(!_.hins.isEmpty).size
     
     // Extracting the list of half-edges...
-    val houts = getHedgesList(0, n, ring.head, Vector.empty[List[Half_edge]])
-    houts.foreach{ hout =>
-      hout.zip(hout.tail).foreach{case(h1, h2) => h1.next = h2}
-    }
-
-    houts
+    getHedgesList(0, n, ring.head, Vector.empty[List[Half_edge]])
   }
 
   @tailrec
@@ -196,27 +187,6 @@ object SweepLine2 {
       start +: hedges :+ end
     }
   }
-  
-  private def getEdgesOn(mbrList: java.util.List[Edge], mbr: LinearRing)
-    (implicit geofactory: GeometryFactory): Vector[LineString] = {
-
-    val verticesOnCell = mbrList.asScala.flatMap{ edge =>
-      val start = edge.getCoordinates.head
-      val inners = edge.getEdgeIntersectionList.iterator.asScala.map{ i =>
-        i.asInstanceOf[EdgeIntersection].getCoordinate
-      }.toArray
-
-      start +: inners 
-    }.toVector :+ mbr.getCoordinates.head
-
-    verticesOnCell.zip(verticesOnCell.tail).zipWithIndex.map{ case(coords, id) =>
-      val p1 = coords._1
-      val p2 = coords._2
-      val segment = geofactory.createLineString(Array(p1, p2))
-      segment.setUserData(EdgeData(-1,0,id,false))
-      segment
-    }
-  }
 
   private def getEdgesTouch(edgesList: java.util.List[Edge],
     outerEdges: Vector[LineString], mbr: LinearRing)
@@ -261,87 +231,48 @@ object SweepLine2 {
     (in, out)
   }
 
-  /* */
-  case class Segment(hedges: List[Half_edge]){
-    val first = hedges.head
-    val last = hedges.last
-    val polygonId = first.data.polygonId
-    val startId = first.data.edgeId
-    val endId = last.data.edgeId
+  /* Functions for concatenate segments */
+  @tailrec
+  private def findNext(s1: Segment, ss: List[Segment]): (Segment, List[Segment]) = {
+    val last = s1.last.v2
+    val (s, new_ss) = ss.partition{_.first.v1 == last}
 
-    override def toString = s"${polygonId}:${startId}:${endId} "
-
-    def wkt(implicit geofactory: GeometryFactory): String = {
-      val coords = hedges.map{_.v1} :+ hedges.last.v2
-      geofactory.createLineString(coords.toArray).toText
+    if(s.isEmpty){
+      (s1, new_ss)
+    } else {
+      val s2 = s.head
+      val hedges = s1.hedges ++ s2.hedges
+      val new_s1 = Segment(hedges)
+      findNext(new_s1, new_ss)
     }
-  }
-
-  def merge2(outer: Vector[List[Half_edge]]
-    , inner: Vector[List[Half_edge]])
-      (implicit geofactory: GeometryFactory): Vector[Half_edge] = {
-
-    val sOut = outer.map(Segment)
-    val sIn_prime  = inner
-      .filter(in => in.last.v2 != in.head.v1)
-      .map(Segment)
-
-    val inA = sIn_prime.map(s => (s.first.v1, s))
-    val inB = sIn_prime.map(s => (s.last.v2, s))
-    val sIn = inA.union(inB).groupBy(_._1).map(_._2).filter(_.size > 1).map{ pair =>
-      val spair = pair.map(_._2).sortBy(_.startId)
-      val s0 = spair(0)
-      val sl = spair(1)
-      sl.last.next = s0.first
-      Segment(sl.hedges ++ s0.hedges)
-    }.toVector
-
-    val out1 = sOut.map(out => (out.first.v1, out.first))
-    val in2  = sIn.map(in   => (in.last.v2,  in.last))
-    out1.union(in2).groupBy(_._1).map(_._2).filter(_.size > 1).foreach{ pair =>
-      val hpair = pair.map(_._2).sortBy(_.data.edgeId)
-      hpair(0).next = hpair(1)
-    }
-
-    val out2 = sOut.map(out => (out.last.v2, out.first))
-    val in1  = sIn.map(in  => (in.first.v1, in.last))
-    out2.union(in1).groupBy(_._1).map(_._2).filter(_.size > 1).foreach{ pair =>
-      val hpair = pair.map(_._2).sortBy(_.data.edgeId)
-      hpair(0).next = hpair(1)
-    }
-
-    sIn.map{_.first}.groupBy(_.data.polygonId).map(_._2.head).toVector
-
-    //sIn
-  }
-
-  def merge(outer: Vector[List[Half_edge]]
-    , inner: Vector[List[Half_edge]])
-      (implicit geofactory: GeometryFactory): Vector[Half_edge] = {
-
-    val segments = outer.union(inner).map(Segment)
-
-    scanSegments(segments.head, segments.tail.toList)
-
-    Vector.empty[Half_edge]
   }
   @tailrec
-  private def scanSegments(s1: Segment, S: List[Segment])
-      (implicit geofactory: GeometryFactory): Unit = {
-    if(S.isEmpty){
-
+  private def concatSegments(segments: List[Segment], r: List[Segment]): List[Segment] = {
+    if(segments.isEmpty){
+      r
     } else {
-      val A = if(!S.exists(_.last.dest == s1.first.orig)){
-        println(s1.wkt)
-        (S.head, S.tail)
-      } else {
-        val p = S.partition(_.last.dest == s1.first.orig)
-        val s2 = p._1.head
-        val tail = p._2
-        val s = Segment(s1.hedges ++ s2.hedges)
-        (s, tail)
-      }
-      scanSegments(A._1, A._2)
+      val (r1, s1) = findNext(segments.head, segments.tail)
+      concatSegments(s1, r :+ r1)
     }
+  }
+  def merge(outer: Vector[List[Half_edge]],
+    inner: Vector[List[Half_edge]], index: Int = -1)
+    (implicit geofactory: GeometryFactory): Iterable[Half_edge] = {
+
+    val sin  = inner.map{Segment}
+    val sout = outer.map{Segment}
+
+    val segments = (sin ++ sout).groupBy(_.polygonId).values.map{ s =>
+      concatSegments(s.toList, List.empty[Segment])
+    }
+
+    segments.flatMap{ ss =>
+        ss.map{ s =>
+          val h = s.hedges
+          h.zip(h.tail).foreach{ case(current, next) => current.next = next }
+          h.last.next = h.head
+          h.head
+        }
+      }
   }
 }
