@@ -1,0 +1,22 @@
+package edu.ucr.dblab.sdcel
+
+import org.rogach.scallop._
+
+class Params(args: Seq[String]) extends ScallopConf(args) {
+  val scale:       ScallopOption[Int]     = opt[Int]     (default = Some(1000))
+  val input1:      ScallopOption[String]  = opt[String]  (required = true)
+  val input2:      ScallopOption[String]  = opt[String]  (default = Some(""))
+  val offset1:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
+  val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
+  val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val output:      ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
+
+  val apath: ScallopOption[String] = opt[String] (default = Some("edgesA.wkt"))
+  val bpath: ScallopOption[String] = opt[String] (default = Some("edgesB.wkt"))
+  val qpath: ScallopOption[String] = opt[String] (default = Some("quadtree.wkt"))
+  val epath: ScallopOption[String] = opt[String] (default = Some("boundary.wkt"))
+
+  verify()
+}
+
