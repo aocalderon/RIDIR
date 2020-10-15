@@ -23,23 +23,24 @@ object DCELMerger2 {
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .getOrCreate()
     import spark.implicits._
-    val params = new Params(args)
-    val input1 = params.input1()
+    implicit val params = new Params(args)
     val model = new PrecisionModel(1000)
     implicit val geofactory = new GeometryFactory(model)
     logger.info("Starting session... Done!")
 
     // Reading data...
-    val (edgesRDD, quadtree, cells) = readEdges(spark, params, input1)
+    val (edgesRDD, quadtree, cells) = readEdges(params.input2())
     logger.info("Reading data... Done!")
 
-    save{"/tmp/edgesCells.wkt"}{
-      cells.values.map{ cell =>
-        val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
-        val id = cell.id
-        val lineage = cell.lineage
-        s"$wkt\t$id\t$lineage\n"
-      }.toList
+    if(params.debug()){
+      save{"/tmp/edgesCells.wkt"}{
+        cells.values.map{ cell =>
+          val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
+          val id = cell.id
+          val lineage = cell.lineage
+          s"$wkt\t$id\t$lineage\n"
+        }.toList
+      }
     }
 
     // Getting LDCELs...
@@ -64,43 +65,46 @@ object DCELMerger2 {
     val n = dcels.count()
     logger.info("Getting LDCELs done!")
 
-    save{"/tmp/edgesHout.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
-        val dcel = dcelsIt.next
-        dcel._2.map{ h =>
-          val wkt = makeWKT(h) 
-          val pid = h.head.data.polygonId
-          val start = h.head.data.edgeId
-          val end = h.last.data.edgeId
-          
-          s"$wkt\t$pid:$start:$end\t$index\n"
-        }.toIterator
-      }.collect
-    }
-    save{"/tmp/edgesHin.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
-        val dcel = dcelsIt.next
-        dcel._3.map{ h =>
-          val wkt = makeWKT(h) 
-          val pid = h.head.data.polygonId
-          val start = h.head.data.edgeId
-          val end = h.last.data.edgeId
-          
-          s"$wkt\t$pid:$start:$end\t$index\n"
-        }.toIterator
-      }.collect
-    }
-    save{"/tmp/edgesH.wkt"}{
-      dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
-        val dcel = dcelsIt.next
-        dcel._4.map{ h =>
-          val wkt = h.getPolygon.toText
-          val pid = h.data.polygonId
-          val eid = h.data.edgeId
-          
-          s"$wkt\t$pid:$eid\t$index\n"
-        }.toIterator
-      }.collect
+    if(params.debug()){
+      save{"/tmp/edgesHout.wkt"}{
+        dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+          val dcel = dcelsIt.next
+          dcel._2.map{ h =>
+            val wkt = makeWKT(h)
+            val pid = h.head.data.polygonId
+            val start = h.head.data.edgeId
+            val end = h.last.data.edgeId
+            
+            s"$wkt\t$pid:$start:$end\t$index\n"
+          }.toIterator
+        }.collect
+      }
+      save{"/tmp/edgesHin.wkt"}{
+        dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+          val dcel = dcelsIt.next
+          dcel._3.map{ h =>
+            val wkt = makeWKT(h)
+            val pid = h.head.data.polygonId
+            val start = h.head.data.edgeId
+            val end = h.last.data.edgeId
+            
+            s"$wkt\t$pid:$start:$end\t$index\n"
+          }.toIterator
+        }.collect
+      }
+      save{"/tmp/edgesH.wkt"}{
+        dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+          val dcel = dcelsIt.next
+          dcel._4.map{ h =>
+            val wkt = h.getPolygon.toText
+            val pid = h.data.polygonId
+            val rid = h.data.ringId
+            val eid = h.data.edgeId
+            
+            s"$wkt\t$pid:$rid:$eid\t$index\n"
+          }.toIterator
+        }.collect
+      }
     }
      
     spark.close
