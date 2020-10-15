@@ -4,9 +4,10 @@ import org.rogach.scallop._
 
 class Params(args: Seq[String]) extends ScallopConf(args) {
   val scale:       ScallopOption[Int]     = opt[Int]     (default = Some(1000))
-  val input1:      ScallopOption[String]  = opt[String]  (required = true)
+  val input1:      ScallopOption[String]  = opt[String]  (default = Some(""))
   val input2:      ScallopOption[String]  = opt[String]  (default = Some(""))
-  val offset1:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
+  val quadtree:    ScallopOption[String]  = opt[String]  (default = Some(""))
+  val boundary:    ScallopOption[String]  = opt[String]  (default = Some(""))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))

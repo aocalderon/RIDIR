@@ -19,10 +19,11 @@ object SweepLine2 {
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
     val innerHedges = innerEdges.map( inner => Half_edge(inner))
 
-    innerHedges.groupBy{_.data.polygonId}.flatMap{ case(pid, hedges_prime) =>
-      val hedges = hedges_prime.sortBy(_.data.edgeId).toList
-      getLineSegments(hedges.tail, List(hedges.head), Vector.empty[List[Half_edge]])
-    }.toVector
+    innerHedges.groupBy{in => (in.data.polygonId, in.data.ringId)}
+      .flatMap{ case(pid, hedges_prime) =>
+        val hedges = hedges_prime.sortBy(_.data.edgeId).toList
+        getLineSegments(hedges.tail, List(hedges.head), Vector.empty[List[Half_edge]])
+      }.toVector
   }
   @tailrec
   private def getLineSegments(hedges: List[Half_edge], segment: List[Half_edge],
