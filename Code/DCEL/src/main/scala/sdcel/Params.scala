@@ -3,7 +3,7 @@ package edu.ucr.dblab.sdcel
 import org.rogach.scallop._
 
 class Params(args: Seq[String]) extends ScallopConf(args) {
-  val scale:       ScallopOption[Int]     = opt[Int]     (default = Some(1000))
+  val scale:       ScallopOption[Double]  = opt[Double]  (default = Some(1000.0))
   val input1:      ScallopOption[String]  = opt[String]  (default = Some(""))
   val input2:      ScallopOption[String]  = opt[String]  (default = Some(""))
   val quadtree:    ScallopOption[String]  = opt[String]  (default = Some(""))

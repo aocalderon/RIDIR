@@ -1,7 +1,7 @@
 package edu.ucr.dblab.sdcel.geometries
 
 import scala.annotation.tailrec
-import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate}
+import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry}
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
@@ -47,7 +47,6 @@ case class Half_edge(edge: LineString) {
 
   val angleAtOrig = math.toDegrees(hangle(v1.x - v2.x, v1.y - v2.y))
   val angleAtDest = math.toDegrees(hangle(v2.x - v1.x, v2.y - v1.y))
-
 
   private def hangle(dx: Double, dy: Double): Double = {
     val length = math.sqrt( (dx * dx) + (dy * dy) )
@@ -95,3 +94,108 @@ case class Segment(hedges: List[Half_edge]) {
 }
 
 case class Cell(id: Int, lineage: String, mbr: LinearRing)
+
+case class Face(outer: Half_edge) {
+  var inners: Vector[Face] = Vector.empty[Face]
+
+  /***
+   * Compute area of irregular polygon
+   * More info at https://www.mathopenref.com/coordpolygonarea2.html
+   ***/
+  def outerArea: Double = {
+    var area: Double = 0.0
+    var h = outer
+    do{
+      area += (h.v1.x + h.v2.x) * (h.v1.y - h.v2.y)
+      h = h.next
+    }while(h != outer)
+
+    area / -2.0
+  }
+
+  private def getCoordinates: Array[Coordinate] = {
+    @tailrec
+    def getCoords(current: Half_edge, end: Half_edge, v: Array[Coordinate]):
+        Array[Coordinate] = {
+      if(current == end) {
+        v
+      } else {
+        getCoords(current.next, end, v :+ current.v2)
+      }
+    }
+    getCoords(outer.next, outer, Array(outer.v1))
+  }
+
+  private def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
+    val coords = getCoordinates
+    geofactory.createPolygon(coords)
+  }
+
+  def getPolygons(implicit geofactory: GeometryFactory): Vector[Polygon] = {
+    toPolygon +: inners.map(_.toPolygon)
+  }
+
+  def getGeometry(implicit geofactory: GeometryFactory): Geometry = {
+    val polys = getPolygons
+    val geom = if(polys.size == 1){
+      polys.head // Return a polygon...
+    } else {
+      // Groups polygons if one contains another...
+      val pairs = for{
+        outer <- polys
+        inner <- polys
+      } yield (outer, inner)
+
+      val partial = pairs.filter{ case (outer, inner) =>
+        try{
+          inner.coveredBy(outer)
+        } catch {
+          case e: com.vividsolutions.jts.geom.TopologyException => {
+            false
+          }
+        }
+      }.groupBy(_._1).mapValues(_.map(_._2))
+      // Set of inner polygons...
+      val diff = partial.values.flatMap(_.tail).toSet
+      val result = partial.filterKeys(partial.keySet.diff(diff)).values
+
+      val polygons = result.map{ row =>
+        val outerPoly = row.head
+        val innerPolys = geofactory.createMultiPolygon(row.tail.toArray)
+        try{
+          outerPoly.difference(innerPolys).asInstanceOf[Polygon]
+        } catch {
+          case e: com.vividsolutions.jts.geom.TopologyException => {
+            geofactory.createPolygon(Array.empty[Coordinate])
+          }
+        }        
+      }
+
+      polygons.size match {
+        // Return an empty polygon...
+        case 0 => geofactory.createPolygon(Array.empty[Coordinate])
+        // Return a polygon with holes...
+        case 1 => polygons.head
+        // Return a multi-polygon...
+        case x if x > 1 => geofactory.createMultiPolygon(polygons.toArray)
+      }
+    }
+    geom match {
+      case geom if geom.isInstanceOf[Polygon] =>{
+        val poly = geom.asInstanceOf[Polygon]
+        if(poly.getNumInteriorRing > 0){
+          geom
+        } else {
+          if(poly.isEmpty()){
+            geom
+          } else {
+            geom
+          }
+        }
+      }
+      case geom if geom.isInstanceOf[MultiPolygon] => geom
+    }
+  }
+
+  def toWKT(implicit geofactory: GeometryFactory): String = getGeometry.toText
+}
