@@ -96,6 +96,9 @@ case class Segment(hedges: List[Half_edge]) {
 case class Cell(id: Int, lineage: String, mbr: LinearRing)
 
 case class Face(outer: Half_edge) {
+  val polygonId = outer.data.polygonId
+  val ringId = outer.data.ringId
+  val isHole = outer.data.isHole
   var inners: Vector[Face] = Vector.empty[Face]
 
   /***
@@ -123,11 +126,13 @@ case class Face(outer: Half_edge) {
         getCoords(current.next, end, v :+ current.v2)
       }
     }
-    getCoords(outer.next, outer, Array(outer.v1))
+    // Adding the first two vertices so it will be start on next...
+    getCoords(outer.next, outer, Array(outer.v1, outer.v2))
   }
 
-  private def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
-    val coords = getCoordinates
+  def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
+    // Need to add first vertex at the end to close the polygon...
+    val coords = getCoordinates :+ outer.v1
     geofactory.createPolygon(coords)
   }
 

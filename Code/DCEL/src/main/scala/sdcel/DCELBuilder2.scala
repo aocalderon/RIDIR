@@ -1,5 +1,6 @@
 package edu.ucr.dblab.sdcel
 
+import scala.annotation.tailrec
 import com.vividsolutions.jts.geom.LineString
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import org.apache.spark.serializer.KryoSerializer
@@ -15,7 +16,7 @@ object DCELBuilder2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def getLDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
-      (implicit geofactory: GeometryFactory): RDD[(Iterable[Half_edge], Int)] = {
+      (implicit geofactory: GeometryFactory): RDD[Iterable[Half_edge]] = {
     edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
       val cell = cells(index).mbr
       val envelope = cell.getEnvelopeInternal
@@ -31,8 +32,7 @@ object DCELBuilder2 {
       val inner = SweepLine2.getHedgesInsideCell(innerEdges.toVector)
       val hedges = SweepLine2.merge(outer, inner)
 
-      val r = (hedges, index)
-      Iterator(r)
+      Iterator(hedges)
     }
   }
 
@@ -74,7 +74,7 @@ object DCELBuilder2 {
       save{"/tmp/edgesH.wkt"}{
         dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next
-          dcel._1.map{ h =>
+          dcel.map{ h =>
             val wkt = h.getPolygon.toText
             val pid = h.data.polygonId
             val rid = h.data.ringId
@@ -84,9 +84,45 @@ object DCELBuilder2 {
           }.toIterator
         }.collect
       }
+
+      val facesRDD = getFaces(dcels)
+      save("/tmp/edgesF.wkt"){
+        facesRDD.map{ face =>
+          s"${face.getGeometry.toText}\t${face.polygonId}\t${face.inners.size}\n"
+        }.collect
+      }
     }
      
     spark.close
+  }
+
+  def getFaces(dcels: RDD[Iterable[Half_edge]])
+      (implicit geofactory: GeometryFactory): RDD[Face] = {
+    @tailrec
+    def matchHoles(holes: List[Face], exteriors: Vector[Face]): Vector[Face] = {
+      holes match {
+        case Nil => exteriors
+        case head +: tail => {
+          val hole = head.toPolygon
+          val exterior = exteriors
+            .find{ exterior =>
+              val polygon = exterior.toPolygon
+              hole.coveredBy(polygon) }.get
+          exterior.inners = exterior.inners :+ head
+          matchHoles(tail, exteriors)
+        }
+      }
+    }
+
+    dcels.mapPartitionsWithIndex{ (index, dcelsIt) =>
+      val dcel = dcelsIt.next
+      dcel.map{Face}
+        .groupBy(_.polygonId).values
+        .map{ faces =>
+          val (holes, exteriors) = faces.toVector.partition(_.isHole)
+          (holes.toList, exteriors)
+        }.toIterator
+    }.flatMap{ case(holes, exteriors) => matchHoles(holes, exteriors)}
   }
 
   def save(filename: String)(content: Seq[String]): Unit = {
