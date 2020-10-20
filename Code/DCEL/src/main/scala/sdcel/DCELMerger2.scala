@@ -40,6 +40,11 @@ object DCELMerger2 {
     val nB = dcelsB.count()
     logger.info("Getting LDCELs for B done!")
 
+    // Merging DCELs...
+    dcelsA.zipPartitions(dcelsB, preservesPartitioning=true){ (iterA, iterB) =>
+      iterA
+    }
+
     if(params.debug()){
       save{"/tmp/edgesCells.wkt"}{
         cells.values.map{ cell =>
@@ -52,7 +57,7 @@ object DCELMerger2 {
       save{"/tmp/edgesHA.wkt"}{
         dcelsA.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next
-          dcel._1.map{ h =>
+          dcel.map{ h =>
             val wkt = h.getPolygon.toText
             val pid = h.data.polygonId
             val rid = h.data.ringId
@@ -65,7 +70,7 @@ object DCELMerger2 {
       save{"/tmp/edgesHB.wkt"}{
         dcelsB.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next
-          dcel._1.map{ h =>
+          dcel.map{ h =>
             val wkt = h.getPolygon.toText
             val pid = h.data.polygonId
             val rid = h.data.ringId
