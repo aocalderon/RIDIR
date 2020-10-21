@@ -32,7 +32,7 @@ case class Half_edge(edge: LineString) {
     geofactory.createLineString(coords.toArray).toText
   }
 
-  private def getNexts: List[Half_edge] = {
+  def getNexts: List[Half_edge] = {
     @tailrec
     def getNextsTailrec(hedges: List[Half_edge]): List[Half_edge] = {
       val next = hedges.last.next
