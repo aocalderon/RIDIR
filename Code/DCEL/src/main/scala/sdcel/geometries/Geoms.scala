@@ -10,16 +10,36 @@ case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
 }
 
 case class Half_edge(edge: LineString) {
+  private val geofactory = edge.getFactory
   private val coords = edge.getCoordinates
   val v1 = coords(0)
   val v2 = coords(1)
   val orig = Vertex(v1)
   val dest = Vertex(v2)
-  val data = edge.getUserData.asInstanceOf[EdgeData]
+  val data = if(edge.getUserData.isInstanceOf[EdgeData])
+    edge.getUserData.asInstanceOf[EdgeData]
+  else
+    EdgeData(-1,-1,-1,false)
   val wkt = edge.toText()
   var twin: Half_edge = null
   var next: Half_edge = null
   var prev: Half_edge = null
+
+  def split(p: Coordinate): List[Half_edge] = {
+    val h0 = this.prev
+    val l1 = geofactory.createLineString(Array(v1, p))
+    l1.setUserData(data.copy(edgeId = -1))
+    val h1 = Half_edge(l1)
+    val l2 = geofactory.createLineString(Array(p, v2))
+    l2.setUserData(data.copy(edgeId = -1))
+    val h2 = Half_edge(l2)
+    val h3 = this.next
+
+    h0.next = h1; h1.next = h2; h2.next = h3;
+    h3.prev = h2; h2.prev = h1; h1.prev = h0;
+
+    List(h1, h2)
+  }
 
   def getPolygon(implicit geofactory: GeometryFactory): Polygon = {
     val coords = v1 +: getNexts.map{_.v2}
@@ -31,22 +51,42 @@ case class Half_edge(edge: LineString) {
     val coords = hedges.map{_.v1} :+ hedges.last.v2
     geofactory.createLineString(coords.toArray).toText
   }
+  def getPrevsAsWKT(implicit geofactory: GeometryFactory): String = {
+    val hedges = getPrevs
+    val coords = hedges.map{_.v2} :+ hedges.last.v1
+    geofactory.createLineString(coords.toArray).toText
+  }
 
   def getNexts: List[Half_edge] = {
     @tailrec
-    def getNextsTailrec(hedges: List[Half_edge]): List[Half_edge] = {
+    def getNextsTailrec(hedges: List[Half_edge], i: Int): List[Half_edge] = {
+      println(hedges.last)
       val next = hedges.last.next
-      if( next == null || next == hedges.head){
+      if( next == null || next == hedges.head ){
         hedges
       } else {
-        getNextsTailrec(hedges :+ next)
+        getNextsTailrec(hedges :+ next, i+1)
       }
     }
-    getNextsTailrec(List(this))
+    getNextsTailrec(List(this), 0)
+  }
+  def getPrevs: List[Half_edge] = {
+    @tailrec
+    def getPrevsTailrec(hedges: List[Half_edge]): List[Half_edge] = {
+      val prev = hedges.last.prev
+      if( prev == null || prev == hedges.head){
+        hedges
+      } else {
+        getPrevsTailrec(hedges :+ prev)
+      }
+    }
+    getPrevsTailrec(List(this))
   }
 
   val angleAtOrig = math.toDegrees(hangle(v1.x - v2.x, v1.y - v2.y))
   val angleAtDest = math.toDegrees(hangle(v2.x - v1.x, v2.y - v1.y))
+
+  def label: String = s"${this.data.label}${this.data.polygonId}"
 
   private def hangle(dx: Double, dy: Double): Double = {
     val length = math.sqrt( (dx * dx) + (dy * dy) )
