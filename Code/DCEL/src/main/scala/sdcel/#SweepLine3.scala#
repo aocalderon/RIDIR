@@ -96,7 +96,6 @@ object SweepLine3 {
     }
     val hedges = setTwins(splits.toList)
 
-    /* debugging
     def printH(h: Half_edge, hid: Int, t: String): String =
       s"${h.edge.toText}\t${hid}\t${t}\t${h.label}"
     def printt(h: Half_edge, hid: Int): String = {
@@ -106,19 +105,17 @@ object SweepLine3 {
       printH(h.next, hid, "N")
     }
     val hh1 = hedges.zipWithIndex.map{case(h, hid)=>printt(h,hid)}
-     */
 
     val incidents = (hedges ++ hedges.map(_.twin)) // Take half-edges and their twins...
       .groupBy(_.v2) // Group them by the destination vertex...
       .filter(_._2.size > 1) // Remove isolate vertices
                              // (those with less than 2 incident half-edges)
-
-    // At each vertex, get their incident half-edges...
+                             // At each vertex, get their incident half-edges...
     val hh = incidents.mapValues{ hList =>
-      // Sort them by angle...
       val hs_prime = hList.sortBy(- _.angleAtDest)
-      // Add first incident to comple the sequence...
+      // Sort them by angle...
       val hs = hs_prime :+ hs_prime.head
+      // Add first incident to comple the sequence...
       // zip and tail will pair each half-edge with its next one...
       hs.zip(hs.tail).foreach{ case(h1, h2) => 
         h1.next = h2.twin
@@ -128,23 +125,44 @@ object SweepLine3 {
       hs
     }.values.flatten
 
-    //val hh2 = hedges.zipWithIndex.map{case(h, hid)=>printt(h,hid)}
+    val hh2 = hedges.zipWithIndex.map{case(h, hid)=>printt(h,hid)}
 
-    /*
     hh1.zip(hh2).map{ case(a, b) =>
       a.split("\n").zip(b.split("\n")).map{ case(a,b) => a + "\t\t" + b}.mkString("\n")
     }.mkString("\n").foreach{print}
-     */
+
+    println
+    println(hedges(5).getNextsAsWKT)
 
     val h = hh.groupBy(s => (s.data.label, s.data.polygonId)).values.map(_.head).toList
-    /********************************************************/
 
-    /********************************************************/
-
+    List(h.toList(2)).foreach{ x =>
+      x.getNexts.map{ n =>
+        val wkt = n.edge.toText
+        val pid = n.data.polygonId
+        val eid = n.data.edgeId
+        s"$wkt\t$pid:$eid"
+      }
+    }
     val intersectionsPoints = intersections.keySet.map{geofactory.createPoint}
+    /********************************************************/
+
+    /********************************************************/
+
+    
     val vif = new java.io.PrintWriter("/tmp/edgesVi.wkt")
     vif.write(intersectionsPoints.map(_.toText).mkString("\n"))
     vif.close
+
+    val sf = new java.io.PrintWriter("/tmp/edgesS.wkt")
+    sf.write(hedges.map{ h =>
+      val wkt1 = h.edge.toText
+      val lab1 = h.label
+      val wkt2 = h.twin.edge.toText
+      val lab2 = h.twin.label
+      s"$wkt1\t$lab1\n$wkt2\t$lab2\n"
+    }.mkString(""))
+    sf.close
 
     val hf = new java.io.PrintWriter("/tmp/edgesH.wkt")
     hf.write(
@@ -157,6 +175,39 @@ object SweepLine3 {
     )
     hf.close
     
+    val haf = new java.io.PrintWriter("/tmp/edgesHa.wkt")
+    haf.write(ha.head.getNextsAsWKT)
+    haf.close
+
+    val hbf = new java.io.PrintWriter("/tmp/edgesHb.wkt")
+    hbf.write(hb(2).getNextsAsWKT)
+    hbf.close
+    
+    val haif = new java.io.PrintWriter("/tmp/edgesHai.wkt")
+    haif.write(
+      intersections.valuesIterator.map{ pair =>
+        val h = pair.head
+        val wkt = h.edge.toText
+        val pid = h.data.polygonId
+        val eid = h.data.edgeId
+        s"$wkt\t$pid:$eid\n"
+      }.mkString("")
+    )
+    haif.close
+
+    val hbif = new java.io.PrintWriter("/tmp/edgesHbi.wkt")
+    hbif.write(
+      intersections.valuesIterator.map{ pair =>
+        val h = pair.last
+        val wkt = h.edge.toText
+        val pid = h.data.polygonId
+        val eid = h.data.edgeId
+        s"$wkt\t$pid:$eid\n"
+      }.mkString("")
+    )
+    hbif.close    
+    
+
     /********************************************************/
   }
 }
