@@ -60,7 +60,6 @@ case class Half_edge(edge: LineString) {
   def getNexts: List[Half_edge] = {
     @tailrec
     def getNextsTailrec(hedges: List[Half_edge], i: Int): List[Half_edge] = {
-      println(hedges.last)
       val next = hedges.last.next
       if( next == null || next == hedges.head ){
         hedges
@@ -83,10 +82,11 @@ case class Half_edge(edge: LineString) {
     getPrevsTailrec(List(this))
   }
 
+  def label: String =
+    s"${this.data.label}${if(this.data.polygonId < 0) "" else this.data.polygonId}"
+
   val angleAtOrig = math.toDegrees(hangle(v1.x - v2.x, v1.y - v2.y))
   val angleAtDest = math.toDegrees(hangle(v2.x - v1.x, v2.y - v1.y))
-
-  def label: String = s"${this.data.label}${this.data.polygonId}"
 
   private def hangle(dx: Double, dy: Double): Double = {
     val length = math.sqrt( (dx * dx) + (dy * dy) )
@@ -99,7 +99,7 @@ case class Half_edge(edge: LineString) {
 
   def reverse(implicit geofactory: GeometryFactory): Half_edge = {
     val edge = geofactory.createLineString(Array(v2, v1))
-    edge.setUserData(EdgeData(-1,0,0,false))
+    edge.setUserData(this.data.copy(polygonId = -1))
     Half_edge(edge)
   }
 }
