@@ -116,11 +116,11 @@ object SweepLine3 {
     // At each vertex, get their incident half-edges...
     val hh = incidents.mapValues{ hList =>
       // Sort them by angle...
-      val hs_prime = hList.sortBy(- _.angleAtDest)
+      val hs = hList.sortBy(- _.angleAtDest)
       // Add first incident to comple the sequence...
-      val hs = hs_prime :+ hs_prime.head
+      val hs_prime = hs :+ hs.head
       // zip and tail will pair each half-edge with its next one...
-      hs.zip(hs.tail).foreach{ case(h1, h2) => 
+      hs_prime.zip(hs_prime.tail).foreach{ case(h1, h2) => 
         h1.next = h2.twin
         h2.twin.prev = h1
       }
@@ -128,15 +128,16 @@ object SweepLine3 {
       hs
     }.values.flatten
 
-    //val hh2 = hedges.zipWithIndex.map{case(h, hid)=>printt(h,hid)}
-
-    /*
-    hh1.zip(hh2).map{ case(a, b) =>
-      a.split("\n").zip(b.split("\n")).map{ case(a,b) => a + "\t\t" + b}.mkString("\n")
-    }.mkString("\n").foreach{print}
-     */
-
-    val h = hh.groupBy(s => (s.data.label, s.data.polygonId)).values.map(_.head).toList
+    val h = hh.map{ h =>
+      val pid1 = h.data.polygonId
+      val pid2 = h.next.data.polygonId
+      if( pid1 >= 0 && pid2 <  0 ) (h.label, h)
+      else if( pid1 <  0 && pid2 >= 0 ) (h.next.label, h.next)
+      else if( pid1 >= 0 && pid2 >= 0 )
+        (List(h.label, h.next.label).sorted.distinct.mkString(" "), h)
+      else ("", null)
+    }.filterNot(_._1 == "")
+      .groupBy(_._1).values.map(_.head)
     /********************************************************/
 
     /********************************************************/
@@ -149,8 +150,8 @@ object SweepLine3 {
     val hf = new java.io.PrintWriter("/tmp/edgesH.wkt")
     hf.write(
       h.map{ x =>
-        val wkt = x.getNextsAsWKT
-        val label = x.label
+        val wkt = x._2.getPolygon.toText
+        val label = x._1
 
         s"$wkt\t$label\n"
       }.mkString("")
