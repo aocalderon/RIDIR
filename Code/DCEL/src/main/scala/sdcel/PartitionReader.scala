@@ -59,7 +59,7 @@ object PartitionReader {
           val edgeId = arr(4).toInt
           val isHole = arr(5).toBoolean
           val edge = reader.read(wkt).asInstanceOf[LineString]
-          val data = EdgeData(polygonId, ringId, edgeId, isHole)
+          val data = EdgeData(polygonId, ringId, edgeId, isHole, "A")
           edge.setUserData(data)
           (partitionId, edge)
         }.toIterator
@@ -88,7 +88,7 @@ object PartitionReader {
           val edgeId = arr(4).toInt
           val isHole = arr(5).toBoolean
           val edge = reader.read(wkt).asInstanceOf[LineString]
-          val data = EdgeData(polygonId, ringId, edgeId, isHole)
+          val data = EdgeData(polygonId, ringId, edgeId, isHole, "B")
           edge.setUserData(data)
           (partitionId, edge)
         }.toIterator
