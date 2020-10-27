@@ -3,15 +3,22 @@ package edu.ucr.dblab.sdcel.geometries
 import scala.annotation.tailrec
 import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry}
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
+import com.vividsolutions.jts.geomgraph.Edge
+
+case class HEdge(coords: Array[Coordinate], h: Half_edge) extends Edge(coords)
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
   label: String = "A") {
   override def toString: String = s"${label}$polygonId\t$ringId\t$edgeId\t$isHole"
 }
 
+case class Tag(label: String, pid: Int){
+  override def toString: String = s"$label$pid"
+}
+
 case class Half_edge(edge: LineString) {
   private val geofactory = edge.getFactory
-  private val coords = edge.getCoordinates
+  val coords = edge.getCoordinates
   val v1 = coords(0)
   val v2 = coords(1)
   val orig = Vertex(v1)
@@ -21,24 +28,31 @@ case class Half_edge(edge: LineString) {
   else
     EdgeData(-1,-1,-1,false)
   val wkt = edge.toText()
+  var tags: List[Tag] = List.empty[Tag]
   var twin: Half_edge = null
   var next: Half_edge = null
   var prev: Half_edge = null
 
+  def getTag: String = tags.filter(_.pid >= 0).distinct.mkString(" ")
+
   def split(p: Coordinate): List[Half_edge] = {
-    val h0 = this.prev
-    val l1 = geofactory.createLineString(Array(v1, p))
-    l1.setUserData(data.copy(edgeId = -1))
-    val h1 = Half_edge(l1)
-    val l2 = geofactory.createLineString(Array(p, v2))
-    l2.setUserData(data.copy(edgeId = -1))
-    val h2 = Half_edge(l2)
-    val h3 = this.next
+    if(p == v1 || p == v2 || !edge.getEnvelopeInternal.intersects(p)){
+      List(this)
+    } else {
+      val h0 = this.prev
+      val l1 = geofactory.createLineString(Array(v1, p))
+      l1.setUserData(data.copy(edgeId = -1))
+      val h1 = Half_edge(l1)
+      val l2 = geofactory.createLineString(Array(p, v2))
+      l2.setUserData(data.copy(edgeId = -1))
+      val h2 = Half_edge(l2)
+      val h3 = this.next
 
-    h0.next = h1; h1.next = h2; h2.next = h3;
-    h3.prev = h2; h2.prev = h1; h1.prev = h0;
+      h0.next = h1; h1.next = h2; h2.next = h3;
+      h3.prev = h2; h2.prev = h1; h1.prev = h0;
 
-    List(h1, h2)
+      List(h1, h2)
+    }
   }
 
   def getPolygon(implicit geofactory: GeometryFactory): Polygon = {
