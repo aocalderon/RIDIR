@@ -101,12 +101,9 @@ object DCELMerger2 {
     }.groupBy(h => (h.v1, h.v2)).mapValues{ h =>
       val tags = h.map(h => Tag(h.data.label, h.data.polygonId))
       val h_prime = h.head
-      h_prime.tags = tags.toList
+      h_prime.tags = tags.toList.sortBy(_.label).distinct
       h_prime
     }.values.toList
-
-    println("Splits")
-    splits.map(h => (h, h.getTag)).foreach{println}
 
     val hedges = setTwins(splits2)
 
@@ -121,6 +118,7 @@ object DCELMerger2 {
     println("Incidents")
     incidents.foreach{println}
 
+    println
     // At each vertex, get their incident half-edges...
     val hh = incidents.mapValues{ hList =>
       // Sort them by angle...
@@ -134,18 +132,14 @@ object DCELMerger2 {
       }
 
       hs
-    }.values.flatten
+    }.values.flatten.filter(_.data.polygonId >= 0)
+
+    hh.map(h => (h, h.tags, h.updateTags)).foreach{println}
 
     val h = hh.map{ h =>
-      val pid1 = h.data.polygonId
-      val pid2 = h.next.data.polygonId
-      if( pid1 >= 0 && pid2 <  0 ) (h.getTag, h)
-      else if( pid1 <  0 && pid2 >= 0 ) (h.next.getTag, h.next)
-      else if( pid1 >= 0 && pid2 >= 0 )
-        ((h.tags ++ h.next.tags).distinct.mkString(" "), h)
-      else ("", null)
-    }.filterNot(_._1 == "")
-      .groupBy(_._1).values.map(_.head)
+      h.tags = h.updateTags
+      (h.getTag, h)
+    }.groupBy(_._1).values.map(_.head)
 
     h
   }
