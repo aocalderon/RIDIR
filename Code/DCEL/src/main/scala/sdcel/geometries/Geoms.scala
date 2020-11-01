@@ -33,7 +33,7 @@ case class Half_edge(edge: LineString) {
   var next: Half_edge = null
   var prev: Half_edge = null
 
-  def getTag: String = tags.filter(_.pid >= 0).distinct.mkString(" ")
+  def getTag: String = tags.sortBy(_.label).mkString(" ")
 
   def split(p: Coordinate): List[Half_edge] = {
     if(p == v1 || p == v2 || !edge.getEnvelopeInternal.intersects(p)){
@@ -47,6 +47,8 @@ case class Half_edge(edge: LineString) {
       l2.setUserData(data.copy(edgeId = -1))
       val h2 = Half_edge(l2)
       val h3 = this.next
+
+      //println(this + " " + p)
 
       h0.next = h1; h1.next = h2; h2.next = h3;
       h3.prev = h2; h2.prev = h1; h1.prev = h0;
@@ -94,6 +96,22 @@ case class Half_edge(edge: LineString) {
       }
     }
     getPrevsTailrec(List(this))
+  }
+
+  def updateTags: List[Tag] = {
+    @tailrec
+    def getNextTailrec(stop: Half_edge, current: Half_edge): List[Tag] = {
+      if( current.tags.size == 2){
+        current.tags
+      } else if(current.label != stop.label){
+        current.tags ++ stop.tags
+      } else if(current == stop){
+        stop.tags
+      } else {
+        getNextTailrec(stop, current.next)
+      }
+    }
+    getNextTailrec(this, this.next)
   }
 
   def label: String =
