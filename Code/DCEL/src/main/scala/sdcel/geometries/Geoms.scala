@@ -48,10 +48,20 @@ case class Half_edge(edge: LineString) {
       val h2 = Half_edge(l2)
       val h3 = this.next
 
-      //println(this + " " + p)
-
-      h0.next = h1; h1.next = h2; h2.next = h3;
-      h3.prev = h2; h2.prev = h1; h1.prev = h0;
+      try {
+        h0.next = h1; h1.next = h2; h2.next = h3;
+        h3.prev = h2; h2.prev = h1; h1.prev = h0;
+      } catch {
+        case e: java.lang.NullPointerException => {
+          println(e)
+          println(this.edge.toText + "\t" + p)
+          println(h0)
+          println(h1)
+          println(h2)
+          println(h3)
+          System.exit(0)
+        }
+      }
 
       List(h1, h2)
     }

@@ -79,11 +79,9 @@ object DCELMerger2 {
 
     val intersections = intersects(ha, hb)
 
-    println("Splits2")
-    val splits2 = intersections.map{ case(p, hList) =>
+    val splits = intersections.map{ case(p, hList) =>
       hList.map(h => (h,p))
-    }
-      .flatten.groupBy(_._1).mapValues(_.map(_._2))
+    }.flatten.groupBy(_._1).mapValues(_.map(_._2))
       .map{ case(k, v) =>
         val h = List(k)
         v.toList.foldLeft(h){ case(h, c) => h.map(_.split(c)).flatten}
@@ -94,31 +92,28 @@ object DCELMerger2 {
       h_prime
     }.values.toList
 
-    splits2.map(h => (h, h.getTag)).foreach{println}
+    val hedges = setTwins(splits)
 
-    val splits = intersections.flatMap{ case(p, hedges) =>
-      hedges.flatMap(_.split(p))
-    }.groupBy(h => (h.v1, h.v2)).mapValues{ h =>
-      val tags = h.map(h => Tag(h.data.label, h.data.polygonId))
-      val h_prime = h.head
-      h_prime.tags = tags.toList.sortBy(_.label).distinct
-      h_prime
-    }.values.toList
+    save("/tmp/edgesT.wkt", 
+      (hedges ++ hedges.map(_.twin).filter(_.data.polygonId < 0)).map{ h =>
+        val wkt = h.edge.toText
+        val lab = h.label
 
-    val hedges = setTwins(splits2)
+        s"$wkt\t$lab\n"
+      }
+    )
 
-    println("Hedges")
-    hedges.map(h => (h, h.twin, h.getTag, h.twin.getTag)).foreach{println}
-
-    val incidents = (hedges ++ hedges.map(_.twin)) // Take half-edges and their twins...
+    // Take half-edges and their twins...
+    val incidents = (hedges ++ hedges.map(_.twin).filter(_.data.polygonId < 0))
       .groupBy(_.v2) // Group them by the destination vertex...
       .filter(_._2.size > 1) // Remove isolate vertices
                              // (those with less than 2 incident half-edges)
 
-    println("Incidents")
-    incidents.foreach{println}
+    //println("Incidents")
+    //incidents.foreach{println}
 
-    println
+    //println
+
     // At each vertex, get their incident half-edges...
     val hh = incidents.mapValues{ hList =>
       // Sort them by angle...
@@ -134,7 +129,7 @@ object DCELMerger2 {
       hs
     }.values.flatten.filter(_.data.polygonId >= 0)
 
-    hh.map(h => (h, h.tags, h.updateTags)).foreach{println}
+    //hh.map(h => (h, h.tags, h.updateTags)).foreach{println}
 
     val h = hh.map{ h =>
       h.tags = h.updateTags
@@ -142,5 +137,12 @@ object DCELMerger2 {
     }.groupBy(_._1).values.map(_.head)
 
     h
+  }
+
+  def save(name: String, content: Seq[String]): Unit = {
+    val hf = new java.io.PrintWriter(name)
+    hf.write(content.mkString(""))
+    hf.close
+    println(s"Saved $name [${content.size} records].")
   }
 }
