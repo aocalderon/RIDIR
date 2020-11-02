@@ -1,7 +1,7 @@
 package edu.ucr.dblab.sdcel
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.LineString
+import com.vividsolutions.jts.geom.Polygon
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge}
 import edu.ucr.dblab.sdcel.DCELMerger2.merge
@@ -14,64 +14,79 @@ object Test3 {
     implicit val reader = new WKTReader(geofactory)
 
     val bufferA = Source.fromFile(args(0))
-    val ha = bufferA.getLines.map{ line =>
+    val ha = bufferA.getLines.zipWithIndex.flatMap{ case(line, polygonId) =>
       val arr = line.split("\t")
-      val linestring = reader.read(arr(0)).asInstanceOf[LineString]
-      val polygonId = arr(2).toInt
-      val ringId = arr(3).toInt
-      val edgeId = arr(4).toInt
-      val isHole = arr(5).toBoolean
-      val data = EdgeData(polygonId, ringId, edgeId, isHole, "A")
-      linestring.setUserData(data)
-      Half_edge(linestring)
-    }.toList.distinct
-    ha.groupBy(_.label).mapValues{ h_prime => 
-      val h = h_prime.sortBy(_.data.edgeId)
-      h.zip(h.tail).foreach{ case(h1, h2) =>
-        h1.next = h2
-        h2.prev = h1
+      val polygon = reader.read(arr(0)).asInstanceOf[Polygon]
+      val ring = polygon.getExteriorRing
+      val coords = ring.getCoordinates.distinct :+ ring.getCoordinates.head
+
+      coords.zip(coords.tail).zipWithIndex.map{ case(coords, edgeId) =>
+        val arr = Array(coords._1, coords._2)
+        val edge = geofactory.createLineString(arr)
+        val data = EdgeData(polygonId, 0, edgeId, false, "A")
+        edge.setUserData(data)
+        Half_edge(edge)
       }
-      h.head.prev = h.last
-      h.last.next = h.head
+    }.toList
+    val ha_prime = ha :+ ha.head
+    ha_prime.zip(ha_prime.tail).foreach{ case(h1, h2) =>
+      h1.next = h2
+      h2.prev = h1
     }
     bufferA.close
+    saveHedges("/tmp/edgesHA.wkt", ha)
 
     val bufferB = Source.fromFile(args(1))
-    val hb = bufferB.getLines.map{ line =>
+    val hb = bufferB.getLines.zipWithIndex.flatMap{ case(line, polygonId) =>
       val arr = line.split("\t")
-      val linestring = reader.read(arr(0)).asInstanceOf[LineString]
-      val polygonId = arr(2).toInt
-      val ringId = arr(3).toInt
-      val edgeId = arr(4).toInt
-      val isHole = arr(5).toBoolean
-      val data = EdgeData(polygonId, ringId, edgeId, isHole, "B")
-      linestring.setUserData(data)
-      Half_edge(linestring)
-    }.toList.distinct
-    hb.groupBy(_.label).mapValues{ h_prime => 
-      val h = h_prime.sortBy(_.data.edgeId)
-      h.zip(h.tail).foreach{ case(h1, h2) =>
-        h1.next = h2
-        h2.prev = h1
+      val polygon = reader.read(arr(0)).asInstanceOf[Polygon]
+      val ring = polygon.getExteriorRing
+      val coords = ring.getCoordinates.distinct :+ ring.getCoordinates.head
+
+      coords.zip(coords.tail).zipWithIndex.map{ case(coords, edgeId) =>
+        val arr = Array(coords._1, coords._2)
+        val edge = geofactory.createLineString(arr)
+        val data = EdgeData(polygonId, 0, edgeId, false, "B")
+        edge.setUserData(data)
+        Half_edge(edge)
       }
-      h.head.prev = h.last
-      h.last.next = h.head
+    }.toList
+    val hb_prime = hb :+ hb.head
+    hb_prime.zip(hb_prime.tail).foreach{ case(h1, h2) =>
+      h1.next = h2
+      h2.prev = h1
     }
     bufferB.close
+    saveHedges("/tmp/edgesHB.wkt", hb)
 
     // Get merge half-edges...
     val h = merge(ha, hb)
 
     val name = "/tmp/edgesH.wkt"
     val hf = new java.io.PrintWriter(name)
-    val wkt = h.map{ x =>
-      val wkt = x._2.getPolygon.toText
-      val label = x._1
+    val wkt = h.take(5).map{ hedge =>
+      val wkt = hedge._2.getNextsAsWKT
+      val pid = hedge._1
 
-      s"$wkt\t$label\n"
+      s"$wkt\t$pid\n"
     }
     hf.write(wkt.mkString(""))
     hf.close
     println(s"Saved $name [${wkt.size} records].")
+
+  }
+
+  private def saveHedges(name:String, hedges: List[Half_edge], tag: String = ""): Unit = {
+    val hf = new java.io.PrintWriter(name)
+    val wkt = hedges.map{ hedge =>
+      val wkt = hedge.edge.toText
+      val pid = hedge.data.polygonId
+
+      s"$wkt\t$pid\n"
+    }
+    hf.write(wkt.mkString(""))
+    hf.close
+    println(s"Saved $name [${wkt.size} records].")
+
   }
 }

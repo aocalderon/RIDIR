@@ -25,7 +25,7 @@ object SDCEL {
         .getOrCreate()
     import spark.implicits._
     implicit val params = new Params(args)
-    val model = new PrecisionModel(1000)
+    val model = new PrecisionModel(params.scale())
     implicit val geofactory = new GeometryFactory(model)
     logger.info("Starting session... Done!")
 
@@ -47,6 +47,7 @@ object SDCEL {
     logger.info("Getting LDCELs for B done!")
 
     // Merging DCELs...
+    /*
     val sdcel = dcelsA.zipPartitions(dcelsB, preservesPartitioning=true){ (iterA, iterB) =>
       val partitionId = TaskContext.getPartitionId
       val t0 = clocktime
@@ -64,6 +65,7 @@ object SDCEL {
     }.persist()
     val nSDcel = sdcel.count()
     logger.info("Merging DCELs... done!")
+     */
 
     if(params.debug()){
       save{"/tmp/edgesCells.wkt"}{
@@ -100,6 +102,7 @@ object SDCEL {
           }.toIterator
         }.collect
       }
+      /*
       save{"/tmp/edgesH.wkt"}{
         sdcel.mapPartitionsWithIndex{ (index, dcelsIt) =>
           dcelsIt.map{ case(tag, h) =>
@@ -112,6 +115,7 @@ object SDCEL {
           }.toIterator
         }.collect
       }
+       */
     }
      
     spark.close
