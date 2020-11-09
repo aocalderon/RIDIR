@@ -53,12 +53,7 @@ case class Half_edge(edge: LineString) {
         h3.prev = h2; h2.prev = h1; h1.prev = h0;
       } catch {
         case e: java.lang.NullPointerException => {
-          println(e)
-          println(this.edge.toText + "\t" + p)
-          println(h0)
-          println(h1)
-          println(h2)
-          println(h3)
+          println("Half-edge split error in " + this.edge.toText + " at " + p)
           System.exit(0)
         }
       }
@@ -68,8 +63,22 @@ case class Half_edge(edge: LineString) {
   }
 
   def getPolygon(implicit geofactory: GeometryFactory): Polygon = {
-    val coords = v1 +: getNexts.map{_.v2}
-    geofactory.createPolygon(coords.toArray)
+
+    try {
+      val coords = (v1 +: getNexts.map{_.v2}).toArray
+      if(coords.size >= 3)
+        geofactory.createPolygon(coords)
+      else
+        emptyPolygon
+    } catch {
+      case e: java.lang.IllegalArgumentException => {
+        println(e.getMessage)
+        println(coords.mkString(" "))
+        System.exit(0)
+        geofactory.createPolygon(coords.toArray)
+      }
+    }
+    
   }
 
   def getNextsAsWKT(implicit geofactory: GeometryFactory): String = {
@@ -121,7 +130,7 @@ case class Half_edge(edge: LineString) {
         getNextTailrec(stop, current.next)
       }
     }
-    getNextTailrec(this, this.next)
+    getNextTailrec(this, this.next).distinct
   }
 
   def label: String =
@@ -143,6 +152,11 @@ case class Half_edge(edge: LineString) {
     val edge = geofactory.createLineString(Array(v2, v1))
     edge.setUserData(this.data.copy(polygonId = -1))
     Half_edge(edge)
+  }
+
+  val emptyPolygon: Polygon = {
+    val p0 = new Coordinate(0,0)
+    geofactory.createPolygon(Array(p0, p0, p0, p0))
   }
 }
 

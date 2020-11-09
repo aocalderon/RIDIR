@@ -11,7 +11,7 @@ import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 import PartitionReader._
 import DCELBuilder2.getLDCELs
-import DCELMerger2.merge
+import DCELMerger2.merge2
 
 object SDCEL {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -40,32 +40,13 @@ object SDCEL {
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells).persist()
+    println
     val nA = dcelsA.count()
     logger.info("Getting LDCELs for A done!")
     val dcelsB = getLDCELs(edgesRDDB, cells).persist()
     val nB = dcelsB.count()
+    println
     logger.info("Getting LDCELs for B done!")
-
-    // Merging DCELs...
-    /*
-    val sdcel = dcelsA.zipPartitions(dcelsB, preservesPartitioning=true){ (iterA, iterB) =>
-      val partitionId = TaskContext.getPartitionId
-      val t0 = clocktime
-
-      val A = iterA.next.toList
-      val B = iterB.next.toList
-
-      val hedges = merge(A, B)
-
-      val t1 = clocktime
-      val time = "%.2f".format((t1 - t0) / 1000.0)
-      logger.info(s"Partition $partitionId in $time s")
-
-      hedges.toIterator
-    }.persist()
-    val nSDcel = sdcel.count()
-    logger.info("Merging DCELs... done!")
-     */
 
     if(params.debug()){
       save{"/tmp/edgesCells.wkt"}{
@@ -102,22 +83,37 @@ object SDCEL {
           }.toIterator
         }.collect
       }
-      /*
-      save{"/tmp/edgesH.wkt"}{
-        sdcel.mapPartitionsWithIndex{ (index, dcelsIt) =>
-          dcelsIt.map{ case(tag, h) =>
-            val wkt = h.getPolygon.toText
-            val pid = h.data.polygonId
-            val rid = h.data.ringId
-            val eid = h.data.edgeId
-            
-            s"$wkt\t$tag\t$index\n"
-          }.toIterator
+    }
+
+    // Merging DCELs...
+    val sdcel = dcelsA.zipPartitions(dcelsB, preservesPartitioning=true){ (iterA, iterB) =>
+      val partitionId = TaskContext.getPartitionId
+      val t0 = clocktime
+
+      val A = iterA.next.map(_.getNexts).flatten.toList
+      val B = iterB.next.map(_.getNexts).flatten.toList
+
+      val hedges = merge2(A, B)
+
+      val t1 = clocktime
+      val time = "%.2f".format((t1 - t0) / 1000.0)
+      logger.info(s"Partition $partitionId in $time s")
+
+      hedges.toIterator
+    }.persist()
+    val nSDcel = sdcel.count()
+    logger.info("Merging DCELs... done!")
+
+    if(params.debug()){
+      save("/tmp/edgesH.wkt"){
+        sdcel.map{ case(h, tag) =>
+          val wkt = h.getPolygon.toText
+
+          s"$wkt\t$tag\n"
         }.collect
       }
-       */
     }
-     
+
     spark.close
   }  
 
