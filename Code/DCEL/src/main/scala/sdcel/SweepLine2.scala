@@ -270,8 +270,12 @@ object SweepLine2 {
     segments.flatMap{ ss =>
         ss.map{ s =>
           val h = s.hedges
-          h.zip(h.tail).foreach{ case(current, next) => current.next = next }
+          h.zip(h.tail).foreach{ case(current, next) =>
+            current.next = next
+            next.prev = current
+          }
           h.last.next = h.head
+          h.head.prev = h.last
           h.head
         }
       }
