@@ -15,7 +15,7 @@ object DCELMerger2 {
 
   def intersects(hedgesA: List[Half_edge], hedgesB: List[Half_edge])
     (implicit geofactory: GeometryFactory): Map[Coordinate, List[Half_edge]] = {
-    val pid = org.apache.spark.TaskContext.getPartitionId
+    val pid = 0//org.apache.spark.TaskContext.getPartitionId
 
     val aList = hedgesA.map{ h =>
       val pts = Array(h.v1, h.v2)
@@ -84,7 +84,9 @@ object DCELMerger2 {
 
   def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)
     (implicit geofactory: GeometryFactory): Iterable[(Half_edge, String)] = {
-    val pid = org.apache.spark.TaskContext.getPartitionId
+    val pid = 0//org.apache.spark.TaskContext.getPartitionId
+
+    // Getting intersection between dcel A and B...
     val intersections = intersects(ha, hb)
 
     if(debug)
@@ -96,6 +98,7 @@ object DCELMerger2 {
         }.toList
       )
 
+    // Split the half-edges which intersect each other...
     val splits = intersections.map{ case(p, hList) =>
       hList.map(h => (h,p))
     }.flatten.groupBy(_._1).mapValues(_.map(_._2))
@@ -109,9 +112,12 @@ object DCELMerger2 {
       h_prime
     }.values.toList
 
+    // Remove the half-edges which intersect and replace them with their splits...
     val hedges_prime = ((ha ++ hb).toSet -- intersections.values.flatten).toList ++ splits
 
+    // Match half-edges with their twins (create them if needed)...
     val hedges = setTwins(hedges_prime)
+    // Extract set of vertices...
     val vertices = hedges.map(_.orig).distinct
 
     if(debug)
@@ -123,7 +129,7 @@ object DCELMerger2 {
         }.toList
       )
 
-    // Group them by the destination vertex...
+    // Group half-edges by the destination vertex (v2)...
     val incidents = (hedges ++ hedges.map(_.twin)).groupBy(_.v2).values.toList
 
     if(debug)
@@ -140,7 +146,7 @@ object DCELMerger2 {
     val h_prime = incidents.map{ hList =>
       // Sort them by angle...
       val hs = hList.sortBy(- _.angleAtDest)
-      // Add first incident to comple the sequence...
+      // Add first incident to complete the sequence...
       val hs_prime = hs :+ hs.head
       // zip and tail will pair each half-edge with its next one...
       hs_prime.zip(hs_prime.tail).foreach{ case(h1, h2) =>
@@ -151,6 +157,7 @@ object DCELMerger2 {
       hs
     }.flatten
 
+    // 
     val h = groupByNext(h_prime.filter{ h =>
         intersections.keySet.contains(h.v2)
       }.toSet, List.empty[(Half_edge, String)]).filter(_._2 != "")
