@@ -17,6 +17,37 @@ import edu.ucr.dblab.sdcel.geometries._
 
 object PartitionReader {
 
+  def readQuadtree(qpath: String, epath: String)(implicit geofactory: GeometryFactory):
+      (StandardQuadTree[Nothing], Map[Int, Cell]) = {
+
+    // Reading quadtree...
+    println(qpath)
+    val quadtreeBuff = Source.fromFile(qpath)
+    val lineages = quadtreeBuff.getLines
+      .map(_.split("\t").head).toList  // lineages are the first column in the file...
+      quadtreeBuff.close
+
+    // Reading boundary...
+    val boundaryBuff = Source.fromFile(epath)
+    val boundaryWkt = boundaryBuff.getLines.next // boundary is the only line in the file...
+    val reader = new WKTReader(geofactory)
+    val boundary = reader.read(boundaryWkt).getEnvelopeInternal
+    boundaryBuff.close
+    val quadtree = Quadtree.create(boundary, lineages)
+
+    // Getting cells...
+    val cells = quadtree.getLeafZones.asScala.map{ leaf =>
+      val id = leaf.partitionId.toInt
+      val lineage = leaf.lineage
+      val mbr = envelope2ring(roundEnvelope(leaf.getEnvelope))
+
+      val cell = Cell(id, lineage, mbr)
+      (id -> cell)
+    }.toMap
+
+    (quadtree, cells)
+  }
+
   def readEdges(input: String)
     (implicit geofactory: GeometryFactory, spark: SparkSession, params: Params):
       (RDD[LineString], StandardQuadTree[Nothing], Map[Int, Cell]) = {
