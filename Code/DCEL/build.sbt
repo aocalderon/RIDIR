@@ -1,5 +1,5 @@
-name := "DCEL"
-organization := "UCR-DBLab"
+name := "sdcel"
+organization := "edu.ucr.dblab"
 version := "0.1"
 scalaVersion in ThisBuild := "2.11.8"
 
@@ -15,10 +15,6 @@ libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.7.25"
 libraryDependencies += "org.rogach" % "scallop_2.11" % "2.1.3"
 libraryDependencies += "ch.cern.sparkmeasure" %% "spark-measure" % "0.16"
 
-mainClass in (Compile, run) := Some("DCELMerger")
-mainClass in (Compile, packageBin) := Some("DCELMerger")
+mainClass in (Compile, run) := Some("edu.ucr.dblab.SDCEL")
+mainClass in (Compile, packageBin) := Some("edu.ucr.dbla.SDCEL")
 
-assemblyMergeStrategy in assembly := {
- case PathList("META-INF", xs @ _*) => MergeStrategy.discard
- case x => MergeStrategy.last
-}

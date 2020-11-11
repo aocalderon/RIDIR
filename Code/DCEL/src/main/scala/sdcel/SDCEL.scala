@@ -19,18 +19,19 @@ object SDCEL {
   def main(args: Array[String]) = {
     // Starting session...
     logger.info("Starting session...")
+    implicit val params = new Params(args)
+    val model = new PrecisionModel(params.scale())
+    implicit val geofactory = new GeometryFactory(model)
+    val (quadtree, cells) = readQuadtree(params.quadtree(), params.boundary())
     implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .getOrCreate()
     import spark.implicits._
-    implicit val params = new Params(args)
-    val model = new PrecisionModel(params.scale())
-    implicit val geofactory = new GeometryFactory(model)
     logger.info("Starting session... Done!")
 
     // Reading data...
-    val (edgesRDDA, quadtree, cells) = readEdges(params.input1())
+    val edgesRDDA = readEdges(params.input1(), quadtree)
     val edgesRDDB = readEdges(params.input2(), quadtree)
     edgesRDDA.persist()
     val nEdgesRDDA = edgesRDDA.count()
@@ -40,12 +41,10 @@ object SDCEL {
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells).persist()
-    println
     val nA = dcelsA.count()
     logger.info("Getting LDCELs for A done!")
     val dcelsB = getLDCELs(edgesRDDB, cells).persist()
     val nB = dcelsB.count()
-    println
     logger.info("Getting LDCELs for B done!")
 
     if(params.debug()){
