@@ -48,11 +48,10 @@ object Test3 {
       val polygon = reader.read(arr(0)).asInstanceOf[Polygon]
 
       val ring = polygon.getExteriorRing.getCoordinates
-
       val coords = if(!CGAlgorithms.isCCW(ring)) {
-        ring.reverse
+        ring.reverse.distinct
       } else {
-        ring
+        ring.distinct
       }
 
       coords.zip(coords.tail).zipWithIndex.map{ case(coords, edgeId) =>

@@ -32,9 +32,9 @@ object SDCEL {
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree)
-    val edgesRDDB = readEdges(params.input2(), quadtree)
     edgesRDDA.persist()
     val nEdgesRDDA = edgesRDDA.count()
+    val edgesRDDB = readEdges(params.input2(), quadtree)
     edgesRDDB.persist()
     val nEdgesRDDB = edgesRDDB.count()
     logger.info("Reading data... Done!")
