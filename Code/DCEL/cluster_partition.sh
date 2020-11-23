@@ -1,0 +1,34 @@
+#!/bin/bash
+
+INPUT1=$1
+INPUT2=$2
+HDFS_PATH=$3
+LOCAL_PATH=$4
+PARTITIONS=$5
+
+EXECUTORS=6
+CORES=4
+DMEMORY=12g
+EMEMORY=30g
+SPARK_JARS=$HOME/Spark/2.4/jars/
+JAR=$HOME/RIDIR/Code/DCEL/target/scala-2.11/sdcel_2.11-0.1.jar
+CLASS="edu.ucr.dblab.sdcel.DCELPartitioner2"
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
+MASTER=yarn
+
+spark-submit \
+    --master local[10] \
+    --jars $HOME/Spark/2.4/jars/geospark-1.2.0.jar,$HOME/Spark/2.4/jars/scallop_2.11-3.1.5.jar \
+    --files $LOG_FILE \
+    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
+    --master $MASTER --deploy-mode client \
+    --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
+    --class $CLASS $JAR \
+    --input1 $INPUT1 \
+    --input2 $INPUT2 \
+    --partitions $PARTITIONS \
+    --apath $HDFS_PATH/edgesA \
+    --bpath $HDFS_PATH/edgesB \
+    --qpath $LOCAL_PATH/quadtree.wkt \
+    --epath $LOCAL_PATH/boundary.wkt

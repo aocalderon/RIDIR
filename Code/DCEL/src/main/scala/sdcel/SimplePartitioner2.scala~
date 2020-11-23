@@ -1,0 +1,11 @@
+package edu.ucr.dblab.sdcel
+
+class SimplePartitioner[V](partitions: Int) extends org.apache.spark.Partitioner {
+  def getPartition(key: Any): Int = {
+    key.asInstanceOf[Int]
+  }
+
+  def numPartitions(): Int = {
+    return partitions
+  }
+}
