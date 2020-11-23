@@ -1,1 +1,0 @@
-["CoordTransformer","DCELBuilder","DCELMerger","EdgePartitioner","FaceTester","QuadtreeTester","SingleLabelCheckerTest","SweepLine","Tester","edu.ucr.dblab.sdcel.DCELBuilder2","edu.ucr.dblab.sdcel.DCELPartitioner2","edu.ucr.dblab.sdcel.OverlapDetector","edu.ucr.dblab.sdcel.SDCEL","edu.ucr.dblab.sdcel.Test1","edu.ucr.dblab.sdcel.Test2","edu.ucr.dblab.sdcel.Test3"]

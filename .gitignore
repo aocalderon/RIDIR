@@ -10,6 +10,13 @@ Code/SDCEL/.metals/*
 Code/SDCEL/.bloop/*
 Code/SDCEL/.ensime_cache/*
 
+Code/DCEL/target/*
+Code/DCEL/project/*
+Code/DCEL/.ensime
+Code/DCEL/.metals/*
+Code/DCEL/.bloop/*
+Code/DCEL/.ensime_cache/*
+
 Code/StarkTester/target/*
 Code/StarkTester/project/*
 Code/StarkTester/.ensime
