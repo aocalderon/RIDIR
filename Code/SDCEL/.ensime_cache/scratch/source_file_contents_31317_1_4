@@ -116,7 +116,7 @@ object DCELMerger2 {
     val hedges_prime = ((ha ++ hb).toSet -- intersections.values.flatten).toList ++ splits
 
     // Match half-edges with their twins (create them if needed)...
-    val hedges = setTwins(hedges_prime).filter(_.twin != null)
+    val hedges = setTwins(hedges_prime)
     // Extract set of vertices...
     val vertices = hedges.map(_.orig).distinct
 
@@ -142,23 +142,8 @@ object DCELMerger2 {
         }
       )
 
-    }
-  
-
     // Group half-edges by the destination vertex (v2)...
-    
-    val incidents = try {
-      (hedges ++ hedges.map(_.twin)).groupBy(_.v2).values.toList
-    } catch {
-      case e: java.lang.NullPointerException => {
-        // Why are you null?
-        println(e)
-        println("Null twin:")
-        hedges.filter(h => h.twin == null).foreach{println}
-        System.exit(0)
-        hedges.groupBy(_.v2).values.toList
-      }
-    }
+    val incidents = (hedges ++ hedges.map(_.twin)).groupBy(_.v2).values.toList
 
     if(debug)
       save(s"/tmp/edgesI$pid.wkt",
@@ -184,8 +169,6 @@ object DCELMerger2 {
 
       hs
     }.flatten
-
-    println("Grouping...")
 
     // 
     val h = groupByNext(h_prime.filter{ h =>
