@@ -21,8 +21,8 @@ spark-submit \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
     --class $CLASS $JAR \
-    --input1 $HDFS_PATH/edgesA \
-    --input2 $HDFS_PATH/edgesA \
+    --input1 $HDFS_PATH/edgesB \
+    --input2 $HDFS_PATH/edgesB \
     --quadtree $LOCAL_PATH/quadtree.wkt \
     --boundary $LOCAL_PATH/boundary.wkt \
     --scale $SCALE --debug
