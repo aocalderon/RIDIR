@@ -1,0 +1,17 @@
+package
+~runMain QuadtreeReader
+package
+cd /home/acald013/RIDIR/Code/DCEL/; sbt;
+package
+clean
+ensimeConfig
+package
+clean
+ensimeConfig
+package
+sbt
+clean
+package
+clean
+ensimeConfig
+package
