@@ -114,6 +114,7 @@ object DCELMerger2 {
         }.flatten.toList
       )
     }
+     
 
     // Split the half-edges which intersect each other...
     val splits = intersections.map{ case(p, hList) =>
@@ -212,19 +213,15 @@ object DCELMerger2 {
       hs
     }.flatten
 
-    println("Grouping...")
-
     // 
     val h = groupByNext(h_prime.filter{ h =>
         intersections.keySet.contains(h.v2)
       }.toSet, List.empty[(Half_edge, String)]).filter(_._2 != "")
 
-    println("Grouping... Done")
 
     if(debug)
       save(s"/tmp/edgesH_prime$pid.wkt",
         h.map{ case(h, tag) =>
-          println(s"$tag $h")
           val wkt = h.getNextsAsWKT
 
           s"$wkt\t$tag\n"
@@ -241,9 +238,6 @@ object DCELMerger2 {
       r
     } else {
       val h = hs.head
-
-      //
-      println(s"at $h")
 
       val tag = if(h.data.label == "A")
         h.label + " " + h.next.label

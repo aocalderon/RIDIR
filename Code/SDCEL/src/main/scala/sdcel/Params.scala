@@ -11,6 +11,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val output:      ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
 
   val apath: ScallopOption[String] = opt[String] (default = Some("edgesA.wkt"))

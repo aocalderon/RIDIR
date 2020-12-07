@@ -3,7 +3,7 @@ package edu.ucr.dblab.sdcel
 import com.vividsolutions.jts.geom.LineString
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import org.apache.spark.serializer.KryoSerializer
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SparkSession, SaveMode}
 import org.apache.spark.TaskContext
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.slf4j.{Logger, LoggerFactory}
@@ -33,7 +33,7 @@ object SDCEL {
 
     // Reading data...
 
-    val filter = "020132"
+    val filter = "2"
     val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
     cells_prime.map(c => (c._2.id, c._2.lineage)).foreach(println)
 
@@ -53,6 +53,7 @@ object SDCEL {
     val nB = dcelsB.count()
     logger.info("Getting LDCELs for B done!")
 
+    /*
     if(params.debug()){
       save{"/tmp/edgesCells.wkt"}{
         cells.values.map{ cell =>
@@ -91,13 +92,14 @@ object SDCEL {
       }
        
     }
+     */
 
     // Merging DCELs...
     val sdcel = dcelsA.zipPartitions(dcelsB, preservesPartitioning=true){ (iterA, iterB) =>
       val A = iterA.next.map(_.getNexts).flatten.toList
       val B = iterB.next.map(_.getNexts).flatten.toList
 
-      val hedges = merge2(A, B, true)
+      val hedges = merge2(A, B, false)
 
       hedges.toIterator
     }.persist()
@@ -112,6 +114,14 @@ object SDCEL {
           s"$wkt\t$tag\n"
         }.collect
       }
+    }
+
+    if(params.save()){
+      sdcel.map{ case(h, tag) =>
+          val wkt = h.getPolygon.toText
+          s"$wkt"
+      }.toDS.write
+        .format("text").mode(SaveMode.Overwrite).save("gadm/level2.1")
     }
 
     spark.close

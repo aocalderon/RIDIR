@@ -69,12 +69,17 @@ case class Half_edge(edge: LineString) {
 
     try {
       val coords = (v1 +: getNexts.map{_.v2}).toArray
-      if(coords.size >= 3)
+      if(coords.size >= 4){
         geofactory.createPolygon(coords)
-      else
+      } else {
+        println("Error creating polygon face. Less than 4 vertices...")
+        println(this)
+        println("Retriving empty polygon instead...")
         emptyPolygon
+      }
     } catch {
       case e: java.lang.IllegalArgumentException => {
+        println("Error creating polygon face...")
         println(e.getMessage)
         println(coords.mkString(" "))
         System.exit(0)
