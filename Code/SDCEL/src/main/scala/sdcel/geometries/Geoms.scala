@@ -197,7 +197,13 @@ case class Segment(hedges: List[Half_edge]) {
   }
 }
 
-case class Cell(id: Int, lineage: String, mbr: LinearRing)
+case class Cell(id: Int, lineage: String, mbr: LinearRing){
+  def wkt(implicit geofactory: GeometryFactory) = toPolygon.toText
+
+  def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
+    geofactory.createPolygon(mbr)
+  }
+}
 
 case class Face(outer: Half_edge) {
   val polygonId = outer.data.polygonId
