@@ -61,7 +61,7 @@ object PolygonDiffer {
       val overlaps = for{
         p1 <- polygons
         p2 <- polygons
-        if p1.intersects(p2) &&
+        if p1.relate(p2, "2********") &&
         p1.getUserData.asInstanceOf[Info].id < p2.getUserData.asInstanceOf[Info].id
       } yield {
         (p1, p2)
