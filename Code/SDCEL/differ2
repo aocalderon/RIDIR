@@ -1,7 +1,6 @@
 #!/bin/bash
 
-INPUT1=$1
-SCALE=$2
+SCALE=$1
 
 EXECUTORS=12
 CORES=9
@@ -9,9 +8,9 @@ DMEMORY=12g
 EMEMORY=30g
 SPARK_JARS=$HOME/Spark/2.4/jars/
 JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
-CLASS="edu.ucr.dblab.sdcel.PolygonDiffer"
+CLASS="edu.ucr.dblab.sdcel.OverlapsReader"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
-MASTER=yarn
+MASTER=local[10]
 
 spark-submit \
     --files $LOG_FILE \
@@ -20,5 +19,4 @@ spark-submit \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
     --class $CLASS $JAR \
-    --input1 $INPUT1 \
     --scale $SCALE 

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-INPUT1=$1
-SCALE=$2
+SCALE=$1
 
 EXECUTORS=12
 CORES=9
@@ -20,5 +19,4 @@ spark-submit \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
     --class $CLASS $JAR \
-    --input1 $INPUT1 \
     --scale $SCALE 

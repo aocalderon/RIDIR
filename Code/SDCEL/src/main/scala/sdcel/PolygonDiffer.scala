@@ -8,6 +8,7 @@ import org.apache.spark.sql.{SparkSession, SaveMode}
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.datasyslab.geospark.enums.GridType
 import org.slf4j.{Logger, LoggerFactory}
 import edu.ucr.dblab.sdcel.PartitionReader.readQuadtree
 import edu.ucr.dblab.sdcel.DCELBuilder2.save
@@ -15,15 +16,6 @@ import edu.ucr.dblab.sdcel.quadtree._
 
 object PolygonDiffer {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
-
-  case class Info(id: Long, desc: String, geomtype: String){
-    override def toString(): String =  s"$id\t$desc\t$geomtype"
-  }
-
-  def setInfo(p: Geometry, id: Long, desc: String): Geometry = {
-    p.setUserData(Info(id, desc, p.getGeometryType))
-    p
-  }
 
   def main(args: Array[String]) = {
     // Starting session...
@@ -41,28 +33,28 @@ object PolygonDiffer {
 
     // Read polygons and quadtree...
     logger.info("Reading data...")
-    val (quadtree, cells) = readQuadtree[Polygon](params.quadtree(), params.boundary())
-    save("/tmp/Cells.wkt"){
-      cells.values.map{_.wkt + "\n"}.toList
-    }
     val polyRDD = read(params.input1())
-    val partitioner = new QuadTreePartitioner(quadtree)
-    polyRDD.spatialPartitioning(partitioner)
+    polyRDD.spatialPartitioning(GridType.QUADTREE, 256)
     val polygons = polyRDD.spatialPartitionedRDD.rdd
-      //.filter{ p =>
-      //  p.getUserData.asInstanceOf[Info].id < 1000
-      //}
     polygons.persist()
     logger.info(s"Polygons: ${polygons.count}")
     logger.info("Reading data... Done!")
-    
+    /*
+    polyRDD.getRawSpatialRDD.rdd.map{ poly =>
+      val wkt = poly.toText
+      val id = poly.getUserData.asInstanceOf[Long]
+
+      s"$wkt\t$id"
+    }.toDS.write.mode(SaveMode.Overwrite).text("gadm/level2raw")
+     */
+
     val differs = polygons.mapPartitionsWithIndex{ (pid, itPolygons) =>
       val polygons = itPolygons.toList
       val overlaps = for{
         p1 <- polygons
         p2 <- polygons
         if p1.relate(p2, "2********") &&
-        p1.getUserData.asInstanceOf[Info].id < p2.getUserData.asInstanceOf[Info].id
+        p1.getUserData.asInstanceOf[Long] < p2.getUserData.asInstanceOf[Long]
       } yield {
         (p1, p2)
       }
@@ -73,15 +65,12 @@ object PolygonDiffer {
         val wkt2 = b.toText
         val id2 = b.getUserData.toString
 
-        s"$wkt1\t$wkt2\t$id1\t$id2\n"
+        s"$wkt1\t$wkt2\t$id1\t$id2"
       }.toIterator
     }.persist
     val n = differs.count
     logger.info(s"Results: $n")
 
-    save("/tmp/edgesSample.wkt"){
-      differs.take(100)
-    }
     differs.toDS.write.mode(SaveMode.Overwrite).text("gadm/overlaps")
 
     spark.close
@@ -90,17 +79,21 @@ object PolygonDiffer {
   def read(input: String)
     (implicit spark: SparkSession, geofactory: GeometryFactory): SpatialRDD[Polygon] = {
 
-    val polygonRaw = spark.read.textFile(input).rdd.zipWithIndex()
+    val polygonRaw = spark.read.textFile(input).rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
-        lines.flatMap{ case(line, id) =>
-          val geom = reader.read(line.replaceAll("\"", ""))
-            (0 until geom.getNumGeometries).map{ i =>
-              val poly = geom.getGeometryN(i).asInstanceOf[Polygon]
-              val shell = geofactory.createPolygon(poly.getExteriorRing.getCoordinates())
-              shell.setUserData(Info(id, "", shell.getGeometryType))
-              shell
-            }
+        lines.flatMap{ line =>
+          val arr = line.split("\t")
+          val wkt = arr(0).replaceAll("\"", "")
+          val geom = reader.read(wkt)
+          val id = arr(1).toLong
+
+          (0 until geom.getNumGeometries).map{ i =>
+            val poly = geom.getGeometryN(i).asInstanceOf[Polygon]
+            val shell = geofactory.createPolygon(poly.getExteriorRing.getCoordinates)
+            shell.setUserData(id)
+            shell
+          }
         }.toIterator
       }
     val polygonRDD = new SpatialRDD[Polygon]()
