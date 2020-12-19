@@ -23,7 +23,7 @@ object DCELBuilder2 {
       val envelope = cell.getEnvelopeInternal
 
       val edges = edgesIt.toVector
-      print(s" $index")
+      //print(s" $index")
 
       val (outerEdges, innerEdges) = edges.partition{ edge =>
         cell.intersects(edge)

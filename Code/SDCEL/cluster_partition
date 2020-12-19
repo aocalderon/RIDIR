@@ -31,4 +31,5 @@ spark-submit \
     --apath $HDFS_PATH/edgesA \
     --bpath $HDFS_PATH/edgesB \
     --qpath $LOCAL_PATH/quadtree.wkt \
-    --epath $LOCAL_PATH/boundary.wkt
+    --epath $LOCAL_PATH/boundary.wkt \
+    --scale 10e13

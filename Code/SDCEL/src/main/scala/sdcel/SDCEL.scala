@@ -23,6 +23,8 @@ object SDCEL {
     val model = new PrecisionModel(params.scale())
     implicit val geofactory = new GeometryFactory(model)
     val (quadtree, cells) = readQuadtree(params.quadtree(), params.boundary())
+    logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
+    logger.info(s"Number of partitions: ${cells.size}")
 
     implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)
@@ -33,25 +35,26 @@ object SDCEL {
 
     // Reading data...
 
-    val filter = "2"
+    val filter = "2123"
     val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
-    cells_prime.map(c => (c._2.id, c._2.lineage)).foreach(println)
+    //cells_prime.map(c => (c._2.id, c._2.lineage)).foreach(println)
+    
 
-    val edgesRDDA = readEdges2(params.input1(), cells_prime, "A")
-    edgesRDDA.persist()
-    val nEdgesRDDA = edgesRDDA.count()
-    val edgesRDDB = readEdges2(params.input2(), cells_prime, "B")
-    edgesRDDB.persist()
-    val nEdgesRDDB = edgesRDDB.count()
+    val edgesRDDA = readEdges2(params.input1(), cells_prime, "A", cells.size)
+    //edgesRDDA.persist()
+    //val nEdgesRDDA = edgesRDDA.count()
+    val edgesRDDB = readEdges2(params.input2(), cells_prime, "B", cells.size)
+    //edgesRDDB.persist()
+    //val nEdgesRDDB = edgesRDDB.count()
     logger.info("Reading data... Done!")
 
     // Getting LDCELs...
-    val dcelsA = getLDCELs(edgesRDDA, cells).persist()
-    val nA = dcelsA.count()
-    logger.info("Getting LDCELs for A done!")
-    val dcelsB = getLDCELs(edgesRDDB, cells).persist()
-    val nB = dcelsB.count()
-    logger.info("Getting LDCELs for B done!")
+    val dcelsA = getLDCELs(edgesRDDA, cells)
+    //val nA = dcelsA.count()
+    logger.info("Getting LDCELs for A... done!")
+    val dcelsB = getLDCELs(edgesRDDB, cells)
+    //val nB = dcelsB.count()
+    logger.info("Getting LDCELs for B... done!")
 
     /*
     if(params.debug()){
@@ -102,8 +105,8 @@ object SDCEL {
       val hedges = merge2(A, B, false)
 
       hedges.toIterator
-    }.persist()
-    val nSDcel = sdcel.count()
+    }//.persist()
+    //val nSDcel = sdcel.count()
     logger.info("Merging DCELs... done!")
 
     if(params.debug()){
@@ -121,7 +124,8 @@ object SDCEL {
           val wkt = h.getPolygon.toText
           s"$wkt"
       }.toDS.write
-        .format("text").mode(SaveMode.Overwrite).save("gadm/level2.1")
+        .format("text").mode(SaveMode.Overwrite).save("gadm/output")
+      logger.info("Saving results at gadm/output.")
     }
 
     spark.close

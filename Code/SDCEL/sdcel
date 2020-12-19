@@ -2,12 +2,11 @@
 
 HDFS_PATH=$1
 LOCAL_PATH=$2
-SCALE=$3
 
 EXECUTORS=12
 CORES=9
-DMEMORY=12g
-EMEMORY=30g
+DMEMORY=30g
+EMEMORY=32g
 SPARK_JARS=$HOME/Spark/2.4/jars/
 JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
 CLASS="edu.ucr.dblab.sdcel.SDCEL"
@@ -21,8 +20,8 @@ spark-submit \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
     --class $CLASS $JAR \
-    --input1 $HDFS_PATH/edgesB \
+    --input1 $HDFS_PATH/edgesA \
     --input2 $HDFS_PATH/edgesB \
     --quadtree $LOCAL_PATH/quadtree.wkt \
     --boundary $LOCAL_PATH/boundary.wkt \
-    --scale $SCALE --debug
+    --scale 10e13 --save

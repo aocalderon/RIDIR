@@ -75,12 +75,11 @@ object PartitionReader {
     edgesRDD
   }
 
-  def readEdges2(input: String, cells: Map[Int, Cell], label: String)
+  def readEdges2(input: String, cells: Map[Int, Cell], label: String, partitions: Int)
     (implicit geofactory: GeometryFactory, spark: SparkSession):
       RDD[LineString] = {
     
     // Reading data...
-    val partitions = cells.keys.max + 1
     val edgesRDD = spark.read.textFile(input).rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
