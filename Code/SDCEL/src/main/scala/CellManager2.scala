@@ -1,7 +1,7 @@
 import DCELMerger.{geofactory, precision, logger}
 import DCELMerger.{envelope2polygon, save}
 //import org.datasyslab.geospark.spatialPartitioning.quadtree.{StandardQuadTree, QuadRectangle}
-import edu.ucr.dblab.quadtree._
+import edu.ucr.dblab.quadtree.{StandardQuadTree}
 import org.apache.spark.rdd.RDD
 import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate, Point, LineString, Polygon}
 import com.vividsolutions.jts.io.WKTReader

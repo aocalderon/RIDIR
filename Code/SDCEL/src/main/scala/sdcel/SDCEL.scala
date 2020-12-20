@@ -35,7 +35,13 @@ object SDCEL {
 
     // Reading data...
 
-    val filter = "2123"
+    save("/tmp/edgesCells.wkt"){
+      cells.values.map{ cell =>
+        cell.wkt + "\n"
+      }.toList
+    }
+    val filter = "1"
+    println("Filter: " + filter)
     val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
     //cells_prime.map(c => (c._2.id, c._2.lineage)).foreach(println)
     

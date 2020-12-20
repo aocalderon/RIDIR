@@ -94,6 +94,15 @@ public class QuadRectangle
         return "x: " + x + " y: " + y + " w: " + width + " h: " + height + " PartitionId: " + partitionId + " Lineage: " +lineage;
     }
 
+    public String wkt()
+    {
+	return "POLYGON ((" + x + " " + y + ", " +
+	    (x + width) + " " + y + ", " +
+	    (x + width) + " " + (y + height) + ", " +
+	    x + " " + (y + height) + ", " +
+	    x + " " + y + "))";
+    }
+
     @Override
     public boolean equals(Object o)
     {

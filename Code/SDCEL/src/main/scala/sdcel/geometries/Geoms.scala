@@ -198,7 +198,7 @@ case class Segment(hedges: List[Half_edge]) {
 }
 
 case class Cell(id: Int, lineage: String, mbr: LinearRing){
-  def wkt(implicit geofactory: GeometryFactory) = toPolygon.toText
+  def wkt(implicit geofactory: GeometryFactory) = s"${toPolygon.toText}\t${lineage}\t${id}"
 
   def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
     geofactory.createPolygon(mbr)
