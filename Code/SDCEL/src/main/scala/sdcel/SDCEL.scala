@@ -40,29 +40,35 @@ object SDCEL {
         cell.wkt + "\n"
       }.toList
     }
-    val filter = "1"
-    println("Filter: " + filter)
-    val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
+    //val filter = "1"
+    //println("Filter: " + filter)
+    //val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
     //cells_prime.map(c => (c._2.id, c._2.lineage)).foreach(println)
     
 
-    val edgesRDDA = readEdges2(params.input1(), cells_prime, "A", cells.size)
-    //edgesRDDA.persist()
-    //val nEdgesRDDA = edgesRDDA.count()
-    val edgesRDDB = readEdges2(params.input2(), cells_prime, "B", cells.size)
-    //edgesRDDB.persist()
-    //val nEdgesRDDB = edgesRDDB.count()
+    val edgesRDDA = readEdges(params.input1(), quadtree, "A")
+    edgesRDDA.persist()
+    val nEdgesRDDA = edgesRDDA.count()
+    println("Edges A: " + nEdgesRDDA)
+
+    val edgesRDDB = readEdges(params.input2(), quadtree, "B")
+    edgesRDDB.persist()
+    val nEdgesRDDB = edgesRDDB.count()
+    println("Edges B: " + nEdgesRDDB)
     logger.info("Reading data... Done!")
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells)
-    //val nA = dcelsA.count()
+    dcelsA.persist()
+    val nA = dcelsA.count()
     logger.info("Getting LDCELs for A... done!")
+
     val dcelsB = getLDCELs(edgesRDDB, cells)
-    //val nB = dcelsB.count()
+    dcelsB.persist()
+    val nB = dcelsB.count()
     logger.info("Getting LDCELs for B... done!")
 
-    /*
+    
     if(params.debug()){
       save{"/tmp/edgesCells.wkt"}{
         cells.values.map{ cell =>
@@ -86,6 +92,7 @@ object SDCEL {
           }.toIterator
         }.collect
       }
+
       save{"/tmp/edgesHB.wkt"}{
         dcelsB.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next
@@ -101,18 +108,17 @@ object SDCEL {
       }
        
     }
-     */
-
+    
     // Merging DCELs...
     val sdcel = dcelsA.zipPartitions(dcelsB, preservesPartitioning=true){ (iterA, iterB) =>
       val A = iterA.next.map(_.getNexts).flatten.toList
       val B = iterB.next.map(_.getNexts).flatten.toList
 
-      val hedges = merge2(A, B, false)
+      val hedges = merge2(A, B, true)
 
       hedges.toIterator
-    }//.persist()
-    //val nSDcel = sdcel.count()
+    }.persist()
+    val nSDcel = sdcel.count()
     logger.info("Merging DCELs... done!")
 
     if(params.debug()){

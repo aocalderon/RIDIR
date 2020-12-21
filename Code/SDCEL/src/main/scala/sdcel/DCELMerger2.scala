@@ -15,8 +15,10 @@ object DCELMerger2 {
 
   def intersects(hedgesA: List[Half_edge], hedgesB: List[Half_edge])
     (implicit geofactory: GeometryFactory): Map[Coordinate, List[Half_edge]] = {
-    val pid = 0//org.apache.spark.TaskContext.getPartitionId
+    val pid = org.apache.spark.TaskContext.getPartitionId
 
+    save("/tmp/edgesHedgesA.wkt", hedgesA.map(a => a.wkt + "\t" + a.data + "\n"))
+    save("/tmp/edgesHedgesB.wkt", hedgesB.map(b => b.wkt + "\t" + b.data + "\n"))
     val aList = hedgesA.map{ h =>
       val pts = Array(h.v1, h.v2)
       HEdge(pts, h)
@@ -84,7 +86,7 @@ object DCELMerger2 {
 
   def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)
     (implicit geofactory: GeometryFactory): Iterable[(Half_edge, String)] = {
-    val pid = 0//org.apache.spark.TaskContext.getPartitionId
+    val pid = org.apache.spark.TaskContext.getPartitionId
 
     // Getting intersection between dcel A and B...
     val intersections = intersects(ha, hb)
@@ -115,7 +117,6 @@ object DCELMerger2 {
       )
     }
      
-
     // Split the half-edges which intersect each other...
     val splits = intersections.map{ case(p, hList) =>
       hList.map(h => (h,p))
@@ -147,7 +148,6 @@ object DCELMerger2 {
     val hedges = setTwins(hedges_prime).filter(_.twin != null)
     // Extract set of vertices...
     val vertices = hedges.map(_.orig).distinct
-
     
     if(debug){
       save(s"/tmp/edgesV$pid.wkt",
@@ -171,10 +171,8 @@ object DCELMerger2 {
       )
 
     }
-  
 
     // Group half-edges by the destination vertex (v2)...
-    
     val incidents = try {
       (hedges ++ hedges.map(_.twin)).groupBy(_.v2).values.toList
     } catch {
@@ -211,12 +209,22 @@ object DCELMerger2 {
       }
 
       hs
-    }.flatten
+    }.flatten.filter{ h =>
+      intersections.keySet.contains(h.v2)
+    }.filter(_.data.polygonId != -1).toSet
 
-    // 
-    val h = groupByNext(h_prime.filter{ h =>
-        intersections.keySet.contains(h.v2)
-      }.toSet, List.empty[(Half_edge, String)]).filter(_._2 != "")
+    println("h_prime: " + h_prime.size)
+    save("/tmp/edgesHprime.wkt",
+      h_prime.map{ h =>
+        h.wkt + "\n"
+      }.toList
+    )
+
+    //
+    val h = groupByNext(h_prime, List.empty[(Half_edge, String)])
+      .filter(_._2 != "")
+
+    println("H size: " + h.size)
 
 
     if(debug)
@@ -234,6 +242,9 @@ object DCELMerger2 {
   @tailrec
   def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)]):
       List[(Half_edge, String)] = {
+
+    println(hs.size)
+
     if(hs.isEmpty) {
       r
     } else {
@@ -245,8 +256,10 @@ object DCELMerger2 {
         h.next.label + " " + h.label
       val tag2 = List(h.label, h.next.label)
         .filterNot(t => t == "A" || t == "B").sorted.mkString(" ")
+
       val hs_new = hs -- h.getNexts.toSet
       val r_new  = r :+ ((h, tag2))
+
       groupByNext(hs_new, r_new)
     }
   }

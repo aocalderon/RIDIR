@@ -59,7 +59,7 @@ object PartitionReader {
         lines.map{ line =>
           val arr = line.split("\t")
           val wkt = arr(0)
-          val partitionId = arr(1).toInt
+          val partitionId = arr(1).toInt - 19062
           val polygonId = arr(2).toInt
           val ringId = arr(3).toInt
           val edgeId = arr(4).toInt
