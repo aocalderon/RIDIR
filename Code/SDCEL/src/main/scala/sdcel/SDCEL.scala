@@ -40,16 +40,23 @@ object SDCEL {
         cell.wkt + "\n"
       }.toList
     }
-    val filter = "1"
-    println("Filter: " + filter)
-    val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
+    //val filter = "0"
+    //println("Filter: " + filter)
+    //val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
     //cells_prime.map(c => (c._2.id, c._2.lineage)).foreach(println)
     
 
-    val edgesRDDA = readEdges2(params.input1(), cells_prime, "A", cells.size)
+    //val edgesRDDA = readEdges2(params.input1(), cells_prime, "A", cells.size)
+    val edgesRDDA = readEdges(params.input1(), quadtree, "A")
+
     //edgesRDDA.persist()
     //val nEdgesRDDA = edgesRDDA.count()
-    val edgesRDDB = readEdges2(params.input2(), cells_prime, "B", cells.size)
+
+
+    //val edgesRDDB = readEdges2(params.input2(), cells_prime, "B", cells.size)
+    val edgesRDDB = readEdges(params.input2(), quadtree, "B")
+
+
     //edgesRDDB.persist()
     //val nEdgesRDDB = edgesRDDB.count()
     logger.info("Reading data... Done!")
