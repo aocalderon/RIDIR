@@ -23,11 +23,14 @@ object DCELBuilder2 {
       val envelope = cell.getEnvelopeInternal
 
       val edges = edgesIt.toVector
-      //print(s" $index")
+      println(s"Edges: ${edges.size}")
 
       val (outerEdges, innerEdges) = edges.partition{ edge =>
         cell.intersects(edge)
       }
+
+      println("OuterEdges: " + outerEdges.size)
+      println("InnerEdges: " + innerEdges.size)
 
       val outer  = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
       val inner  = SweepLine2.getHedgesInsideCell(innerEdges.toVector)
