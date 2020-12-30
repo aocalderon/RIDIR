@@ -24,6 +24,11 @@ Code/StarkTester/.metals/*
 Code/StarkTester/.bloop/*
 Code/StarkTester/.ensime_cache/*
 
+Code/Scala/PrecisionChecker/target/*
+Code/Scala/PrecisionChecker/project/*
+Code/Scala/PrecisionChecker/.ensime
+Code/Scala/PrecisionChecker/.ensime_cache/*
+
 Code/Scala/RandomEdgeGenerator/target/*
 Code/Scala/RandomEdgeGenerator/project/*
 Code/Scala/RandomEdgeGenerator/.ensime
