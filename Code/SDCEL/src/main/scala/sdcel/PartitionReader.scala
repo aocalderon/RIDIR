@@ -59,7 +59,7 @@ object PartitionReader {
         lines.map{ line =>
           val arr = line.split("\t")
           val wkt = arr(0)
-          val partitionId = arr(1).toInt - 19062
+          val partitionId = arr(1).toInt
           val polygonId = arr(2).toInt
           val ringId = arr(3).toInt
           val edgeId = arr(4).toInt
@@ -75,6 +75,74 @@ object PartitionReader {
     edgesRDD
   }
 
+  def filterQuadtree[T](qpath: String, epath: String, filter: String)
+    (implicit geofactory: GeometryFactory):
+      (StandardQuadTree[T], Map[Int, Cell]) = {
+
+    // Reading quadtree...
+    val quadtreeBuff = Source.fromFile(qpath)
+    // lineages are the first column in the file...
+    val lineages = quadtreeBuff.getLines.map(_.split("\t").head).toList
+    quadtreeBuff.close
+
+    // Reading boundary...
+    val boundaryBuff = Source.fromFile(epath)
+    val boundaryWkt = boundaryBuff.getLines.next // boundary is the only line in the file...
+    val reader = new WKTReader(geofactory)
+    val boundary = reader.read(boundaryWkt).getEnvelopeInternal
+    boundaryBuff.close
+    val quadtree = Quadtree.create[T](boundary, lineages)
+    val quadtree_prime = Quadtree.filter(quadtree, filter)
+
+    // Getting cells...
+    val partitions = getPartitions(quadtree_prime)
+    val cells_prime = quadtree_prime.getLeafZones.asScala.map{ leaf =>
+      val id = partitions.indexOf(leaf.partitionId.toInt)
+      val lineage = leaf.lineage
+      val mbr = envelope2ring(roundEnvelope(leaf.getEnvelope))
+
+      val cell = Cell(id, lineage, mbr)
+      (id -> cell)
+    }.toMap
+
+    (quadtree_prime, cells_prime)
+  }
+
+  def getPartitions[T](quadtree: StandardQuadTree[T]): List[Int] = {
+    quadtree.getLeafZones.asScala.map{ leaf =>
+      leaf.partitionId.toInt
+    }.sorted.toList
+  }
+
+  def filterEdges[T](input: String, quadtree: StandardQuadTree[T], label: String)
+    (implicit geofactory: GeometryFactory, spark: SparkSession): RDD[LineString] = {
+
+    val partitions = getPartitions(quadtree)
+
+    // Reading data...
+    val edgesRDD = spark.read.textFile(input).rdd
+      .mapPartitionsWithIndex{ case(index, linesIt) =>
+        val reader = new WKTReader(geofactory)
+        linesIt.map{ line =>
+          val arr = line.split("\t")
+          val partitionId = partitions.indexOf(arr(1).toInt)
+          val wkt = arr(0)
+          val polygonId = arr(2).toInt
+          val ringId = arr(3).toInt
+          val edgeId = arr(4).toInt
+          val isHole = arr(5).toBoolean
+          val edge = reader.read(wkt).asInstanceOf[LineString]
+          val data = EdgeData(polygonId, ringId, edgeId, isHole, label)
+          edge.setUserData(data)
+          (partitionId, edge)
+        }.toIterator.filter(_._1 >= 0)
+      }.partitionBy(new SimplePartitioner(partitions.size))
+      .map(_._2)
+
+    edgesRDD
+  }
+
+  /*
   def readEdges2(input: String, cells: Map[Int, Cell], label: String, partitions: Int)
     (implicit geofactory: GeometryFactory, spark: SparkSession):
       RDD[LineString] = {
@@ -106,7 +174,7 @@ object PartitionReader {
       .map(_._2)
 
     edgesRDD2
-  }
+  }*/
 
   def getLineStrings(polygon: Polygon, polygon_id: Long)
     (implicit geofactory: GeometryFactory): List[LineString] = {

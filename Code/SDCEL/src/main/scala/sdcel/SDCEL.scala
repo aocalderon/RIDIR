@@ -22,7 +22,13 @@ object SDCEL {
     implicit val params = new Params(args)
     val model = new PrecisionModel(params.scale())
     implicit val geofactory = new GeometryFactory(model)
-    val (quadtree, cells) = readQuadtree(params.quadtree(), params.boundary())
+
+    //val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
+    val filter = params.filter()
+    val (quadtree, cells) = filterQuadtree[Int](params.quadtree(), params.boundary(),
+      filter)
+    //cells.foreach(println)
+
     logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
     logger.info(s"Number of partitions: ${cells.size}")
 
@@ -34,38 +40,38 @@ object SDCEL {
     logger.info("Starting session... Done!")
 
     // Reading data...
-
     save("/tmp/edgesCells.wkt"){
       cells.values.map{ cell =>
         cell.wkt + "\n"
       }.toList
     }
-    //val filter = "1"
-    //println("Filter: " + filter)
-    //val cells_prime = cells.filter(_._2.lineage.slice(0, filter.size) == filter)
-    //cells_prime.map(c => (c._2.id, c._2.lineage)).foreach(println)
-    
 
-    val edgesRDDA = readEdges(params.input1(), quadtree, "A")
-    edgesRDDA.persist()
-    val nEdgesRDDA = edgesRDDA.count()
-    println("Edges A: " + nEdgesRDDA)
+    //val edgesRDDA = readEdges(params.input1(), quadtree, "A")
+    val edgesRDDA = filterEdges(params.input1(), quadtree, "A")
 
-    val edgesRDDB = readEdges(params.input2(), quadtree, "B")
-    edgesRDDB.persist()
-    val nEdgesRDDB = edgesRDDB.count()
-    println("Edges B: " + nEdgesRDDB)
+
+    //edgesRDDA.persist()
+    //val nEdgesRDDA = edgesRDDA.count()
+    //println("Edges A: " + nEdgesRDDA)
+
+    //val edgesRDDB = readEdges(params.input2(), quadtree, "B")
+    val edgesRDDB = filterEdges(params.input2(), quadtree, "B")
+
+    //edgesRDDB.persist()
+    //val nEdgesRDDB = edgesRDDB.count()
+    //println("Edges B: " + nEdgesRDDB)
+
     logger.info("Reading data... Done!")
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells)
-    dcelsA.persist()
-    val nA = dcelsA.count()
+    //dcelsA.persist()
+    //val nA = dcelsA.count()
     logger.info("Getting LDCELs for A... done!")
 
     val dcelsB = getLDCELs(edgesRDDB, cells)
-    dcelsB.persist()
-    val nB = dcelsB.count()
+    //dcelsB.persist()
+    //val nB = dcelsB.count()
     logger.info("Getting LDCELs for B... done!")
 
     
