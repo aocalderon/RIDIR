@@ -14,10 +14,11 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val output:      ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
 
-  val apath: ScallopOption[String] = opt[String] (default = Some("edgesA.wkt"))
-  val bpath: ScallopOption[String] = opt[String] (default = Some("edgesB.wkt"))
-  val qpath: ScallopOption[String] = opt[String] (default = Some("quadtree.wkt"))
-  val epath: ScallopOption[String] = opt[String] (default = Some("boundary.wkt"))
+  val apath:  ScallopOption[String] = opt[String] (default = Some("edgesA.wkt"))
+  val bpath:  ScallopOption[String] = opt[String] (default = Some("edgesB.wkt"))
+  val qpath:  ScallopOption[String] = opt[String] (default = Some("quadtree.wkt"))
+  val epath:  ScallopOption[String] = opt[String] (default = Some("boundary.wkt"))
+  val filter: ScallopOption[String] = opt[String] (default = Some("*"))
 
   verify()
 }

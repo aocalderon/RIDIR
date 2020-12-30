@@ -1,0 +1,301 @@
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:4:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.LineString[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:5:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:6:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.serializer.KryoSerializer[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:7:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.sql.SparkSession[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:8:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.rdd.RDD[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:9:12: object datasyslab is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.datasyslab.geospark.serde.GeoSparkKryoRegistrator[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:10:12: object slf4j is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.slf4j.{Logger, LoggerFactory}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:11:28: object quadtree is not a member of package edu.ucr.dblab.sdcel[0m
+[0m[[0m[31merror[0m] [0m[0mimport edu.ucr.dblab.sdcel.quadtree._[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:12:28: object geometries is not a member of package edu.ucr.dblab.sdcel[0m
+[0m[[0m[31merror[0m] [0m[0mimport edu.ucr.dblab.sdcel.geometries._[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:16:24: not found: type Logger[0m
+[0m[[0m[31merror[0m] [0m[0m  implicit val logger: Logger = LoggerFactory.getLogger("myLogger")[0m
+[0m[[0m[31merror[0m] [0m[0m                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:16:33: not found: value LoggerFactory[0m
+[0m[[0m[31merror[0m] [0m[0m  implicit val logger: Logger = LoggerFactory.getLogger("myLogger")[0m
+[0m[[0m[31merror[0m] [0m[0m                                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:19:47: not found: type RDD[0m
+[0m[[0m[31merror[0m] [0m[0m      (implicit geofactory: GeometryFactory): RDD[Iterable[Half_edge]] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:18:27: not found: type RDD[0m
+[0m[[0m[31merror[0m] [0m[0m  def getLDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:18:60: not found: type Cell[0m
+[0m[[0m[31merror[0m] [0m[0m  def getLDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])[0m
+[0m[[0m[31merror[0m] [0m[0m                                                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:19:29: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m      (implicit geofactory: GeometryFactory): RDD[Iterable[Half_edge]] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:46:26: not found: value SparkSession[0m
+[0m[[0m[31merror[0m] [0m[0m    implicit val spark = SparkSession.builder()[0m
+[0m[[0m[31merror[0m] [0m[0m                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:47:44: not found: type KryoSerializer[0m
+[0m[[0m[31merror[0m] [0m[0m        .config("spark.serializer",classOf[KryoSerializer].getName)[0m
+[0m[[0m[31merror[0m] [0m[0m                                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:48:51: not found: type GeoSparkKryoRegistrator[0m
+[0m[[0m[31merror[0m] [0m[0m        .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)[0m
+[0m[[0m[31merror[0m] [0m[0m                                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/Params.scala:3:12: object rogach is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.rogach.scallop._[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/Params.scala:5:41: not found: type ScallopConf[0m
+[0m[[0m[31merror[0m] [0m[0mclass Params(args: Seq[String]) extends ScallopConf(args) {[0m
+[0m[[0m[31merror[0m] [0m[0m                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/Params.scala:6:20: not found: type ScallopOption[0m
+[0m[[0m[31merror[0m] [0m[0m  val scale:       ScallopOption[Double]  = opt[Double]  (default = Some(1000.0))[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:53:21: not found: type PrecisionModel[0m
+[0m[[0m[31merror[0m] [0m[0m    val model = new PrecisionModel(scale)[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:54:35: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m    implicit val geofactory = new GeometryFactory(model)[0m
+[0m[[0m[31merror[0m] [0m[0m                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:15:28: object quadtree is not a member of package edu.ucr.dblab.sdcel[0m
+[0m[[0m[31merror[0m] [0m[0mimport edu.ucr.dblab.sdcel.quadtree._[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:16:28: object geometries is not a member of package edu.ucr.dblab.sdcel[0m
+[0m[[0m[31merror[0m] [0m[0mimport edu.ucr.dblab.sdcel.geometries._[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:21:8: not found: type StandardQuadTree[0m
+[0m[[0m[31merror[0m] [0m[0m      (StandardQuadTree[T], Map[Int, Cell]) = {[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:21:38: not found: type Cell[0m
+[0m[[0m[31merror[0m] [0m[0m      (StandardQuadTree[T], Map[Int, Cell]) = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:8:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:20:74: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m  def readQuadtree[T](qpath: String, epath: String)(implicit geofactory: GeometryFactory):[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:58:42: not found: type LineString[0m
+[0m[[0m[31merror[0m] [0m[0m    val (quadtree, cells) = readQuadtree[LineString](params.quadtree(), params.boundary())[0m
+[0m[[0m[31merror[0m] [0m[0m                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/Params.scala:9:20: not found: type ScallopOption[0m
+[0m[[0m[31merror[0m] [0m[0m  val quadtree:    ScallopOption[String]  = opt[String]  (default = Some(""))[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/Params.scala:10:20: not found: type ScallopOption[0m
+[0m[[0m[31merror[0m] [0m[0m  val boundary:    ScallopOption[String]  = opt[String]  (default = Some(""))[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:12:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.rdd.RDD[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:52:7: not found: type RDD[0m
+[0m[[0m[31merror[0m] [0m[0m      RDD[LineString] = {[0m
+[0m[[0m[31merror[0m] [0m[0m      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:50:45: not found: type StandardQuadTree[0m
+[0m[[0m[31merror[0m] [0m[0m  def readEdges[T](input: String, quadtree: StandardQuadTree[T], label: String)[0m
+[0m[[0m[31merror[0m] [0m[0m                                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:51:27: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory, spark: SparkSession):[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:11:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.sql.SparkSession[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:51:51: not found: type SparkSession[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory, spark: SparkSession):[0m
+[0m[[0m[31merror[0m] [0m[0m                                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/Params.scala:7:20: not found: type ScallopOption[0m
+[0m[[0m[31merror[0m] [0m[0m  val input1:      ScallopOption[String]  = opt[String]  (default = Some(""))[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/Params.scala:13:20: not found: type ScallopOption[0m
+[0m[[0m[31merror[0m] [0m[0m  val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:64:15: value values is not a member of Any[0m
+[0m[[0m[31merror[0m] [0m[0m        cells.values.map{ cell =>[0m
+[0m[[0m[31merror[0m] [0m[0m              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:7:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{LineString, Polygon, LinearRing}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:144:45: not found: type Polygon[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Polygon = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:6:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{Coordinate, Envelope}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:143:27: not found: type Envelope[0m
+[0m[[0m[31merror[0m] [0m[0m  def envelope2polygon(e: Envelope)[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/PartitionReader.scala:144:27: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Polygon = {[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:105:47: not found: type RDD[0m
+[0m[[0m[31merror[0m] [0m[0m      (implicit geofactory: GeometryFactory): RDD[Face] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:104:23: not found: type RDD[0m
+[0m[[0m[31merror[0m] [0m[0m  def getFaces(dcels: RDD[Iterable[Half_edge]])[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:105:29: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m      (implicit geofactory: GeometryFactory): RDD[Face] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:107:72: not found: type Face[0m
+[0m[[0m[31merror[0m] [0m[0m    def matchHoles(holes: List[Face], exteriors: Vector[Face]): Vector[Face] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:107:32: not found: type Face[0m
+[0m[[0m[31merror[0m] [0m[0m    def matchHoles(holes: List[Face], exteriors: Vector[Face]): Vector[Face] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELBuilder2.scala:107:57: not found: type Face[0m
+[0m[[0m[31merror[0m] [0m[0m    def matchHoles(holes: List[Face], exteriors: Vector[Face]): Vector[Face] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:3:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:4:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geomgraph.index.SegmentIntersector[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:5:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.algorithm.RobustLineIntersector[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:6:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:7:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.Coordinate[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:8:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geomgraph.EdgeIntersection[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:9:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geomgraph.Edge[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:12:28: object geometries is not a member of package edu.ucr.dblab.sdcel[0m
+[0m[[0m[31merror[0m] [0m[0mimport edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge, Tag}[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:17:49: not found: type Coordinate[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Map[Coordinate, List[Half_edge]] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:17:66: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Map[Coordinate, List[Half_edge]] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:16:32: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def intersects(hedgesA: List[Half_edge], hedgesB: List[Half_edge])[0m
+[0m[[0m[31merror[0m] [0m[0m                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:16:58: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def intersects(hedgesA: List[Half_edge], hedgesB: List[Half_edge])[0m
+[0m[[0m[31merror[0m] [0m[0m                                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:17:27: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Map[Coordinate, List[Half_edge]] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:18:19: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0m    val pid = org.apache.spark.TaskContext.getPartitionId[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:24:7: not found: value HEdge[0m
+[0m[[0m[31merror[0m] [0m[0m      HEdge(pts, h)[0m
+[0m[[0m[31merror[0m] [0m[0m      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:29:7: not found: value HEdge[0m
+[0m[[0m[31merror[0m] [0m[0m      HEdge(pts, h)[0m
+[0m[[0m[31merror[0m] [0m[0m      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:32:25: not found: type SimpleMCSweepLineIntersector[0m
+[0m[[0m[31merror[0m] [0m[0m    val sweepline = new SimpleMCSweepLineIntersector()[0m
+[0m[[0m[31merror[0m] [0m[0m                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:33:31: not found: type RobustLineIntersector[0m
+[0m[[0m[31merror[0m] [0m[0m    val lineIntersector = new RobustLineIntersector()[0m
+[0m[[0m[31merror[0m] [0m[0m                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:35:34: not found: type SegmentIntersector[0m
+[0m[[0m[31merror[0m] [0m[0m    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)[0m
+[0m[[0m[31merror[0m] [0m[0m                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:44:13: not found: type Coordinate[0m
+[0m[[0m[31merror[0m] [0m[0m      List[(Coordinate, Half_edge)] = {[0m
+[0m[[0m[31merror[0m] [0m[0m            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:44:25: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m      List[(Coordinate, Half_edge)] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:43:53: not found: type HEdge[0m
+[0m[[0m[31merror[0m] [0m[0m  private def getIntersections(list: java.util.List[HEdge]):[0m
+[0m[[0m[31merror[0m] [0m[0m                                                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:45:27: missing parameter type[0m
+[0m[[0m[31merror[0m] [0m[0m    list.asScala.flatMap{ edge =>[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:54:50: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): List[Half_edge] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:53:29: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def setTwins(hedges: List[Half_edge])[0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:54:27: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): List[Half_edge] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:56:25: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m    case class H(hedge: Half_edge, vertex: Vertex, angle: Double)[0m
+[0m[[0m[31merror[0m] [0m[0m                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:56:44: not found: type Vertex[0m
+[0m[[0m[31merror[0m] [0m[0m    case class H(hedge: Half_edge, vertex: Vertex, angle: Double)[0m
+[0m[[0m[31merror[0m] [0m[0m                                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:88:55: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Iterable[(Half_edge, String)] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:87:23: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:87:44: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)[0m
+[0m[[0m[31merror[0m] [0m[0m                                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:88:27: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Iterable[(Half_edge, String)] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:89:19: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0m    val pid = org.apache.spark.TaskContext.getPartitionId[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:244:13: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m      List[(Half_edge, String)] = {[0m
+[0m[[0m[31merror[0m] [0m[0m            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:243:27: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)], i: Int = 0):[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:243:48: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)], i: Int = 0):[0m
+[0m[[0m[31merror[0m] [0m[0m                                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:271:63: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Iterable[(String, Half_edge)] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:270:22: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def merge(ha: List[Half_edge], hb: List[Half_edge])[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:270:43: not found: type Half_edge[0m
+[0m[[0m[31merror[0m] [0m[0m  def merge(ha: List[Half_edge], hb: List[Half_edge])[0m
+[0m[[0m[31merror[0m] [0m[0m                                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELMerger2.scala:271:27: not found: type GeometryFactory[0m
+[0m[[0m[31merror[0m] [0m[0m    (implicit geofactory: GeometryFactory): Iterable[(String, Half_edge)] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:4:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{Coordinate, Envelope}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:5:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{LineString, Polygon}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:6:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:7:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.io.WKTReader[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:8:12: object vividsolutions is not a member of package com[0m
+[0m[[0m[31merror[0m] [0m[0mimport com.vividsolutions.jts.algorithm.CGAlgorithms[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:9:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.{SparkContext, SparkConf}[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:10:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.serializer.KryoSerializer[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/acald013/RIDIR/Code/SDCEL/src/main/scala/sdcel/DCELPartitioner2.scala:11:12: object apache is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.apache.spark.sql.SparkSession[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m470 errors found[0m

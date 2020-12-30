@@ -240,10 +240,8 @@ object DCELMerger2 {
   }
 
   @tailrec
-  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)]):
+  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)], i: Int = 0):
       List[(Half_edge, String)] = {
-
-    println(hs.size)
 
     if(hs.isEmpty) {
       r
@@ -260,7 +258,12 @@ object DCELMerger2 {
       val hs_new = hs -- h.getNexts.toSet
       val r_new  = r :+ ((h, tag2))
 
-      groupByNext(hs_new, r_new)
+      if(hs == hs_new){
+        println("No changes in rescursion...")
+        r
+      } else {
+        groupByNext(hs_new, r_new, i + 1)
+      }
     }
   }
 

@@ -36,4 +36,14 @@ object Quadtree {
 
     current
   }
+
+  def filter[T](quadtree: StandardQuadTree[T], lineage: String): StandardQuadTree[T] = {
+    var current = quadtree
+    for(position <- lineage.map(_.toInt - 48)){
+      val regions = current.getRegions()
+      current = regions(position)
+    }
+
+    current
+  }
 }
