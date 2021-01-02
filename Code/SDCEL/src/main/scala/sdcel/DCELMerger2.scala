@@ -53,16 +53,17 @@ object DCELMerger2 {
   def setTwins(hedges: List[Half_edge])
     (implicit geofactory: GeometryFactory): List[Half_edge] = {
 
-    case class H(hedge: Half_edge, vertex: Vertex, angle: Double)
+    //case class H(hedge: Half_edge, vertex: Vertex, angle: Double)
+    case class H(hedge: Half_edge, start: Vertex, end: Vertex)
     // Get a copy of the half-edge by their vertices and angles...
     val Hs = hedges.flatMap{ h =>
       List(
-        H(h, h.orig, h.angleAtOrig),
-        H(h, h.dest, h.angleAtDest)
+        H(h, h.orig, h.dest),
+        H(h, h.dest, h.orig)
       )
     }
     // Group by its vertex and angle...
-    val grouped = Hs.groupBy(h => (h.vertex, h.angle)).values.foreach{ hList =>
+    val grouped = Hs.groupBy(h => (h.start, h.end)).values.foreach{ hList =>
       val (h0, h1) = if(hList.size == 1) {
         // If at a vertex, a half-edge is alone at its angle, we create its twin...
         val h0 = hList(0).hedge
@@ -84,7 +85,8 @@ object DCELMerger2 {
     hedges
   }
 
-  def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)
+  def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false,
+    max: Int = Int.MaxValue)
     (implicit geofactory: GeometryFactory): Iterable[(Half_edge, String)] = {
     val pid = org.apache.spark.TaskContext.getPartitionId
 
@@ -160,13 +162,20 @@ object DCELMerger2 {
       save("/tmp/edgesHedges.wkt",
         hedges.map{ h =>
           val wkt = h.wkt
-          s"$wkt\n"
+          val pid = h.data.polygonId
+          val eid = h.data.edgeId
+          s"$wkt\t$pid\t$eid\n"
         }
       )
       save("/tmp/edgesTwins.wkt",
         hedges.map{ h =>
-          val wkt = if(h.twin != null) h.twin.wkt else "LINESTRING EMPTY"
-          s"$wkt\n"
+          val (wkt, pid, eid, wkt1, pid1, eid1) = if(h.twin != null)
+            (h.wkt, h.data.polygonId, h.data.edgeId,
+              h.twin.wkt, h.twin.data.polygonId, h.twin.data.edgeId)
+          else
+            (h.wkt, h.data.polygonId, h.data.edgeId,
+              "LINESTRING EMPTY", -9, -9)
+          s"$wkt\t$pid\t$eid\t$wkt1\t$pid1\t$eid1\n"
         }
       )
 
@@ -221,7 +230,7 @@ object DCELMerger2 {
     )
 
     //
-    val h = groupByNext(h_prime, List.empty[(Half_edge, String)])
+    val h = groupByNext(h_prime, List.empty[(Half_edge, String)], max)
       .filter(_._2 != "")
 
     println("H size: " + h.size)
@@ -240,12 +249,13 @@ object DCELMerger2 {
   }
 
   @tailrec
-  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)], i: Int = 0):
-      List[(Half_edge, String)] = {
+  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)],
+    max: Int = Int.MaxValue): List[(Half_edge, String)] = {
 
-    if(hs.isEmpty) {
+    if(hs.isEmpty /*|| hs.size <= 11*/) {
       r
     } else {
+      println(hs.size)
       val h = hs.head
 
       val tag = if(h.data.label == "A")
@@ -255,14 +265,15 @@ object DCELMerger2 {
       val tag2 = List(h.label, h.next.label)
         .filterNot(t => t == "A" || t == "B").sorted.mkString(" ")
 
-      val hs_new = hs -- h.getNexts.toSet
-      val r_new  = r :+ ((h, tag2))
-
-      if(hs == hs_new){
-        println("No changes in rescursion...")
-        r
+      h.MAX_RECURSION = max
+      val nexts = h.getNexts
+      if(nexts.isEmpty){
+        r :+ ((h, "Error"))
       } else {
-        groupByNext(hs_new, r_new, i + 1)
+        val hs_new = hs -- h.getNexts.toSet
+        val r_new  = r :+ ((h, tag2))
+
+        groupByNext(hs_new, r_new, max)
       }
     }
   }

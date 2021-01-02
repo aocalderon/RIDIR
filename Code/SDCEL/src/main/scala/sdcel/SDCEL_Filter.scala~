@@ -23,15 +23,10 @@ object SDCEL {
     val model = new PrecisionModel(params.scale())
     implicit val geofactory = new GeometryFactory(model)
 
+    val filter = params.filter()
     val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
-    save{"/tmp/edgesCells.wkt"}{
-      cells.values.map{ cell =>
-        val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
-        val id = cell.id
-        val lineage = cell.lineage
-        s"$wkt\t$id\t$lineage\n"
-      }.toList
-    }
+    //val (quadtree, cells) = filterQuadtree[Int](params.quadtree(), params.boundary(),
+    //  filter)
 
     logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
     logger.info(s"Number of partitions: ${cells.size}")
@@ -45,11 +40,16 @@ object SDCEL {
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A")
+    //val edgesRDDA = filterEdges(params.input1(), quadtree, "A")
+
+
     //edgesRDDA.persist()
     //val nEdgesRDDA = edgesRDDA.count()
     //println("Edges A: " + nEdgesRDDA)
 
     val edgesRDDB = readEdges(params.input2(), quadtree, "B")
+    //val edgesRDDB = filterEdges(params.input2(), quadtree, "B")
+
     //edgesRDDB.persist()
     //val nEdgesRDDB = edgesRDDB.count()
     //println("Edges B: " + nEdgesRDDB)
@@ -69,6 +69,15 @@ object SDCEL {
 
     
     if(params.debug()){
+      save{"/tmp/edgesCells.wkt"}{
+        cells.values.map{ cell =>
+          val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
+          val id = cell.id
+          val lineage = cell.lineage
+          s"$wkt\t$id\t$lineage\n"
+        }.toList
+      }
+      
       save{"/tmp/edgesHA.wkt"}{
         dcelsA.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next

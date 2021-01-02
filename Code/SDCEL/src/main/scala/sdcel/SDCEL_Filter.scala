@@ -13,7 +13,7 @@ import PartitionReader._
 import DCELBuilder2.getLDCELs
 import DCELMerger2.merge2
 
-object SDCEL_Tester {
+object SDCEL_Filter {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def main(args: Array[String]) = {
@@ -26,7 +26,6 @@ object SDCEL_Tester {
     val filter = params.filter()
     val (quadtree, cells) = filterQuadtree[Int](params.quadtree(), params.boundary(),
       filter)
-    cells foreach println
 
     logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
     logger.info(s"Number of partitions: ${cells.size}")
@@ -38,41 +37,40 @@ object SDCEL_Tester {
     import spark.implicits._
     logger.info("Starting session... Done!")
 
+    // Reading data...
     val edgesRDDA = filterEdges(params.input1(), quadtree, "A")
     val edgesRDDB = filterEdges(params.input2(), quadtree, "B")
+    logger.info("Reading data... Done!")
 
-    save("/tmp/edgesCells.wkt"){
-      cells.values.map{ cell =>
-        cell.wkt + "\n"
-      }.toList
-    }
-    save("/tmp/edgesA.wkt"){
-      edgesRDDA.mapPartitionsWithIndex{ (pid, edgesIt) =>
-        edgesIt.map{ edge =>
-          val wkt = edge.toText()
-          val data = edge.getUserData.asInstanceOf[EdgeData]
-          val polyId = data.polygonId
-          val ringId = data.ringId
-          val edgeId = data.edgeId
-          val isHole = data.isHole
+    // Getting LDCELs...
+    val dcelsA = getLDCELs(edgesRDDA, cells)
+    logger.info("Getting LDCELs for A... done!")
 
-          s"$wkt\t$pid\t$polyId\t$ringId\t$edgeId\t$isHole\n"
-        }
-      }.collect
-    }
-    save("/tmp/edgesB.wkt"){
-      edgesRDDB.mapPartitionsWithIndex{ (pid, edgesIt) =>
-        edgesIt.map{ edge =>
-          val wkt = edge.toText()
-          val data = edge.getUserData.asInstanceOf[EdgeData]
-          val polyId = data.polygonId
-          val ringId = data.ringId
-          val edgeId = data.edgeId
-          val isHole = data.isHole
+    val dcelsB = getLDCELs(edgesRDDB, cells)
+    logger.info("Getting LDCELs for B... done!")
 
-          s"$wkt\t$pid\t$polyId\t$ringId\t$edgeId\t$isHole\n"
-        }
-      }.collect
+    // Merging DCELs...
+    val sdcel = dcelsA.zipPartitions(dcelsB, preservesPartitioning=true){ (iterA, iterB) =>
+      val A = iterA.next.map(_.getNexts).flatten.toList
+      val B = iterB.next.map(_.getNexts).flatten.toList
+
+      
+      val hedges = merge2(A, B, debug=false, max=(A.size + B.size))
+
+      hedges.toIterator
+    }.persist()
+    val nSDcel = sdcel.count()
+    logger.info("Merging DCELs... done!")
+
+    sdcel.filter(_._2 == "Error").foreach(println)
+
+    if(params.save()){
+      sdcel.map{ case(h, tag) =>
+          val wkt = h.getPolygon.toText
+          s"$wkt"
+      }.toDS.write
+        .format("text").mode(SaveMode.Overwrite).save("gadm/output")
+      logger.info("Saving results at gadm/output.")
     }
 
     spark.close

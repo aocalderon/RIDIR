@@ -32,6 +32,7 @@ case class Half_edge(edge: LineString) {
   var twin: Half_edge = null
   var next: Half_edge = null
   var prev: Half_edge = null
+  var MAX_RECURSION: Int = Int.MaxValue
 
   def getTag: String = tags.sortBy(_.label).mkString(" ")
 
@@ -94,17 +95,19 @@ case class Half_edge(edge: LineString) {
     val coords = hedges.map{_.v1} :+ hedges.last.v2
     geofactory.createLineString(coords.toArray).toText
   }
+
   def getPrevsAsWKT(implicit geofactory: GeometryFactory): String = {
     val hedges = getPrevs
     val coords = hedges.map{_.v2} :+ hedges.last.v1
     geofactory.createLineString(coords.toArray).toText
   }
 
-  def getNexts: List[Half_edge] = {
+  def getNextsDebug: List[Half_edge] = {
     @tailrec
     def getNextsTailrec(hedges: List[Half_edge], i: Int): List[Half_edge] = {
       val next = hedges.last.next
-      if( next == null || next == hedges.head ){
+      //println(next)
+      if( next == null || next == hedges.head || i > 100){
         hedges
       } else {
         getNextsTailrec(hedges :+ next, i+1)
@@ -112,6 +115,23 @@ case class Half_edge(edge: LineString) {
     }
     getNextsTailrec(List(this), 0)
   }
+
+  def getNexts: List[Half_edge] = {
+    @tailrec
+    def getNextsTailrec(hedges: List[Half_edge], i: Int): List[Half_edge] = {
+
+      val next = hedges.last.next
+      if( next == null || next == hedges.head){
+        hedges
+      } else if(i >= MAX_RECURSION){
+        List.empty[Half_edge]
+      }else {
+        getNextsTailrec(hedges :+ next, i + 1)
+      }
+    }
+    getNextsTailrec(List(this), 0)
+  }
+
   def getPrevs: List[Half_edge] = {
     @tailrec
     def getPrevsTailrec(hedges: List[Half_edge]): List[Half_edge] = {

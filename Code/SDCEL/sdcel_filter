@@ -3,6 +3,7 @@
 HDFS_PATH=$1
 LOCAL_PATH=$2
 SCALE=$3
+FILTER=$4
 
 EXECUTORS=12
 CORES=9
@@ -10,7 +11,7 @@ DMEMORY=30g
 EMEMORY=32g
 SPARK_JARS=$HOME/Spark/2.4/jars/
 JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
-CLASS="edu.ucr.dblab.sdcel.SDCEL"
+CLASS="edu.ucr.dblab.sdcel.SDCEL_Filter"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 MASTER=yarn
 
@@ -25,4 +26,4 @@ spark-submit \
     --input2 $HDFS_PATH/edgesB \
     --quadtree $LOCAL_PATH/quadtree.wkt \
     --boundary $LOCAL_PATH/boundary.wkt \
-    --scale $SCALE --save
+    --scale $SCALE --filter $FILTER

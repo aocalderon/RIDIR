@@ -13,7 +13,7 @@ import PartitionReader._
 import DCELBuilder2.getLDCELs
 import DCELMerger2.merge2
 
-object SDCEL {
+object SDCEL_Local {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def main(args: Array[String]) = {
@@ -24,15 +24,6 @@ object SDCEL {
     implicit val geofactory = new GeometryFactory(model)
 
     val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
-    save{"/tmp/edgesCells.wkt"}{
-      cells.values.map{ cell =>
-        val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
-        val id = cell.id
-        val lineage = cell.lineage
-        s"$wkt\t$id\t$lineage\n"
-      }.toList
-    }
-
     logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
     logger.info(s"Number of partitions: ${cells.size}")
 
@@ -45,30 +36,26 @@ object SDCEL {
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A")
-    //edgesRDDA.persist()
-    //val nEdgesRDDA = edgesRDDA.count()
-    //println("Edges A: " + nEdgesRDDA)
-
     val edgesRDDB = readEdges(params.input2(), quadtree, "B")
-    //edgesRDDB.persist()
-    //val nEdgesRDDB = edgesRDDB.count()
-    //println("Edges B: " + nEdgesRDDB)
-
     logger.info("Reading data... Done!")
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells)
-    //dcelsA.persist()
-    //val nA = dcelsA.count()
     logger.info("Getting LDCELs for A... done!")
 
     val dcelsB = getLDCELs(edgesRDDB, cells)
-    //dcelsB.persist()
-    //val nB = dcelsB.count()
     logger.info("Getting LDCELs for B... done!")
-
     
     if(params.debug()){
+      save{"/tmp/edgesCells.wkt"}{
+        cells.values.map{ cell =>
+          val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
+          val id = cell.id
+          val lineage = cell.lineage
+          s"$wkt\t$id\t$lineage\n"
+        }.toList
+      }
+      
       save{"/tmp/edgesHA.wkt"}{
         dcelsA.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next
@@ -119,15 +106,6 @@ object SDCEL {
           s"$wkt\t$tag\n"
         }.collect
       }
-    }
-
-    if(params.save()){
-      sdcel.map{ case(h, tag) =>
-          val wkt = h.getPolygon.toText
-          s"$wkt"
-      }.toDS.write
-        .format("text").mode(SaveMode.Overwrite).save("gadm/output")
-      logger.info("Saving results at gadm/output.")
     }
 
     spark.close
