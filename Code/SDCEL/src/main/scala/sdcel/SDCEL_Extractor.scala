@@ -13,7 +13,7 @@ import PartitionReader._
 import DCELBuilder2.getLDCELs
 import DCELMerger2.merge2
 
-object SDCEL_Tester {
+object SDCEL_Extract {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def main(args: Array[String]) = {
@@ -41,19 +41,40 @@ object SDCEL_Tester {
     val edgesRDDA = filterEdges(params.input1(), quadtree, "A")
     val edgesRDDB = filterEdges(params.input2(), quadtree, "B")
 
-    save("/tmp/edgesCells.wkt"){
+    val output = params.output()
+    save(s"${output}/quadtree.wkt"){
       cells.values.map{ cell =>
-        cell.wkt + "\n"
+        cell.lineage + "\n"
       }.toList
     }
-    save("/tmp/edgesEdgesA.wkt"){
-      edgesRDDA.map{ edge =>
-        s"${edge.toText()}\t${edge.getUserData}\n"
+    save(s"${output}/boundary.wkt"){
+      val boundary = envelope2polygon(quadtree.getZone.getEnvelope)
+      List(boundary.toText())
+    }
+    save(s"${output}/A.wkt"){
+      edgesRDDA.mapPartitionsWithIndex{ (pid, edges) =>
+        edges.map{ edge =>
+          val wkt = edge.toText()
+          val data = edge.getUserData.asInstanceOf[EdgeData]
+          val polyId = data.polygonId
+          val ringId = data.ringId
+          val edgeId = data.edgeId
+          val isHole = data.isHole
+          s"$wkt\t$pid\t$polyId\t$ringId\t$edgeId\$isHole\n"
+        }
       }.collect
     }
-    save("/tmp/edgesEdgesB.wkt"){
-      edgesRDDB.map{ edge =>
-        s"${edge.toText()}\t${edge.getUserData}\n"
+    save(s"${output}/B.wkt"){
+      edgesRDDB.mapPartitionsWithIndex{ (pid, edges) =>
+        edges.map{ edge =>
+          val wkt = edge.toText()
+          val data = edge.getUserData.asInstanceOf[EdgeData]
+          val polyId = data.polygonId
+          val ringId = data.ringId
+          val edgeId = data.edgeId
+          val isHole = data.isHole
+          s"$wkt\t$pid\t$polyId\t$ringId\t$edgeId\$isHole\n"
+        }
       }.collect
     }
 
