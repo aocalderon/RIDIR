@@ -16,6 +16,8 @@ import DCELMerger2.merge2
 object SDCEL {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
+  case class Settings(appId: String)
+
   def main(args: Array[String]) = {
     // Starting session...
     logger.info("Starting session...")
@@ -41,7 +43,12 @@ object SDCEL {
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .getOrCreate()
     import spark.implicits._
-    logger.info("Starting session... Done!")
+    val conf = spark.sparkContext.getConf
+    val appId = conf.get("spark.app.id")
+    implicit val settings = Settings(appId)
+    val command = System.getProperty("sun.java.command")
+    log(command)
+    log("Starting session... Done!")
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A")
@@ -54,18 +61,18 @@ object SDCEL {
     //val nEdgesRDDB = edgesRDDB.count()
     //println("Edges B: " + nEdgesRDDB)
 
-    logger.info("Reading data... Done!")
+    log("Reading data... Done!")
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells)
     //dcelsA.persist()
     //val nA = dcelsA.count()
-    logger.info("Getting LDCELs for A... done!")
+    log("Getting LDCELs for A... done!")
 
     val dcelsB = getLDCELs(edgesRDDB, cells)
     //dcelsB.persist()
     //val nB = dcelsB.count()
-    logger.info("Getting LDCELs for B... done!")
+    log("Getting LDCELs for B... done!")
 
     
     if(params.debug()){
@@ -109,7 +116,7 @@ object SDCEL {
       hedges.toIterator
     }.persist()
     val nSDcel = sdcel.count()
-    logger.info("Merging DCELs... done!")
+    log("Merging DCELs... done!")
 
     if(params.debug()){
       save("/tmp/edgesH.wkt"){
@@ -132,6 +139,10 @@ object SDCEL {
 
     spark.close
   }  
+
+  def log(msg: String)(implicit logger: Logger, settings: Settings): Unit = {
+    logger.info(s"${settings.appId}|$msg")
+  }
 
   def save(filename: String)(content: Seq[String]): Unit = {
     val start = clocktime

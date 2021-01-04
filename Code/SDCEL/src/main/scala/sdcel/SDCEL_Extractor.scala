@@ -7,13 +7,14 @@ import org.apache.spark.sql.{SparkSession, SaveMode}
 import org.apache.spark.TaskContext
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.slf4j.{Logger, LoggerFactory}
+import collection.JavaConverters._
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 import PartitionReader._
 import DCELBuilder2.getLDCELs
 import DCELMerger2.merge2
 
-object SDCEL_Extract {
+object SDCEL_Extractor {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def main(args: Array[String]) = {
@@ -26,7 +27,6 @@ object SDCEL_Extract {
     val filter = params.filter()
     val (quadtree, cells) = filterQuadtree[Int](params.quadtree(), params.boundary(),
       filter)
-    cells foreach println
 
     logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
     logger.info(s"Number of partitions: ${cells.size}")
@@ -42,15 +42,6 @@ object SDCEL_Extract {
     val edgesRDDB = filterEdges(params.input2(), quadtree, "B")
 
     val output = params.output()
-    save(s"${output}/quadtree.wkt"){
-      cells.values.map{ cell =>
-        cell.lineage + "\n"
-      }.toList
-    }
-    save(s"${output}/boundary.wkt"){
-      val boundary = envelope2polygon(quadtree.getZone.getEnvelope)
-      List(boundary.toText())
-    }
     save(s"${output}/A.wkt"){
       edgesRDDA.mapPartitionsWithIndex{ (pid, edges) =>
         edges.map{ edge =>
@@ -78,6 +69,16 @@ object SDCEL_Extract {
           s"$wkt\t$pid\t$polyId\t$ringId\t$edgeId\t$isHole\n"
         }
       }.collect
+    }
+    save(s"${output}/boundary.wkt"){
+      val boundary = envelope2polygon(quadtree.getZone.getEnvelope)
+      List(boundary.toText() + "\n")
+    }
+    save(s"${output}/quadtree.wkt"){
+      quadtree.assignPartitionLineage()
+      quadtree.getLeafZones.asScala.map{ leaf =>
+        leaf.lineage + "\n"
+      }.toList
     }
 
     spark.close
