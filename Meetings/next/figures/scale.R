@@ -1,23 +1,19 @@
 require(tidyverse)
 require(lubridate)
 
-paramsPattern = "input1"
+paramsPattern = "num-executors"
 getParams <- function(command){
   params = str_trim(str_split(command, "--")[[1]])
   params = params[grepl(paramsPattern, params)]
   return(paste(params, collapse = " "))
 }
-extractPartitions <- function(input){
-  return(str_replace(str_replace(input, "gadm/edges_P", ""), "K/edgesA", ""))
-}
 
-log = enframe(readLines("nohup.txt"))
+log = enframe(readLines("scale.txt"))
 spark = log %>% filter(grepl(value, pattern = "SparkSubmit ")) %>% 
   separate(value, into = c("time", "appId", "command"), sep = "\\|")
 spark$params = spark$command %>% map(getParams)
-spark = spark %>% separate(params, into = c(NA,"input"), sep = " ") %>%
-  select(appId, input) %>%
-  mutate(partitions = extractPartitions(input))
+spark = spark %>% separate(params, into = c(NA,"nodes"), sep = " ") %>%
+  select(appId, nodes) 
 
 START = "Reading data"
 END   = "Merging DCELs"
@@ -33,14 +29,14 @@ sdcel1 = sdcel0 %>% pivot_wider(names_from = phase, values_from = time)
 names(sdcel1) = c("appId", "read", "merge")
 sdcel = sdcel1 %>% mutate(time = merge - read)
 
-data = spark %>% inner_join(sdcel, by = "appId") %>% select(partitions, time) %>%
-  group_by(partitions) %>% summarise(time = mean(time))
-data$partitions = factor(data$partitions, levels = c("2", "4", "6", "8", "10", "12", "14"))
+data = spark %>% inner_join(sdcel, by = "appId") %>% select(nodes, time) %>%
+  group_by(nodes) %>% summarise(time = mean(time))
+data$nodes = factor(data$nodes, levels = c("1", "2", "4", "8"))
 
-p = ggplot(data = data, aes(x = partitions, y = time)) +
+p = ggplot(data = data, aes(x = nodes, y = time)) +
   geom_bar(stat="identity", position=position_dodge(width = 0.75), width = 0.7) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  labs(x="Partitions (x1000)", y="Time [min]", title="Execution time by number of partitions") 
+  labs(x="Nodes", y="Time [min]", title="Execution time by number of partitions") 
 plot(p)
 
-ggsave(paste0("nohup.pdf"), width = 12, height = 8, device = "pdf")
+ggsave(paste0("scale.pdf"), width = 12, height = 8, device = "pdf")
