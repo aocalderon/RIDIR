@@ -1,1 +1,0 @@
-spark-submit --master spark://mr-hn:7077 --class DCELMerger /home/acald013/RIDIR/Code/DCEL/target/scala-2.11/dcel_2.11-0.1.jar --input1 ~/RIDIR/Datasets/Phili/phili_2000_2272.wkt --offset1 2 --input2 ~/RIDIR/Datasets/Phili/phili_2010_2272.wkt --offset2 2 --nlevels 8 --maxentries 200 --fraction 0.25 --save --debug --cores 4 --executors 30
