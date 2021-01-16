@@ -7,6 +7,7 @@ val SparkVersion = "2.4.0"
 
 libraryDependencies += "org.apache.spark" %% "spark-core" % SparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-sql" % SparkVersion
+libraryDependencies += "org.apache.spark" %% "spark-mllib" % SparkVersion
 libraryDependencies += "org.datasyslab" % "geospark" % "1.2.0"
 libraryDependencies += "org.datasyslab" % "geospark-sql_2.3" % "1.2.0"
 libraryDependencies += "org.datasyslab" % "geospark-viz_2.3" % "1.2.0"
