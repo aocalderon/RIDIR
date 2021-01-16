@@ -11,7 +11,7 @@ extractPartitions <- function(input){
   return(str_replace(str_replace(input, "gadm/edges_P", ""), "K/edgesA", ""))
 }
 
-log = enframe(readLines("nohup.txt"))
+log = enframe(readLines("performance.txt"))
 spark = log %>% filter(grepl(value, pattern = "SparkSubmit ")) %>% 
   separate(value, into = c("time", "appId", "command"), sep = "\\|")
 spark$params = spark$command %>% map(getParams)

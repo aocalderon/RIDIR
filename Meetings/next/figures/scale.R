@@ -36,7 +36,7 @@ data$nodes = factor(data$nodes, levels = c("1", "2", "4", "8"))
 p = ggplot(data = data, aes(x = nodes, y = time)) +
   geom_bar(stat="identity", position=position_dodge(width = 0.75), width = 0.7) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-  labs(x="Nodes", y="Time [min]", title="Execution time by number of partitions") 
+  labs(x="Nodes", y="Time [min]", title="Execution time by number of nodes") 
 plot(p)
 
 ggsave(paste0("scale.pdf"), width = 12, height = 8, device = "pdf")
