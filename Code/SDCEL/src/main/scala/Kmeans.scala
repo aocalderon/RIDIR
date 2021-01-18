@@ -15,18 +15,21 @@
  * limitations under the License.
  */
 
-// scalastyle:off println
-
 import org.apache.spark.{SparkConf, SparkContext}
-// $example on$
-import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
+import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg.Vectors
-// $example off$
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate, Point}
 import org.apache.log4j.{Level, Logger}
 
-object KMeansExample {
+object KMeansFinder {
+
+  case class Cell(id: Int, point: Point, edges: Int)
+  case class Centroid(point: Point, id: Int)
+  case class Data(wkt: String, cell_id: Int, class_id: Int, dist: Double, nedges: Long,
+    cumulative: Long = 0L) {
+    override def toString = s"$wkt\t$cell_id\t$class_id\t$dist\t$nedges\t$cumulative\n"
+  }
 
   def main(args: Array[String]) {
     Logger.getLogger("org").setLevel(Level.WARN)
@@ -36,31 +39,21 @@ object KMeansExample {
     val conf = new SparkConf().setAppName("KMeansExample")
     val sc = new SparkContext(conf)
 
-    // $example on$
-    // Load and parse the data
     val input = args(0)
-    val data = sc.textFile(input)
-    val parsedData = data.map{ line =>
-      val arr = line.split("\t")
-      val x = arr(3).toDouble
-      val y = arr(4).toDouble
-      Vectors.dense(Array(x, y))
-    }.cache()
-
-    // Cluster the data into two classes using KMeans
     val numClusters = args(1).toInt
     val numIterations = args(2).toInt
-    val clusters = KMeans.train(parsedData, numClusters, numIterations)
 
-    case class Centroid(point: Point, id: Int)
-    val centroids = clusters.clusterCenters.map{ center =>
-      val x = center.toArray(0)
-      val y = center.toArray(1)
-      geofactory.createPoint(new Coordinate(x, y))
-    }.zipWithIndex.map{ case(p, i) => Centroid(p, i) }
+    val buffer = scala.io.Source
+      .fromFile("/home/acald013/RIDIR/Datasets/DCEL/filter.wkt")
+    val toFilter = buffer.getLines.map{ line =>
+      val arr = line.split("\t")
+      arr(1).toInt
+    }.toSet
+    println(s"Cell to filter: ${toFilter.size}")
+    buffer.close
 
-    case class Cell(id: Int, point: Point, edges: Int)
-    val cells = data.map{ line =>
+    // Load the data...
+    val cells = sc.textFile(input).map{ line =>
       val arr = line.split("\t")
       val i = arr(2).toInt
       val x = arr(3).toDouble
@@ -68,26 +61,50 @@ object KMeansExample {
       val n = arr(5).toInt
       val p = geofactory.createPoint(new Coordinate(x, y))
       Cell(i, p, n)
-    }
+    }.filter(cell => !toFilter.contains(cell.id))
 
+    val tedges = cells.map(_.edges).reduce(_ + _)
+    println(s"# of edges in dataset: $tedges [${tedges/numClusters}]")
+
+    // Parse the data...
+    val parsedData = cells.map{ cell =>
+      val x = cell.point.getX
+      val y = cell.point.getY
+      Vectors.dense(Array(x, y))
+    }.cache()
+
+    // Cluster the data into two classes using KMeans
+    val model = KMeans.train(parsedData, numClusters, numIterations)
+
+    // Parse centroids...
+    val centroids = model.clusterCenters.map{ center =>
+      val x = center.toArray(0)
+      val y = center.toArray(1)
+      geofactory.createPoint(new Coordinate(x, y))
+    }.zipWithIndex.map{ case(p, i) => Centroid(p, i) }
+    centroids foreach println
+
+    // Measure distance...
     val classes = cells.map{ cell =>
       val dist_and_class = centroids.map{ centroid =>
         (centroid.point.distance(cell.point), centroid.id)
       }.minBy(_._1)
-      (cell.id, dist_and_class._2, dist_and_class._1, cell.edges)
+      Data(cell.point.toText, cell.id, dist_and_class._2, dist_and_class._1, cell.edges)
     }
 
-    def saveClass(c: Int): Unit = {
-      val f = new java.io.PrintWriter(s"/tmp/kmeans${c}.tsv")
-      val content = classes.filter(_._2 == c)
-        .sortBy{ case(i,c,d,n) => (d, n) }.map{ case(i,c,d,n) =>
-          s"$i\t$c\t$d\t$n\n"
-        }.collect
-      f.write(content.mkString(""))
+    // Save classes...
+    (0 until numClusters).foreach{ c =>
+      val sample = classes.filter(_.class_id == c).collect
+        .sortBy(s => (s.dist, -s.nedges))
+      val cumulative = sample.scanLeft(0L)( (a, b) => a + b.nedges)
+      println(s"# of edges per class $c: ${sample.map(_.nedges).reduce(_ + _)}")
+      val data = sample.zip(cumulative).map{ case(data, cumulative) =>
+        data.copy(cumulative = cumulative)
+      }
+      val f = new java.io.PrintWriter(s"/tmp/edgesClass${c}.wkt")
+      f.write(data.mkString(""))
       f.close
     }
-
-    saveClass(0)
 
     sc.stop()
   }
