@@ -28,6 +28,8 @@ object PC1 {
       println(s"Intersection results: ${r.toText()}")
     }
 
-
+    val l: List[Int] = List(1,2,3,4,5,6,7)
+    val x = l.scanLeft(0)(_ + _)
+    println(x)
   }
 }
