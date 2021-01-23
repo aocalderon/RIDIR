@@ -1,0 +1,8 @@
+dcel
+CMakeCache.txt
+CMakeFiles/*
+cmake_install.cmake
+CMakeLists.txt
+Makefile
+nohup.out
+*.wkt
