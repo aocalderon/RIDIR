@@ -39,38 +39,27 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/cmake -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
+CMAKE_SOURCE_DIR = /home/and/RIDIR/Code/CGAL/DCEL
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
+CMAKE_BINARY_DIR = /home/and/RIDIR/Code/CGAL/DCEL
 
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -78,11 +67,22 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named dcel
+# Target rules for targets named cgal_check_build_system
 
 # Build rule for target.
-dcel: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 dcel
-.PHONY : dcel
+cgal_check_build_system: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 cgal_check_build_system
+.PHONY : cgal_check_build_system
 
 # fast build rule for target.
-dcel/fast:
-	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/build
-.PHONY : dcel/fast
+cgal_check_build_system/fast:
+	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/build
+.PHONY : cgal_check_build_system/fast
 
 #=============================================================================
 # Target rules for targets named ALL_CGAL_TARGETS
@@ -137,17 +137,17 @@ ALL_CGAL_TARGETS/fast:
 .PHONY : ALL_CGAL_TARGETS/fast
 
 #=============================================================================
-# Target rules for targets named cgal_check_build_system
+# Target rules for targets named dcel
 
 # Build rule for target.
-cgal_check_build_system: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 cgal_check_build_system
-.PHONY : cgal_check_build_system
+dcel: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dcel
+.PHONY : dcel
 
 # fast build rule for target.
-cgal_check_build_system/fast:
-	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/build
-.PHONY : cgal_check_build_system/fast
+dcel/fast:
+	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/build
+.PHONY : dcel/fast
 
 dcel.o: dcel.cpp.o
 
@@ -182,11 +182,11 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... dcel"
-	@echo "... ALL_CGAL_TARGETS"
-	@echo "... cgal_check_build_system"
 	@echo "... edit_cache"
+	@echo "... rebuild_cache"
+	@echo "... cgal_check_build_system"
+	@echo "... ALL_CGAL_TARGETS"
+	@echo "... dcel"
 	@echo "... dcel.o"
 	@echo "... dcel.i"
 	@echo "... dcel.s"

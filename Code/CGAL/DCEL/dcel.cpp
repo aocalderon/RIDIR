@@ -124,6 +124,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Inserting polygons..." << std::endl;
     int start = getMilliCount();
     int edges = 0;
+    int npolys = polys.size();
+    int ipolys = 1;
     for(Polygon p : polys){
       std::vector<Point_2> points;
       for (vertexIt vi = p.outer_boundary().begin(); vi != p.outer_boundary().end(); ++vi){
@@ -132,10 +134,14 @@ int main(int argc, char* argv[]) {
       points.push_back(points[0]);
       Polyline_2 lines = polyline_construct(points.begin(), points.end());
       insert(arr1, lines);
-      //std::cout << "Polygon added. " << points.size() << " segments." << std::endl;
       edges += points.size();
+      if(ipolys % 1000 == 0){
+	std::cout << "Polygon added (" << ipolys << "/" << npolys << ")." << std::endl;
+      }
+      ipolys++;
     }
-
+    std::cout << "Insertion done! [" << npolys << " polygons|" << edges << " segments]." << std::endl;      
+    
     // Assigning face IDs...
     ArrangementA_2::Face_iterator ait;
     int n = 0;
@@ -170,6 +176,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Inserting polygons..." << std::endl;
     start = getMilliCount();
     edges = 0;
+    npolys = polys.size();
+    ipolys = 1;
     for(Polygon p : polys){
       std::vector<Point_2> points;
       for (vertexIt vi = p.outer_boundary().begin(); vi != p.outer_boundary().end(); ++vi){
@@ -178,9 +186,13 @@ int main(int argc, char* argv[]) {
       points.push_back(points[0]);
       Polyline_2 lines = polyline_construct(points.begin(), points.end());
       insert(arr2, lines);
-      //std::cout << "Polygon added. " << points.size() << " segments." << std::endl;
       edges += points.size();
+      if(ipolys % 1000 == 0){
+	std::cout << "Polygon added (" << ipolys << "/" << npolys << ")." << std::endl;
+      }
+      ipolys++;
     }
+    std::cout << "Insertion done! [" << npolys << " polygons|" << edges << " segments]." << std::endl;      
 
     // Assigning face IDs...
     ArrangementB_2::Face_iterator bit;
