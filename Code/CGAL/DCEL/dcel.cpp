@@ -21,6 +21,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <ctime>
+#include <chrono>
 
 #include "dcels.h"
 #include "arr_print.h"
@@ -42,6 +44,30 @@ int getMilliSpan(int nTimeStart){
 	return nSpan;
 }
 
+std::string getTime(){
+  using namespace std::chrono;
+
+  // get current time
+  auto now = system_clock::now();
+
+  // get number of milliseconds for the current second
+  // (remainder after division into seconds)
+  auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+
+  // convert to std::time_t in order to convert to std::tm (broken time)
+  auto timer = system_clock::to_time_t(now);
+
+  // convert to broken time
+  std::tm bt = *std::localtime(&timer);
+
+  std::ostringstream oss;
+
+  oss << std::put_time(&bt, "%m-%d-%Y %H:%M:%S"); // HH:MM:SS
+  oss << '.' << std::setfill('0') << std::setw(3) << ms.count() << "|";
+
+  return oss.str();
+}
+
 // Defining a functor for creating the face label...
 struct Overlay_label{
   string operator() (string a, string b) const {
@@ -49,9 +75,8 @@ struct Overlay_label{
   }
 };
 
-
 int main(int argc, char* argv[]) {
-  
+    
   // General definitions...
   typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
   typedef CGAL::Arr_segment_traits_2<Kernel>                Segment_traits_2;
@@ -112,7 +137,7 @@ int main(int argc, char* argv[]) {
     Traits_2::Construct_curve_2 polyline_construct = traits.construct_curve_2_object();
 
     // Reading WKT file...
-    std::cout << "Reading A polygons..." << std::endl;
+    std::cout << getTime() << "Reading A polygons..." << std::endl;
     do {
       Polygon p;
       CGAL::read_polygon_WKT(isA, p);
@@ -121,7 +146,7 @@ int main(int argc, char* argv[]) {
     } while(isA.good() && !isA.eof());
 
     // Inserting as polyline...
-    std::cout << "Inserting polygons..." << std::endl;
+    std::cout << getTime() << "Inserting polygons..." << std::endl;
     int start = getMilliCount();
     int edges = 0;
     int npolys = polys.size();
@@ -136,11 +161,11 @@ int main(int argc, char* argv[]) {
       insert(arr1, lines);
       edges += points.size();
       if(ipolys % 1000 == 0){
-	std::cout << "Polygon added (" << ipolys << "/" << npolys << ")." << std::endl;
+	std::cout << getTime() << "Polygon added (" << ipolys << "/" << npolys << ")." << std::endl;
       }
       ipolys++;
     }
-    std::cout << "Insertion done! [" << npolys << " polygons|" << edges << " segments]." << std::endl;      
+    std::cout << getTime() << "Insertion done! [" << npolys << " polygons|" << edges << " segments]." << std::endl;      
     
     // Assigning face IDs...
     ArrangementA_2::Face_iterator ait;
@@ -153,10 +178,10 @@ int main(int argc, char* argv[]) {
 	n++;
       }
     }
-    cout << "Done with A [" << edges << " edges]." << endl;
+    std::cout << getTime() << "Done with A [" << edges << " edges]." << endl;
     int milliSecondsElapsed = getMilliSpan(start);
     double timeA = milliSecondsElapsed / 1000.0;
-    std::cout << "Time for A: " << timeA << " s." << std::endl;
+    std::cout << getTime() << "Time for A: " << timeA << " s." << std::endl;
     //------------------------------------------------------------------------------------------------
 
     ifstream isB( filename2 );
@@ -164,7 +189,7 @@ int main(int argc, char* argv[]) {
     polys.clear();
 
     // Reading WKT file...
-    std::cout << "Reading B polygons..." << std::endl;
+    std::cout << getTime() << "Reading B polygons..." << std::endl;
     do {
       Polygon p;
       CGAL::read_polygon_WKT(isB, p);
@@ -173,7 +198,7 @@ int main(int argc, char* argv[]) {
     } while(isB.good() && !isB.eof());
 
     // Inserting as polyline...
-    std::cout << "Inserting polygons..." << std::endl;
+    std::cout << getTime() << "Inserting polygons..." << std::endl;
     start = getMilliCount();
     edges = 0;
     npolys = polys.size();
@@ -188,11 +213,11 @@ int main(int argc, char* argv[]) {
       insert(arr2, lines);
       edges += points.size();
       if(ipolys % 1000 == 0){
-	std::cout << "Polygon added (" << ipolys << "/" << npolys << ")." << std::endl;
+	std::cout << getTime() << "Polygon added (" << ipolys << "/" << npolys << ")." << std::endl;
       }
       ipolys++;
     }
-    std::cout << "Insertion done! [" << npolys << " polygons|" << edges << " segments]." << std::endl;      
+    std::cout << getTime() << "Insertion done! [" << npolys << " polygons|" << edges << " segments]." << std::endl;      
 
     // Assigning face IDs...
     ArrangementB_2::Face_iterator bit;
@@ -204,14 +229,14 @@ int main(int argc, char* argv[]) {
 	m++;
       }
     }
-    cout << "Done with B [" << edges << " edges]." << endl;
+    std::cout << getTime() << "Done with B [" << edges << " edges]." << endl;
     milliSecondsElapsed = getMilliSpan(start);
     double timeB = milliSecondsElapsed / 1000.0;
-    std::cout << "Time for B: " << timeB << " s." << std::endl;
+    std::cout << getTime() << "Time for B: " << timeB << " s." << std::endl;
     //------------------------------------------------------------------------------------------------
 
     // Compute the overlay of the two arrangements.
-    std::cout << "Computing overlay..." << std::endl;
+    std::cout << getTime() << "Computing overlay..." << std::endl;
     start = getMilliCount();
     ArrangementRes_2 overlay_arr;
     Overlay_traits   overlay_traits;
@@ -220,14 +245,14 @@ int main(int argc, char* argv[]) {
 
     milliSecondsElapsed = getMilliSpan(start);
     double timeO = milliSecondsElapsed / 1000.0;
-    std::cout << "Time for overlay: " << timeO << " s." << std::endl;
+    std::cout << getTime() << "Time for overlay: " << timeO << " s." << std::endl;
     
     if(debug){
       // Go over the faces of the overlaid arrangement and their labels.
       ArrangementRes_2::Face_iterator  res_fit;
       ofstream wkt;
       wkt.open ("faces.wkt");
-      cout << "Saving faces to faces.wkt..." << endl;
+      std::cout << getTime() << "Saving faces to faces.wkt..." << endl;
       int nfaces = 0;
       for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
 	if(!res_fit->is_unbounded()){
@@ -237,7 +262,7 @@ int main(int argc, char* argv[]) {
 	}
       }
       wkt.close();
-      std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+      std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
     }
 
     // Compute an overlay opeartion on the merged arrangement.
@@ -253,19 +278,19 @@ int main(int argc, char* argv[]) {
     //
 
     for(char operation: opearations){
-      std::cout << "Computing overlay operation: ";
+      std::cout << getTime() << "Computing overlay operation: ";
       start = getMilliCount();
 
       switch(operation){
       case 'i':
 	{
 	  string op = "Intersection";
-	  std::cout << op << std::endl;
+	  std::cout << getTime() << op << std::endl;
 	  // Go over the faces of the overlaid arrangement and their labels.
 	  ArrangementRes_2::Face_iterator f;
 	  ofstream wkt;
 	  wkt.open (op + ".wkt");
-	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  std::cout << getTime() << "Saving faces to " + op + ".wkt..." << endl;
 	  int nfaces = 0;
 	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
 	    if(!f->is_unbounded()){
@@ -284,18 +309,18 @@ int main(int argc, char* argv[]) {
 	    }
 	  }
 	  wkt.close();
-	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
 	  break;
 	}
       case 'u':
 	{
 	  string op = "Union";
-	  std::cout << op << std::endl;
+	  std::cout << getTime() << op << std::endl;
 	  // Go over the faces of the overlaid arrangement and their labels.
 	  ArrangementRes_2::Face_iterator f;
 	  ofstream wkt;
 	  wkt.open (op + ".wkt");
-	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  std::cout << getTime() << "Saving faces to " + op + ".wkt..." << endl;
 	  int nfaces = 0;
 	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
 	    if(!f->is_unbounded()){
@@ -314,18 +339,18 @@ int main(int argc, char* argv[]) {
 	    }
 	  }
 	  wkt.close();
-	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
 	  break;
 	}
       case 's':
 	{
 	  string op = "Symmetric";
-	  std::cout << op << std::endl;
+	  std::cout << getTime() << op << std::endl;
 	  // Go over the faces of the overlaid arrangement and their labels.
 	  ArrangementRes_2::Face_iterator f;
 	  ofstream wkt;
 	  wkt.open (op + ".wkt");
-	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  std::cout << getTime() << "Saving faces to " + op + ".wkt..." << endl;
 	  int nfaces = 0;
 	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
 	    if(!f->is_unbounded()){
@@ -344,18 +369,18 @@ int main(int argc, char* argv[]) {
 	    }
 	  }
 	  wkt.close();
-	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
 	  break;
 	}
       case 'a':
 	{
 	  string op = "SymmetricA";
-	  std::cout << op << std::endl;
+	  std::cout << getTime() << op << std::endl;
 	  // Go over the faces of the overlaid arrangement and their labels.
 	  ArrangementRes_2::Face_iterator f;
 	  ofstream wkt;
 	  wkt.open (op + ".wkt");
-	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  std::cout << getTime() << "Saving faces to " + op + ".wkt..." << endl;
 	  int nfaces = 0;
 	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
 	    if(!f->is_unbounded()){
@@ -374,18 +399,18 @@ int main(int argc, char* argv[]) {
 	    }
 	  }
 	  wkt.close();
-	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
 	  break;
 	}
       case 'b':
 	{
 	  string op = "SymmetricB";
-	  std::cout << op << std::endl;
+	  std::cout << getTime() << op << std::endl;
 	  // Go over the faces of the overlaid arrangement and their labels.
 	  ArrangementRes_2::Face_iterator f;
 	  ofstream wkt;
 	  wkt.open (op + ".wkt");
-	  cout << "Saving faces to " + op + ".wkt..." << endl;
+	  std::cout << getTime() << "Saving faces to " + op + ".wkt..." << endl;
 	  int nfaces = 0;
 	  for (f = overlay_arr.faces_begin(); f != overlay_arr.faces_end(); ++f){
 	    if(!f->is_unbounded()){
@@ -404,17 +429,17 @@ int main(int argc, char* argv[]) {
 	    }
 	  }
 	  wkt.close();
-	  std::cout << "Done! " << nfaces << " faces saved." << std::endl;
+	  std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
 	  break;
 	}
       case 0:
-	std::cout << "No overlay operation has been selected." << std::endl;
+	std::cout << getTime() << "No overlay operation has been selected." << std::endl;
 	break;
       }
       milliSecondsElapsed = getMilliSpan(start);
       double timeOp = milliSecondsElapsed / 1000.0;
-      std::cout << "Time for overlay operator: " << timeOp << " s." << std::endl;
-      std::cout << "Total Time: " << timeA + timeB + timeO + timeOp << " s." << std::endl;
+      std::cout << getTime() << "Time for overlay operator: " << timeOp << " s." << std::endl;
+      std::cout << getTime() << "Total Time: " << timeA + timeB + timeO + timeOp << " s." << std::endl;
     }
     
   }
