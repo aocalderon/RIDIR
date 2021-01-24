@@ -75,6 +75,36 @@ object PartitionReader {
     edgesRDD
   }
 
+  def readAndFilterEdges[T](input: String, quadtree: StandardQuadTree[T], label: String,
+    filter: Set[Int])(implicit geofactory: GeometryFactory, spark: SparkSession):
+      RDD[LineString] = {
+    
+    // Reading data...
+    val partitions = quadtree.getLeafZones.size
+    val edgesRDD = spark.read.textFile(input).rdd
+      .mapPartitionsWithIndex{ case(index, lines) =>
+        val reader = new WKTReader(geofactory)
+        lines.map{ line =>
+          val arr = line.split("\t")
+          val wkt = arr(0)
+          val partitionId = arr(1).toInt
+          val polygonId = arr(2).toInt
+          val ringId = arr(3).toInt
+          val edgeId = arr(4).toInt
+          val isHole = arr(5).toBoolean
+          val edge = reader.read(wkt).asInstanceOf[LineString]
+          val data = EdgeData(polygonId, ringId, edgeId, isHole, label)
+          edge.setUserData(data)
+          (partitionId, edge)
+        }.toIterator
+      }
+      .filter{ case(pid, edge) => filter.contains(pid) }
+      .partitionBy(new SimplePartitioner(partitions))
+      .map(_._2)
+
+    edgesRDD
+  }
+
   def filterQuadtree[T](qpath: String, epath: String, filter: String)
     (implicit geofactory: GeometryFactory):
       (StandardQuadTree[T], Map[Int, Cell]) = {
@@ -141,40 +171,6 @@ object PartitionReader {
 
     edgesRDD
   }
-
-  /*
-  def readEdges2(input: String, cells: Map[Int, Cell], label: String, partitions: Int)
-    (implicit geofactory: GeometryFactory, spark: SparkSession):
-      RDD[LineString] = {
-    
-    // Reading data...
-    val edgesRDD = spark.read.textFile(input).rdd
-      .mapPartitionsWithIndex{ case(index, lines) =>
-        val reader = new WKTReader(geofactory)
-        lines.map{ line =>
-          val arr = line.split("\t")
-          val partitionId = arr(1).toInt
-          if(cells.keySet.contains(partitionId)){
-            val wkt = arr(0)
-            val polygonId = arr(2).toInt
-            val ringId = arr(3).toInt
-            val edgeId = arr(4).toInt
-            val isHole = arr(5).toBoolean
-            val edge = reader.read(wkt).asInstanceOf[LineString]
-            val data = EdgeData(polygonId, ringId, edgeId, isHole, label)
-            edge.setUserData(data)
-            (partitionId, edge)
-          } else {
-            (-1, null)
-          }
-        }
-      }.filter(_._1 >= 0)
-      
-    val edgesRDD2 = edgesRDD.partitionBy(new SimplePartitioner(partitions))
-      .map(_._2)
-
-    edgesRDD2
-  }*/
 
   def getLineStrings(polygon: Polygon, polygon_id: Long)
     (implicit geofactory: GeometryFactory): List[LineString] = {
