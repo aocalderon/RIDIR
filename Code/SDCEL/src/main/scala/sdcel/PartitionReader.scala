@@ -75,12 +75,11 @@ object PartitionReader {
     edgesRDD
   }
 
-  def readAndFilterEdges[T](input: String, quadtree: StandardQuadTree[T], label: String,
-    filter: Set[Int])(implicit geofactory: GeometryFactory, spark: SparkSession):
-      RDD[LineString] = {
+  def readAndFilterEdges[T](input: String, label: String, filter: Map[Int, Int])
+    (implicit geofactory: GeometryFactory, spark: SparkSession): RDD[LineString] = {
     
     // Reading data...
-    val partitions = quadtree.getLeafZones.size
+    val partitions = filter.size
     val edgesRDD = spark.read.textFile(input).rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
@@ -98,7 +97,8 @@ object PartitionReader {
           (partitionId, edge)
         }.toIterator
       }
-      .filter{ case(pid, edge) => filter.contains(pid) }
+      .filter{ case(pid, edge) => filter.keySet.contains(pid) }
+      .map{ case(pid, edge) => (filter(pid), edge) }
       .partitionBy(new SimplePartitioner(partitions))
       .map(_._2)
 
