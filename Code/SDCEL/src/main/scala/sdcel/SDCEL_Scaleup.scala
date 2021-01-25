@@ -59,14 +59,17 @@ object SDCEL_Scaleup {
       val pids = buffer.getLines.map(_.split("\t")(1).toInt).toList
       buffer.close
       pids
-    }.flatten.toSet    
+    }.flatten.sorted.zipWithIndex.toMap
+    save("/tmp/partitionsDict.tsv"){
+      filter.toList.sortBy(_._2).map{ case(pid, i) => s"$i\t$pid\n"}
+    }
 
-    val edgesRDDA = readAndFilterEdges(params.input1(), quadtree, "A", filter)
+    val edgesRDDA = readAndFilterEdges(params.input1(), "A", filter)
     edgesRDDA.persist()
     val nEdgesRDDA = edgesRDDA.count()
     log("Edges A: " + nEdgesRDDA)
 
-    val edgesRDDB = readAndFilterEdges(params.input2(), quadtree, "B", filter)
+    val edgesRDDB = readAndFilterEdges(params.input2(), "B", filter)
     edgesRDDB.persist()
     val nEdgesRDDB = edgesRDDB.count()
     log("Edges B: " + nEdgesRDDB)
@@ -84,7 +87,6 @@ object SDCEL_Scaleup {
     //val nB = dcelsB.count()
     log("Getting LDCELs for B... done!")
 
-    
     if(params.debug()){
       save{"/tmp/edgesHA.wkt"}{
         dcelsA.mapPartitionsWithIndex{ (index, dcelsIt) =>
