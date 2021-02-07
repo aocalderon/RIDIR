@@ -14,7 +14,7 @@ import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
-import edu.ucr.dblab.quadtree._
+import edu.ucr.dblab.sdcel.quadtree._
 
 object DCELPartitioner2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -22,18 +22,20 @@ object DCELPartitioner2 {
   def read(input: String)
     (implicit spark: SparkSession, geofactory: GeometryFactory): SpatialRDD[LineString] = {
 
-    val edgesRaw = spark.read.textFile(input).rdd
-      .mapPartitionsWithIndex{ case(index, lines) =>
-        val reader = new WKTReader(geofactory)
-        lines.flatMap{ line =>
-          val geom = reader.read(line.replaceAll("\"", ""))
-            (0 until geom.getNumGeometries).map{ i =>
-              geom.getGeometryN(i).asInstanceOf[Polygon]
-            }
-        }.toIterator
-      }.zipWithIndex.flatMap{ case(polygon, id) =>
-          getLineStrings(polygon, id)
-      }.persist
+    val polys = spark.read.textFile(input).rdd.persist
+    val nPolys = polys.count
+    logger.info(s"# of Polys:\t$nPolys")
+    val edgesRaw = polys.mapPartitionsWithIndex{ case(index, lines) =>
+      val reader = new WKTReader(geofactory)
+      lines.flatMap{ line =>
+        val geom = reader.read(line.replaceAll("\"", ""))
+          (0 until geom.getNumGeometries).map{ i =>
+            geom.getGeometryN(i).asInstanceOf[Polygon]
+          }
+      }.toIterator
+    }.zipWithIndex.flatMap{ case(polygon, id) =>
+        getLineStrings(polygon, id)
+    }.persist
     val edgesRDD = new SpatialRDD[LineString]()
     edgesRDD.setRawSpatialRDD(edgesRaw)
     edgesRDD.analyze()
@@ -58,29 +60,53 @@ object DCELPartitioner2 {
     logger.info("Reading data...")
     val edgesRDDA = read(params.input1())
     val nEdgesRDDA = edgesRDDA.getRawSpatialRDD.count()
+    logger.info(s"# of Edges:\t$nEdgesRDDA")
     val edgesRDDB = read(params.input2())
     val nEdgesRDDB = edgesRDDB.getRawSpatialRDD.count()
+    logger.info(s"# of Edges:\t$nEdgesRDDB")
     val edgesRDD = edgesRDDA.getRawSpatialRDD.rdd  union edgesRDDB.getRawSpatialRDD.rdd
     val nEdgesRDD = nEdgesRDDA + nEdgesRDDB
+    
     val boundary = edgesRDDA.boundary
     boundary.expandToInclude(edgesRDDB.boundary)
     logger.info("Reading data... Done!")
 
     // Partitioning data...
     logger.info("Partitioning data...")
-    val fc = new FractionCalculator()
-    val fraction = fc.getFraction(params.partitions(), nEdgesRDD)
-    val samples = edgesRDD.sample(false, fraction, 42)
-      .map(_.getEnvelopeInternal).collect().toList.asJava
-    val partitioning = new QuadtreePartitioning(samples,
-      boundary, params.partitions())
-    val quadtree = partitioning.getPartitionTree()
-    quadtree.assignPartitionLineage()
-    val partitioner = new QuadTreePartitioner(quadtree)
-    edgesRDDA.spatialPartitioning(partitioner)
-    val edgesA = edgesRDDA.spatialPartitionedRDD.rdd.persist()
-    edgesRDDB.spatialPartitioning(partitioner)
-    val edgesB = edgesRDDB.spatialPartitionedRDD.rdd.persist()
+    val (quadtree, edgesA, edgesB) = if(params.bycapacity()){
+      val definition = new QuadRectangle(boundary)
+      val maxentries = params.maxentries()
+      val maxlevel   = params.maxlevel()
+      val fraction   = params.fraction()
+      val quadtree = new StandardQuadTree[LineString](definition, 0, maxentries, maxlevel)
+      val samples = edgesRDD.sample(false, fraction, 42).collect()
+      samples.foreach{ edge =>
+        quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
+      }
+      quadtree.assignPartitionIds
+      quadtree.assignPartitionLineage
+      val partitioner = new QuadTreePartitioner(quadtree)
+      edgesRDDA.spatialPartitioning(partitioner)
+      val edgesA = edgesRDDA.spatialPartitionedRDD.rdd.persist()
+      edgesRDDB.spatialPartitioning(partitioner)
+      val edgesB = edgesRDDB.spatialPartitionedRDD.rdd.persist()
+      (quadtree, edgesA, edgesB)
+    } else {
+      val fc = new FractionCalculator()
+      val fraction = fc.getFraction(params.partitions(), nEdgesRDD)
+      val samples = edgesRDD.sample(false, fraction, 42)
+        .map(_.getEnvelopeInternal).collect().toList.asJava
+      val partitioning = new QuadtreePartitioning(samples,
+        boundary, params.partitions())
+      val quadtree = partitioning.getPartitionTree()
+      quadtree.assignPartitionLineage()
+      val partitioner = new QuadTreePartitioner(quadtree)
+      edgesRDDA.spatialPartitioning(partitioner)
+      val edgesA = edgesRDDA.spatialPartitionedRDD.rdd.persist()
+      edgesRDDB.spatialPartitioning(partitioner)
+      val edgesB = edgesRDDB.spatialPartitionedRDD.rdd.persist()
+      (quadtree, edgesA, edgesB)
+    }
     logger.info("Partitioning data... Done")
 
     // Saving the boundary...
