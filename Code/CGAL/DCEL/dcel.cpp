@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
       Polyline_2 lines = polyline_construct(points.begin(), points.end());
       insert(arr1, lines);
       edges += points.size();
-      if(ipolys % 100 == 0){
+      if(ipolys % 1000 == 0){
 	std::cout << getTime() << "Polygon added (" << ipolys << "/" << npolys << ")." << std::endl;
       }
       ipolys++;
