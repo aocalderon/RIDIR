@@ -1,7 +1,0 @@
-name := "PrecisionChecker"
-organization := "edu.ucr.dblab"
-version := "0.1"
-scalaVersion in ThisBuild := "2.11.8"
-
-libraryDependencies += "org.locationtech.jts" % "jts-core" % "1.16.0"
-
