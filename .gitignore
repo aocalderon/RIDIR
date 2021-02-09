@@ -8,6 +8,7 @@
 *.Rhistory
 *.o
 *~
+*#
 
 Code/CGAL/DCEL/CMakeFiles/
 Code/CGAL/DCEL/dcel
