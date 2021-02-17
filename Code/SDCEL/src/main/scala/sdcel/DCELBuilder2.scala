@@ -16,25 +16,30 @@ object DCELBuilder2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def getLDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
-      (implicit geofactory: GeometryFactory): RDD[Iterable[Half_edge]] = {
+    (implicit geofactory: GeometryFactory, logger: Logger, spark: SparkSession)
+      : RDD[Iterable[Half_edge]] = {
+
+    val appId = spark.sparkContext.getConf.get("spark.app.id")
 
     edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
+      logger.info(s"$appId|Starting local DCELs...")
       val cell = cells(index).mbr
       val envelope = cell.getEnvelopeInternal
 
       val edges = edgesIt.toVector
-      println(s"Edges: ${edges.size}")
+      logger.info(s"Edges: ${edges.size}")
 
       val (outerEdges, innerEdges) = edges.partition{ edge =>
         cell.intersects(edge)
       }
 
-      println("OuterEdges: " + outerEdges.size)
-      println("InnerEdges: " + innerEdges.size)
+      logger.info("OuterEdges: " + outerEdges.size)
+      logger.info("InnerEdges: " + innerEdges.size)
 
       val outer  = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
       val inner  = SweepLine2.getHedgesInsideCell(innerEdges.toVector)
       val hedges = SweepLine2.merge(outer, inner)
+      logger.info(s"$appId|Ending local DCELs... Done!")
 
       Iterator(hedges)
     }
@@ -48,6 +53,9 @@ object DCELBuilder2 {
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .getOrCreate()
     import spark.implicits._
+    val conf = spark.sparkContext.getConf
+    val appId = conf.get("spark.app.id")
+    implicit val settings = Settings(appId)
     implicit val params = new Params(args)
     val scale = params.scale()
     val model = new PrecisionModel(scale)

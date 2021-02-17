@@ -55,7 +55,7 @@ object SDCEL_Filter {
       val B = iterB.next.map(_.getNexts).flatten.toList
 
       
-      val hedges = merge2(A, B, debug=false, max=(A.size + B.size))
+      val hedges = merge2(A, B)
 
       hedges.toIterator
     }.persist()

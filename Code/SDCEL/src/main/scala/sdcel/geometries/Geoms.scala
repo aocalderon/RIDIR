@@ -5,6 +5,8 @@ import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry}
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
 import com.vividsolutions.jts.geomgraph.Edge
 
+case class Settings(appId: String)
+
 case class HEdge(coords: Array[Coordinate], h: Half_edge) extends Edge(coords)
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,

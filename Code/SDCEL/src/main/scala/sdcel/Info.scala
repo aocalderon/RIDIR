@@ -9,7 +9,8 @@ import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.slf4j.{Logger, LoggerFactory}
 
 import PartitionReader.{readQuadtree, readEdges, envelope2polygon}
-import edu.ucr.dblab.sdcel.SDCEL.{Settings, log, save}
+import edu.ucr.dblab.sdcel.SDCEL.{log, save}
+import edu.ucr.dblab.sdcel.geometries.Settings
 
 object Info {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")

@@ -16,8 +16,6 @@ import DCELMerger2.merge2
 object SDCEL {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
-  case class Settings(appId: String)
-
   def main(args: Array[String]) = {
     // Starting session...
     logger.info("Starting session...")
@@ -111,7 +109,7 @@ object SDCEL {
       val A = iterA.next.map(_.getNexts).flatten.toList
       val B = iterB.next.map(_.getNexts).flatten.toList
 
-      val hedges = merge2(A, B, true)
+      val hedges = merge2(A, B)
 
       hedges.toIterator
     }.persist()

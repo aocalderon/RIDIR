@@ -17,8 +17,8 @@ object DCELMerger2 {
     (implicit geofactory: GeometryFactory): Map[Coordinate, List[Half_edge]] = {
     val pid = org.apache.spark.TaskContext.getPartitionId
 
-    save("/tmp/edgesHedgesA.wkt", hedgesA.map(a => a.wkt + "\t" + a.data + "\n"))
-    save("/tmp/edgesHedgesB.wkt", hedgesB.map(b => b.wkt + "\t" + b.data + "\n"))
+    //save("/tmp/edgesHedgesA.wkt", hedgesA.map(a => a.wkt + "\t" + a.data + "\n"))
+    //save("/tmp/edgesHedgesB.wkt", hedgesB.map(b => b.wkt + "\t" + b.data + "\n"))
     val aList = hedgesA.map{ h =>
       val pts = Array(h.v1, h.v2)
       HEdge(pts, h)
@@ -85,13 +85,13 @@ object DCELMerger2 {
     hedges
   }
 
-  def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false,
-    max: Int = Int.MaxValue)
+  def merge2(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)
     (implicit geofactory: GeometryFactory): Iterable[(Half_edge, String)] = {
     val pid = org.apache.spark.TaskContext.getPartitionId
 
     // Getting intersection between dcel A and B...
     val intersections = intersects(ha, hb)
+    println("Intersections found...")
 
     if(debug){
       val inters_prime = intersections.zipWithIndex
@@ -132,6 +132,7 @@ object DCELMerger2 {
       h_prime.tags = tags.toList
       h_prime
     }.values.toList
+    println("Splits found...")
 
     if(debug)
       save(s"/tmp/edgesS$pid.wkt",
@@ -150,6 +151,7 @@ object DCELMerger2 {
     val hedges = setTwins(hedges_prime).filter(_.twin != null)
     // Extract set of vertices...
     val vertices = hedges.map(_.orig).distinct
+    println("Twins found...")
     
     if(debug){
       save(s"/tmp/edgesV$pid.wkt",
@@ -178,7 +180,6 @@ object DCELMerger2 {
           s"$wkt\t$pid\t$eid\t$wkt1\t$pid1\t$eid1\n"
         }
       )
-
     }
 
     // Group half-edges by the destination vertex (v2)...
@@ -194,6 +195,7 @@ object DCELMerger2 {
         hedges.groupBy(_.v2).values.toList
       }
     }
+    println("Incidents found...")
 
     if(debug)
       save(s"/tmp/edgesI$pid.wkt",
@@ -221,22 +223,25 @@ object DCELMerger2 {
     }.flatten.filter{ h =>
       intersections.keySet.contains(h.v2)
     }.filter(_.data.polygonId != -1).toSet
+    println("H_prime found...")
 
-    println("h_prime: " + h_prime.size)
-    save("/tmp/edgesHprime.wkt",
-      h_prime.map{ h =>
-        h.wkt + "\n"
-      }.toList
-    )
+    if(debug){
+      println("h_prime: " + h_prime.size)
+      save("/tmp/edgesHprime.wkt",
+        h_prime.map{ h =>
+          h.wkt + "\n"
+        }.toList
+      )
+    }
 
-    //
-    val h = groupByNext(h_prime, List.empty[(Half_edge, String)], max)
+    // Group by next...
+    val h = groupByNext(h_prime, List.empty[(Half_edge, String)])
       .filter(_._2 != "")
+    println("Done!")
 
-    println("H size: " + h.size)
 
-
-    if(debug)
+    if(debug){
+      println("H size: " + h.size)
       save(s"/tmp/edgesH_prime$pid.wkt",
         h.map{ case(h, tag) =>
           val wkt = h.getNextsAsWKT
@@ -244,18 +249,20 @@ object DCELMerger2 {
           s"$wkt\t$tag\n"
         }.toList
       )
+    }
 
     h
   }
 
   @tailrec
-  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)],
-    max: Int = Int.MaxValue): List[(Half_edge, String)] = {
+  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)])
+      : List[(Half_edge, String)] = {
 
-    if(hs.isEmpty /*|| hs.size <= 11*/) {
+    if(hs.isEmpty) {
+      println("Group by next recursion has finished.")
       r
     } else {
-      println(hs.size)
+      println("Group by next iteration.  Size of hs: " + hs.size)
       val h = hs.head
 
       val tag = if(h.data.label == "A")
@@ -265,7 +272,6 @@ object DCELMerger2 {
       val tag2 = List(h.label, h.next.label)
         .filterNot(t => t == "A" || t == "B").sorted.mkString(" ")
 
-      h.MAX_RECURSION = max
       val nexts = h.getNexts
       if(nexts.isEmpty){
         r :+ ((h, "Error"))
@@ -273,108 +279,9 @@ object DCELMerger2 {
         val hs_new = hs -- h.getNexts.toSet
         val r_new  = r :+ ((h, tag2))
 
-        groupByNext(hs_new, r_new, max)
+        groupByNext(hs_new, r_new)
       }
     }
-  }
-
-  def merge(ha: List[Half_edge], hb: List[Half_edge])
-    (implicit geofactory: GeometryFactory): Iterable[(String, Half_edge)] = {
-
-    val intersections = intersects(ha, hb)
-
-    /* Debug */
-    save("/tmp/edgesI.wkt", 
-      intersections.keys.map{ c =>
-        val wkt = geofactory.createPoint(c).toText
-
-        s"$wkt\n"
-      }.toList
-    )
-    /* Debug */
-
-    val splits = intersections.map{ case(p, hList) =>
-      hList.map(h => (h,p))
-    }.flatten.groupBy(_._1).mapValues(_.map(_._2))
-      .map{ case(k, v) =>
-        val h = List(k)
-        v.toList.foldLeft(h){ case(h, c) => h.map(_.split(c)).flatten}
-      }.flatten.groupBy(h => (h.v1, h.v2)).mapValues{ h =>
-      val tags = h.map(h => Tag(h.data.label, h.data.polygonId))
-      val h_prime = h.head
-      h_prime.tags = tags.toList
-      h_prime
-    }.values.toList
-
-    val hedges = setTwins(splits)
-
-    /* Debug */
-    save("/tmp/edgesT.wkt", 
-      (hedges ++ hedges.map(_.twin).filter(_.data.polygonId < 0)).map{ h =>
-        val wkt = h.edge.toText
-        val lab = h.label
-
-        s"$wkt\t$lab\t${h.prev}\n"
-      }
-    )
-    /* Debug */
-
-    // Take half-edges and their twins...
-    val incidents = (hedges ++ hedges.map(_.twin).filter(_.data.polygonId < 0))
-      .groupBy(_.v2) // Group them by the destination vertex...
-      .filter(_._2.size > 1) // Remove isolate vertices
-                             // (those with less than 2 incident half-edges)
-    .values.toList
-
-    /* Debug */
-    save("/tmp/edgesIn.wkt", 
-      incidents.map{ case(hedges) =>
-        val labs = hedges.map(_.label).sorted
-        val wkt = geofactory.createMultiLineString(hedges.map(_.edge).toArray).toText
-
-        val As = labs.filter(_.contains("A")).size
-        val Bs = labs.filter(_.contains("B")).size
-        val ls = hedges.map(_.data.label)
-        val AB = ls.exists(_ == "A") && ls.exists(_ == "B")
-        val ABs = labs.filter(l => l.contains("A") && l.contains("B")).size
-
-        s"$wkt\t${labs.size}\t$As\t$Bs\t$AB\t$ABs\t${labs.mkString(", ")}\n"
-      }.toList
-    )
-    /* Debug */
-
-    // At each vertex, get their incident half-edges...
-    val hh = incidents.map{ hList =>
-      // Sort them by angle...
-      val hs = hList.sortBy(- _.angleAtDest)
-      // Add first incident to comple the sequence...
-      val hs_prime = hs :+ hs.head
-      // zip and tail will pair each half-edge with its next one...
-      hs_prime.zip(hs_prime.tail).foreach{ case(h1, h2) =>
-        h1.next = h2.twin
-        h2.twin.prev = h1
-      }
-
-      hs
-    }.flatten.filter(_.data.polygonId >= 0)
-
-    //hh.map(h => (h, h.tags, h.updateTags)).foreach{println}
-    /* Debug */
-    save("/tmp/edgesHH.wkt", 
-      hh.map{ hedge =>
-        val wkt = hedge.edge.toText
-
-        s"$wkt\t${hedge.tags}\t${hedge.updateTags}\t${hedge.prev}\n"
-      }.toList
-    )
-    /* Debug */
-
-    val h = hh.map{ h =>
-      h.tags = h.updateTags
-      (h.getTag, h)
-    }.groupBy(_._1).values.map(_.head)
-
-    h
   }
 
   def save(name: String, content: Seq[String]): Unit = {
