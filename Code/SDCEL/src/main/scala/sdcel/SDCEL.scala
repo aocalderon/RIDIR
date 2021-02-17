@@ -110,9 +110,10 @@ object SDCEL {
       val B = iterB.next.map(_.getNexts).flatten.toList
 
       val hedges = merge2(A, B)
+      log("End of local merge...")
 
       hedges.toIterator
-    }.persist()
+    }
     val nSDcel = sdcel.count()
     log("Merging DCELs... done!")
 
