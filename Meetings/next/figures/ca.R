@@ -9,7 +9,7 @@ getParams <- function(command){
   return(paste(params, collapse = " "))
 }
 
-log = enframe(readLines("capacity.txt"))
+log = enframe(readLines("ca.txt"))
 spark = log %>% filter(grepl(value, pattern = "SparkSubmit ")) %>% 
   separate(value, into = c("time", "duration", "appId", "command"), sep = "\\|")
 spark$params = spark$command %>% map(getParams)
@@ -56,13 +56,12 @@ bar2 = ggplot(data = cgal, aes(x = capacity, y = time)) +
   scale_y_continuous(breaks = seq(0, 800, 200)) + coord_cartesian(ylim = c(0, 800)) + 
   labs(x="", y="", title="") 
 plot_grid(bar1, bar2, align = "h", ncol = 2, rel_widths = c(6/10, 1/10))
-ggsave(paste0("capacity.pdf"), width = 12, height = 8, device = "pdf")
+ggsave(paste0("ca.pdf"), width = 12, height = 8, device = "pdf")
 
-# sample = c("1", "2", "5", "10", "25", "50")
-# p = ggplot(data = data %>% filter(capacity %in% sample), aes(x = capacity, y = time)) +
-#   geom_bar(stat="identity", position=position_dodge(width = 0.75), width = 0.7) + 
-#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
-#   labs(x="Max Capacity per Cell", y="Time [sec]", title="Execution time by maximum capacity per cell") 
-# plot(p)
-# 
-# ggsave(paste0("capacity_sample.pdf"), width = 12, height = 8, device = "pdf")
+sample = c("1", "2", "5", "10", "25", "50")
+p = ggplot(data = data %>% filter(capacity %in% sample), aes(x = capacity, y = time)) +
+ geom_bar(stat="identity", position=position_dodge(width = 0.75), width = 0.7) + 
+ theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+ labs(x="Max Capacity per Cell", y="Time [sec]", title="Execution time by maximum capacity per cell") 
+
+ggsave(paste0("ca_sample.pdf"), width = 12, height = 8, device = "pdf")
