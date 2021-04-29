@@ -74,6 +74,7 @@ object DCELPartitioner2 {
     // Partitioning data...
     logger.info("Partitioning data...")
     val (quadtree, edgesA, edgesB) = if(params.bycapacity()){
+      logger.info("Partition by capacity (${params.maxentries()})")
       val definition = new QuadRectangle(boundary)
       val maxentries = params.maxentries()
       val maxlevel   = params.maxlevel()
@@ -92,8 +93,10 @@ object DCELPartitioner2 {
       val edgesB = edgesRDDB.spatialPartitionedRDD.rdd.persist()
       (quadtree, edgesA, edgesB)
     } else {
+      logger.info(s"Partition by number (${params.partitions()})")
       val fc = new FractionCalculator()
       val fraction = fc.getFraction(params.partitions(), nEdgesRDD)
+      logger.info(s"Fraction: ${fraction}")
       val samples = edgesRDD.sample(false, fraction, 42)
         .map(_.getEnvelopeInternal).collect().toList.asJava
       val partitioning = new QuadtreePartitioning(samples,
@@ -108,6 +111,7 @@ object DCELPartitioner2 {
       (quadtree, edgesA, edgesB)
     }
     logger.info("Partitioning data... Done")
+    logger.info(s"Number of partitions: ${quadtree.getLeafZones.size}")
 
     // Saving the boundary...
     save{params.epath()}{

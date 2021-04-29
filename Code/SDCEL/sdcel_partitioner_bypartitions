@@ -5,6 +5,7 @@ INPUT2=$2
 HDFS_PATH=$3
 LOCAL_PATH=$4
 PARTITIONS=$5
+SCALE=$6
 
 EXECUTORS=12
 CORES=9
@@ -32,4 +33,4 @@ spark-submit \
     --bpath $HDFS_PATH/edgesB \
     --qpath $LOCAL_PATH/quadtree.wkt \
     --epath $LOCAL_PATH/boundary.wkt \
-    --scale 10e14
+    --scale $SCALE

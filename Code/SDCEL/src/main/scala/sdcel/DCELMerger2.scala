@@ -91,7 +91,6 @@ object DCELMerger2 {
 
     // Getting intersection between dcel A and B...
     val intersections = intersects(ha, hb)
-    println("Intersections found...")
 
     if(debug){
       val inters_prime = intersections.zipWithIndex
@@ -132,7 +131,6 @@ object DCELMerger2 {
       h_prime.tags = tags.toList
       h_prime
     }.values.toList
-    println("Splits found...")
 
     if(debug)
       save(s"/tmp/edgesS$pid.wkt",
@@ -151,7 +149,6 @@ object DCELMerger2 {
     val hedges = setTwins(hedges_prime).filter(_.twin != null)
     // Extract set of vertices...
     val vertices = hedges.map(_.orig).distinct
-    println("Twins found...")
     
     if(debug){
       save(s"/tmp/edgesV$pid.wkt",
@@ -195,7 +192,6 @@ object DCELMerger2 {
         hedges.groupBy(_.v2).values.toList
       }
     }
-    println("Incidents found...")
 
     if(debug)
       save(s"/tmp/edgesI$pid.wkt",
@@ -223,7 +219,6 @@ object DCELMerger2 {
     }.flatten.filter{ h =>
       intersections.keySet.contains(h.v2)
     }.filter(_.data.polygonId != -1).toSet
-    println("H_prime found...")
 
     if(debug){
       println("h_prime: " + h_prime.size)
@@ -237,8 +232,6 @@ object DCELMerger2 {
     // Group by next...
     val h = groupByNext(h_prime, List.empty[(Half_edge, String)])
       .filter(_._2 != "")
-    println("Done!")
-
 
     if(debug){
       println("H size: " + h.size)
@@ -259,10 +252,8 @@ object DCELMerger2 {
       : List[(Half_edge, String)] = {
 
     if(hs.isEmpty) {
-      println("Group by next recursion has finished.")
       r
     } else {
-      println("Group by next iteration.  Size of hs: " + hs.size)
       val h = hs.head
 
       val tag = if(h.data.label == "A")
