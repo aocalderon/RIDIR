@@ -13,16 +13,28 @@ import PartitionReader._
 import DCELBuilder2.getLDCELs
 import DCELMerger2.merge2
 
+import Utils._
+
 object SDCEL_Scaleup {
-  implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
-
-  case class Settings(appId: String)
-
   def main(args: Array[String]) = {
     // Starting session...
     logger.info("Starting session...")
     implicit val params = new Params(args)
-    val model = new PrecisionModel(params.scale())
+    implicit val spark = SparkSession.builder()
+        .config("spark.serializer",classOf[KryoSerializer].getName)
+        .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
+        .getOrCreate()
+    import spark.implicits._
+    val conf = spark.sparkContext.getConf
+    val appId = conf.get("spark.app.id")
+    val command = System.getProperty("sun.java.command")
+    implicit val settings = Settings(
+      tolerance = params.tolerance(),
+      debug = params.debug(),
+      appId = appId
+    )    
+    log(command)
+    val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
 
     val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
@@ -38,16 +50,6 @@ object SDCEL_Scaleup {
     logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
     logger.info(s"Number of partitions: ${cells.size}")
 
-    implicit val spark = SparkSession.builder()
-        .config("spark.serializer",classOf[KryoSerializer].getName)
-        .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-        .getOrCreate()
-    import spark.implicits._
-    val conf = spark.sparkContext.getConf
-    val appId = conf.get("spark.app.id")
-    implicit val settings = Settings(appId)
-    val command = System.getProperty("sun.java.command")
-    log(command)
     log("Starting session... Done!")
 
     // Reading data...
@@ -151,19 +153,4 @@ object SDCEL_Scaleup {
 
     spark.close
   }  
-
-  def log(msg: String)(implicit logger: Logger, settings: Settings): Unit = {
-    logger.info(s"${settings.appId}|$msg")
-  }
-
-  def save(filename: String)(content: Seq[String]): Unit = {
-    val start = clocktime
-    val f = new java.io.PrintWriter(filename)
-    f.write(content.mkString(""))
-    f.close
-    val end = clocktime
-    val time = "%.2f".format((end - start) / 1000.0)
-    logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
-  }
-  private def clocktime = System.currentTimeMillis()
 }

@@ -5,17 +5,15 @@ import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry}
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
 import com.vividsolutions.jts.geomgraph.Edge
 
-case class Settings(appId: String)
+case class Tag(label: String, pid: Int){
+  override def toString: String = s"$label$pid"
+}
 
 case class HEdge(coords: Array[Coordinate], h: Half_edge) extends Edge(coords)
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
   label: String = "A") {
   override def toString: String = s"${label}$polygonId\t$ringId\t$edgeId\t$isHole"
-}
-
-case class Tag(label: String, pid: Int){
-  override def toString: String = s"$label$pid"
 }
 
 case class Half_edge(edge: LineString) {
@@ -69,7 +67,6 @@ case class Half_edge(edge: LineString) {
   }
 
   def getPolygon(implicit geofactory: GeometryFactory): Polygon = {
-
     try {
       val coords = (v1 +: getNexts.map{_.v2}).toArray
       if(coords.size >= 4){
