@@ -17,7 +17,6 @@
 \definecolor{light-gray}{gray}{0.9}
 
 \begin{document}
-\begin{tabular}{@{}c@{}}
 \begin{tikzpicture}
     \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
     \tikzstyle{node2}=[draw,scale=0.4,shape=circle,color=red,fill=red]    
@@ -76,5 +75,4 @@
     \draw[barbarrow, color=red] (L) -- (K);
 
 \end{tikzpicture}
-\end{tabular}
 \end{document}

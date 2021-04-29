@@ -94,84 +94,35 @@
   \end{frame}
 }
 
-\section*{Experiments}
+\begin{frame}{DCEL construction in CGAL...}{Incremental algorithm \footnote{\tiny{D. Halperin, “Arrangements,” in Handbook of discrete and computational geometry, USA: CRC Press, Inc., 1997, pp. 389–412.}}}
 
-%% Performance using small dataset...
-\subsection{Compared to sequential tool}
+Given a collection $\mathcal{L}={l_1,...,l_i}$ of $i$ lines, we assume the DCEL $\mathcal{A}(\mathcal{L}_i)$ \\
+To add next line $l_{i+1}$ do:
+    \begin{enumerate}
+        \item Find \textit{zone} (set of faces intersected) for $l_{i+1}$.
+        \item Find point $p$ of intersection between $l_{i+1}$ and an edge of $\mathcal{A}(\mathcal{L}_i)$; split that edge.
+        \item Walk along $l_{i+1}$ from $p$ to left updating $\mathcal{A}(\mathcal{L}_i)$.
+        \item Walk along $l_{i+1}$ from $p$ to right completing the construction.
+    \end{enumerate}
+\end{frame}
 
-\begin{frame}{Compared to sequential tool}
+\begin{frame}{DCEL construction in CGAL...}
+    \centering 
+    \includegraphics[trim=5.8cm 12cm 7cm 11cm, clip, width=0.9\textwidth]{figures/incremental.pdf}
+\end{frame}
+
+\begin{frame}{DCEL construction in CGAL...}
+    \centering 
+    \includegraphics[trim=3cm 13.5cm 13.5cm 12cm, clip, width=0.9\textwidth]{figures/walk.pdf}
+\end{frame}
+
+\begin{frame}{DCEL merge (overlay) in CGAL...}
     \begin{itemize}
-        \item Using California Census Dataset.
-        \item Inputs: the census-track administrative levels for California in 2000 and 2010.
-        \item Output: the merged DCEL for both inputs.
-        \item Measuring time of construction for the final merged DCEL (including the DCELs for both layers and the merge).
-        \item Compare the proposal (SDCEL) using different values of maximum number per partition and the sequential alternative (CGAL).
+        \item I did not find a specific reference to the merge (overlay) from two DCEL in CGAL, but...
+        \item Checking github repository \href{https://tinyurl.com/5cc7w7t3}{Arr\_overlay\_2.h}, it seems the strategy is to add the edges from the smaller DCEL to the bigger one using the incremental construction. 
     \end{itemize}
+
 \end{frame}
 
-\begin{frame}{Compared to sequential tool}{General}
-    \centering 
-    \includegraphics[width=0.9\textwidth]{figures/ca.pdf}
-\end{frame}
-
-\begin{frame}{Compared to sequential tool}{Focus on}
-    \centering 
-    \includegraphics[width=0.9\textwidth]{figures/ca_sample.pdf}
-\end{frame}
-
-%% Performance using large dataset...
-\subsection{Compared to 1-core execution}
-
-\begin{frame}{Compared to 1-core execution}
-    \begin{itemize}
-        \item Using GADM Dataset.
-        \item Inputs: Administrative levels for the whole world.  Level 0 (Countries) and Level 1 (States) disaggregated by individual polygons.
-        \item Output: the merged DCEL for both inputs.
-        \item Measuring time of construction for the final merged DCEL (including the DCELs for both layers and the merge).
-        \item Compare SDCEL using different number of partitions and SDCEL running on just 1 core.
-    \end{itemize}
-\end{frame}
-\begin{frame}{Compared to 1-core execution}{General}
-    \centering 
-    \includegraphics[width=0.9\textwidth]{figures/gadm.pdf}
-\end{frame}
-\begin{frame}{Compared to 1-core execution}{Focus on}
-    \centering 
-    \includegraphics[width=0.9\textwidth]{figures/gadm_sample.pdf}
-\end{frame}
-
-%% Speed up analysis...
-\subsection{Speed up Analysis}
-
-\begin{frame}{Speed up Analysis}
-    \begin{itemize}
-        \item Using GADM Dataset.
-        \item Inputs: Administrative levels for the whole world.  Level 0 (Countries) and Level 1 (States) disaggregated by individual polygons.
-        \item Output: the merged DCEL for both inputs.
-        \item Measuring time of construction for the final merged DCEL.
-        \item Compare SDCEL using different number of nodes (each node with 9 cores).
-    \end{itemize}
-\end{frame}
-\begin{frame}{Speed up Analysis}
-    \centering 
-    \includegraphics[width=0.9\textwidth]{figures/speedup.pdf}
-\end{frame}
-
-%% Scale up analysis...
-\subsection{Scale up Analysis}
-
-\begin{frame}{Scale up Analysis}
-    \begin{itemize}
-        \item Using GADM Dataset.
-        \item Inputs: 4 sections of the previous GADM dataset spatially dividing its extension in approximate the same number of polygons and edges. 
-        \item Output: the merged DCEL for both inputs to each section.
-        \item Measuring time of construction for the final merged DCEL.
-        \item Compare SDCEL increasing the size of the inputs (1 section, 2 sections, 3 section and 4 sections) and also increasing number of available nodes.
-    \end{itemize}
-\end{frame}
-\begin{frame}{Scale up Analysis}
-    \centering 
-    \includegraphics[width=0.9\textwidth]{figures/scaleup.pdf}
-\end{frame}
 
 \end{document}
