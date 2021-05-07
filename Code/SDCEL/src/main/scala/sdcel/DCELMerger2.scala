@@ -31,7 +31,7 @@ object DCELMerger2 {
     
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
-    lineIntersector.setPrecisionModel(new PrecisionModel(1e13))
+    //lineIntersector.setPrecisionModel(new PrecisionModel(1e3))
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
     sweepline.computeIntersections(aList, bList, segmentIntersector)

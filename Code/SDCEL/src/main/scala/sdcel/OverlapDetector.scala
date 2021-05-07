@@ -14,6 +14,8 @@ import org.geotools.geometry.jts.GeometryClipper
 import edu.ucr.dblab.sdcel.PartitionReader.readQuadtree
 import edu.ucr.dblab.sdcel.quadtree._
 
+import Utils.Settings
+
 object OverlapDetector {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
@@ -23,6 +25,7 @@ object OverlapDetector {
     val params = new Params(args)
     val model = new PrecisionModel(params.scale())
     implicit val geofactory = new GeometryFactory(model)
+    implicit val settings = Settings()
 
     implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)

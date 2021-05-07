@@ -12,18 +12,26 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.rdd.RDD
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import scala.language.postfixOps
+
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 
+import Utils._
+
 object PartitionReader {
 
-  def readQuadtree[T](qpath: String, epath: String)(implicit geofactory: GeometryFactory):
+  def readQuadtree[T](qpath: String, epath: String)
+    (implicit geofactory: GeometryFactory, settings: Settings):
       (StandardQuadTree[T], Map[Int, Cell]) = {
 
     // Reading quadtree...
     val quadtreeBuff = Source.fromFile(qpath)
     // lineages are the first column in the file...
     val lineages = quadtreeBuff.getLines.map(_.split("\t").head).toList
+    if(settings.debug){
+      println(s"Is lineages empty?: ${lineages.isEmpty}")
+      lineages.foreach(println)
+    }
     quadtreeBuff.close
 
     // Reading boundary...

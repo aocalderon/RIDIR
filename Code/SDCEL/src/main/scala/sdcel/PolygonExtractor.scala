@@ -20,6 +20,8 @@ import edu.ucr.dblab.sdcel.PolygonChecker2._
 import edu.ucr.dblab.sdcel.geometries.Cell
 import edu.ucr.dblab.sdcel.quadtree.Quadtree
 
+import Utils.Settings
+
 object PolygonExtractor {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
  
@@ -30,6 +32,7 @@ object PolygonExtractor {
     implicit val params = new Params(args)
     val model = new PrecisionModel(SCALE)
     implicit val geofactory = new GeometryFactory(model)
+    implicit val settings = Settings()
     
     val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
 

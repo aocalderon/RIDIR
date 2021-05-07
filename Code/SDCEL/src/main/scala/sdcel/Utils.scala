@@ -2,8 +2,12 @@ package edu.ucr.dblab.sdcel
 
 import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate, Polygon, Point}
-import org.apache.spark.sql.SparkSession
+
+import org.apache.spark.sql.{SparkSession, Dataset, Row, functions}
+import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
+
+import ch.cern.sparkmeasure.TaskMetrics
 
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -15,9 +19,10 @@ object Utils {
   case class Settings(
     tolerance: Double = 1e-3,
     debug: Boolean = false,
+    local: Boolean = false,
     seed: Long = 42L,
     appId: String = "0",
-    storageLevel: StorageLevel = StorageLevel.MEMORY_ONLY_2
+    persistance: StorageLevel = StorageLevel.MEMORY_ONLY_2
   ){
     val scale = 1 / tolerance
   }
@@ -36,6 +41,14 @@ object Utils {
     logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
   }
   private def clocktime = System.currentTimeMillis()
+
+  def getPhaseMetrics(metrics: TaskMetrics, phaseName: String)(implicit settings: Settings): Dataset[Row] = {
+    metrics.createTaskMetricsDF()
+      .withColumn("appId", functions.lit(settings.appId))
+      .withColumn("phaseName", functions.lit(phaseName))
+      .select("host", "index", "launchTime", "finishTime", "duration", "appId", "phaseName")
+      .orderBy("launchTime")
+  }
 
 }
 

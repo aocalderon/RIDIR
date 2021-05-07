@@ -1,10 +1,11 @@
 #!/bin/bash
 
+PS=(2 4 6 8 10 12 14)
 for n in $(seq 1 $1)
 do
-    for P in 2 4 6 8 10 12 14
+    for P in "${PS[@]}"
     do
-	echo "Run $n ./sdcel gadm/edges_P${P}K /home/acald013/Test/edges_P${P}K 1e8"
-	#./sdcel gadm/edges_P${P}K /home/acald013/Test/edges_P${P}K 1e8
+	echo "Run $n ./sdcel gadm/edges_P${P}K /home/acald013/Test/edges_P${P}K 1e-8"
+	./sdcel gadm/edges_P${P}K /home/acald013/Test/edges_P${P}K 1e-8
     done
 done

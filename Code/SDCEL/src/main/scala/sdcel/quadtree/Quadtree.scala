@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Envelope
 
 object Quadtree {  
   def create[T](boundary: Envelope, lineages: List[String]): StandardQuadTree[T] = {
-    val quadtree = if(lineages.isEmpty){
+    val quadtree = if(lineages.size < 4){  // If quadtree has only one level, we just return a simplre quadtree with the boundary...
       new StandardQuadTree[T](new QuadRectangle(boundary), 0, 1, 0)
     } else {
       val maxLevel = lineages.map(_.size).max

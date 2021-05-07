@@ -2,17 +2,23 @@ package edu.ucr.dblab.sdcel
 
 import com.vividsolutions.jts.geom.LineString
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
+
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.{SparkSession, SaveMode}
+import org.apache.spark.storage.StorageLevel
 import org.apache.spark.TaskContext
+
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.slf4j.{Logger, LoggerFactory}
+import ch.cern.sparkmeasure.TaskMetrics
+
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
+
 import PartitionReader._
 import DCELBuilder2.getLDCELs
 import DCELMerger2.merge2
-
+import DCELOverlay2._
 import Utils._
 
 object SDCEL {
@@ -21,20 +27,30 @@ object SDCEL {
     logger.info("Starting session...")
     implicit val params = new Params(args)
     implicit val spark = SparkSession.builder()
-        .config("spark.serializer",classOf[KryoSerializer].getName)
-        .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-        .getOrCreate()
+      .config("spark.serializer",classOf[KryoSerializer].getName)
+      .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
+      .getOrCreate()
     import spark.implicits._
+    //val metrics = TaskMetrics(spark)
     val conf = spark.sparkContext.getConf
     val appId = conf.get("spark.app.id")
     implicit val settings = Settings(
       tolerance = params.tolerance(),
       debug = params.debug(),
+      local = params.local(),
+      persistance = params.persistance() match {
+        case 0 => StorageLevel.NONE
+        case 1 => StorageLevel.MEMORY_ONLY
+        case 2 => StorageLevel.MEMORY_ONLY_SER
+        case 3 => StorageLevel.MEMORY_ONLY_2
+        case 4 => StorageLevel.MEMORY_ONLY_SER_2
+      },
       appId = appId
     )
     val command = System.getProperty("sun.java.command")
     log(command)
 
+    logger.info(s"Scale: ${settings.scale}")
     val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
 
@@ -48,34 +64,31 @@ object SDCEL {
         s"$wkt\t$id\t$lineage\n"
       }.toList
     }
-
-    logger.info(s"Number of partitions: ${quadtree.getLeafZones.size()}")
     logger.info(s"Number of partitions: ${cells.size}")
-
     log("Starting session... Done!")
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A")
-    //edgesRDDA.persist()
-    //val nEdgesRDDA = edgesRDDA.count()
-    //println("Edges A: " + nEdgesRDDA)
+    edgesRDDA.persist(settings.persistance)
+    val nEdgesRDDA = edgesRDDA.count()
+    println("Edges A: " + nEdgesRDDA)
 
     val edgesRDDB = readEdges(params.input2(), quadtree, "B")
-    //edgesRDDB.persist()
-    //val nEdgesRDDB = edgesRDDB.count()
-    //println("Edges B: " + nEdgesRDDB)
+    edgesRDDB.persist(settings.persistance)
+    val nEdgesRDDB = edgesRDDB.count()
+    println("Edges B: " + nEdgesRDDB)
 
     log("Reading data... Done!")
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells)
-    //dcelsA.persist()
-    //val nA = dcelsA.count()
+    dcelsA.persist(settings.persistance)
+    val nA = dcelsA.count()
     log("Getting LDCELs for A... done!")
 
     val dcelsB = getLDCELs(edgesRDDB, cells)
-    //dcelsB.persist()
-    //val nB = dcelsB.count()
+    dcelsB.persist(settings.persistance)
+    val nB = dcelsB.count()
     log("Getting LDCELs for B... done!")
     
     if(params.debug()){
@@ -115,7 +128,7 @@ object SDCEL {
       val hedges = merge2(A, B)
 
       hedges.toIterator
-    }
+    }.cache
     val nSDcel = sdcel.count()
     log("Merging DCELs... done!")
 
@@ -133,9 +146,23 @@ object SDCEL {
       sdcel.map{ case(h, tag) =>
           val wkt = h.getPolygon.toText
           s"$wkt"
-      }.toDS.write
-        .format("text").mode(SaveMode.Overwrite).save("gadm/output")
+      }.toDS.write.mode("overwrite").text("gadm/output")
       logger.info("Saving results at gadm/output.")
+    }
+
+    // Running overlay operations...
+    val faces = sdcel.map{ case(hedge, tag) =>
+      val boundary = hedge.getPolygon
+      FaceViz(boundary, tag)
+    }
+
+    if(params.overlay()){
+      val output_path = params.output()
+      overlapOp(faces, intersection, s"${output_path}/edgesInt")
+      overlapOp(faces, difference,   s"${output_path}/edgesDif")
+      overlapOp(faces, union,        s"${output_path}/edgesUni")
+      overlapOp(faces, differenceA,  s"${output_path}/edgesDiA")
+      overlapOp(faces, differenceB,  s"${output_path}/edgesDiB")
     }
 
     spark.close
