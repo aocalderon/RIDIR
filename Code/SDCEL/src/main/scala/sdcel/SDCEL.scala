@@ -31,7 +31,6 @@ object SDCEL {
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
     import spark.implicits._
-    //val metrics = TaskMetrics(spark)
     val conf = spark.sparkContext.getConf
     val appId = conf.get("spark.app.id")
     implicit val settings = Settings(
@@ -56,7 +55,8 @@ object SDCEL {
 
     val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
 
-    save{"/tmp/edgesCells.wkt"}{
+    val qtag = params.quadtree().split("/").filter(_.contains("edges")).head.split("_")(1)
+    save{s"/tmp/edgesCells_${qtag}.tsv"}{
       cells.values.map{ cell =>
         val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
         val id = cell.id
@@ -64,31 +64,44 @@ object SDCEL {
         s"$wkt\t$id\t$lineage\n"
       }.toList
     }
-    logger.info(s"Number of partitions: ${cells.size}")
+    logger.info(s"${appId}|npartitions=${cells.size}")
     log("Starting session... Done!")
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A")
-    edgesRDDA.persist(settings.persistance)
     val nEdgesRDDA = edgesRDDA.count()
-    println("Edges A: " + nEdgesRDDA)
+    logger.info(s"${appId}|nEdgesA=${nEdgesRDDA}")
+
+    save(s"/tmp/cellsA_${qtag}.tsv"){
+      edgesRDDA.mapPartitionsWithIndex{ (pid, it) =>
+        val n = it.size
+        val wkt = cells(pid).wkt
+        val r = s"$pid\t$n\t$wkt\n"
+        Iterator(r)
+      }.collect
+    }
 
     val edgesRDDB = readEdges(params.input2(), quadtree, "B")
-    edgesRDDB.persist(settings.persistance)
     val nEdgesRDDB = edgesRDDB.count()
-    println("Edges B: " + nEdgesRDDB)
-
+    logger.info(s"${appId}|nEdgesB=${nEdgesRDDB}")
     log("Reading data... Done!")
+
+    save(s"/tmp/cellsB_${qtag}.tsv"){
+      edgesRDDB.mapPartitionsWithIndex{ (pid, it) =>
+        val n = it.size
+        val wkt = cells(pid).wkt
+        val r = s"$pid\t$n\t$wkt\n"
+        Iterator(r)
+      }.collect
+    }
 
     // Getting LDCELs...
     val dcelsA = getLDCELs(edgesRDDA, cells)
-    dcelsA.persist(settings.persistance)
-    val nA = dcelsA.count()
+    //val nA = dcelsA.count()
     log("Getting LDCELs for A... done!")
 
     val dcelsB = getLDCELs(edgesRDDB, cells)
-    dcelsB.persist(settings.persistance)
-    val nB = dcelsB.count()
+    //val nB = dcelsB.count()
     log("Getting LDCELs for B... done!")
     
     if(params.debug()){
@@ -128,7 +141,7 @@ object SDCEL {
       val hedges = merge2(A, B)
 
       hedges.toIterator
-    }.cache
+    }
     val nSDcel = sdcel.count()
     log("Merging DCELs... done!")
 
