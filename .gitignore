@@ -13,6 +13,12 @@
 Code/CGAL/DCEL/CMakeFiles/
 Code/CGAL/DCEL/dcel
 
+Meetings/next/figures/CC/concurrencycheccker/target/*
+Meetings/next/figures/CC/concurrencycheccker/project/*
+Meetings/next/figures/CC/concurrencycheccker/.ensime
+Meetings/next/figures/CC/concurrencycheccker/.ensime_cache/*
+Meetings/next/figures/CC/concurrencycheccker/metastore_db/*
+
 Code/Areal/target/*
 Code/Areal/project/*
 Code/Areal/.ensime
