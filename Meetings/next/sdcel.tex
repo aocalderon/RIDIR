@@ -94,35 +94,29 @@
   \end{frame}
 }
 
-\begin{frame}{DCEL construction in CGAL...}{Incremental algorithm \footnote{\tiny{D. Halperin, “Arrangements,” in Handbook of discrete and computational geometry, USA: CRC Press, Inc., 1997, pp. 389–412.}}}
 
-Given a collection $\mathcal{L}={l_1,...,l_i}$ of $i$ lines, we assume the DCEL $\mathcal{A}(\mathcal{L}_i)$ \\
-To add next line $l_{i+1}$ do:
-    \begin{enumerate}
-        \item Find \textit{zone} (set of faces intersected) for $l_{i+1}$.
-        \item Find point $p$ of intersection between $l_{i+1}$ and an edge of $\mathcal{A}(\mathcal{L}_i)$; split that edge.
-        \item Walk along $l_{i+1}$ from $p$ to left updating $\mathcal{A}(\mathcal{L}_i)$.
-        \item Walk along $l_{i+1}$ from $p$ to right completing the construction.
-    \end{enumerate}
-\end{frame}
-
-\begin{frame}{DCEL construction in CGAL...}
+\begin{frame}{Evaluation Plan...}
     \centering 
-    \includegraphics[trim=5.8cm 12cm 7cm 11cm, clip, width=0.9\textwidth]{figures/incremental.pdf}
+    \includegraphics[trim=0cm 2cm 0cm 0cm, clip, width=1\textwidth]{figures/ep}
 \end{frame}
 
-\begin{frame}{DCEL construction in CGAL...}
+\begin{frame}{Other papers...}
     \centering 
-    \includegraphics[trim=3cm 13.5cm 13.5cm 12cm, clip, width=0.9\textwidth]{figures/walk.pdf}
+    \includegraphics[width=1\textwidth]{figures/papers}
 \end{frame}
 
-\begin{frame}{DCEL merge (overlay) in CGAL...}
-    \begin{itemize}
-        \item I did not find a specific reference to the merge (overlay) from two DCEL in CGAL, but...
-        \item Checking github repository \href{https://tinyurl.com/5cc7w7t3}{Arr\_overlay\_2.h}, it seems the strategy is to add the edges from the smaller DCEL to the bigger one using the incremental construction. 
-    \end{itemize}
-
+\begin{frame}{Generator...}
+    \centering 
+    \includegraphics[width=1\textwidth]{figures/voronoi}
 \end{frame}
 
+\begin{frame}{Balance issues...}{Running few partitions}
+    \centering [n = 6304] \\
+    \includegraphics[width=0.6\textwidth]{figures/plots/cores468}
+\end{frame}
+\begin{frame}{Balance issues...}{Running many partitions}
+    \centering [n = 44389] \\
+    \includegraphics[width=0.6\textwidth]{figures/plots/cores488}
+\end{frame}
 
 \end{document}

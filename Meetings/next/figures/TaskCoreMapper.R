@@ -1,8 +1,8 @@
 require(tidyverse)
 require(lubridate)
 
-id = "0729"
-log = read_tsv(paste0("mapper",id,".tsv"))
+id = "488"
+log = read_tsv(paste0("tasks/mapper",id,".tsv"))
 
 minTime = min(as.numeric(log$launchTime))
 timeline = log %>%
@@ -10,7 +10,7 @@ timeline = log %>%
   mutate(start = as_datetime(launchTime/1000), end = as_datetime(finishTime/1000)) %>%
   select(coreId, host, taskId, start, end, duration) 
 
-t = timeline %>% filter(duration > 25)
+t = timeline %>% filter(duration > 1)
 
 p =ggplot(t, aes(x=end, y=coreId)) + 
   geom_segment(aes(x=start, xend=end, y=coreId, yend=coreId, color = host), size=2) +
@@ -19,4 +19,4 @@ p =ggplot(t, aes(x=end, y=coreId)) +
   facet_wrap(~host, ncol = 1) + 
   theme(legend.position = "none")
 p
-ggsave(paste0("TaskCoreMapper",id,".pdf"), width = 12, height = 20, device = "pdf")
+ggsave(paste0("tasks/TaskCoreMapper",id,".pdf"), width = 12, height = 20, device = "pdf")
