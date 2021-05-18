@@ -18,8 +18,8 @@ class Task:
     def toString(self):
         return("{}\t{}\t{}\t{}\t{}\n".format(host, taskId, launch, finish, duration))
 
-id = "0729"
-filename = "/home/and/RIDIR/Meetings/next/figures/sdcel{}.tsv".format(id)
+id = "490"
+filename = "/home/and/RIDIR/Meetings/next/figures/tasks/{}.tsv".format(id)
 cores = 9
 
 def getAvailableCore(T, time, taskId):
@@ -35,11 +35,12 @@ with open(filename) as f:
     next(f)
     for line in f:
         arr = line.split("\t")
-        taskId = int(arr[3])
-        launch = int(arr[4])
-        finish = int(arr[5])
-        duration = int(arr[6])
-        host = arr[9]
+        taskId = int(arr[0])
+        host = arr[1]
+        launch = int(arr[2])
+        finish = int(arr[3])
+        duration = int(arr[4])
+        #print(launch)
         task = Task(host, taskId, launch, finish, duration)
         tasks_prime.append(task)
 start = min(tasks_prime, key = lambda task: task.launch).launch    
@@ -49,7 +50,7 @@ for t in tasks_prime:
     tasks.append(task)
 length = max(tasks, key = lambda  task: task.finish).finish
 
-f = open("/home/and/RIDIR/Meetings/next/figures/mapper{}.tsv".format(id), "w")
+f = open("/home/and/RIDIR/Meetings/next/figures/tasks/mapper{}.tsv".format(id), "w")
 f.write("coreId\thost\ttaskId\tlaunchTime\tfinishTime\tduration\n")
 
 hosts = ["mr-01","mr-02","mr-03","mr-04","mr-05","mr-06","mr-07","mr-08","mr-09","mr-10","mr-11","mr-12"]

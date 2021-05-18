@@ -29,7 +29,7 @@ tasks = read_tsv("tasks.tsv") %>%
   inner_join(spark, by = c("appId")) %>%
   select(appId, node, index, launchTime, duration)
 
-test = tasks %>% filter(appId == "application_1615435002078_0468") %>% 
+test = tasks %>% filter(appId == "application_1615435002078_0490") %>% 
   mutate(start = as.numeric(as.POSIXct(as_datetime(launchTime))) * 1000) %>%
   mutate(end = start + duration) 
 

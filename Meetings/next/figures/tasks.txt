@@ -313,3 +313,18 @@ Run 2 ./sdcel gadm/edges_P14K /home/acald013/Test/edges_P14K 1e-8
 2021-05-10 18:10:42,834|448409|application_1615435002078_0488|Getting LDCELs for A... done!
 2021-05-10 18:10:43,157|448732|application_1615435002078_0488|Getting LDCELs for B... done!
 2021-05-10 18:13:23,998|609573|application_1615435002078_0488|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P14K /home/acald013/Test/edges_P14K 1e-8
+2021-05-17 10:05:00,264|0|Starting session...
+2021-05-17 10:05:14,049|13785|application_1615435002078_0490|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=30g --conf spark.locality.wait=100ms --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P14K/edgesA --input2 gadm/edges_P14K/edgesB --quadtree /home/acald013/Test/edges_P14K/quadtree.wkt --boundary /home/acald013/Test/edges_P14K/boundary.wkt --tolerance 1e-8
+2021-05-17 10:05:14,049|13785|Scale: 1.0E8
+2021-05-17 10:05:15,639|15375|Saved /tmp/edgesCells_P14K.tsv in 0.09s [44389 records].
+2021-05-17 10:05:15,639|15375|application_1615435002078_0490|npartitions=44389
+2021-05-17 10:05:15,639|15375|application_1615435002078_0490|Starting session... Done!
+2021-05-17 10:07:12,114|131850|application_1615435002078_0490|nEdgesA=32794587
+2021-05-17 10:08:53,143|232879|Saved /tmp/cellsA_P14K.tsv in 0.08s [44389 records].
+2021-05-17 10:10:48,492|348228|application_1615435002078_0490|nEdgesB=37717198
+2021-05-17 10:10:48,492|348228|application_1615435002078_0490|Reading data... Done!
+2021-05-17 10:12:28,347|448083|Saved /tmp/cellsB_P14K.tsv in 0.07s [44389 records].
+2021-05-17 10:12:28,705|448441|application_1615435002078_0490|Getting LDCELs for A... done!
+2021-05-17 10:12:29,014|448750|application_1615435002078_0490|Getting LDCELs for B... done!
+2021-05-17 10:15:10,323|610059|application_1615435002078_0490|Merging DCELs... done!
