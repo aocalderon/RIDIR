@@ -3,6 +3,8 @@
 HDFS_PATH=$1
 LOCAL_PATH=$2
 TOLERANCE=$3
+WAIT=$4
+WAIT=${WAIT:-"100ms"}
 
 EXECUTORS=12
 CORES=9
@@ -17,9 +19,7 @@ MASTER=yarn
 spark-submit \
     --files $LOG_FILE \
     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
-    --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics \
-    --conf spark.sparkmeasure.printToStdout=false \
-    --conf spark.sparkmeasure.outputFilename="/tmp/metrics_$(date +%s).json" \
+    --conf spark.locality.wait=$WAIT \
     --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \

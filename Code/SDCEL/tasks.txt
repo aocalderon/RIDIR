@@ -103,3 +103,213 @@ Run 1 ./sdcel gadm/edges_P14K /home/acald013/Test/edges_P14K 1e-8
 2021-05-10 12:17:55,075|454394|application_1615435002078_0474|Getting LDCELs for A... done!
 2021-05-10 12:17:55,393|454712|application_1615435002078_0474|Getting LDCELs for B... done!
 2021-05-10 12:20:38,446|617765|application_1615435002078_0474|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P2K /home/acald013/Test/edges_P2K 1e-8
+2021-05-10 16:44:35,410|0|Starting session...
+2021-05-10 16:44:49,021|13611|application_1615435002078_0475|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620690272.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P2K/edgesA --input2 gadm/edges_P2K/edgesB --quadtree /home/acald013/Test/edges_P2K/quadtree.wkt --boundary /home/acald013/Test/edges_P2K/boundary.wkt --tolerance 1e-8
+2021-05-10 16:44:49,021|13611|Scale: 1.0E8
+2021-05-10 16:44:49,444|14034|Saved /tmp/edgesCells_P2K.tsv in 0.01s [6304 records].
+2021-05-10 16:44:49,445|14035|application_1615435002078_0475|npartitions=6304
+2021-05-10 16:44:49,445|14035|application_1615435002078_0475|Starting session... Done!
+2021-05-10 16:45:15,270|39860|application_1615435002078_0475|nEdgesA=32705781
+2021-05-10 16:45:19,415|44005|Saved /tmp/cellsA_P2K.tsv in 0.01s [6304 records].
+2021-05-10 16:45:34,072|58662|application_1615435002078_0475|nEdgesB=37614504
+2021-05-10 16:45:34,072|58662|application_1615435002078_0475|Reading data... Done!
+2021-05-10 16:45:37,814|62404|Saved /tmp/cellsB_P2K.tsv in 0.01s [6304 records].
+2021-05-10 16:45:37,874|62464|application_1615435002078_0475|Getting LDCELs for A... done!
+2021-05-10 16:45:37,919|62509|application_1615435002078_0475|Getting LDCELs for B... done!
+2021-05-10 16:49:48,158|312748|application_1615435002078_0475|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P4K /home/acald013/Test/edges_P4K 1e-8
+2021-05-10 16:49:52,127|0|Starting session...
+2021-05-10 16:50:05,590|13463|application_1615435002078_0476|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620690589.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P4K/edgesA --input2 gadm/edges_P4K/edgesB --quadtree /home/acald013/Test/edges_P4K/quadtree.wkt --boundary /home/acald013/Test/edges_P4K/boundary.wkt --tolerance 1e-8
+2021-05-10 16:50:05,590|13463|Scale: 1.0E8
+2021-05-10 16:50:06,265|14138|Saved /tmp/edgesCells_P4K.tsv in 0.02s [12430 records].
+2021-05-10 16:50:06,265|14138|application_1615435002078_0476|npartitions=12430
+2021-05-10 16:50:06,265|14138|application_1615435002078_0476|Starting session... Done!
+2021-05-10 16:50:40,354|48227|application_1615435002078_0476|nEdgesA=32724586
+2021-05-10 16:50:50,394|58267|Saved /tmp/cellsA_P4K.tsv in 0.01s [12430 records].
+2021-05-10 16:51:11,400|79273|application_1615435002078_0476|nEdgesB=37636713
+2021-05-10 16:51:11,400|79273|application_1615435002078_0476|Reading data... Done!
+2021-05-10 16:51:20,447|88320|Saved /tmp/cellsB_P4K.tsv in 0.02s [12430 records].
+2021-05-10 16:51:20,557|88430|application_1615435002078_0476|Getting LDCELs for A... done!
+2021-05-10 16:51:20,647|88520|application_1615435002078_0476|Getting LDCELs for B... done!
+2021-05-10 16:53:22,389|210262|application_1615435002078_0476|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P6K /home/acald013/Test/edges_P6K 1e-8
+2021-05-10 16:53:26,399|0|Starting session...
+2021-05-10 16:53:40,382|13983|application_1615435002078_0477|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620690803.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P6K/edgesA --input2 gadm/edges_P6K/edgesB --quadtree /home/acald013/Test/edges_P6K/quadtree.wkt --boundary /home/acald013/Test/edges_P6K/boundary.wkt --tolerance 1e-8
+2021-05-10 16:53:40,382|13983|Scale: 1.0E8
+2021-05-10 16:53:41,196|14797|Saved /tmp/edgesCells_P6K.tsv in 0.04s [18868 records].
+2021-05-10 16:53:41,197|14798|application_1615435002078_0477|npartitions=18868
+2021-05-10 16:53:41,197|14798|application_1615435002078_0477|Starting session... Done!
+2021-05-10 16:54:24,531|58132|application_1615435002078_0477|nEdgesA=32741735
+2021-05-10 16:54:45,112|78713|Saved /tmp/cellsA_P6K.tsv in 0.04s [18868 records].
+2021-05-10 16:55:34,542|128143|application_1615435002078_0477|nEdgesB=37656474
+2021-05-10 16:55:34,542|128143|application_1615435002078_0477|Reading data... Done!
+2021-05-10 16:55:54,682|148283|Saved /tmp/cellsB_P6K.tsv in 0.03s [18868 records].
+2021-05-10 16:55:54,829|148430|application_1615435002078_0477|Getting LDCELs for A... done!
+2021-05-10 16:55:54,967|148568|application_1615435002078_0477|Getting LDCELs for B... done!
+2021-05-10 16:57:57,826|271427|application_1615435002078_0477|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P8K /home/acald013/Test/edges_P8K 1e-8
+2021-05-10 16:58:01,677|0|Starting session...
+2021-05-10 16:58:15,371|13694|application_1615435002078_0478|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620691079.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P8K/edgesA --input2 gadm/edges_P8K/edgesB --quadtree /home/acald013/Test/edges_P8K/quadtree.wkt --boundary /home/acald013/Test/edges_P8K/boundary.wkt --tolerance 1e-8
+2021-05-10 16:58:15,372|13695|Scale: 1.0E8
+2021-05-10 16:58:16,393|14716|Saved /tmp/edgesCells_P8K.tsv in 0.05s [25087 records].
+2021-05-10 16:58:16,394|14717|application_1615435002078_0478|npartitions=25087
+2021-05-10 16:58:16,394|14717|application_1615435002078_0478|Starting session... Done!
+2021-05-10 16:59:25,993|84316|application_1615435002078_0478|nEdgesA=32755730
+2021-05-10 17:00:00,706|119029|Saved /tmp/cellsA_P8K.tsv in 0.05s [25087 records].
+2021-05-10 17:01:02,381|180704|application_1615435002078_0478|nEdgesB=37672702
+2021-05-10 17:01:02,382|180705|application_1615435002078_0478|Reading data... Done!
+2021-05-10 17:01:37,280|215603|Saved /tmp/cellsB_P8K.tsv in 0.04s [25087 records].
+2021-05-10 17:01:37,483|215806|application_1615435002078_0478|Getting LDCELs for A... done!
+2021-05-10 17:01:37,669|215992|application_1615435002078_0478|Getting LDCELs for B... done!
+2021-05-10 17:03:32,343|330666|application_1615435002078_0478|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P10K /home/acald013/Test/edges_P10K 1e-8
+2021-05-10 17:03:36,581|0|Starting session...
+2021-05-10 17:03:50,601|14020|application_1615435002078_0479|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620691413.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P10K/edgesA --input2 gadm/edges_P10K/edgesB --quadtree /home/acald013/Test/edges_P10K/quadtree.wkt --boundary /home/acald013/Test/edges_P10K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:03:50,601|14020|Scale: 1.0E8
+2021-05-10 17:03:51,894|15313|Saved /tmp/edgesCells_P10K.tsv in 0.06s [31540 records].
+2021-05-10 17:03:51,895|15314|application_1615435002078_0479|npartitions=31540
+2021-05-10 17:03:51,895|15314|application_1615435002078_0479|Starting session... Done!
+2021-05-10 17:05:17,414|100833|application_1615435002078_0479|nEdgesA=32769523
+2021-05-10 17:06:09,636|153055|Saved /tmp/cellsA_P10K.tsv in 0.07s [31540 records].
+2021-05-10 17:07:30,345|233764|application_1615435002078_0479|nEdgesB=37688622
+2021-05-10 17:07:30,345|233764|application_1615435002078_0479|Reading data... Done!
+2021-05-10 17:08:21,971|285390|Saved /tmp/cellsB_P10K.tsv in 0.09s [31540 records].
+2021-05-10 17:08:22,244|285663|application_1615435002078_0479|Getting LDCELs for A... done!
+2021-05-10 17:08:22,462|285881|application_1615435002078_0479|Getting LDCELs for B... done!
+2021-05-10 17:10:26,319|409738|application_1615435002078_0479|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P12K /home/acald013/Test/edges_P12K 1e-8
+2021-05-10 17:10:30,858|0|Starting session...
+2021-05-10 17:10:45,043|14185|application_1615435002078_0480|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620691827.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P12K/edgesA --input2 gadm/edges_P12K/edgesB --quadtree /home/acald013/Test/edges_P12K/quadtree.wkt --boundary /home/acald013/Test/edges_P12K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:10:45,043|14185|Scale: 1.0E8
+2021-05-10 17:10:46,545|15687|Saved /tmp/edgesCells_P12K.tsv in 0.08s [38164 records].
+2021-05-10 17:10:46,546|15688|application_1615435002078_0480|npartitions=38164
+2021-05-10 17:10:46,546|15688|application_1615435002078_0480|Starting session... Done!
+2021-05-10 17:12:26,704|115846|application_1615435002078_0480|nEdgesA=32782441
+2021-05-10 17:13:42,825|191967|Saved /tmp/cellsA_P12K.tsv in 0.06s [38164 records].
+2021-05-10 17:15:14,359|283501|application_1615435002078_0480|nEdgesB=37703330
+2021-05-10 17:15:14,359|283501|application_1615435002078_0480|Reading data... Done!
+2021-05-10 17:16:29,496|358638|Saved /tmp/cellsB_P12K.tsv in 0.07s [38164 records].
+2021-05-10 17:16:29,839|358981|application_1615435002078_0480|Getting LDCELs for A... done!
+2021-05-10 17:16:30,128|359270|application_1615435002078_0480|Getting LDCELs for B... done!
+2021-05-10 17:18:53,834|502976|application_1615435002078_0480|Merging DCELs... done!
+Run 1 ./sdcel gadm/edges_P14K /home/acald013/Test/edges_P14K 1e-8
+2021-05-10 17:18:58,192|0|Starting session...
+2021-05-10 17:19:12,378|14186|application_1615435002078_0481|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620692335.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P14K/edgesA --input2 gadm/edges_P14K/edgesB --quadtree /home/acald013/Test/edges_P14K/quadtree.wkt --boundary /home/acald013/Test/edges_P14K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:19:12,379|14187|Scale: 1.0E8
+2021-05-10 17:19:13,939|15747|Saved /tmp/edgesCells_P14K.tsv in 0.09s [44389 records].
+2021-05-10 17:19:13,939|15747|application_1615435002078_0481|npartitions=44389
+2021-05-10 17:19:13,939|15747|application_1615435002078_0481|Starting session... Done!
+2021-05-10 17:21:05,962|127770|application_1615435002078_0481|nEdgesA=32794587
+2021-05-10 17:22:47,714|229522|Saved /tmp/cellsA_P14K.tsv in 0.07s [44389 records].
+2021-05-10 17:24:33,980|335788|application_1615435002078_0481|nEdgesB=37717198
+2021-05-10 17:24:33,980|335788|application_1615435002078_0481|Reading data... Done!
+2021-05-10 17:26:13,920|435728|Saved /tmp/cellsB_P14K.tsv in 0.08s [44389 records].
+2021-05-10 17:26:14,273|436081|application_1615435002078_0481|Getting LDCELs for A... done!
+2021-05-10 17:26:14,585|436393|application_1615435002078_0481|Getting LDCELs for B... done!
+2021-05-10 17:28:57,144|598952|application_1615435002078_0481|Merging DCELs... done!
+Run 2 ./sdcel gadm/edges_P2K /home/acald013/Test/edges_P2K 1e-8
+2021-05-10 17:29:01,783|0|Starting session...
+2021-05-10 17:29:15,667|13884|application_1615435002078_0482|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620692938.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P2K/edgesA --input2 gadm/edges_P2K/edgesB --quadtree /home/acald013/Test/edges_P2K/quadtree.wkt --boundary /home/acald013/Test/edges_P2K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:29:15,668|13885|Scale: 1.0E8
+2021-05-10 17:29:16,093|14310|Saved /tmp/edgesCells_P2K.tsv in 0.01s [6304 records].
+2021-05-10 17:29:16,093|14310|application_1615435002078_0482|npartitions=6304
+2021-05-10 17:29:16,094|14311|application_1615435002078_0482|Starting session... Done!
+2021-05-10 17:29:42,586|40803|application_1615435002078_0482|nEdgesA=32705781
+2021-05-10 17:29:46,955|45172|Saved /tmp/cellsA_P2K.tsv in 0.01s [6304 records].
+2021-05-10 17:30:00,180|58397|application_1615435002078_0482|nEdgesB=37614504
+2021-05-10 17:30:00,181|58398|application_1615435002078_0482|Reading data... Done!
+2021-05-10 17:30:03,845|62062|Saved /tmp/cellsB_P2K.tsv in 0.01s [6304 records].
+2021-05-10 17:30:03,906|62123|application_1615435002078_0482|Getting LDCELs for A... done!
+2021-05-10 17:30:03,950|62167|application_1615435002078_0482|Getting LDCELs for B... done!
+2021-05-10 17:33:45,119|283336|application_1615435002078_0482|Merging DCELs... done!
+Run 2 ./sdcel gadm/edges_P4K /home/acald013/Test/edges_P4K 1e-8
+2021-05-10 17:33:49,022|0|Starting session...
+2021-05-10 17:34:02,776|13754|application_1615435002078_0483|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620693226.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P4K/edgesA --input2 gadm/edges_P4K/edgesB --quadtree /home/acald013/Test/edges_P4K/quadtree.wkt --boundary /home/acald013/Test/edges_P4K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:34:02,777|13755|Scale: 1.0E8
+2021-05-10 17:34:03,458|14436|Saved /tmp/edgesCells_P4K.tsv in 0.02s [12430 records].
+2021-05-10 17:34:03,458|14436|application_1615435002078_0483|npartitions=12430
+2021-05-10 17:34:03,458|14436|application_1615435002078_0483|Starting session... Done!
+2021-05-10 17:34:37,668|48646|application_1615435002078_0483|nEdgesA=32724586
+2021-05-10 17:34:47,957|58935|Saved /tmp/cellsA_P4K.tsv in 0.02s [12430 records].
+2021-05-10 17:35:09,835|80813|application_1615435002078_0483|nEdgesB=37636713
+2021-05-10 17:35:09,835|80813|application_1615435002078_0483|Reading data... Done!
+2021-05-10 17:35:19,502|90480|Saved /tmp/cellsB_P4K.tsv in 0.02s [12430 records].
+2021-05-10 17:35:19,607|90585|application_1615435002078_0483|Getting LDCELs for A... done!
+2021-05-10 17:35:19,694|90672|application_1615435002078_0483|Getting LDCELs for B... done!
+2021-05-10 17:37:42,009|232987|application_1615435002078_0483|Merging DCELs... done!
+Run 2 ./sdcel gadm/edges_P6K /home/acald013/Test/edges_P6K 1e-8
+2021-05-10 17:37:46,048|0|Starting session...
+2021-05-10 17:38:00,226|14178|application_1615435002078_0484|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620693463.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P6K/edgesA --input2 gadm/edges_P6K/edgesB --quadtree /home/acald013/Test/edges_P6K/quadtree.wkt --boundary /home/acald013/Test/edges_P6K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:38:00,227|14179|Scale: 1.0E8
+2021-05-10 17:38:01,108|15060|Saved /tmp/edgesCells_P6K.tsv in 0.04s [18868 records].
+2021-05-10 17:38:01,109|15061|application_1615435002078_0484|npartitions=18868
+2021-05-10 17:38:01,109|15061|application_1615435002078_0484|Starting session... Done!
+2021-05-10 17:38:44,048|58000|application_1615435002078_0484|nEdgesA=32741735
+2021-05-10 17:39:04,569|78521|Saved /tmp/cellsA_P6K.tsv in 0.03s [18868 records].
+2021-05-10 17:39:52,915|126867|application_1615435002078_0484|nEdgesB=37656474
+2021-05-10 17:39:52,915|126867|application_1615435002078_0484|Reading data... Done!
+2021-05-10 17:40:13,023|146975|Saved /tmp/cellsB_P6K.tsv in 0.03s [18868 records].
+2021-05-10 17:40:13,173|147125|application_1615435002078_0484|Getting LDCELs for A... done!
+2021-05-10 17:40:13,309|147261|application_1615435002078_0484|Getting LDCELs for B... done!
+2021-05-10 17:42:13,370|267322|application_1615435002078_0484|Merging DCELs... done!
+Run 2 ./sdcel gadm/edges_P8K /home/acald013/Test/edges_P8K 1e-8
+2021-05-10 17:42:17,528|0|Starting session...
+2021-05-10 17:42:31,981|14453|application_1615435002078_0485|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620693734.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P8K/edgesA --input2 gadm/edges_P8K/edgesB --quadtree /home/acald013/Test/edges_P8K/quadtree.wkt --boundary /home/acald013/Test/edges_P8K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:42:31,981|14453|Scale: 1.0E8
+2021-05-10 17:42:33,037|15509|Saved /tmp/edgesCells_P8K.tsv in 0.05s [25087 records].
+2021-05-10 17:42:33,038|15510|application_1615435002078_0485|npartitions=25087
+2021-05-10 17:42:33,038|15510|application_1615435002078_0485|Starting session... Done!
+2021-05-10 17:43:42,882|85354|application_1615435002078_0485|nEdgesA=32755730
+2021-05-10 17:44:16,680|119152|Saved /tmp/cellsA_P8K.tsv in 0.04s [25087 records].
+2021-05-10 17:45:19,189|181661|application_1615435002078_0485|nEdgesB=37672702
+2021-05-10 17:45:19,189|181661|application_1615435002078_0485|Reading data... Done!
+2021-05-10 17:45:53,588|216060|Saved /tmp/cellsB_P8K.tsv in 0.04s [25087 records].
+2021-05-10 17:45:53,807|216279|application_1615435002078_0485|Getting LDCELs for A... done!
+2021-05-10 17:45:53,994|216466|application_1615435002078_0485|Getting LDCELs for B... done!
+2021-05-10 17:47:54,148|336620|application_1615435002078_0485|Merging DCELs... done!
+Run 2 ./sdcel gadm/edges_P10K /home/acald013/Test/edges_P10K 1e-8
+2021-05-10 17:47:58,271|0|Starting session...
+2021-05-10 17:48:12,252|13981|application_1615435002078_0486|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620694075.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P10K/edgesA --input2 gadm/edges_P10K/edgesB --quadtree /home/acald013/Test/edges_P10K/quadtree.wkt --boundary /home/acald013/Test/edges_P10K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:48:12,252|13981|Scale: 1.0E8
+2021-05-10 17:48:13,456|15185|Saved /tmp/edgesCells_P10K.tsv in 0.04s [31540 records].
+2021-05-10 17:48:13,457|15186|application_1615435002078_0486|npartitions=31540
+2021-05-10 17:48:13,457|15186|application_1615435002078_0486|Starting session... Done!
+2021-05-10 17:49:40,195|101924|application_1615435002078_0486|nEdgesA=32769523
+2021-05-10 17:50:32,085|153814|Saved /tmp/cellsA_P10K.tsv in 0.06s [31540 records].
+2021-05-10 17:51:49,703|231432|application_1615435002078_0486|nEdgesB=37688622
+2021-05-10 17:51:49,703|231432|application_1615435002078_0486|Reading data... Done!
+2021-05-10 17:52:41,143|282872|Saved /tmp/cellsB_P10K.tsv in 0.06s [31540 records].
+2021-05-10 17:52:41,388|283117|application_1615435002078_0486|Getting LDCELs for A... done!
+2021-05-10 17:52:41,616|283345|application_1615435002078_0486|Getting LDCELs for B... done!
+2021-05-10 17:54:44,321|406050|application_1615435002078_0486|Merging DCELs... done!
+Run 2 ./sdcel gadm/edges_P12K /home/acald013/Test/edges_P12K 1e-8
+2021-05-10 17:54:48,810|0|Starting session...
+2021-05-10 17:55:02,946|14136|application_1615435002078_0487|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620694485.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P12K/edgesA --input2 gadm/edges_P12K/edgesB --quadtree /home/acald013/Test/edges_P12K/quadtree.wkt --boundary /home/acald013/Test/edges_P12K/boundary.wkt --tolerance 1e-8
+2021-05-10 17:55:02,946|14136|Scale: 1.0E8
+2021-05-10 17:55:04,411|15601|Saved /tmp/edgesCells_P12K.tsv in 0.08s [38164 records].
+2021-05-10 17:55:04,412|15602|application_1615435002078_0487|npartitions=38164
+2021-05-10 17:55:04,412|15602|application_1615435002078_0487|Starting session... Done!
+2021-05-10 17:56:42,324|113514|application_1615435002078_0487|nEdgesA=32782441
+2021-05-10 17:57:59,282|190472|Saved /tmp/cellsA_P12K.tsv in 0.06s [38164 records].
+2021-05-10 17:59:32,023|283213|application_1615435002078_0487|nEdgesB=37703330
+2021-05-10 17:59:32,023|283213|application_1615435002078_0487|Reading data... Done!
+2021-05-10 18:00:47,811|359001|Saved /tmp/cellsB_P12K.tsv in 0.07s [38164 records].
+2021-05-10 18:00:48,127|359317|application_1615435002078_0487|Getting LDCELs for A... done!
+2021-05-10 18:00:48,399|359589|application_1615435002078_0487|Getting LDCELs for B... done!
+2021-05-10 18:03:09,714|500904|application_1615435002078_0487|Merging DCELs... done!
+Run 2 ./sdcel gadm/edges_P14K /home/acald013/Test/edges_P14K 1e-8
+2021-05-10 18:03:14,425|0|Starting session...
+2021-05-10 18:03:28,608|14183|application_1615435002078_0488|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.sparkmeasure.outputFilename=/tmp/metrics_1620694991.json --conf spark.driver.memory=30g --conf spark.extraListeners=ch.cern.sparkmeasure.FlightRecorderStageMetrics --conf spark.sparkmeasure.printToStdout=false --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 15g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/edges_P14K/edgesA --input2 gadm/edges_P14K/edgesB --quadtree /home/acald013/Test/edges_P14K/quadtree.wkt --boundary /home/acald013/Test/edges_P14K/boundary.wkt --tolerance 1e-8
+2021-05-10 18:03:28,608|14183|Scale: 1.0E8
+2021-05-10 18:03:30,269|15844|Saved /tmp/edgesCells_P14K.tsv in 0.10s [44389 records].
+2021-05-10 18:03:30,269|15844|application_1615435002078_0488|npartitions=44389
+2021-05-10 18:03:30,270|15845|application_1615435002078_0488|Starting session... Done!
+2021-05-10 18:05:28,723|134298|application_1615435002078_0488|nEdgesA=32794587
+2021-05-10 18:07:09,899|235474|Saved /tmp/cellsA_P14K.tsv in 0.07s [44389 records].
+2021-05-10 18:09:03,044|348619|application_1615435002078_0488|nEdgesB=37717198
+2021-05-10 18:09:03,045|348620|application_1615435002078_0488|Reading data... Done!
+2021-05-10 18:10:42,486|448061|Saved /tmp/cellsB_P14K.tsv in 0.09s [44389 records].
+2021-05-10 18:10:42,834|448409|application_1615435002078_0488|Getting LDCELs for A... done!
+2021-05-10 18:10:43,157|448732|application_1615435002078_0488|Getting LDCELs for B... done!
+2021-05-10 18:13:23,998|609573|application_1615435002078_0488|Merging DCELs... done!

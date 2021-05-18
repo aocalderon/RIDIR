@@ -68,7 +68,7 @@ object SDCEL {
     log("Starting session... Done!")
 
     // Reading data...
-    val edgesRDDA = readEdges(params.input1(), quadtree, "A")
+    val edgesRDDA = readEdges(params.input1(), quadtree, "A").cache
     val nEdgesRDDA = edgesRDDA.count()
     logger.info(s"${appId}|nEdgesA=${nEdgesRDDA}")
 
@@ -81,7 +81,7 @@ object SDCEL {
       }.collect
     }
 
-    val edgesRDDB = readEdges(params.input2(), quadtree, "B")
+    val edgesRDDB = readEdges(params.input2(), quadtree, "B").cache
     val nEdgesRDDB = edgesRDDB.count()
     logger.info(s"${appId}|nEdgesB=${nEdgesRDDB}")
     log("Reading data... Done!")
