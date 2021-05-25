@@ -15,6 +15,7 @@ import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
 import edu.ucr.dblab.sdcel.quadtree._
+import Utils._
 
 object DCELPartitioner2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
@@ -52,7 +53,16 @@ object DCELPartitioner2 {
         .getOrCreate()
     import spark.implicits._
     val params = new Params(args)
-    val model = new PrecisionModel(params.scale())
+    implicit val settings = Settings(
+      tolerance = params.tolerance(),
+      debug = params.debug(),
+      local = params.local(),
+      appId = spark.sparkContext.applicationId
+    )
+    val command = System.getProperty("sun.java.command")
+    logger.info(command)
+    logger.info(s"Scale: ${settings.scale}")
+    val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
     logger.info("Starting session... Done!")
 
@@ -74,13 +84,14 @@ object DCELPartitioner2 {
     // Partitioning data...
     logger.info("Partitioning data...")
     val (quadtree, edgesA, edgesB) = if(params.bycapacity()){
-      logger.info("Partition by capacity (${params.maxentries()})")
+      logger.info(s"Partition by capacity (${params.maxentries()})")
       val definition = new QuadRectangle(boundary)
       val maxentries = params.maxentries()
       val maxlevel   = params.maxlevel()
       val fraction   = params.fraction()
       val quadtree = new StandardQuadTree[LineString](definition, 0, maxentries, maxlevel)
       val samples = edgesRDD.sample(false, fraction, 42).collect()
+      logger.info(s"Sample size: ${samples.size}")
       samples.foreach{ edge =>
         quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
       }

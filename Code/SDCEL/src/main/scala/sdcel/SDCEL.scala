@@ -55,7 +55,7 @@ object SDCEL {
 
     val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
 
-    val qtag = params.quadtree().split("/").filter(_.contains("edges")).head.split("_")(1)
+    val qtag = params.qtag()
     save{s"/tmp/edgesCells_${qtag}.tsv"}{
       cells.values.map{ cell =>
         val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText

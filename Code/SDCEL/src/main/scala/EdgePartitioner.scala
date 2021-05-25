@@ -154,10 +154,14 @@ object EdgePartitioner{
   def getCellsAtCorner(quadtree: StandardQuadTree[LineString], c: QuadRectangle): (List[QuadRectangle], Point) = {
     val region = c.lineage.takeRight(1).toInt
     val corner = region match {
-      case 0 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMinY))
-      case 1 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMinY))
-      case 2 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMaxY))
-      case 3 => geofactory.createPoint(new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMaxY))
+      case 0 => geofactory.createPoint(
+        new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMinY))
+      case 1 => geofactory.createPoint(
+        new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMinY))
+      case 2 => geofactory.createPoint(
+        new Coordinate(c.getEnvelope.getMaxX, c.getEnvelope.getMaxY))
+      case 3 => geofactory.createPoint(
+        new Coordinate(c.getEnvelope.getMinX, c.getEnvelope.getMaxY))
     }
     val envelope = corner.getEnvelopeInternal
     val precision = 1 / precisionModel.getScale
@@ -170,21 +174,27 @@ object EdgePartitioner{
 
   // Main methods
 
-  def readPolygons(spark: SparkSession, params: EdgePartitionerConf): (RDD[Polygon], Long) = {
+  def readPolygons(spark: SparkSession,
+    params: EdgePartitionerConf): (RDD[Polygon], Long) = {
     val input  = params.input()
     val offset = params.offset()
     val quote  = params.quote()
-    val polygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, i) =>
-      val arr = line.split("\t")
-      val userData = List(s"$i") ++ (0 until arr.size).filter(_ != offset).map(i => arr(i))
-      val wkt = if(quote){
-        arr(offset).replaceAll("\"", "")
-      } else {
-        arr(offset)
-      }
-      val polygon = new WKTReader(geofactory).read(wkt)
-      polygon.setUserData(userData.mkString("\t"))
-      polygon.asInstanceOf[Polygon]
+    val polygons = spark.read.textFile(input).rdd.zipWithUniqueId()
+      .mapPartitions{ lines =>
+        val reader = new WKTReader(geofactory)
+        lines.map{ case(line, i) =>
+          val arr = line.split("\t")
+          val userData = List(s"$i") ++
+            (0 until arr.size).filter(_ != offset).map(i => arr(i))
+          val wkt = if(quote){
+            arr(offset).replaceAll("\"", "")
+          } else {
+            arr(offset)
+          }
+          val polygon = reader.read(wkt)
+          polygon.setUserData(userData.mkString("\t"))
+          polygon.asInstanceOf[Polygon]
+        }
     }.cache
     val nPolygons = polygons.count()
     (polygons, nPolygons)
@@ -194,7 +204,6 @@ object EdgePartitioner{
     val edges = polygons.flatMap(getLineStrings).cache
     val nEdges = edges.count()
     (edges, nEdges)
-
   }
 
   def partitionEdges(edges: RDD[LineString])(implicit params: EdgePartitionerConf):
@@ -204,7 +213,7 @@ object EdgePartitioner{
     edgesRDD.analyze()
     val boundary = new QuadRectangle(edgesRDD.boundaryEnvelope)
     val quadtree = new StandardQuadTree[LineString](boundary, 0, params.maxentries(), params.nlevels())
-    for(edge <- edges.sample(false, params.sample(), 42).collect()) {
+    for(edge <- edges.sample(false, params.fraction(), 42).collect()) {
       quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
     }
     quadtree.assignPartitionIds()
@@ -281,7 +290,8 @@ object EdgePartitioner{
 
   import scala.annotation.tailrec
   @tailrec
-  def getNodes(start: Half_edge, end: Half_edge, v: Vector[Half_edge]): Vector[Half_edge] = {
+  def getNodes(start: Half_edge, end: Half_edge, v: Vector[Half_edge]):
+      Vector[Half_edge] = {
     if(start == end){
       v :+ end
     } else {
@@ -290,7 +300,8 @@ object EdgePartitioner{
   }
 
   @tailrec
-  def connectHedges(v: Vector[Half_edge], r: Vector[Vector[Half_edge]]): Vector[Vector[Half_edge]] = {
+  def connectHedges(v: Vector[Half_edge], r: Vector[Vector[Half_edge]]):
+      Vector[Vector[Half_edge]] = {
     if(v.isEmpty){
       r
     } else {
@@ -384,7 +395,7 @@ object EdgePartitioner{
     // Starting session...
     val spark = timer{"Starting session"}{
       SparkSession.builder()
-        .config("spark.default.parallelism", 3 * 120)
+        .config("spark.default.parallelism", 3 * 108)
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
         .config("spark.scheduler.mode", "FAIR")
@@ -478,16 +489,14 @@ object EdgePartitioner{
 class EdgePartitionerConf(args: Seq[String]) extends ScallopConf(args) {
   val input:       ScallopOption[String]  = opt[String]  (required = true)
   val offset:      ScallopOption[Int]     = opt[Int]     (default = Some(0))
-  val host:        ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
-  val port:        ScallopOption[String]  = opt[String]  (default = Some("7077"))
-  val cores:       ScallopOption[Int]     = opt[Int]     (default = Some(4))
-  val executors:   ScallopOption[Int]     = opt[Int]     (default = Some(3))
   val grid:        ScallopOption[String]  = opt[String]  (default = Some("KDBTREE"))
   val index:       ScallopOption[String]  = opt[String]  (default = Some("QUADTREE"))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(512))
-  val sample:      ScallopOption[Double]  = opt[Double]  (default = Some(0.25))
+
+  val fraction:      ScallopOption[Double]  = opt[Double]  (default = Some(0.25))
   val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(500))
   val nlevels:     ScallopOption[Int]     = opt[Int]     (default = Some(6))
+
   val quote:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))

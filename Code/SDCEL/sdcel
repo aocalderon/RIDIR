@@ -3,7 +3,9 @@
 HDFS_PATH=$1
 LOCAL_PATH=$2
 TOLERANCE=$3
-WAIT=$4
+QTAG=$4
+QTAG=${QTAG:-"Tag"}
+WAIT=$5
 WAIT=${WAIT:-"100ms"}
 
 EXECUTORS=12
@@ -28,5 +30,5 @@ spark-submit \
     --input2 $HDFS_PATH/edgesB \
     --quadtree $LOCAL_PATH/quadtree.wkt \
     --boundary $LOCAL_PATH/boundary.wkt \
-    --tolerance $TOLERANCE
+    --tolerance $TOLERANCE --qtag $QTAG
 
