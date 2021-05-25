@@ -1,27 +1,20 @@
 require(tidyverse)
 require(rvest)
 
-getTaskTable <- function(appId, stageId) {
+getTaskSummaryTable <- function(appId, stageId) {
   theurl = paste0("http://localhost:18081/history/", appId, 
                   "/stages/stage/?id=", stageId, 
-                  "&attempt=0&task.sort=Duration&task.desc=true&task.pageSize=2400")
-  # &task.sort=Duration&task.desc=true&task.pageSize=250
+                  "&attempt=0")
   theurl = url(theurl, "rb")
   webpage <- read_html(theurl)
   close(theurl)
   
-  tasks0 = webpage %>%
-    html_nodes("#task-table") %>% 
-    html_table(fill = TRUE) %>% .[[1]] %>% select(X1, X2, X6, X7, X8, X9, X16)
-  names(tasks0) = c("cellId", "taskId", "executor", "host", "launchTime", "duration", "sizeAndRecords")
-  tasks = tasks0 %>% separate(host, into = c("host", NA, NA), sep = "\n") %>%
-    separate(sizeAndRecords, into = c("size", "records"), sep = " / ") %>%
-    mutate(duration = duration %>% map(parseTime)) %>%
-    mutate(size = size %>% map(parseSize)) %>%
-    unite("executor", host:executor, sep = ":") %>% 
-    mutate(duration = as.numeric(duration), size = as.numeric(size)) %>%
+  tasks = webpage %>%
+    html_nodes("#task-summary-table") %>% 
+    html_table(fill = TRUE) %>% .[[1]] %>%
+    select(X1, X4, X6) %>%
     mutate(appId = appId, stageId = stageId)
-  
+  names(tasks) = c("metric", "mean", "max", "appId", "stageId")
   return(tasks)
 }
 
@@ -33,7 +26,9 @@ parseTime <- function(str){
   d = as.numeric(arr[[1]][1])
   if(arr[[1]][2] == "ms"){
     d = d / 1000.0
-  }
+  } else if(arr[[1]][2] == "min"){
+    d = d * 60
+  }    
   return(d)
 }
 

@@ -1,0 +1,561 @@
+metric	mean	max	appId	stageId
+Duration	0.1 s	4 s	application_1615435002078_0601	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0601	10
+Task Deserialization Time	0.2 s	0.6 s	application_1615435002078_0601	10
+GC Time	0 ms	0.4 s	application_1615435002078_0601	10
+Result Serialization Time	0 ms	40 ms	application_1615435002078_0601	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0601	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0601	10
+Input Size / Records	312.8 KB / 1808	1620.6 KB / 7390	application_1615435002078_0601	10
+Duration	0.2 s	8 s	application_1615435002078_0602	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0602	10
+Task Deserialization Time	0.1 s	3 s	application_1615435002078_0602	10
+GC Time	0 ms	3 s	application_1615435002078_0602	10
+Result Serialization Time	0 ms	0.2 s	application_1615435002078_0602	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0602	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0602	10
+Input Size / Records	463.0 KB / 2630	2.3 MB / 10146	application_1615435002078_0602	10
+Duration	0.3 s	11 s	application_1615435002078_0603	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0603	10
+Task Deserialization Time	84 ms	2 s	application_1615435002078_0603	10
+GC Time	0 ms	2 s	application_1615435002078_0603	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0603	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0603	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0603	10
+Input Size / Records	620.2 KB / 3442	3.0 MB / 13136	application_1615435002078_0603	10
+Duration	0.5 s	13 s	application_1615435002078_0604	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0604	10
+Task Deserialization Time	67 ms	2 s	application_1615435002078_0604	10
+GC Time	37 ms	3 s	application_1615435002078_0604	10
+Result Serialization Time	0 ms	11 ms	application_1615435002078_0604	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0604	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0604	10
+Input Size / Records	774.8 KB / 4256	3.7 MB / 16390	application_1615435002078_0604	10
+Duration	0.7 s	18 s	application_1615435002078_0605	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0605	10
+Task Deserialization Time	56 ms	2 s	application_1615435002078_0605	10
+GC Time	43 ms	3 s	application_1615435002078_0605	10
+Result Serialization Time	0 ms	18 ms	application_1615435002078_0605	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0605	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0605	10
+Input Size / Records	924.3 KB / 5106	4.4 MB / 19184	application_1615435002078_0605	10
+Duration	0.8 s	22 s	application_1615435002078_0606	10
+Scheduler Delay	4 ms	95 ms	application_1615435002078_0606	10
+Task Deserialization Time	48 ms	2 s	application_1615435002078_0606	10
+GC Time	49 ms	2 s	application_1615435002078_0606	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0606	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0606	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0606	10
+Input Size / Records	1074.3 KB / 5966	5.1 MB / 23014	application_1615435002078_0606	10
+Duration	1.0 s	26 s	application_1615435002078_0607	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0607	10
+Task Deserialization Time	42 ms	1 s	application_1615435002078_0607	10
+GC Time	61 ms	4 s	application_1615435002078_0607	10
+Result Serialization Time	0 ms	99 ms	application_1615435002078_0607	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0607	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0607	10
+Input Size / Records	1259.8 KB / 7002	5.8 MB / 25836	application_1615435002078_0607	10
+Duration	1 s	37 s	application_1615435002078_0608	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0608	10
+Task Deserialization Time	38 ms	2 s	application_1615435002078_0608	10
+GC Time	65 ms	3 s	application_1615435002078_0608	10
+Result Serialization Time	0 ms	2 ms	application_1615435002078_0608	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0608	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0608	10
+Input Size / Records	1398.5 KB / 7754	6.4 MB / 28771	application_1615435002078_0608	10
+Duration	1 s	45 s	application_1615435002078_0609	10
+Scheduler Delay	4 ms	0.1 s	application_1615435002078_0609	10
+Task Deserialization Time	34 ms	2 s	application_1615435002078_0609	10
+GC Time	72 ms	3 s	application_1615435002078_0609	10
+Result Serialization Time	0 ms	3 ms	application_1615435002078_0609	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0609	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0609	10
+Input Size / Records	1559.7 KB / 8688	7.4 MB / 32534	application_1615435002078_0609	10
+Duration	2 s	42 s	application_1615435002078_0610	10
+Scheduler Delay	4 ms	2 s	application_1615435002078_0610	10
+Task Deserialization Time	31 ms	2 s	application_1615435002078_0610	10
+GC Time	91 ms	5 s	application_1615435002078_0610	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0610	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0610	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0610	10
+Input Size / Records	1709.6 KB / 9518	8.2 MB / 36072	application_1615435002078_0610	10
+Duration	2 s	52 s	application_1615435002078_0611	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0611	10
+Task Deserialization Time	29 ms	1 s	application_1615435002078_0611	10
+GC Time	0.1 s	7 s	application_1615435002078_0611	10
+Result Serialization Time	0 ms	16 ms	application_1615435002078_0611	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0611	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0611	10
+Input Size / Records	1886.3 KB / 10404	8.9 MB / 38526	application_1615435002078_0611	10
+Duration	2 s	1.0 min	application_1615435002078_0612	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0612	10
+Task Deserialization Time	26 ms	2 s	application_1615435002078_0612	10
+GC Time	0.1 s	6 s	application_1615435002078_0612	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0612	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0612	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0612	10
+Input Size / Records	2033.7 KB / 11232	9.7 MB / 41746	application_1615435002078_0612	10
+Duration	2 s	1.3 min	application_1615435002078_0613	10
+Scheduler Delay	5 ms	2 s	application_1615435002078_0613	10
+Task Deserialization Time	25 ms	1 s	application_1615435002078_0613	10
+GC Time	0.1 s	8 s	application_1615435002078_0613	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0613	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0613	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0613	10
+Input Size / Records	2.1 MB / 11890	10.1 MB / 44856	application_1615435002078_0613	10
+Duration	3 s	1.3 min	application_1615435002078_0614	10
+Scheduler Delay	5 ms	0.2 s	application_1615435002078_0614	10
+Task Deserialization Time	23 ms	2 s	application_1615435002078_0614	10
+GC Time	0.2 s	11 s	application_1615435002078_0614	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0614	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0614	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0614	10
+Input Size / Records	2.2 MB / 12624	11.0 MB / 47880	application_1615435002078_0614	10
+Duration	0.1 s	5 s	application_1615435002078_0587	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0587	10
+Task Deserialization Time	0.2 s	2 s	application_1615435002078_0587	10
+GC Time	0 ms	2 s	application_1615435002078_0587	10
+Result Serialization Time	0 ms	14 ms	application_1615435002078_0587	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0587	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0587	10
+Input Size / Records	311.0 KB / 1808	1668.7 KB / 7390	application_1615435002078_0587	10
+Duration	0.2 s	8 s	application_1615435002078_0588	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0588	10
+Task Deserialization Time	0.1 s	2 s	application_1615435002078_0588	10
+GC Time	0 ms	2 s	application_1615435002078_0588	10
+Result Serialization Time	0 ms	41 ms	application_1615435002078_0588	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0588	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0588	10
+Input Size / Records	463.0 KB / 2630	2.3 MB / 10146	application_1615435002078_0588	10
+Duration	0.4 s	12 s	application_1615435002078_0589	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0589	10
+Task Deserialization Time	84 ms	2 s	application_1615435002078_0589	10
+GC Time	0 ms	2 s	application_1615435002078_0589	10
+Result Serialization Time	0 ms	56 ms	application_1615435002078_0589	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0589	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0589	10
+Input Size / Records	619.7 KB / 3442	3.0 MB / 13136	application_1615435002078_0589	10
+Duration	0.5 s	11 s	application_1615435002078_0590	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0590	10
+Task Deserialization Time	67 ms	2 s	application_1615435002078_0590	10
+GC Time	36 ms	2 s	application_1615435002078_0590	10
+Result Serialization Time	0 ms	12 ms	application_1615435002078_0590	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0590	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0590	10
+Input Size / Records	774.7 KB / 4256	3.7 MB / 16390	application_1615435002078_0590	10
+Duration	0.6 s	14 s	application_1615435002078_0591	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0591	10
+Task Deserialization Time	56 ms	2 s	application_1615435002078_0591	10
+GC Time	43 ms	3 s	application_1615435002078_0591	10
+Result Serialization Time	0 ms	8 ms	application_1615435002078_0591	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0591	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0591	10
+Input Size / Records	923.8 KB / 5106	4.4 MB / 19184	application_1615435002078_0591	10
+Duration	0.8 s	26 s	application_1615435002078_0592	10
+Scheduler Delay	4 ms	2 s	application_1615435002078_0592	10
+Task Deserialization Time	48 ms	2 s	application_1615435002078_0592	10
+GC Time	51 ms	4 s	application_1615435002078_0592	10
+Result Serialization Time	0 ms	11 ms	application_1615435002078_0592	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0592	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0592	10
+Input Size / Records	1074.2 KB / 5966	5.0 MB / 23014	application_1615435002078_0592	10
+Duration	1.0 s	29 s	application_1615435002078_0593	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0593	10
+Task Deserialization Time	42 ms	1 s	application_1615435002078_0593	10
+GC Time	55 ms	2 s	application_1615435002078_0593	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0593	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0593	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0593	10
+Input Size / Records	1259.2 KB / 7002	5.9 MB / 25836	application_1615435002078_0593	10
+Duration	1 s	33 s	application_1615435002078_0594	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0594	10
+Task Deserialization Time	38 ms	2 s	application_1615435002078_0594	10
+GC Time	66 ms	4 s	application_1615435002078_0594	10
+Result Serialization Time	0 ms	18 ms	application_1615435002078_0594	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0594	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0594	10
+Input Size / Records	1402.0 KB / 7754	6.5 MB / 28771	application_1615435002078_0594	10
+Duration	1 s	48 s	application_1615435002078_0595	10
+Scheduler Delay	4 ms	2 s	application_1615435002078_0595	10
+Task Deserialization Time	34 ms	1 s	application_1615435002078_0595	10
+GC Time	80 ms	4 s	application_1615435002078_0595	10
+Result Serialization Time	0 ms	50 ms	application_1615435002078_0595	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0595	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0595	10
+Input Size / Records	1563.6 KB / 8688	7.5 MB / 32534	application_1615435002078_0595	10
+Duration	2 s	1.1 min	application_1615435002078_0596	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0596	10
+Task Deserialization Time	31 ms	2 s	application_1615435002078_0596	10
+GC Time	91 ms	7 s	application_1615435002078_0596	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0596	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0596	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0596	10
+Input Size / Records	1708.4 KB / 9518	8.1 MB / 36072	application_1615435002078_0596	10
+Duration	2 s	1.0 min	application_1615435002078_0597	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0597	10
+Task Deserialization Time	28 ms	1 s	application_1615435002078_0597	10
+GC Time	0.1 s	6 s	application_1615435002078_0597	10
+Result Serialization Time	0 ms	13 ms	application_1615435002078_0597	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0597	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0597	10
+Input Size / Records	1883.8 KB / 10404	8.8 MB / 38526	application_1615435002078_0597	10
+Duration	2 s	60 s	application_1615435002078_0598	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0598	10
+Task Deserialization Time	26 ms	2 s	application_1615435002078_0598	10
+GC Time	0.1 s	8 s	application_1615435002078_0598	10
+Result Serialization Time	0 ms	16 ms	application_1615435002078_0598	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0598	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0598	10
+Input Size / Records	2030.7 KB / 11232	9.6 MB / 41746	application_1615435002078_0598	10
+Duration	2 s	60 s	application_1615435002078_0599	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0599	10
+Task Deserialization Time	25 ms	1 s	application_1615435002078_0599	10
+GC Time	0.1 s	6 s	application_1615435002078_0599	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0599	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0599	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0599	10
+Input Size / Records	2.1 MB / 11890	10.0 MB / 44856	application_1615435002078_0599	10
+Duration	2 s	59 s	application_1615435002078_0600	10
+Scheduler Delay	4 ms	0.1 s	application_1615435002078_0600	10
+Task Deserialization Time	23 ms	2 s	application_1615435002078_0600	10
+GC Time	0.1 s	6 s	application_1615435002078_0600	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0600	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0600	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0600	10
+Input Size / Records	2.3 MB / 12624	11.1 MB / 47880	application_1615435002078_0600	10
+Duration	0.1 s	4 s	application_1615435002078_0573	10
+Scheduler Delay	4 ms	0.3 s	application_1615435002078_0573	10
+Task Deserialization Time	0.2 s	0.8 s	application_1615435002078_0573	10
+GC Time	0 ms	0.6 s	application_1615435002078_0573	10
+Result Serialization Time	0 ms	95 ms	application_1615435002078_0573	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0573	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0573	10
+Input Size / Records	311.3 KB / 1808	1716.6 KB / 7390	application_1615435002078_0573	10
+Duration	0.2 s	6 s	application_1615435002078_0574	10
+Scheduler Delay	4 ms	2 s	application_1615435002078_0574	10
+Task Deserialization Time	0.1 s	2 s	application_1615435002078_0574	10
+GC Time	0 ms	2 s	application_1615435002078_0574	10
+Result Serialization Time	0 ms	18 ms	application_1615435002078_0574	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0574	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0574	10
+Input Size / Records	462.0 KB / 2630	2.3 MB / 10146	application_1615435002078_0574	10
+Duration	0.4 s	8 s	application_1615435002078_0575	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0575	10
+Task Deserialization Time	84 ms	2 s	application_1615435002078_0575	10
+GC Time	0 ms	2 s	application_1615435002078_0575	10
+Result Serialization Time	0 ms	21 ms	application_1615435002078_0575	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0575	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0575	10
+Input Size / Records	620.3 KB / 3442	3.0 MB / 13136	application_1615435002078_0575	10
+Duration	0.4 s	12 s	application_1615435002078_0576	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0576	10
+Task Deserialization Time	67 ms	2 s	application_1615435002078_0576	10
+GC Time	37 ms	2 s	application_1615435002078_0576	10
+Result Serialization Time	0 ms	2 ms	application_1615435002078_0576	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0576	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0576	10
+Input Size / Records	773.5 KB / 4256	3.8 MB / 16390	application_1615435002078_0576	10
+Duration	0.6 s	21 s	application_1615435002078_0577	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0577	10
+Task Deserialization Time	56 ms	2 s	application_1615435002078_0577	10
+GC Time	44 ms	3 s	application_1615435002078_0577	10
+Result Serialization Time	0 ms	21 ms	application_1615435002078_0577	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0577	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0577	10
+Input Size / Records	923.6 KB / 5106	4.3 MB / 19184	application_1615435002078_0577	10
+Duration	0.8 s	25 s	application_1615435002078_0578	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0578	10
+Task Deserialization Time	48 ms	2 s	application_1615435002078_0578	10
+GC Time	50 ms	3 s	application_1615435002078_0578	10
+Result Serialization Time	0 ms	22 ms	application_1615435002078_0578	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0578	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0578	10
+Input Size / Records	1078.4 KB / 5966	5.1 MB / 23014	application_1615435002078_0578	10
+Duration	0.9 s	20 s	application_1615435002078_0579	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0579	10
+Task Deserialization Time	42 ms	2 s	application_1615435002078_0579	10
+GC Time	57 ms	2 s	application_1615435002078_0579	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0579	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0579	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0579	10
+Input Size / Records	1258.1 KB / 7002	5.8 MB / 25836	application_1615435002078_0579	10
+Duration	1 s	45 s	application_1615435002078_0580	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0580	10
+Task Deserialization Time	38 ms	2 s	application_1615435002078_0580	10
+GC Time	67 ms	4 s	application_1615435002078_0580	10
+Result Serialization Time	0 ms	13 ms	application_1615435002078_0580	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0580	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0580	10
+Input Size / Records	1400.8 KB / 7754	6.6 MB / 28771	application_1615435002078_0580	10
+Duration	1 s	35 s	application_1615435002078_0581	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0581	10
+Task Deserialization Time	34 ms	2 s	application_1615435002078_0581	10
+GC Time	83 ms	4 s	application_1615435002078_0581	10
+Result Serialization Time	0 ms	6 ms	application_1615435002078_0581	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0581	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0581	10
+Input Size / Records	1573.3 KB / 8688	7.4 MB / 32534	application_1615435002078_0581	10
+Duration	2 s	52 s	application_1615435002078_0582	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0582	10
+Task Deserialization Time	31 ms	2 s	application_1615435002078_0582	10
+GC Time	94 ms	5 s	application_1615435002078_0582	10
+Result Serialization Time	0 ms	12 ms	application_1615435002078_0582	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0582	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0582	10
+Input Size / Records	1716.6 KB / 9518	8.0 MB / 36072	application_1615435002078_0582	10
+Duration	2 s	53 s	application_1615435002078_0583	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0583	10
+Task Deserialization Time	29 ms	2 s	application_1615435002078_0583	10
+GC Time	0.1 s	5 s	application_1615435002078_0583	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0583	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0583	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0583	10
+Input Size / Records	1885.6 KB / 10404	8.9 MB / 38526	application_1615435002078_0583	10
+Duration	2 s	1.6 min	application_1615435002078_0584	10
+Scheduler Delay	5 ms	0.1 s	application_1615435002078_0584	10
+Task Deserialization Time	26 ms	1 s	application_1615435002078_0584	10
+GC Time	0.1 s	7 s	application_1615435002078_0584	10
+Result Serialization Time	0 ms	11 ms	application_1615435002078_0584	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0584	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0584	10
+Input Size / Records	2032.9 KB / 11232	9.5 MB / 41746	application_1615435002078_0584	10
+Duration	2 s	1.2 min	application_1615435002078_0585	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0585	10
+Task Deserialization Time	25 ms	2 s	application_1615435002078_0585	10
+GC Time	0.1 s	7 s	application_1615435002078_0585	10
+Result Serialization Time	0 ms	8 ms	application_1615435002078_0585	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0585	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0585	10
+Input Size / Records	2.1 MB / 11890	10.1 MB / 44856	application_1615435002078_0585	10
+Duration	3 s	1.8 min	application_1615435002078_0586	10
+Scheduler Delay	5 ms	0.1 s	application_1615435002078_0586	10
+Task Deserialization Time	23 ms	2 s	application_1615435002078_0586	10
+GC Time	0.2 s	7 s	application_1615435002078_0586	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0586	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0586	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0586	10
+Input Size / Records	2.2 MB / 12624	10.7 MB / 47880	application_1615435002078_0586	10
+Duration	0.1 s	6 s	application_1615435002078_0559	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0559	10
+Task Deserialization Time	0.2 s	2 s	application_1615435002078_0559	10
+GC Time	0 ms	2 s	application_1615435002078_0559	10
+Result Serialization Time	0 ms	8 ms	application_1615435002078_0559	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0559	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0559	10
+Input Size / Records	310.2 KB / 1808	1668.7 KB / 7390	application_1615435002078_0559	10
+Duration	0.2 s	6 s	application_1615435002078_0560	10
+Scheduler Delay	4 ms	0.3 s	application_1615435002078_0560	10
+Task Deserialization Time	0.1 s	2 s	application_1615435002078_0560	10
+GC Time	0 ms	2 s	application_1615435002078_0560	10
+Result Serialization Time	0 ms	10 ms	application_1615435002078_0560	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0560	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0560	10
+Input Size / Records	462.1 KB / 2630	2.3 MB / 10146	application_1615435002078_0560	10
+Duration	0.4 s	11 s	application_1615435002078_0561	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0561	10
+Task Deserialization Time	84 ms	3 s	application_1615435002078_0561	10
+GC Time	0 ms	3 s	application_1615435002078_0561	10
+Result Serialization Time	0 ms	13 ms	application_1615435002078_0561	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0561	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0561	10
+Input Size / Records	620.1 KB / 3442	3.0 MB / 13136	application_1615435002078_0561	10
+Duration	0.5 s	13 s	application_1615435002078_0562	10
+Scheduler Delay	4 ms	1.0 s	application_1615435002078_0562	10
+Task Deserialization Time	67 ms	2 s	application_1615435002078_0562	10
+GC Time	37 ms	2 s	application_1615435002078_0562	10
+Result Serialization Time	0 ms	21 ms	application_1615435002078_0562	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0562	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0562	10
+Input Size / Records	775.5 KB / 4256	3.7 MB / 16390	application_1615435002078_0562	10
+Duration	0.6 s	14 s	application_1615435002078_0563	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0563	10
+Task Deserialization Time	56 ms	1 s	application_1615435002078_0563	10
+GC Time	42 ms	2 s	application_1615435002078_0563	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0563	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0563	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0563	10
+Input Size / Records	923.6 KB / 5106	4.3 MB / 19184	application_1615435002078_0563	10
+Duration	0.8 s	23 s	application_1615435002078_0564	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0564	10
+Task Deserialization Time	48 ms	1 s	application_1615435002078_0564	10
+GC Time	51 ms	3 s	application_1615435002078_0564	10
+Result Serialization Time	0 ms	63 ms	application_1615435002078_0564	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0564	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0564	10
+Input Size / Records	1080.7 KB / 5966	5.1 MB / 23014	application_1615435002078_0564	10
+Duration	1 s	26 s	application_1615435002078_0565	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0565	10
+Task Deserialization Time	42 ms	1 s	application_1615435002078_0565	10
+GC Time	57 ms	3 s	application_1615435002078_0565	10
+Result Serialization Time	0 ms	9 ms	application_1615435002078_0565	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0565	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0565	10
+Input Size / Records	1258.5 KB / 7002	5.8 MB / 25836	application_1615435002078_0565	10
+Duration	1 s	32 s	application_1615435002078_0566	10
+Scheduler Delay	4 ms	2 s	application_1615435002078_0566	10
+Task Deserialization Time	38 ms	2 s	application_1615435002078_0566	10
+GC Time	67 ms	4 s	application_1615435002078_0566	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0566	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0566	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0566	10
+Input Size / Records	1401.7 KB / 7754	6.4 MB / 28771	application_1615435002078_0566	10
+Duration	1 s	37 s	application_1615435002078_0567	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0567	10
+Task Deserialization Time	34 ms	1 s	application_1615435002078_0567	10
+GC Time	82 ms	5 s	application_1615435002078_0567	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0567	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0567	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0567	10
+Input Size / Records	1573.3 KB / 8688	7.4 MB / 32534	application_1615435002078_0567	10
+Duration	2 s	40 s	application_1615435002078_0568	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0568	10
+Task Deserialization Time	31 ms	2 s	application_1615435002078_0568	10
+GC Time	94 ms	5 s	application_1615435002078_0568	10
+Result Serialization Time	0 ms	10 ms	application_1615435002078_0568	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0568	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0568	10
+Input Size / Records	1707.6 KB / 9518	7.9 MB / 36072	application_1615435002078_0568	10
+Duration	2 s	42 s	application_1615435002078_0569	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0569	10
+Task Deserialization Time	28 ms	2 s	application_1615435002078_0569	10
+GC Time	0.1 s	5 s	application_1615435002078_0569	10
+Result Serialization Time	0 ms	13 ms	application_1615435002078_0569	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0569	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0569	10
+Input Size / Records	1887.3 KB / 10404	8.8 MB / 38526	application_1615435002078_0569	10
+Duration	2 s	1.7 min	application_1615435002078_0570	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0570	10
+Task Deserialization Time	26 ms	1 s	application_1615435002078_0570	10
+GC Time	0.1 s	7 s	application_1615435002078_0570	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0570	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0570	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0570	10
+Input Size / Records	2038.0 KB / 11232	9.7 MB / 41746	application_1615435002078_0570	10
+Duration	2 s	1.0 min	application_1615435002078_0571	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0571	10
+Task Deserialization Time	25 ms	1 s	application_1615435002078_0571	10
+GC Time	0.1 s	7 s	application_1615435002078_0571	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0571	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0571	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0571	10
+Input Size / Records	2.1 MB / 11890	10.1 MB / 44856	application_1615435002078_0571	10
+Duration	3 s	1.8 min	application_1615435002078_0572	10
+Scheduler Delay	5 ms	1 s	application_1615435002078_0572	10
+Task Deserialization Time	23 ms	2 s	application_1615435002078_0572	10
+GC Time	0.1 s	7 s	application_1615435002078_0572	10
+Result Serialization Time	0 ms	20 ms	application_1615435002078_0572	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0572	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0572	10
+Input Size / Records	2.2 MB / 12624	10.7 MB / 47880	application_1615435002078_0572	10
+Duration	0.1 s	6 s	application_1615435002078_0545	10
+Scheduler Delay	4 ms	2 s	application_1615435002078_0545	10
+Task Deserialization Time	0.2 s	3 s	application_1615435002078_0545	10
+GC Time	0 ms	3 s	application_1615435002078_0545	10
+Result Serialization Time	0 ms	42 ms	application_1615435002078_0545	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0545	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0545	10
+Input Size / Records	310.4 KB / 1808	1620.6 KB / 7390	application_1615435002078_0545	10
+Duration	0.2 s	5 s	application_1615435002078_0546	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0546	10
+Task Deserialization Time	0.1 s	2 s	application_1615435002078_0546	10
+GC Time	0 ms	2 s	application_1615435002078_0546	10
+Result Serialization Time	0 ms	19 ms	application_1615435002078_0546	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0546	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0546	10
+Input Size / Records	464.0 KB / 2630	2.3 MB / 10146	application_1615435002078_0546	10
+Duration	0.4 s	10 s	application_1615435002078_0547	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0547	10
+Task Deserialization Time	84 ms	1 s	application_1615435002078_0547	10
+GC Time	0 ms	2 s	application_1615435002078_0547	10
+Result Serialization Time	0 ms	13 ms	application_1615435002078_0547	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0547	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0547	10
+Input Size / Records	620.2 KB / 3442	3.0 MB / 13136	application_1615435002078_0547	10
+Duration	0.5 s	13 s	application_1615435002078_0548	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0548	10
+Task Deserialization Time	68 ms	2 s	application_1615435002078_0548	10
+GC Time	38 ms	3 s	application_1615435002078_0548	10
+Result Serialization Time	0 ms	35 ms	application_1615435002078_0548	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0548	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0548	10
+Input Size / Records	763.8 KB / 4256	3.7 MB / 16390	application_1615435002078_0548	10
+Duration	0.6 s	13 s	application_1615435002078_0549	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0549	10
+Task Deserialization Time	57 ms	4 s	application_1615435002078_0549	10
+GC Time	45 ms	5 s	application_1615435002078_0549	10
+Result Serialization Time	0 ms	13 ms	application_1615435002078_0549	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0549	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0549	10
+Input Size / Records	923.6 KB / 5106	4.4 MB / 19184	application_1615435002078_0549	10
+Duration	0.8 s	25 s	application_1615435002078_0550	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0550	10
+Task Deserialization Time	48 ms	2 s	application_1615435002078_0550	10
+GC Time	50 ms	4 s	application_1615435002078_0550	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0550	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0550	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0550	10
+Input Size / Records	1079.1 KB / 5966	5.1 MB / 23014	application_1615435002078_0550	10
+Duration	1.0 s	27 s	application_1615435002078_0551	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0551	10
+Task Deserialization Time	42 ms	2 s	application_1615435002078_0551	10
+GC Time	59 ms	3 s	application_1615435002078_0551	10
+Result Serialization Time	0 ms	10 ms	application_1615435002078_0551	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0551	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0551	10
+Input Size / Records	1258.1 KB / 7002	6.0 MB / 25836	application_1615435002078_0551	10
+Duration	1 s	43 s	application_1615435002078_0552	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0552	10
+Task Deserialization Time	38 ms	2 s	application_1615435002078_0552	10
+GC Time	68 ms	4 s	application_1615435002078_0552	10
+Result Serialization Time	0 ms	12 ms	application_1615435002078_0552	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0552	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0552	10
+Input Size / Records	1395.4 KB / 7754	6.6 MB / 28771	application_1615435002078_0552	10
+Duration	1 s	39 s	application_1615435002078_0553	10
+Scheduler Delay	4 ms	1 s	application_1615435002078_0553	10
+Task Deserialization Time	34 ms	2 s	application_1615435002078_0553	10
+GC Time	80 ms	4 s	application_1615435002078_0553	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0553	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0553	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0553	10
+Input Size / Records	1573.0 KB / 8688	7.4 MB / 32534	application_1615435002078_0553	10
+Duration	2 s	55 s	application_1615435002078_0554	10
+Scheduler Delay	4 ms	0.1 s	application_1615435002078_0554	10
+Task Deserialization Time	31 ms	0.2 s	application_1615435002078_0554	10
+GC Time	92 ms	5 s	application_1615435002078_0554	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0554	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0554	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0554	10
+Input Size / Records	1723.8 KB / 9518	8.1 MB / 36072	application_1615435002078_0554	10
+Duration	2 s	1.2 min	application_1615435002078_0555	10
+Scheduler Delay	4 ms	0.2 s	application_1615435002078_0555	10
+Task Deserialization Time	28 ms	1 s	application_1615435002078_0555	10
+GC Time	0.1 s	5 s	application_1615435002078_0555	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0555	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0555	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0555	10
+Input Size / Records	1882.8 KB / 10404	8.7 MB / 38526	application_1615435002078_0555	10
+Duration	2 s	58 s	application_1615435002078_0556	10
+Scheduler Delay	4 ms	0.1 s	application_1615435002078_0556	10
+Task Deserialization Time	26 ms	2 s	application_1615435002078_0556	10
+GC Time	0.1 s	6 s	application_1615435002078_0556	10
+Result Serialization Time	0 ms	6 ms	application_1615435002078_0556	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0556	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0556	10
+Input Size / Records	2034.7 KB / 11232	9.6 MB / 41746	application_1615435002078_0556	10
+Duration	2 s	1.3 min	application_1615435002078_0557	10
+Scheduler Delay	5 ms	2 s	application_1615435002078_0557	10
+Task Deserialization Time	25 ms	0.2 s	application_1615435002078_0557	10
+GC Time	0.1 s	8 s	application_1615435002078_0557	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0557	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0557	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0557	10
+Input Size / Records	2.1 MB / 11890	10.2 MB / 44856	application_1615435002078_0557	10
+Duration	2 s	1.1 min	application_1615435002078_0558	10
+Scheduler Delay	5 ms	1 s	application_1615435002078_0558	10
+Task Deserialization Time	23 ms	2 s	application_1615435002078_0558	10
+GC Time	0.2 s	7 s	application_1615435002078_0558	10
+Result Serialization Time	0 ms	1 ms	application_1615435002078_0558	10
+Getting Result Time	0 ms	0 ms	application_1615435002078_0558	10
+Peak Execution Memory	0.0 B	0.0 B	application_1615435002078_0558	10
+Input Size / Records	2.2 MB / 12624	10.9 MB / 47880	application_1615435002078_0558	10

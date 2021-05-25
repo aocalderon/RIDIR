@@ -5,7 +5,8 @@
 *.snm
 *.toc
 *.synctex.gz
-*.Rhistory
+.Rhistory
+.RData
 *.o
 *~
 *#
@@ -13,11 +14,11 @@
 Code/CGAL/DCEL/CMakeFiles/
 Code/CGAL/DCEL/dcel
 
-Meetings/next/figures/CC/concurrencycheccker/target/*
-Meetings/next/figures/CC/concurrencycheccker/project/*
-Meetings/next/figures/CC/concurrencycheccker/.ensime
-Meetings/next/figures/CC/concurrencycheccker/.ensime_cache/*
-Meetings/next/figures/CC/concurrencycheccker/metastore_db/*
+Code/Scala/ConcurrencyChecker/target/*
+Code/Scala/ConcurrencyChecker/project/*
+Code/Scala/ConcurrencyChecker/.ensime
+Code/Scala/ConcurrencyChecker/.ensime_cache/*
+Code/Scala/ConcurrencyChecker/metastore_db/*
 
 Code/Areal/target/*
 Code/Areal/project/*
