@@ -1,0 +1,13 @@
+#!/bin/bash
+
+HPATH="Test/EPP/"
+LPATH="/home/acald013/RIDIR/local_path/EPP/"
+LS=(5 7 10 12 15 17 20 22 25 27 30)
+
+for L in "${LS[@]}"
+do
+    echo "rm -fR ${LPATH}E${L}K/"
+    rm -fR ${LPATH}E${L}K/
+    echo "hdfs dfs -rm -f -r ${HPATH}E${L}K/"
+    hdfs dfs -rm -f -r ${HPATH}E${L}K/
+done

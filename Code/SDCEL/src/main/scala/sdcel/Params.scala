@@ -11,9 +11,11 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val boundary:    ScallopOption[String]  = opt[String]  (default = Some(""))
   val bycapacity:  ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
+
   val fraction:    ScallopOption[Double]  = opt[Double]  (default = Some(0.01))
   val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
   val maxlevel:    ScallopOption[Int]     = opt[Int]     (default = Some(8))
+
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
@@ -25,6 +27,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val bpath:  ScallopOption[String] = opt[String] (default = Some("edgesB.wkt"))
   val qpath:  ScallopOption[String] = opt[String] (default = Some("quadtree.wkt"))
   val epath:  ScallopOption[String] = opt[String] (default = Some("boundary.wkt"))
+  val qtag:   ScallopOption[String] = opt[String] (default = Some("tag"))
   val filter: ScallopOption[String] = opt[String] (default = Some("*"))
 
   verify()

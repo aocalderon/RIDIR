@@ -5,7 +5,7 @@ INPUT2=$2
 HDFS_PATH=$3
 LOCAL_PATH=$4
 MAXENTRIES=$5
-SCALE=$6
+TOLERANCE=$6
 
 EXECUTORS=12
 CORES=9
@@ -32,5 +32,5 @@ spark-submit \
     --bpath $HDFS_PATH/edgesB \
     --qpath $LOCAL_PATH/quadtree.wkt \
     --epath $LOCAL_PATH/boundary.wkt \
-    --bycapacity --maxentries $MAXENTRIES \
-    --scale $SCALE
+    --bycapacity --maxentries $MAXENTRIES --maxlevel 13 --fraction 0.1 \
+    --tolerance $TOLERANCE
