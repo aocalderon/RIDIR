@@ -21,11 +21,14 @@ object DCELPartitioner2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def read(input: String)
-    (implicit spark: SparkSession, geofactory: GeometryFactory): SpatialRDD[LineString] = {
+    (implicit spark: SparkSession, geofactory: GeometryFactory, settings: Settings):
+      SpatialRDD[LineString] = {
 
     val polys = spark.read.textFile(input).rdd.persist
-    val nPolys = polys.count
-    logger.info(s"# of Polys:\t$nPolys")
+    if(settings.debug){
+      val nPolys = polys.count
+      logger.info(s"TIME|npolys$nPolys")
+    }
     val edgesRaw = polys.mapPartitionsWithIndex{ case(index, lines) =>
       val reader = new WKTReader(geofactory)
       lines.flatMap{ line =>
@@ -46,7 +49,6 @@ object DCELPartitioner2 {
 
   def main(args: Array[String]) = {
     // Starting session...
-    logger.info("Starting session...")
     implicit val spark = SparkSession.builder()
         .config("spark.serializer",classOf[KryoSerializer].getName)
         .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
@@ -60,43 +62,42 @@ object DCELPartitioner2 {
       appId = spark.sparkContext.applicationId
     )
     val command = System.getProperty("sun.java.command")
-    logger.info(command)
-    logger.info(s"Scale: ${settings.scale}")
+    log(s"COMMAND|$command")
+    log(s"INFO|scale=${settings.scale}")
     val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
-    logger.info("Starting session... Done!")
+    log("TIME|Start")
 
     // Reading data...
-    logger.info("Reading data...")
     val edgesRDDA = read(params.input1())
     val nEdgesRDDA = edgesRDDA.getRawSpatialRDD.count()
-    logger.info(s"# of Edges:\t$nEdgesRDDA")
+    log(s"INFO|edgesA=$nEdgesRDDA")
     val edgesRDDB = read(params.input2())
     val nEdgesRDDB = edgesRDDB.getRawSpatialRDD.count()
-    logger.info(s"# of Edges:\t$nEdgesRDDB")
+    log(s"INFO|edgesB=$nEdgesRDDB")
     val edgesRDD = edgesRDDA.getRawSpatialRDD.rdd  union edgesRDDB.getRawSpatialRDD.rdd
     val nEdgesRDD = nEdgesRDDA + nEdgesRDDB
-    
     val boundary = edgesRDDA.boundary
     boundary.expandToInclude(edgesRDDB.boundary)
-    logger.info("Reading data... Done!")
+    log("TIME|Read")
 
     // Partitioning data...
-    logger.info("Partitioning data...")
     val (quadtree, edgesA, edgesB) = if(params.bycapacity()){
-      logger.info(s"Partition by capacity (${params.maxentries()})")
+      log(s"INFO|capacity=${params.maxentries()}")
       val definition = new QuadRectangle(boundary)
       val maxentries = params.maxentries()
       val maxlevel   = params.maxlevel()
       val fraction   = params.fraction()
       val quadtree = new StandardQuadTree[LineString](definition, 0, maxentries, maxlevel)
       val samples = edgesRDD.sample(false, fraction, 42).collect()
-      logger.info(s"Sample size: ${samples.size}")
+      log(s"INFO|sample=${samples.size}")
+      log("TIME|Sample")
       samples.foreach{ edge =>
         quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
       }
       quadtree.assignPartitionIds
       quadtree.assignPartitionLineage
+      log("TIME|Quadtree")
       val partitioner = new QuadTreePartitioner(quadtree)
       edgesRDDA.spatialPartitioning(partitioner)
       val edgesA = edgesRDDA.spatialPartitionedRDD.rdd.persist()
@@ -121,15 +122,16 @@ object DCELPartitioner2 {
       val edgesB = edgesRDDB.spatialPartitionedRDD.rdd.persist()
       (quadtree, edgesA, edgesB)
     }
-    logger.info("Partitioning data... Done")
-    logger.info(s"Number of partitions: ${quadtree.getLeafZones.size}")
+    edgesA.count()
+    edgesB.count()
+    log(s"INFO|partitions=${quadtree.getLeafZones.size}")
+    log("TIME|Partition")
 
     // Saving the boundary...
     save{params.epath()}{
       val wkt = envelope2polygon(boundary).toText
       List(s"$wkt\n")
     }
-
     // Saving the quadtree
     save{params.qpath()}{
       quadtree.getLeafZones.asScala.map{ leaf =>
@@ -140,7 +142,6 @@ object DCELPartitioner2 {
         s"$lineage\t$id\t$wkt\n"
       }
     }
-    
     // Saving to HDFS or Local...
     if(!params.local()){
       saveToHDFS(edgesA, params.apath())
@@ -149,8 +150,10 @@ object DCELPartitioner2 {
       saveToLocal(edgesA, params.apath())
       saveToLocal(edgesB, params.bpath())
     }
-
+    log("TIME|Saving")
+    
     spark.close
+    log("TIME|Close")
   }
 
   def saveToLocal(edges: RDD[LineString], name: String): Unit = {

@@ -30,5 +30,5 @@ spark-submit \
     --input2 $HDFS_PATH/edgesB \
     --quadtree $LOCAL_PATH/quadtree.wkt \
     --boundary $LOCAL_PATH/boundary.wkt \
-    --tolerance $TOLERANCE --qtag $QTAG
+    --tolerance $TOLERANCE --qtag $QTAG --notmerge
 

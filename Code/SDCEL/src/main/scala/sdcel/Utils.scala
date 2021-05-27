@@ -16,6 +16,8 @@ object Utils {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   //** Case Class
+  case class Timestamp(t: Long)
+  case class Tick(var t: Long)
   case class Settings(
     tolerance: Double = 1e-3,
     debug: Boolean = false,
@@ -28,7 +30,15 @@ object Utils {
   }
   
   def log(msg: String)(implicit logger: Logger, settings: Settings): Unit = {
+    val now = System.currentTimeMillis
     logger.info(s"${settings.appId}|$msg")
+  }
+
+  def log2(msg: String)(implicit prev: Tick, logger: Logger, settings: Settings): Unit = {
+    val now = System.currentTimeMillis
+    val duration = now - prev.t
+    logger.info(s"${settings.appId}|$duration|$msg")
+    prev.t = now
   }
 
   def save(filename: String)(content: Seq[String]): Unit = {
