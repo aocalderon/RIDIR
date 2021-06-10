@@ -18,10 +18,11 @@ object DCELBuilder2 {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def getLDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
-    (implicit geofactory: GeometryFactory, logger: Logger, spark: SparkSession)
+    (implicit geofactory: GeometryFactory, logger: Logger, spark: SparkSession,
+    settings: Settings)
       : RDD[Iterable[Half_edge]] = {
 
-    val appId = spark.sparkContext.getConf.get("spark.app.id")
+    //val appId = spark.sparkContext.getConf.get("spark.app.id")
 
     edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
       val cell = cells(index).mbr
@@ -30,7 +31,7 @@ object DCELBuilder2 {
       val (outerEdges, innerEdges) = edges.partition{ edge =>
         cell.intersects(edge)
       }
-      val outer  = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell)
+      val outer  = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell, index)
       val inner  = SweepLine2.getHedgesInsideCell(innerEdges.toVector)
       val hedges = SweepLine2.merge(outer, inner)
 

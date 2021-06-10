@@ -65,19 +65,23 @@ object SweepLine2 {
     index: Int = -1)
     (implicit geofactory: GeometryFactory): Vector[List[Half_edge]] = {
 
+    // Converting my edges in Edge Java class...
     val edgesList = outerEdges.map{ linestring =>
       new com.vividsolutions.jts.geomgraph.Edge(linestring.getCoordinates)
     }.asJava
 
+    // Converting cell edges in Edge Java class...
     val mbrList = mbr.getCoordinates.zip(mbr.getCoordinates.tail).toList.map{case(p1, p2) =>
       new com.vividsolutions.jts.geomgraph.Edge(Array(p1, p2))
     }.asJava
 
+    // Setting Sweepline java class...
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
     lineIntersector.setMakePrecise(geofactory.getPrecisionModel)
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
+    // Finding intersections...
     sweepline.computeIntersections(edgesList, mbrList, segmentIntersector)
 
     // Getting list of the intersections (coordinates) on cell...
@@ -85,8 +89,9 @@ object SweepLine2 {
       val hon = Half_edge(edge)
       Intersection(hon.v1, hon, Mode.On) // we collect the origen of the edges on cell...
     }
+
     // Getting hedges coming to the cell (in) and leaving the cell (out)...
-    val (edgesIn, edgesOut) = getEdgesTouch(edgesList, outerEdges, mbr)
+    val (edgesIn, edgesOut) = getEdgesTouch(edgesList, outerEdges, mbr, index)
     val iIn = edgesIn.map{ edge =>
       val hin = Half_edge(edge)
       Intersection(hin.v2, hin, Mode.In) // hin comes to the cell at coord v2...
@@ -95,6 +100,15 @@ object SweepLine2 {
       val hout = Half_edge(edge)
       Intersection(hout.v1, hout, Mode.Out) // hout leaves the cell at coord v1... 
     }
+
+    if(index == 1){
+      println("On")
+      iOn.foreach(println)
+      println("In")
+      iIn.foreach(println)
+      println("Out")
+      iOut.foreach(println)
+    }    
 
     // Grouping hedges in and out by their coordinate intersections...
     val intersections = iOn union iIn union iOut
@@ -190,7 +204,7 @@ object SweepLine2 {
   }
 
   private def getEdgesTouch(edgesList: java.util.List[Edge],
-    outerEdges: Vector[LineString], mbr: LinearRing)
+    outerEdges: Vector[LineString], mbr: LinearRing, index: Int = -1)
     (implicit geofactory: GeometryFactory): (Vector[LineString],Vector[LineString])  = {
 
     case class T(coords: Array[Coordinate], data: EdgeData, isIn: Boolean)
@@ -203,24 +217,29 @@ object SweepLine2 {
       val end = extremes(1)
 
       val eiList = edge.getEdgeIntersectionList.iterator.asScala.toList
+
       if(eiList.length == 1){
         val intersection = eiList.head.asInstanceOf[EdgeIntersection].getCoordinate
         if(start != intersection && end != intersection &&
           envelope.contains(start) && !envelope.contains(end))
-          T(Array(start, intersection), data, true)
+          List(T(Array(start, intersection), data, true))
         else if(start != intersection && end != intersection &&
           !envelope.contains(start) && envelope.contains(end))
-          T(Array(intersection, end), data, false)
+          List(T(Array(intersection, end), data, false))
         else if(end == intersection && envelope.contains(start))
-          T(Array(start, intersection), data, true)
+          List(T(Array(start, intersection), data, true))
         else if(start == intersection && envelope.contains(end))
-          T(Array(intersection, end), data, false)
+          List(T(Array(intersection, end), data, false))
         else
-          T(Array.empty[Coordinate], data, false)
+          List(T(Array.empty[Coordinate], data, false))
+      } else if(eiList.length == 2){
+        val is = eiList.map(_.asInstanceOf[EdgeIntersection].getCoordinate)
+        List(T(Array(is.head, is.last), data, true),
+        T(Array(is.head, is.last), data, false))
       } else {
-        T(Array.empty[Coordinate], data, false)
+        List(T(Array.empty[Coordinate], data, false))
       }
-    }.filterNot(_.coords.isEmpty).map{ t =>
+    }.flatten.filterNot(_.coords.isEmpty).map{ t =>
         val segment = geofactory.createLineString(t.coords)
         segment.setUserData(t.data)
         (t.isIn, segment)
