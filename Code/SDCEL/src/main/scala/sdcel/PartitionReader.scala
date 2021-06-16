@@ -46,7 +46,11 @@ object PartitionReader {
     val cells = quadtree.getLeafZones.asScala.map{ leaf =>
       val id = leaf.partitionId.toInt
       val lineage = leaf.lineage
-      val mbr = envelope2ring(roundEnvelope(leaf.getEnvelope))
+      val envelope = roundEnvelope(leaf.getEnvelope)
+      if(settings.debug){
+        println(s"$lineage\t$id\t$envelope")
+      }
+      val mbr = envelope2ring(envelope)
 
       val cell = Cell(id, lineage, mbr)
       (id -> cell)
