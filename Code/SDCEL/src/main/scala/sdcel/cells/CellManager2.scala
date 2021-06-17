@@ -14,14 +14,61 @@ import scala.annotation.tailrec
 import edu.ucr.dblab.sdcel.PartitionReader._
 import edu.ucr.dblab.sdcel.Utils.{Settings, save}
 import edu.ucr.dblab.sdcel.quadtree.{StandardQuadTree, QuadRectangle, Quadtree}
+import edu.ucr.dblab.sdcel.geometries.Cell
 
 object CellManager2 {
-  // Model the cell of a quadtree...
-  case class Cell(id: Int, lineage: String, boundary: Envelope)  
-  // Model the relation between an 'empty' cell and its closest 'non-empty' cell...
-  case class ClosestCell(lineage: String, closest: String, point: Point)
 
-  def getClosestPath[T](Q: StandardQuadTree[T], NE: List[Int], c: Cell)
+  def solve[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell], empties: List[Int])
+    (implicit geofactory: GeometryFactory, settings: Settings): List[(Point, Int, Int)] = {
+
+    val non_empties = quadtree.getLeafZones.asScala.map(_.partitionId.toInt).toSet
+      .diff(empties.toSet).toList.sorted
+
+    solveTailRec(quadtree, cells, empties, non_empties, List.empty[(Point,Int,Int)]).distinct
+  }
+
+  @tailrec
+  private def solveTailRec[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
+    empties: List[Int], non_empties: List[Int], result: List[(Point, Int, Int)])
+    (implicit geofactory: GeometryFactory, settings: Settings): List[(Point, Int, Int)] = {
+
+    empties match {
+      case Nil => result
+      case empty +: tail => {
+        val cell = cells(empty)
+        val (pid, point, pids) = getClosestPath(quadtree, non_empties, cell)
+        val new_empties = tail.toSet.diff(pids.toSet).toList
+        val new_result = result ++ pids.map( p => (point, pid, p))
+        solveTailRec(quadtree, cells, new_empties, non_empties, new_result)
+      }
+    }
+  }
+
+  def solveEmptyCells[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
+    non_empties: List[Int]) (implicit geofactory: GeometryFactory, settings: Settings):
+      List[(Point, Int, Int)] = {
+
+    val empties = quadtree.getLeafZones.asScala.map(_.partitionId.toInt).toSet
+      .diff(non_empties.toSet).toList.sorted
+
+    val L = for{
+      empty <- empties
+    } yield {
+      val cell = cells(empty)
+      getClosestPath(quadtree, non_empties, cell)
+    }
+
+    L.groupBy{ case(pid, point, pids) => (pid, point) }
+      .map{ case(key, value) =>
+        val pid = key._1
+        val point = key._2
+        val pids = value.map(_._3).flatten.toSet
+
+        pids.map( p => (point, pid, p))
+      }.flatten.toList
+  }
+ 
+  private def getClosestPath[T](Q: StandardQuadTree[T], NE: List[Int], c: Cell)
     (implicit geofactory: GeometryFactory, settings: Settings):
       (Int, Point, List[Int]) = {
 
@@ -76,7 +123,7 @@ object CellManager2 {
       .filterNot(_.lineage == c.lineage)
       .map{ q =>
         val id = q.partitionId.toInt
-        Cell(id, q.lineage, q.getEnvelope)
+        Cell(id, q.lineage, envelope2ring(q.getEnvelope))
       }.sortBy(_.id).toList
 
     (cells, corner)
@@ -104,7 +151,7 @@ object CellManager2 {
 
   def main(args: Array[String]) = {
     implicit val geofactory = new GeometryFactory(new PrecisionModel(100))
-    implicit val settings = Settings(tolerance = 0.001, debug = true)
+    implicit val settings = Settings(tolerance = 0.001, debug = false)
     implicit val spark = SparkSession.builder()
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
@@ -126,7 +173,7 @@ object CellManager2 {
     save("/tmp/edgesC.wkt"){
       quadtree.getLeafZones.asScala.map{ leaf =>
         val id = leaf.partitionId
-        val cell = Cell(id, leaf.lineage, leaf.getEnvelope)
+        val cell = Cell(id, leaf.lineage, envelope2ring(leaf.getEnvelope))
         val (around, point) = getCellsAtCorner(quadtree, cell)
 
         val wkt = point.toText
@@ -149,25 +196,9 @@ object CellManager2 {
 
     // Testing getClosestPath function...
     val non_empties = List(5, 17, 32, 48)
-    val empties = (0 to 51).toSet.diff(non_empties.toSet).toList.sorted
-
-    val L = for{
-      empty <- empties
-    } yield {
-      val c = cells(empty)
-      val cell = Cell(c.id, c.lineage, c.mbr.getEnvelopeInternal)
-      getClosestPath(quadtree, non_empties, cell)
-    }
-
-    val result = L.groupBy{ case(pid, point, pids) => (pid, point) }
-      .map{ case(key, value) =>
-        val pid = key._1
-        val point = key._2
-        val pids = value.map(_._3).flatten.toSet
-
-        pids.map( p => (point, pid, p))
-      }.flatten
-
+    val empties = (0 to 51).toSet.diff(non_empties.toSet).toList
+    //val result = solveEmptyCells(quadtree, cells, non_empties)
+    val result = solve(quadtree, cells, empties)
     save("/tmp/edgesR.wkt"){
       result.map{ case(point, pid, p) =>
         val wkt = cells(p).wkt
@@ -177,6 +208,5 @@ object CellManager2 {
 
     spark.close()
   }
-
 }
 
