@@ -80,17 +80,23 @@ object SDCEL {
     log2("TIME|read")
 
     if(params.debug()){
-      save(s"/tmp/cellsA_${qtag}.tsv"){
+      save(s"/tmp/edgesCA_${qtag}.wkt"){
         edgesRDDA.mapPartitionsWithIndex{ (pid, it) =>
-          val n = it.size
+          val edges = it.toList
+          val cell = cells(pid).mbr
+          val non_empty = edges.exists{ _.intersects(cell) }
+          val n = edges.size
           val wkt = cells(pid).wkt
-          val r = s"$pid\t$n\t$wkt\n"
+          val r = s"$wkt\t$pid\t$n\t$non_empty\n"
           Iterator(r)
         }.collect
       }
-      save(s"/tmp/cellsB_${qtag}.tsv"){
+      save(s"/tmp/cellsCB_${qtag}.wkt"){
         edgesRDDB.mapPartitionsWithIndex{ (pid, it) =>
-          val n = it.size
+          val edges = it.toList
+          val cell = cells(pid).mbr
+          val empty = edges.exists{ _.intersects(cell) }
+          val n = edges.size
           val wkt = cells(pid).wkt
           val r = s"$pid\t$n\t$wkt\n"
           Iterator(r)

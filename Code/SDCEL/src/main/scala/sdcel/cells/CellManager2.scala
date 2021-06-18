@@ -18,98 +18,86 @@ import edu.ucr.dblab.sdcel.geometries.Cell
 
 object CellManager2 {
 
-  def solve[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell], empties: List[Int])
+  def solveEmptyCells[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
+    empties: List[Int])
     (implicit geofactory: GeometryFactory, settings: Settings): List[(Point, Int, Int)] = {
 
     val non_empties = quadtree.getLeafZones.asScala.map(_.partitionId.toInt).toSet
       .diff(empties.toSet).toList.sorted
 
-    solveTailRec(quadtree, cells, empties, non_empties, List.empty[(Point,Int,Int)]).distinct
+    solveRec(quadtree, cells, empties, non_empties, List.empty[(Point,Int,Int)]).distinct
   }
 
   @tailrec
-  private def solveTailRec[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
+  private def solveRec[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
     empties: List[Int], non_empties: List[Int], result: List[(Point, Int, Int)])
     (implicit geofactory: GeometryFactory, settings: Settings): List[(Point, Int, Int)] = {
 
+    // iterate recursively over the set of empty cells...
     empties match {
       case Nil => result
       case empty +: tail => {
         val cell = cells(empty)
         val (pid, point, pids) = getClosestPath(quadtree, non_empties, cell)
+        // remove the complete path of cells solved in the past call...
         val new_empties = tail.toSet.diff(pids.toSet).toList
         val new_result = result ++ pids.map( p => (point, pid, p))
-        solveTailRec(quadtree, cells, new_empties, non_empties, new_result)
+        solveRec(quadtree, cells, new_empties, non_empties, new_result)
       }
     }
   }
 
-  def solveEmptyCells[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
-    non_empties: List[Int]) (implicit geofactory: GeometryFactory, settings: Settings):
-      List[(Point, Int, Int)] = {
-
-    val empties = quadtree.getLeafZones.asScala.map(_.partitionId.toInt).toSet
-      .diff(non_empties.toSet).toList.sorted
-
-    val L = for{
-      empty <- empties
-    } yield {
-      val cell = cells(empty)
-      getClosestPath(quadtree, non_empties, cell)
-    }
-
-    L.groupBy{ case(pid, point, pids) => (pid, point) }
-      .map{ case(key, value) =>
-        val pid = key._1
-        val point = key._2
-        val pids = value.map(_._3).flatten.toSet
-
-        pids.map( p => (point, pid, p))
-      }.flatten.toList
-  }
- 
+  // helper function to call closest function
   private def getClosestPath[T](Q: StandardQuadTree[T], NE: List[Int], c: Cell)
     (implicit geofactory: GeometryFactory, settings: Settings):
       (Int, Point, List[Int]) = {
 
+    // just create a fake point and empty list to start the recursion...
     val point_prime = geofactory.createPoint(new Coordinate(0,0))
     val path_prime  = List.empty[Int]
     val (pid, path, point) = closest(Q, NE, c, path_prime, point_prime)
 
-    (pid, point, path :+ c.id)
+    (pid, point, path :+ c.id) // attach the current cell to the path
   }
 
   @tailrec
+  // Recursive function to get the list of empty cells and the non-empty cell and point
+  // which is the closest to them...
   private def closest[T](Q: StandardQuadTree[T], NE: List[Int], c: Cell,
     path: List[Int], point: Point)
     (implicit geofactory: GeometryFactory, settings: Settings):
       (Int, List[Int], Point) = {
 
-    //println(s"c: $c")
+    // get cells in the corner and reference point...
     val (cs, point) = getCellsAtCorner(Q, c)
-    //println(s"cs: $cs")
-    //println(s"point: $point")
+    // if one of the cells is non-empty we can finish...
     if(cs.exists(x => isInNonEmpties(x, NE))){
       val (non_empties, empties) = cs.partition(x => isInNonEmpties(x, NE))
       val non_empty = non_empties.head.id
       val ids = empties.map(_.id)
       (non_empty, path ++ ids, point)
-    } else {
-      val new_c = getDeepestCell(cs)
-      //println(s"new_c: $new_c")
-
+    } else { // if not...
+      val new_c = getDeepestCell(cs) // choose the deepest cell...
+      // extract the cell parent quadtree...  
       val Q_prime = Quadtree.extract(Q, getLineageParent(new_c))
-      val new_NE = filterNoNEmpties(NE, Q_prime)
-      val new_path = path ++ cs.map(_.id)
+      // filter the non-empty cells to only the children of the choosen cell parent...
+      val new_NE = filterNonEmpties(NE, Q_prime) 
+      val new_path = path ++ cs.map(_.id) // accumulate the set of empty cells involved...
+      // repeat recursion...
       closest(Q, new_NE, new_c, new_path, point)
     }
   }
 
+  // Return the 3 cells that touch the internal corner of the given cell...
+  // The internal corner is that one which point to the interior
+  // of the cell parent...
   private def getCellsAtCorner[T](quadtree: StandardQuadTree[T], c: Cell)
     (implicit geofactory: GeometryFactory, settings: Settings): (List[Cell], Point) = {
 
+    // take the quadrant of the cell...
     val region = c.lineage.takeRight(1).toInt
     val b = c.boundary
+    // depending on quadrant and boundary get the coordinate of interior corner...
     val (x, y) = region match {
       case 0 => (b.getMaxX, b.getMinY)
       case 1 => (b.getMinX, b.getMinY)
@@ -118,13 +106,15 @@ object CellManager2 {
     }
     val corner = geofactory.createPoint(new Coordinate(x, y))
     val envelope = corner.getEnvelopeInternal
-    envelope.expandBy(settings.tolerance)
+    envelope.expandBy(settings.tolerance) // expand corner a bit to ensure touch...
+
+    // from quadtree get the cells that touch the corner...
     val cells = quadtree.findZones(new QuadRectangle(envelope)).asScala
-      .filterNot(_.lineage == c.lineage)
+      .filterNot(_.lineage == c.lineage) // remove current cell...
       .map{ q =>
         val id = q.partitionId.toInt
         Cell(id, q.lineage, envelope2ring(q.getEnvelope))
-      }.sortBy(_.id).toList
+      }.toList
 
     (cells, corner)
   }
@@ -138,7 +128,7 @@ object CellManager2 {
     cells.map(cell => (cell.lineage.length, cell)).maxBy(_._1)._2
 
   // Filter the list of non-empty cells with those from the new quadtree...
-  private def filterNoNEmpties[T](non_empties: List[Int],
+  private def filterNonEmpties[T](non_empties: List[Int],
     quadtree: StandardQuadTree[T]): List[Int] = {
 
     val ids = quadtree.getLeafZones.asScala.map(_.partitionId)
@@ -149,6 +139,7 @@ object CellManager2 {
   private def isInNonEmpties(cell: Cell, non_empties: List[Int]): Boolean =
     non_empties.exists(_ == cell.id)
 
+  // for testing purposes...
   def main(args: Array[String]) = {
     implicit val geofactory = new GeometryFactory(new PrecisionModel(100))
     implicit val settings = Settings(tolerance = 0.001, debug = false)
@@ -198,7 +189,7 @@ object CellManager2 {
     val non_empties = List(5, 17, 32, 48)
     val empties = (0 to 51).toSet.diff(non_empties.toSet).toList
     //val result = solveEmptyCells(quadtree, cells, non_empties)
-    val result = solve(quadtree, cells, empties)
+    val result = solveEmptyCells(quadtree, cells, empties)
     save("/tmp/edgesR.wkt"){
       result.map{ case(point, pid, p) =>
         val wkt = cells(p).wkt
