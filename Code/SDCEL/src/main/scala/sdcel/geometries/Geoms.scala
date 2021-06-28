@@ -34,6 +34,19 @@ case class Half_edge(edge: LineString) {
   var prev: Half_edge = null
   var MAX_RECURSION: Int = Int.MaxValue
 
+  def getPolygonId(): Int = {
+    @tailrec
+    def polyId(hedge: Half_edge): Int = {
+      if(hedge.data.polygonId >= 0){
+        hedge.data.polygonId
+      } else {
+        polyId(hedge.next)
+      }
+    }
+
+    polyId(this)
+  }
+
   def getTag: String = tags.sortBy(_.label).mkString(" ")
 
   def split(p: Coordinate): List[Half_edge] = {
@@ -223,6 +236,32 @@ case class Cell(id: Int, lineage: String, mbr: LinearRing){
 
   def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
     geofactory.createPolygon(mbr)
+  }
+
+  def toHalf_edge(polyId: Int, label: String)
+    (implicit geofactory: GeometryFactory): Half_edge = {
+
+    val se = new Coordinate(boundary.getMinX, boundary.getMinY)
+    val sw = new Coordinate(boundary.getMaxX, boundary.getMinY)
+    val nw = new Coordinate(boundary.getMaxX, boundary.getMaxY)
+    val ne = new Coordinate(boundary.getMinX, boundary.getMaxY)
+    val e1 = geofactory.createLineString(Array(se, sw))
+    val e2 = geofactory.createLineString(Array(sw, nw))
+    val e3 = geofactory.createLineString(Array(nw, ne))
+    val e4 = geofactory.createLineString(Array(ne, se))
+    e1.setUserData(EdgeData(polyId, 0, 1, false, label))
+    e2.setUserData(EdgeData(polyId, 0, 2, false, label))
+    e3.setUserData(EdgeData(polyId, 0, 3, false, label))
+    e4.setUserData(EdgeData(polyId, 0, 4, false, label))
+    val h1 = Half_edge(e1)
+    val h2 = Half_edge(e2)
+    val h3 = Half_edge(e3)
+    val h4 = Half_edge(e4)
+    h1.next = h2; h1.prev = h4
+    h2.next = h3; h2.prev = h1
+    h3.next = h4; h3.prev = h2
+    h4.next = h1; h4.prev = h3
+    h1
   }
 }
 

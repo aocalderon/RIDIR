@@ -1,6 +1,6 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.LineString
+import com.vividsolutions.jts.geom.{LineString, Point}
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 
 import org.apache.spark.serializer.KryoSerializer
@@ -57,7 +57,7 @@ object SDCEL {
     val qtag = params.qtag()
     if(params.debug()){
       log(s"INFO|scale=${settings.scale}")
-      save{s"/tmp/edgesCells_${qtag}.tsv"}{
+      save{s"/tmp/edgesCells_${qtag}.wkt"}{
         cells.values.map{ cell =>
           val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
           val id = cell.id
@@ -163,9 +163,42 @@ object SDCEL {
       val nSDcel = sdcel.count()
       log2("TIME|merge")
 
+      // *************************************
+      // * START: Dealing with empty cells...
+      // *************************************
+      val (ne, e) = sdcel.mapPartitionsWithIndex{ (pid, it) =>
+        val faces = it.map(_._1.getPolygon).toList
+        val cell = cells(pid).mbr
+        val non_empty = faces.exists{ _.intersects(cell) }
+        val r = (pid, non_empty)
+        Iterator(r)
+      }.collect().partition{ case(pid, non_empty) => non_empty }
+      val non_empties = ne.map(_._1).toList
+      val empties = e.map(_._1).toList
+      println(s"Non empties set: ${non_empties.mkString(" ")}")
+      println(s"Empties set: ${empties.mkString(" ")}")
+      import edu.ucr.dblab.sdcel.cells.EmptyCellManager._
+      val r_prime = solve(quadtree, cells, non_empties, empties)
+      r_prime.foreach(println)
+      // Getting polygon IDs from known partitions...
+      val r = updatePolygonIds(r_prime, sdcel)
+      val str = r.map{_.toString}.mkString("\n")
+      println(s"r:\n$str")
+      val sdcel_prime = fixEmptyCells(r, sdcel, cells)
+      // ***********************************
+      // * END: Dealing with empty cells...
+      // ***********************************
+
       if(params.debug()){
         save("/tmp/edgesF.wkt"){
           sdcel.map{ case(h, tag) =>
+            val wkt = h.getPolygon.toText
+
+            s"$wkt\t$tag\n"
+          }.collect
+        }
+        save("/tmp/edgesF_prime.wkt"){
+          sdcel_prime.map{ case(h, tag) =>
             val wkt = h.getPolygon.toText
 
             s"$wkt\t$tag\n"

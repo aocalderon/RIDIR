@@ -1,9 +1,10 @@
 package edu.ucr.dblab.sdcel.cells
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate, Point}
+import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate, Point, Polygon}
 
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.rdd.RDD
 import org.apache.spark.serializer.KryoSerializer
 
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
@@ -14,18 +15,72 @@ import scala.annotation.tailrec
 import edu.ucr.dblab.sdcel.PartitionReader._
 import edu.ucr.dblab.sdcel.Utils.{Settings, save}
 import edu.ucr.dblab.sdcel.quadtree.{StandardQuadTree, QuadRectangle, Quadtree}
-import edu.ucr.dblab.sdcel.geometries.Cell
+import edu.ucr.dblab.sdcel.geometries.{Cell, Half_edge}
 
-object CellManager2 {
+object EmptyCellManager {
+  // model the data from a empty cell:
+  // point: the reference point to find the required polygon id.
+  // pid: the partition id where the point must be queried.
+  // empty: the partition id of the empty cell.
+  // polyId: the polygon id which the empty cell must be updated.
+  case class EmptyCell(point: Point, pid: Int, empty:Int,
+    polyId: Int = -1, label: String = "*"){
 
-  def solveEmptyCells[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
-    empties: List[Int])
-    (implicit geofactory: GeometryFactory, settings: Settings): List[(Point, Int, Int)] = {
+    override def toString: String = s"$point\t$pid\t$empty\t$polyId\t$label"
 
-    val non_empties = quadtree.getLeafZones.asScala.map(_.partitionId.toInt).toSet
-      .diff(empties.toSet).toList.sorted
+    // return a expanded version of the point to help in the intersection call...
+    def reference(implicit settings: Settings, geofactory: GeometryFactory): Polygon = {
+      val envelope = point.getEnvelopeInternal
+      envelope.expandBy(settings.tolerance)
+      envelope2polygon(envelope)
+    }
+  }
 
-    solveRec(quadtree, cells, empties, non_empties, List.empty[(Point,Int,Int)]).distinct
+  def fixEmptyCells(r: List[EmptyCell], sdcel: RDD[(Half_edge, String)],
+    cells: Map[Int, Cell])
+    (implicit settings: Settings, geofactory: GeometryFactory):  RDD[(Half_edge, String)]= {
+    val pids = r.map(_.empty).toSet
+    sdcel.mapPartitionsWithIndex{ (pid, it) =>
+      if(pids.contains(pid)){
+        val empty = r.filter(_.empty == pid).head
+        
+        val h = cells(pid).toHalf_edge(empty.polyId, empty.label)
+        val tuple = (h, empty.label)
+        it ++ Iterator(tuple)
+      } else {
+        it
+      }
+    }
+  }  
+
+  def updatePolygonIds(r: List[EmptyCell], sdcel: RDD[(Half_edge, String)])
+      (implicit settings: Settings, geofactory: GeometryFactory): List[EmptyCell] = {
+    val pids = r.map(_.pid).toSet
+    sdcel.mapPartitionsWithIndex{ (pid, it) =>
+      if(pids.contains(pid)){
+        val cells  = r.filter(_.pid == pid)
+        val hedges = it.toList
+
+        val list = for{
+          cell  <- cells
+          hedge <- hedges if hedge._1.getPolygon.intersects{cell.reference}
+        } yield {
+          cell.copy(polyId = hedge._1.getPolygonId, label = hedge._2)
+        }
+        list.toIterator
+      } else {
+        List.empty[EmptyCell].toIterator
+      }
+    }.collect.toList
+  }
+
+  def solve[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
+    non_empties: List[Int], empties: List[Int])
+    (implicit geofactory: GeometryFactory, settings: Settings): List[EmptyCell] = {
+
+    solveRec(quadtree, cells, empties, non_empties, List.empty[(Point,Int,Int)])
+      .distinct
+      .map{ case(point, pid, empty) => EmptyCell(point, pid, empty)}
   }
 
   @tailrec
@@ -189,11 +244,11 @@ object CellManager2 {
     val non_empties = List(5, 17, 32, 48)
     val empties = (0 to 51).toSet.diff(non_empties.toSet).toList
     //val result = solveEmptyCells(quadtree, cells, non_empties)
-    val result = solveEmptyCells(quadtree, cells, empties)
+    val result = solve(quadtree, cells, non_empties , empties)
     save("/tmp/edgesR.wkt"){
-      result.map{ case(point, pid, p) =>
-        val wkt = cells(p).wkt
-        s"$wkt\t$p\t$pid\n"
+      result.map{ cell =>
+        val wkt = cells(cell.empty).wkt
+        s"$wkt\t${cell.empty}\t${cell.pid}\n"
       }.toList
     }
 

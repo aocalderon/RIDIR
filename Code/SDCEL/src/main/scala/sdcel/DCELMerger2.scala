@@ -92,6 +92,11 @@ object DCELMerger2 {
     // Getting intersection between dcel A and B...
     val intersections = intersects(ha, hb)
 
+      if(pid == 3){
+        println(s"Intersections at 3")
+        intersections.foreach(println)
+      }
+
     if(debug){
       val inters_prime = intersections.zipWithIndex
       save(s"/tmp/edgesC$pid.wkt",
@@ -233,7 +238,10 @@ object DCELMerger2 {
     val h = groupByNext(h_prime, List.empty[(Half_edge, String)])
       .filter(_._2 != "")
 
-    if(debug){
+    if(false){
+      println(s"PID: $pid")
+      val labels = h_prime.map{_.getNexts.map{_.label}.mkString(" ")}.mkString("\n")
+      println(s"$labels \n")
       println("H size: " + h.size)
       save(s"/tmp/edgesH_prime$pid.wkt",
         h.map{ case(h, tag) =>
