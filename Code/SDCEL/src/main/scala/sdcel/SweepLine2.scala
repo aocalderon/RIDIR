@@ -84,31 +84,22 @@ object SweepLine2 {
     // Finding intersections...
     sweepline.computeIntersections(edgesList, mbrList, segmentIntersector)
 
-    // Getting list of the intersections (coordinates) on cell...
+    // Getting list of the intersections (coordinates) on cell border...
     val iOn = getEdgesOn(mbrList).map{ edge =>
       val hon = Half_edge(edge)
-      Intersection(hon.v1, hon, Mode.On) // we collect the origen of the edges on cell...
+      Intersection(hon.v1, hon, Mode.On) // we collect the origen of the edges on border...
     }
 
-    // Getting hedges coming to the cell (in) and leaving the cell (out)...
+    // Getting hedges coming to the border (in) and leaving the border (out)...
     val (edgesIn, edgesOut) = getEdgesTouch(edgesList, outerEdges, mbr, index)
     val iIn = edgesIn.map{ edge =>
       val hin = Half_edge(edge)
-      Intersection(hin.v2, hin, Mode.In) // hin comes to the cell at coord v2...
+      Intersection(hin.v2, hin, Mode.In) // hin comes to the border at coord v2...
     }
     val iOut = edgesOut.map{ edge =>
       val hout = Half_edge(edge)
-      Intersection(hout.v1, hout, Mode.Out) // hout leaves the cell at coord v1... 
+      Intersection(hout.v1, hout, Mode.Out) // hout leaves the border at coord v1... 
     }
-
-    if(index == 1){
-      println("On")
-      iOn.foreach(println)
-      println("In")
-      iIn.foreach(println)
-      println("Out")
-      iOut.foreach(println)
-    }    
 
     // Grouping hedges in and out by their coordinate intersections...
     val intersections = iOn union iIn union iOut
@@ -128,9 +119,11 @@ object SweepLine2 {
 
     // Finding the number of half-edges involved...
     val n = ring.filter(!_.hins.isEmpty).size
-    
+
     // Extracting the list of half-edges...
-    getHedgesList(0, n, ring.head, Vector.empty[List[Half_edge]])
+    val r = getHedgesList(0, n, ring.head, Vector.empty[List[Half_edge]])
+
+    r
   }
 
   @tailrec
@@ -146,7 +139,7 @@ object SweepLine2 {
     }
   }
 
-  // Getting list of coordinates which intersect the cell...
+  // Getting list of coordinates which intersect the cell border...
   private def getEdgesOn(mbrList: java.util.List[Edge])
       (implicit geofactory: GeometryFactory): Vector[LineString] = {
     val coords = mbrList.asScala.flatMap{ edge =>
@@ -163,8 +156,7 @@ object SweepLine2 {
       val segment = geofactory.createLineString(Array(p1, p2))
       segment.setUserData(EdgeData(-1,0,id,false))
       segment
-    }
-    
+    }    
   }
 
   @tailrec
@@ -276,14 +268,23 @@ object SweepLine2 {
     }
   }
   def merge(outer: Vector[List[Half_edge]],
-    inner: Vector[List[Half_edge]], index: Int = -1)
+    inner: Vector[List[Half_edge]], partitionId: Int = -1)
     (implicit geofactory: GeometryFactory): Iterable[Half_edge] = {
 
-    val sin  = inner.map{Segment}
-    val sout = outer.map{Segment}
+    val sin  = inner.map{hs => Segment(hs.distinct)}
+    val sout = outer.map{hs => Segment(hs.distinct)}
 
-    val segments = (sin ++ sout).groupBy(_.polygonId).values.map{ s =>
-      concatSegments(s.toList, List.empty[Segment])
+    val segments0 = (sin ++ sout).groupBy(_.polygonId).values.toList
+    if(partitionId == 29){
+      segments0.filter(_.head.polygonId == 34).map(_.distinct).foreach{println}
+    }
+
+    val segments = segments0.map{ s =>
+      // I have to purge the list of segments to fix the bug of hedge touching two cell borders...
+      //val segs = findExtensions(s, Vector.empty[Segment]).toList
+      val segs = s.toList
+
+      concatSegments(segs, List.empty[Segment])
     }
 
     segments.flatMap{ ss =>
@@ -299,4 +300,47 @@ object SweepLine2 {
         }
       }
   }
+
+  // Start: Functions to fix bug when half-edge touch two cell borders at the same time...
+  def checkExtension[T](x: Segment, borders: Vector[Segment]): Boolean = {
+    borders.exists { b  => b.last == x.first || b.first == x.last }
+  }
+
+  def extend[T](x: Segment, borders: Vector[Segment]): Segment = {
+    val left  = borders.foldLeft(x){ (l, r) =>
+      if(l.first == r.last)
+        Segment(r.hedges ++ l.hedges.tail)
+      else
+        l
+    }
+    val right = borders.foldLeft(x){ (l, r) =>
+      if(l.last == r.first)
+        Segment(l.hedges ++ r.hedges.tail)
+      else
+        l
+    }
+
+    Segment(left.hedges.slice(0, left.hedges.length - x.hedges.length) ++ right.hedges)
+  }
+
+  @tailrec
+  def findExtensions(borders: Vector[Segment], result: Vector[Segment])
+      : Vector[Segment] = {
+
+    val (extendibles, isolates) = borders.partition( b => checkExtension(b, borders))
+    val new_result = result ++ isolates
+    if(extendibles.isEmpty){
+      new_result
+    } else {
+      val first = extendibles.head
+      val tail  = extendibles.tail
+      val extension = extend(first, tail)
+
+      val new_borders = extendibles.filter{ x =>
+        extension.hedges.intersect(x.hedges).isEmpty } ++ List(extension)
+
+      findExtensions(new_borders, new_result)
+    }
+  }
+  // End: Functions to fix bug when half-edge touch two cell borders at the same time...
 }

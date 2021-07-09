@@ -11,14 +11,14 @@ import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge, Tag}
 
+import Utils._
+
 object DCELMerger2 {
 
   def intersects(hedgesA: List[Half_edge], hedgesB: List[Half_edge])
     (implicit geofactory: GeometryFactory): Map[Coordinate, List[Half_edge]] = {
     val pid = org.apache.spark.TaskContext.getPartitionId
 
-    //save("/tmp/edgesHedgesA.wkt", hedgesA.map(a => a.wkt + "\t" + a.data + "\n"))
-    //save("/tmp/edgesHedgesB.wkt", hedgesB.map(b => b.wkt + "\t" + b.data + "\n"))
     val aList = hedgesA.map{ h =>
       val pts = Array(h.v1, h.v2)
       HEdge(pts, h)
@@ -31,7 +31,6 @@ object DCELMerger2 {
     
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
-    //lineIntersector.setPrecisionModel(new PrecisionModel(1e3))
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
     sweepline.computeIntersections(aList, bList, segmentIntersector)
@@ -40,11 +39,12 @@ object DCELMerger2 {
       .groupBy(_._1).mapValues(_.map(_._2).sortBy(_.data.label))
   }
 
-  private def getIntersections(list: java.util.List[HEdge]):
-      List[(Coordinate, Half_edge)] = {
+  private def getIntersections(list: java.util.List[HEdge])
+    (implicit geofactory: GeometryFactory): List[(Coordinate, Half_edge)] = {
     list.asScala.flatMap{ edge =>
       edge.getEdgeIntersectionList.iterator.asScala.map{ i =>
-        (i.asInstanceOf[EdgeIntersection].getCoordinate, edge.h)
+        val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
+        (coord, edge.h)
       }.toList
     }.toList
   }
@@ -92,7 +92,7 @@ object DCELMerger2 {
     // Getting intersection between dcel A and B...
     val intersections = intersects(ha, hb)
 
-      if(pid == 3){
+      if(pid == 1){
         println(s"Intersections at 3")
         intersections.foreach(println)
       }
@@ -124,13 +124,27 @@ object DCELMerger2 {
     }
      
     // Split the half-edges which intersect each other...
-    val splits = intersections.map{ case(p, hList) =>
+    val splits0 = intersections.map{ case(p, hList) =>
       hList.map(h => (h,p))
     }.flatten.groupBy(_._1).mapValues(_.map(_._2))
-      .map{ case(k, v) =>
-        val h = List(k)
-        v.toList.foldLeft(h){ case(h, c) => h.map(_.split(c)).flatten}
-      }.flatten.groupBy(h => (h.v1, h.v2)).mapValues{ h =>
+
+    if(pid == 1){
+        println(s"Splits at 3")
+        splits0.foreach(println)
+      }
+
+    val splits1 = splits0.map{ case(k, v) =>
+      val h = List(k)
+      // traverse the half-edge splitting at each coordinate
+      v.toList.foldLeft(h){ case(h, c) => h.map(_.split(c)).flatten}
+    }.flatten.groupBy(h => (h.v1, h.v2))
+
+    if(pid == 1){
+        println(s"Splits at 3")
+        splits1.foreach(println)
+      }
+
+    val splits = splits1.mapValues{ h =>
       val tags = h.map(h => Tag(h.data.label, h.data.polygonId))
       val h_prime = h.head
       h_prime.tags = tags.toList
@@ -225,6 +239,11 @@ object DCELMerger2 {
       intersections.keySet.contains(h.v2)
     }.filter(_.data.polygonId != -1).toSet
 
+    if(pid == 1){
+      println("h_prime at 3:")
+      h_prime.map(h => (h, h.getTag)).foreach(println)
+    }
+
     if(debug){
       println("h_prime: " + h_prime.size)
       save("/tmp/edgesHprime.wkt",
@@ -237,6 +256,11 @@ object DCELMerger2 {
     // Group by next...
     val h = groupByNext(h_prime, List.empty[(Half_edge, String)])
       .filter(_._2 != "")
+
+    if(pid == 1){
+      println("h")
+      h.foreach{println}
+    }
 
     if(false){
       println(s"PID: $pid")
@@ -264,11 +288,7 @@ object DCELMerger2 {
     } else {
       val h = hs.head
 
-      val tag = if(h.data.label == "A")
-        h.label + " " + h.next.label
-      else
-        h.next.label + " " + h.label
-      val tag2 = List(h.label, h.next.label)
+      val tag = List(h.label, h.next.label)
         .filterNot(t => t == "A" || t == "B").sorted.mkString(" ")
 
       val nexts = h.getNexts
@@ -276,7 +296,8 @@ object DCELMerger2 {
         r :+ ((h, "Error"))
       } else {
         val hs_new = hs -- h.getNexts.toSet
-        val r_new  = r :+ ((h, tag2))
+        h.tags = h.updateTags
+        val r_new  = r :+ ((h, h.getTag))
 
         groupByNext(hs_new, r_new)
       }

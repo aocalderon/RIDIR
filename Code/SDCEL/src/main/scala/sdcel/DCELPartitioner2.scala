@@ -15,6 +15,8 @@ import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
 import edu.ucr.dblab.sdcel.quadtree._
+import edu.ucr.dblab.sdcel.geometries.{Cell, LEdge}
+
 import Utils._
 
 object DCELPartitioner2 {
@@ -184,6 +186,74 @@ object DCELPartitioner2 {
       .text(name)
   }
 
+  // Start: Function to mark edges and their intersections with the quadtree cells...
+  import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector
+  import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
+  import com.vividsolutions.jts.algorithm.RobustLineIntersector
+  import com.vividsolutions.jts.geomgraph.EdgeIntersection
+  //import com.vividsolutions.jts.geomgraph.Edge
+  //import scala.collection.JavaConverters._
+
+  private def getIntersectionsOnBorders(borders: List[LEdge])
+      : List[(Coordinate, String)] = {
+
+    borders.flatMap{ border =>
+      border.getEdgeIntersectionList.iterator.asScala.map{ i =>
+        val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
+        (coord, border.l.getUserData.toString)
+      }.toList
+    }.toList
+  }
+
+  private def matchIntersectedEdgesAndBorders(edges: Iterator[LEdge],
+    intersections: List[(Coordinate, String)], partitionId: Int): Iterator[String] = {
+
+    edges.map{ edge =>
+      val wkt = edge.l.toText
+      val data = edge.l.getUserData
+      val interList = edge.getEdgeIntersectionList.iterator.asScala.toList
+      val n = interList.size
+
+      if(n == 0){
+        s"$wkt\t$partitionId\t$data\tNone"
+      } else {
+        val coords = interList.map{_.asInstanceOf[EdgeIntersection].getCoordinate }
+        val crossingData = for{
+          c1 <- coords
+          c2 <- intersections if(c2._1 == c1)
+        } yield {
+          s"${c2._2}:${c1.x} ${c1.y}"
+        }
+
+        // Saving crossing info as: "N:x1 y1|W:x2 y2" ...
+        s"$wkt\t$partitionId\t$data\t${crossingData.mkString("|")}"        
+      }
+    }
+  }
+ 
+  def saveToHDFSWithCrossingInfo(edges: RDD[LineString], cells: Map[Int, Cell],
+    name: String)(implicit spark: SparkSession, geofactory: GeometryFactory): Unit = {
+    import spark.implicits._
+    edges.mapPartitionsWithIndex{ (pid, edgesIt) =>
+      val edges = edgesIt.map{edge => LEdge(edge.getCoordinates, edge)}.toList.asJava
+      val borders = cells(pid).toLEdges.asJava
+      
+      val sweepline = new SimpleMCSweepLineIntersector()
+      val lineIntersector = new RobustLineIntersector()
+      val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+
+      sweepline.computeIntersections(edges, borders, segmentIntersector)
+
+      val intersections = getIntersectionsOnBorders(borders.asScala.toList)
+
+      matchIntersectedEdgesAndBorders(edges.asScala.toIterator, intersections, pid)
+
+    }.toDF.write
+      .mode(org.apache.spark.sql.SaveMode.Overwrite)
+      .text(name)
+  }
+  // End: Function to mark edges and their intersections with the quadtree cells...
+
   def getLineStrings(polygon: Polygon, polygon_id: Long)
     (implicit geofactory: GeometryFactory): List[LineString] = {
     getRings(polygon).zipWithIndex
@@ -195,6 +265,7 @@ object DCELPartitioner2 {
           val isHole = ring_id > 0
 
           val line = geofactory.createLineString(coords)
+          // Save info from the edge...
           line.setUserData(s"$polygon_id\t$ring_id\t$order\t${isHole}")
 
           line
