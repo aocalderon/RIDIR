@@ -191,8 +191,6 @@ object DCELPartitioner2 {
   import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
   import com.vividsolutions.jts.algorithm.RobustLineIntersector
   import com.vividsolutions.jts.geomgraph.EdgeIntersection
-  //import com.vividsolutions.jts.geomgraph.Edge
-  //import scala.collection.JavaConverters._
 
   private def getIntersectionsOnBorders(borders: List[LEdge])
       : List[(Coordinate, String)] = {
@@ -235,8 +233,13 @@ object DCELPartitioner2 {
     name: String)(implicit spark: SparkSession, geofactory: GeometryFactory): Unit = {
     import spark.implicits._
     edges.mapPartitionsWithIndex{ (pid, edgesIt) =>
-      val edges = edgesIt.map{edge => LEdge(edge.getCoordinates, edge)}.toList.asJava
-      val borders = cells(pid).toLEdges.asJava
+      val cell = cells(pid)
+
+      val edges = edgesIt
+        .filter(edge => edge.intersects(cell.toPolygon)) // be sure edge intersect cell
+        .map{edge => LEdge(edge.getCoordinates, edge)}.toList.asJava
+
+      val borders = cell.toLEdges.asJava
       
       val sweepline = new SimpleMCSweepLineIntersector()
       val lineIntersector = new RobustLineIntersector()

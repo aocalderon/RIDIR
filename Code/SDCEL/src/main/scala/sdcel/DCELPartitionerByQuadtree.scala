@@ -73,7 +73,8 @@ object DCELPartitionerByQuadtree {
     if(settings.debug){
       save("/tmp/edgesA.wkt"){
         edgesA.mapPartitionsWithIndex{ (pid, it) =>
-          it.map{ line =>
+          val cell = cells(pid)
+          it.filter(_.intersects(cell.toPolygon)).map{ line =>
             val wkt = line.toText()
             s"$wkt\t$pid\n"
           }
@@ -81,7 +82,8 @@ object DCELPartitionerByQuadtree {
       }
       save("/tmp/edgesB.wkt"){
         edgesB.mapPartitionsWithIndex{ (pid, it) =>
-          it.map{ line =>
+          val cell = cells(pid)
+          it.filter(_.intersects(cell.toPolygon)).map{ line =>
             val wkt = line.toText()
             s"$wkt\t$pid\n"
           }

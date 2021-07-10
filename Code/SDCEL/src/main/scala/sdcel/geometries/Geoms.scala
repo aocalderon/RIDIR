@@ -30,6 +30,7 @@ case class Half_edge(edge: LineString) {
   else
     EdgeData(-1,-1,-1,false)
   val wkt = edge.toText()
+  var original_coords: Array[Coordinate] = Array.empty[Coordinate]
   var tags: List[Tag] = List.empty[Tag]
   var twin: Half_edge = null
   var next: Half_edge = null
@@ -244,6 +245,31 @@ case class Cell(id: Int, lineage: String, mbr: LinearRing){
 
   def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
     geofactory.createPolygon(mbr)
+  }
+
+  def getSouthBorder(implicit geofactory: GeometryFactory): LineString = {
+    val se = new Coordinate(boundary.getMinX, boundary.getMinY)
+    val sw = new Coordinate(boundary.getMaxX, boundary.getMinY)
+    val S = geofactory.createLineString(Array(se, sw))
+    S
+  }
+  def getWestBorder(implicit geofactory: GeometryFactory): LineString = {
+    val sw = new Coordinate(boundary.getMaxX, boundary.getMinY)
+    val nw = new Coordinate(boundary.getMaxX, boundary.getMaxY)
+    val W = geofactory.createLineString(Array(sw, nw))
+    W
+  }
+  def getNorthBorder(implicit geofactory: GeometryFactory): LineString = {
+    val nw = new Coordinate(boundary.getMaxX, boundary.getMaxY)
+    val ne = new Coordinate(boundary.getMinX, boundary.getMaxY)
+    val N = geofactory.createLineString(Array(nw, ne))
+    N
+  }
+  def getEastBorder(implicit geofactory: GeometryFactory): LineString = {
+    val se = new Coordinate(boundary.getMinX, boundary.getMinY)
+    val ne = new Coordinate(boundary.getMinX, boundary.getMaxY)
+    val E = geofactory.createLineString(Array(ne, se))
+    E
   }
 
   def toLEdges(implicit geofactory: GeometryFactory): List[LEdge] = {
