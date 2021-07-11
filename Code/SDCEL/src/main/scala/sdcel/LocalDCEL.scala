@@ -57,6 +57,7 @@ object LocalDCEL {
       setNextAndPrev(ins)
 
       // run sequential routine to create dcel for outs...
+      sequential(outs)
 
       if(pid == partitionId){
         println(s"PID $partitionId:")
@@ -69,12 +70,18 @@ object LocalDCEL {
         E.foreach{println}
         println
 
-        println("In sequential")
-        sequential(outs)
+        println("outs")
+        outs.map(_.wkt).foreach{println}
 
-        println("Outs")
-        outs.map{ out => s"I am $out: my next is ${out.next} and my prev is ${out.prev}"}
-          .foreach{println}
+        println("output")
+        outs.map{ o => s"I am $o and my next is ${o.next} and my prev is ${o.prev}"}
+          .foreach(println)
+
+        println("polygon")
+        
+        outs.filter(_.data.polygonId != -1)  // Remove outer face
+          .groupBy{_.data.polygonId}.values.map(_.head) // Pick only one half-edge per polygon...
+          .map(_.getPolygon.toText).foreach{println}
       }
 
       (outs ++ outs.filter(_.twin.isNewTwin).map(_.twin) ++
@@ -86,16 +93,11 @@ object LocalDCEL {
     save("/tmp/edgesCross.wkt"){r}
   }
 
-  // I HAVE TO DEBUG SEQGUENTIAL!!!
   // Sequential implementation of dcel...
   def sequential(hedges_prime: List[Half_edge], partitionId: Int = -1): Unit = {
     // Group half-edges by the destination vertex (v2)...
-    val hedges = hedges_prime ++ hedges_prime.filter(_.twin.isNewTwin)
-    val incidents = (hedges).groupBy(_.v2).values.toList
-
-    println("Incidents")
-    incidents.foreach{println}
-    println("done")
+    val hedges = hedges_prime ++ hedges_prime.filter(_.twin.isNewTwin).map(_.twin)
+    val incidents = hedges.groupBy(_.v2).values.toList
 
     // At each vertex, get their incident half-edges...
     val h_prime = incidents.map{ hList =>
