@@ -20,6 +20,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 
+import DCELMerger2.{setTwins}
 import Utils._
 
 object LocalDCEL {
@@ -28,7 +29,7 @@ object LocalDCEL {
     settings: Settings)
       : Unit = {
 
-    val partitionId = 15
+    val partitionId = 9
 
     val r = edgesRDD.mapPartitionsWithIndex{ (pid, it) =>
 
@@ -47,7 +48,16 @@ object LocalDCEL {
       val bordersE = splitBorder(cell.getEastBorder, E)
       val borders = (bordersS ++ bordersW ++ bordersN ++ bordersE)
 
-      // Need to test all the partitions...
+      val outs = (borders.map{Half_edge} ++ getCrossingHalf_edges(crossing)).distinct
+      val ins = containedIt.map{Half_edge}.toList
+
+      // pair each half_edge with its twin...
+      setTwins(outs)
+      setTwins(ins)
+      setNextAndPrev(ins)
+
+      // run sequential routine to create dcel for outs...
+
       if(pid == partitionId){
         println(s"PID $partitionId:")
         S.foreach{println}
@@ -59,16 +69,61 @@ object LocalDCEL {
         E.foreach{println}
         println
 
-        println("Splits")
-        getCrossingHalf_edges(crossing)
+        println("In sequential")
+        sequential(outs)
+
+        println("Outs")
+        outs.map{ out => s"I am $out: my next is ${out.next} and my prev is ${out.prev}"}
+          .foreach{println}
       }
 
-        getCrossingHalf_edges(crossing)
-        .map(b => s"${b.wkt}\n").toIterator
+      (outs ++ outs.filter(_.twin.isNewTwin).map(_.twin) ++
+        ins ++ ins.filter(_.twin.isNewTwin).map(_.twin))
+        .map(b => s"${b.wkt}\t${b.data}\n").toIterator
 
       //it
     }.collect
     save("/tmp/edgesCross.wkt"){r}
+  }
+
+  // I HAVE TO DEBUG SEQGUENTIAL!!!
+  // Sequential implementation of dcel...
+  def sequential(hedges_prime: List[Half_edge], partitionId: Int = -1): Unit = {
+    // Group half-edges by the destination vertex (v2)...
+    val hedges = hedges_prime ++ hedges_prime.filter(_.twin.isNewTwin)
+    val incidents = (hedges).groupBy(_.v2).values.toList
+
+    println("Incidents")
+    incidents.foreach{println}
+    println("done")
+
+    // At each vertex, get their incident half-edges...
+    val h_prime = incidents.map{ hList =>
+      // Sort them by angle...
+      val hs = hList.sortBy(- _.angleAtDest)
+      // Add first incident to complete the sequence...
+      val hs_prime = hs :+ hs.head
+      // zip and tail will pair each half-edge with its next one...
+      hs_prime.zip(hs_prime.tail).foreach{ case(h1, h2) =>
+        h1.next = h2.twin
+        h2.twin.prev = h1
+      }
+
+      hs
+    }.flatten
+  }
+
+  // Set the next and prev pointer for the inners edges based on its edgeId...
+  def setNextAndPrev(ins: List[Half_edge]): List[Half_edge] = {
+    ins.groupBy{in => (in.data.polygonId, in.data.ringId)}
+      .flatMap{ case(pid, hedges_prime) =>
+        val hedges = hedges_prime.sortBy(_.data.edgeId)
+        hedges.zip(hedges.tail).map{ case(h1, h2) =>
+          h1.next = h2
+          h2.prev = h1
+        }
+        hedges
+      }.toList
   }
 
   // Split crossing edges according to the cell border they intersect...
@@ -88,6 +143,7 @@ object LocalDCEL {
       val nsplits = crossing_info.size
 
       nsplits match {
+        // Single case, the edge has only one intersection.
         case 1 => {
           val arr = crossing_info.head.split(":")
           val border = arr(0)
@@ -100,6 +156,9 @@ object LocalDCEL {
           hedge
         }
         case 2 => {
+          // If the edge has two different intersections we extract the section between
+          // those two coords.  We sorted the coords according how close they are from the
+          // start of the edge.
           val intersections = crossing_info.map{ cross =>
             val data = cross.split(":")
             val xy = data(1).split(" ")
@@ -112,8 +171,8 @@ object LocalDCEL {
             split.setUserData(edge.getUserData)
             split
           } else {
-            // solve special case for edge in corner...
-            // select a coord and solve as it was a edge with a single intersection point
+            // If the two coords are the same is because the edge touch just a corner.
+            // We select a coord and solve it as an edge with a single intersection point.
             val arr = crossing_info.head.split(":")
             val border = arr(0)
             val xy = arr(1).split(" ")
@@ -140,6 +199,8 @@ object LocalDCEL {
     val end   = edge.getEndPoint.getCoordinate
     
     // Use the border side to infer the orientation...
+    // for example, if edge intersects north we ask if the start of the edge is below
+    // or above that intersection.
     val coords = border match {
       case "N" => {
         if (start.y >= coord.y) Array(coord, end) else Array(start, coord)
@@ -163,6 +224,8 @@ object LocalDCEL {
       (implicit geofactory: GeometryFactory): List[LineString] = {
 
     @tailrec
+    // Recursively cut the first section of the coord at the head of the list.
+    // Note: the coords have been sorted according to the border.
     def splitBorderT(border: LineString, coords: List[Coordinate], r: List[LineString])
       (implicit geofactory: GeometryFactory): List[LineString] = {
 

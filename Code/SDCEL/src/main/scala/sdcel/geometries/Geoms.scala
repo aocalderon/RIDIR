@@ -35,6 +35,7 @@ case class Half_edge(edge: LineString) {
   var twin: Half_edge = null
   var next: Half_edge = null
   var prev: Half_edge = null
+  var isNewTwin: Boolean = false
   var MAX_RECURSION: Int = Int.MaxValue
 
   override def toString = s"${edge.toText}\t$data"
@@ -197,7 +198,9 @@ case class Half_edge(edge: LineString) {
   def reverse(implicit geofactory: GeometryFactory): Half_edge = {
     val edge = geofactory.createLineString(Array(v2, v1))
     edge.setUserData(this.data.copy(polygonId = -1))
-    Half_edge(edge)
+    val h = Half_edge(edge)
+    h.isNewTwin = true
+    h
   }
 
   val emptyPolygon: Polygon = {

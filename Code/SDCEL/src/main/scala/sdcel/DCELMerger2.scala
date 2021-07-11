@@ -53,7 +53,6 @@ object DCELMerger2 {
   def setTwins(hedges: List[Half_edge])
     (implicit geofactory: GeometryFactory): List[Half_edge] = {
 
-    //case class H(hedge: Half_edge, vertex: Vertex, angle: Double)
     case class H(hedge: Half_edge, start: Vertex, end: Vertex)
     // Get a copy of the half-edge by their vertices and angles...
     val Hs = hedges.flatMap{ h =>
@@ -62,8 +61,9 @@ object DCELMerger2 {
         H(h, h.dest, h.orig)
       )
     }
+
     // Group by its vertex and angle...
-    val grouped = Hs.groupBy(h => (h.start, h.end)).values.foreach{ hList =>
+    val grouped = Hs.groupBy(h => (h.start, h.end)).values.map{ hList =>
       val (h0, h1) = if(hList.size == 1) {
         // If at a vertex, a half-edge is alone at its angle, we create its twin...
         val h0 = hList(0).hedge
@@ -79,6 +79,8 @@ object DCELMerger2 {
       // Setting the twins...
       h0.twin = h1
       h1.twin = h0
+
+      (h0, h1)
     }
 
     // Let's return the modified half-edges...
