@@ -238,6 +238,13 @@ case class Segment(hedges: List[Half_edge]) {
     s"${s.toText}\t${first.data}"
   }
 
+  def isClose: Boolean = {
+    //if(startId != 0)
+    //  false
+    //else
+      last.v2 == first.v1
+  }
+
   def tail: Segment = Segment(hedges.tail) 
 }
 

@@ -26,7 +26,7 @@ object SweepLine2 {
       }.toVector
   }
   @tailrec
-  private def getLineSegments(hedges: List[Half_edge], segment: List[Half_edge],
+  def getLineSegments(hedges: List[Half_edge], segment: List[Half_edge],
     segments: Vector[List[Half_edge]]): Vector[List[Half_edge]] = {
 
     hedges match {
