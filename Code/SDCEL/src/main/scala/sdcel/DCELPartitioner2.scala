@@ -266,10 +266,11 @@ object DCELPartitioner2 {
           val coord2 = pair._2
           val coords = Array(coord1, coord2)
           val isHole = ring_id > 0
+          val n = polygon.getNumPoints - 2
 
           val line = geofactory.createLineString(coords)
           // Save info from the edge...
-          line.setUserData(s"$polygon_id\t$ring_id\t$order\t${isHole}")
+          line.setUserData(s"$polygon_id\t$ring_id\t$order\t${isHole}\t${n}")
 
           line
         }

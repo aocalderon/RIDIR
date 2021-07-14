@@ -13,9 +13,9 @@ case class HEdge(coords: Array[Coordinate], h: Half_edge) extends Edge(coords)
 case class LEdge(coords: Array[Coordinate], l: LineString) extends Edge(coords)
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
-  label: String = "A", crossingInfo: String = "") {
+  label: String = "A", crossingInfo: String = "", nedges: Int = -1) {
   override def toString: String =
-    s"${label}$polygonId\t$ringId\t$edgeId\t$isHole\t$crossingInfo"
+    s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo"
 }
 
 case class Half_edge(edge: LineString) {
@@ -239,11 +239,10 @@ case class Segment(hedges: List[Half_edge]) {
   }
 
   def isClose: Boolean = {
-    //if(startId != 0)
-    //  false
-    //else
-      last.v2 == first.v1
+    last.v2 == first.v1
   }
+
+  def getExtremes: List[Half_edge] = if(hedges.size == 1) List(first) else List(first, last)
 
   def tail: Segment = Segment(hedges.tail) 
 }
