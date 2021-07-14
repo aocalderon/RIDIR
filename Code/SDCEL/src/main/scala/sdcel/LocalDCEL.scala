@@ -30,47 +30,41 @@ object LocalDCEL {
     settings: Settings)
       : Unit = {
 
-    val partitionId = 29
+    val partitionId = 1
 
     val r = edgesRDD.mapPartitionsWithIndex{ (pid, it) =>
-
-      /*
+      
       val (containedIt, crossingIt) = classifyEdges(it)
+      val crossing = getCrossing(crossingIt.toList)
 
-      val crossing = crossingIt.toList
       val S = getIntersectionsOnBorder(crossing, "S")
       val W = getIntersectionsOnBorder(crossing, "W")
       val N = getIntersectionsOnBorder(crossing, "N")
       val E = getIntersectionsOnBorder(crossing, "E")
-
       val cell = cells(pid)
       val bordersS = splitBorder(cell.getSouthBorder, S)
       val bordersW = splitBorder(cell.getWestBorder, W)
       val bordersN = splitBorder(cell.getNorthBorder, N)
       val bordersE = splitBorder(cell.getEastBorder, E)
-      val borders = (bordersS ++ bordersW ++ bordersN ++ bordersE)
+      val borders = (bordersS ++ bordersW ++ bordersN ++ bordersE).map{Half_edge}
+      setTwins(borders)
+      setNextAndPrevBorders(borders)
 
-      val outs = (borders.map{Half_edge} ++ getCrossingHalf_edges(crossing)).distinct
-      val ins = containedIt.map{Half_edge}.toList
+      val inner = (containedIt ++ crossing).map{Half_edge}.toList
+      setTwins(inner)
 
-      // pair each half_edge with its twin...
-      setTwins(outs)
-      setTwins(ins)
-       */
+      val inner_segments = sortInnerHedges(inner)
+      setNextAndPrev(inner_segments)
+      val (inner_closed, inner_open) = inner_segments.partition(_.isClose)
+      // closing pointer in polygons fully contained...
+      inner_closed.map{ seg =>
+        seg.last.next = seg.first
+        seg.first.prev = seg.last
+      }
 
+      merge(inner.filter(_.data.crossingInfo != "None"),  borders)
+      
       if(pid == partitionId){
-        /*
-        println(s"PID $partitionId:")
-        S.foreach{println}
-        println
-        W.foreach{println}
-        println
-        N.foreach{println}
-        println
-        E.foreach{println}
-        println
-         */
-
         val (containedIt, crossingIt) = classifyEdges(it)
         val crossing = getCrossing(crossingIt.toList)
 
@@ -78,11 +72,26 @@ object LocalDCEL {
         val W = getIntersectionsOnBorder(crossing, "W")
         val N = getIntersectionsOnBorder(crossing, "N")
         val E = getIntersectionsOnBorder(crossing, "E")
+        val cell = cells(pid)
+        val bordersS = splitBorder(cell.getSouthBorder, S)
+        val bordersW = splitBorder(cell.getWestBorder, W)
+        val bordersN = splitBorder(cell.getNorthBorder, N)
+        val bordersE = splitBorder(cell.getEastBorder, E)
+        val borders = (bordersS ++ bordersW ++ bordersN ++ bordersE).map{Half_edge}
+        setTwins(borders)
+        setNextAndPrevBorders(borders)
 
         val inner = (containedIt ++ crossing).map{Half_edge}.toList
         setTwins(inner)
 
+        
         val inner_segments = sortInnerHedges(inner)
+        println("Segments")
+        inner_segments.map{ seg =>
+          val ids = seg.hedges.map(_.data.edgeId).mkString(" ")
+          println(s"${seg.polygonId}")
+          println(ids)
+        }
         setNextAndPrev(inner_segments)
         val (inner_closed, inner_open) = inner_segments.partition(_.isClose)
         // closing pointer in polygons fully contained...
@@ -91,23 +100,20 @@ object LocalDCEL {
           seg.first.prev = seg.last 
         }
 
-        val extremes = inner_open.flatMap(_.getExtremes)
-
         println("inner_segments")
         inner_segments.map{ inner =>
           s"${inner.wkt}\t${inner.polygonId}"
         }.foreach{println}
 
-        println("extremes")
-        extremes.map{ e =>
-          s"${e.wkt}\t${e.data.crossingInfo}\t${e.data.polygonId}"
-        }.foreach{println}
-        println("Done")
+        println("Merge")
+        merge(inner.filter(_.data.crossingInfo != "None"),  borders)
+        inner.map{_.getPolygon.toText}.foreach(println)
       }
 
-      it
+      inner.map{b => s"${b.getPolygon.toText}\n" }.toIterator
+      //it
     }.collect
-    //save("/tmp/edgesCross.wkt"){r}
+    save("/tmp/edgesCross.wkt"){r}
   }
 
   // Sequential implementation of dcel...
@@ -132,12 +138,12 @@ object LocalDCEL {
     }.flatten
   }
 
-  def merge(inners_prime: List[Half_edge], outers_prime: List[Half_edge]): Unit = {
-    val inners = inners_prime ++ inners_prime.filter(_.twin.isNewTwin).map(_.twin)
-    val outers = outers_prime ++ outers_prime.filter(_.twin.isNewTwin).map(_.twin)
-    val vertices = inners.map(_.v2)
+  def merge(crossing0: List[Half_edge], borders0: List[Half_edge]): Unit = {
+    val crossing = crossing0 ++ crossing0.filter(_.twin.isNewTwin).map(_.twin)
+    val vertices = borders0.map(_.v2)
+    val borders =  borders0 ++ borders0.filter(_.twin.isNewTwin).map(_.twin)
 
-    val hedges = (inners ++ outers).filter(h => vertices.contains(h.v2))
+    val hedges = (borders ++ crossing).filter(h => vertices.contains(h.v2))
     val incidents = hedges.groupBy(_.v2).values.toList
 
     // At each vertex, get their incident half-edges...
@@ -153,7 +159,7 @@ object LocalDCEL {
       }
 
       hs
-    }.flatten
+    }
   }
 
   def sortInnerHedges(innerHedges: List[Half_edge]): List[Segment] = {
@@ -161,18 +167,24 @@ object LocalDCEL {
       .flatMap{ case(pid, hedges_prime) =>
         val hedges = hedges_prime.sortBy(_.data.edgeId).toList
 
-        println(hedges.head.data.polygonId)
-        println(hedges.map{_.data.edgeId}.mkString(" "))
+        //println(hedges.head.data.polygonId)
+        //println(hedges.map{_.data.edgeId}.mkString(" "))
 
         val ins = getLineSegments(hedges.tail, List(hedges.head),
           List.empty[List[Half_edge]])
 
         val segs = ins.map{Segment}
-        if(segs.head.startId == 0 && segs.head.first.data.crossingInfo == "None" ){
-          val head = segs.head
-          val last = segs.last
-          val new_head = Segment(last.hedges ++ head.hedges)
-          new_head +: segs.slice(1, segs.length - 1)
+        if(segs.head.startId == 0){
+          val lastEdgeId = segs.last.last.data.edgeId
+          val nEdgesPoly = segs.last.last.data.nedges
+          if(lastEdgeId == nEdgesPoly){
+            val head = segs.head
+            val last = segs.last
+            val new_head = Segment(last.hedges ++ head.hedges)
+            new_head +: segs.slice(1, segs.length - 1)
+          } else{
+            segs
+          }
         } else {
           segs
         }
@@ -209,6 +221,16 @@ object LocalDCEL {
         h2.prev = h1
       }
     }
+  }
+
+  // Set the next and prev pointer for the inners edges based on its edgeId...
+  def setNextAndPrevBorders(hedges: List[Half_edge]): Unit = {
+    hedges.zip(hedges.tail).map{ case(h1, h2) =>
+      h1.next = h2
+      h2.prev = h1
+    }
+    hedges.head.prev = hedges.last
+    hedges.last.next = hedges.head
   }
 
   // Split crossing edges according to the cell border they intersect...

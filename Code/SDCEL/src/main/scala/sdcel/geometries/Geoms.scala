@@ -102,8 +102,9 @@ case class Half_edge(edge: LineString) {
         println(e.getMessage)
         println(coords.mkString(" "))
         println(this)
-        System.exit(0)
-        geofactory.createPolygon(coords.toArray)
+        //System.exit(0)
+        //geofactory.createPolygon(coords.toArray)
+        emptyPolygon
       }
     }
     
