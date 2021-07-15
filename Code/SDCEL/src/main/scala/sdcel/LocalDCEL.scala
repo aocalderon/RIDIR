@@ -28,7 +28,7 @@ object LocalDCEL {
   def createLocalDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
     (implicit geofactory: GeometryFactory, logger: Logger, spark: SparkSession,
     settings: Settings)
-      : Unit = {
+      : RDD[Half_edge] = {
 
     val partitionId = 1
 
@@ -86,7 +86,7 @@ object LocalDCEL {
 
         
         val inner_segments = sortInnerHedges(inner)
-        println("Segments")
+        //println("Segments")
         inner_segments.map{ seg =>
           val ids = seg.hedges.map(_.data.edgeId).mkString(" ")
           println(s"${seg.polygonId}")
@@ -100,20 +100,21 @@ object LocalDCEL {
           seg.first.prev = seg.last 
         }
 
-        println("inner_segments")
+        //println("inner_segments")
         inner_segments.map{ inner =>
           s"${inner.wkt}\t${inner.polygonId}"
         }.foreach{println}
 
-        println("Merge")
+        //println("Merge")
         merge(inner.filter(_.data.crossingInfo != "None"),  borders)
         inner.map{_.getPolygon.toText}.foreach(println)
       }
 
-      inner.map{b => s"${b.getPolygon.toText}\n" }.toIterator
+      (inner ++ borders).toIterator
       //it
-    }.collect
-    save("/tmp/edgesCross.wkt"){r}
+    }
+    //save("/tmp/edgesCross.wkt"){r}
+    r
   }
 
   // Sequential implementation of dcel...

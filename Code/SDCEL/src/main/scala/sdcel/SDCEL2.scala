@@ -17,7 +17,7 @@ import edu.ucr.dblab.sdcel.geometries._
 
 import PartitionReader._
 import DCELBuilder2.getLDCELs
-import DCELMerger2.{intersects, merge2}
+import DCELMerger2.{merge2, merge3}
 import DCELOverlay2._
 
 import Utils._
@@ -82,6 +82,29 @@ object SDCEL2 {
     log2("TIME|read")
 
     val ldcelA = createLocalDCELs(edgesRDDA, cells)
+    //save("/tmp/edgesFA.wkt"){
+    //  ldcelA.map{ hedge => s"${hedge.getPolygon}\n" }.collect
+    //}
+
+    val ldcelB = createLocalDCELs(edgesRDDB, cells)
+    //save("/tmp/edgesFB.wkt"){
+    //  ldcelB.map{ hedge => s"${hedge.getPolygon}\n" }.collect
+    //}
+
+    val sdcel = ldcelA
+      .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
+
+        val A = iterA.toList
+        val B = iterB.toList
+        val hedges = merge3(A, B)
+
+        hedges.toIterator
+      }.cache
+    val nSDcel = sdcel.count()
+    save("/tmp/edgesFC.wkt"){
+      sdcel.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
+    }
+    
 
     spark.close
   }

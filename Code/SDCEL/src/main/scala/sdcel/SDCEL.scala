@@ -121,7 +121,6 @@ object SDCEL {
 
     
     if(params.debug()){
-      /*
       save{"/tmp/edgesHA.wkt"}{
         dcelsA.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next
@@ -135,7 +134,6 @@ object SDCEL {
           }.toIterator
         }.collect
       }
-       */
       save{"/tmp/edgesHB.wkt"}{
         dcelsB.mapPartitionsWithIndex{ (index, dcelsIt) =>
           val dcel = dcelsIt.next
