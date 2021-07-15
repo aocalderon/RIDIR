@@ -486,7 +486,7 @@ object DCELMerger2 {
       .filter(_._2 != "")
 
     if(pid == partitionId){
-      println("h")
+      println("Done.")
       //h.foreach{println}
     }
 

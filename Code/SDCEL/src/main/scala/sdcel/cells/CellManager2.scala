@@ -39,17 +39,23 @@ object EmptyCellManager {
   def fixEmptyCells(r: List[EmptyCell], sdcel: RDD[(Half_edge, String)],
     cells: Map[Int, Cell])
     (implicit settings: Settings, geofactory: GeometryFactory):  RDD[(Half_edge, String)]= {
-    val pids = r.map(_.empty).toSet
-    sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      if(pids.contains(pid)){
-        val empty = r.filter(_.empty == pid).head
-        
-        val h = cells(pid).toHalf_edge(empty.polyId, empty.label)
-        val tuple = (h, empty.label)
-        it ++ Iterator(tuple)
-      } else {
-        it
+
+    if(!r.isEmpty){
+      val pids = r.map(_.empty).toSet
+
+      sdcel.mapPartitionsWithIndex{ (pid, it) =>
+        if(pids.contains(pid)){
+          val empty = r.filter(_.empty == pid).head
+          
+          val h = cells(pid).toHalf_edge(empty.polyId, empty.label)
+          val tuple = (h, empty.label)
+          it ++ Iterator(tuple)
+        } else {
+          it
+        }
       }
+    } else {
+      sdcel
     }
   }  
 
