@@ -60,6 +60,11 @@ object Utils {
       .orderBy("launchTime")
   }
 
+  def round(number: Double)(implicit geofactory: GeometryFactory): Double = {
+    val scale = geofactory.getPrecisionModel.getScale
+    Math.round(number * scale) / scale
+  }
+
   import Numeric.Implicits._
 
   def mean[T: Numeric](xs: Iterable[T]): Double = xs.sum.toDouble / xs.size

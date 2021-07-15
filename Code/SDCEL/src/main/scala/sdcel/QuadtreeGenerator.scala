@@ -19,7 +19,7 @@ import edu.ucr.dblab.sdcel.geometries.{Cell, LEdge}
 
 import Utils._
 
-object DCELPartitioner2 {
+object QuadtreeGenerator {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def read(input: String)
@@ -83,8 +83,8 @@ object DCELPartitioner2 {
     boundary.expandToInclude(edgesRDDB.boundary)
     log("TIME|Read")
 
-    // Partitioning data...
-    val (quadtree, edgesA, edgesB) = if(params.bycapacity()){
+    // Creating quadtree...
+    val quadtree = if(params.bycapacity()){
       log(s"INFO|capacity=${params.maxentries()}")
       val definition = new QuadRectangle(boundary)
       val maxentries = params.maxentries()
@@ -100,12 +100,7 @@ object DCELPartitioner2 {
       quadtree.assignPartitionIds
       quadtree.assignPartitionLineage
       log("TIME|Quadtree")
-      val partitioner = new QuadTreePartitioner(quadtree)
-      edgesRDDA.spatialPartitioning(partitioner)
-      val edgesA = edgesRDDA.spatialPartitionedRDD.rdd.persist()
-      edgesRDDB.spatialPartitioning(partitioner)
-      val edgesB = edgesRDDB.spatialPartitionedRDD.rdd.persist()
-      (quadtree, edgesA, edgesB)
+      quadtree
     } else {
       logger.info(s"Partition by number (${params.partitions()})")
       val fc = new FractionCalculator()
@@ -117,15 +112,8 @@ object DCELPartitioner2 {
         boundary, params.partitions())
       val quadtree = partitioning.getPartitionTree()
       quadtree.assignPartitionLineage()
-      val partitioner = new QuadTreePartitioner(quadtree)
-      edgesRDDA.spatialPartitioning(partitioner)
-      val edgesA = edgesRDDA.spatialPartitionedRDD.rdd.persist()
-      edgesRDDB.spatialPartitioning(partitioner)
-      val edgesB = edgesRDDB.spatialPartitionedRDD.rdd.persist()
-      (quadtree, edgesA, edgesB)
+      quadtree
     }
-    edgesA.count()
-    edgesB.count()
     log(s"INFO|partitions=${quadtree.getLeafZones.size}")
     log("TIME|Partition")
 
@@ -144,118 +132,10 @@ object DCELPartitioner2 {
         s"$lineage\t$id\t$wkt\n"
       }
     }
-    // Saving to HDFS or Local...
-    if(!params.local()){
-      saveToHDFS(edgesA, params.apath())
-      saveToHDFS(edgesB, params.bpath())
-    } else {
-      saveToLocal(edgesA, params.apath())
-      saveToLocal(edgesB, params.bpath())
-    }
-    log("TIME|Saving")
     
     spark.close
     log("TIME|Close")
   }
-
-  def saveToLocal(edges: RDD[LineString], name: String): Unit = {
-    save{name}{
-      edges.mapPartitionsWithIndex{ (index, edgesIt) =>
-        edgesIt.map{ edge =>
-          val wkt = edge.toText
-          val data = edge.getUserData
-
-          s"$wkt\t$index\t$data\n"
-        }
-      }.collect
-    }
-  }
-
-  def saveToHDFS(edges: RDD[LineString], name: String)
-    (implicit spark: SparkSession): Unit = {
-    import spark.implicits._
-    edges.mapPartitionsWithIndex{ (index, edgesIt) =>
-      edgesIt.map{ edge =>
-        val wkt = edge.toText
-        val data = edge.getUserData
-
-        s"$wkt\t$index\t$data"
-      }
-    }.toDF.write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text(name)
-  }
-
-  // Start: Function to mark edges and their intersections with the quadtree cells...
-  import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector
-  import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
-  import com.vividsolutions.jts.algorithm.RobustLineIntersector
-  import com.vividsolutions.jts.geomgraph.EdgeIntersection
-
-  private def getIntersectionsOnBorders(borders: List[LEdge])
-      : List[(Coordinate, String)] = {
-
-    borders.flatMap{ border =>
-      border.getEdgeIntersectionList.iterator.asScala.map{ i =>
-        val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
-        (coord, border.l.getUserData.toString)
-      }.toList
-    }.toList
-  }
-
-  private def matchIntersectedEdgesAndBorders(edges: Iterator[LEdge],
-    intersections: List[(Coordinate, String)], partitionId: Int): Iterator[String] = {
-
-    edges.map{ edge =>
-      val wkt = edge.l.toText
-      val data = edge.l.getUserData
-      val interList = edge.getEdgeIntersectionList.iterator.asScala.toList
-      val n = interList.size
-
-      if(n == 0){
-        s"$wkt\t$partitionId\t$data\tNone"
-      } else {
-        val coords = interList.map{_.asInstanceOf[EdgeIntersection].getCoordinate }
-        val crossingData = for{
-          c1 <- coords
-          c2 <- intersections if(c2._1 == c1)
-        } yield {
-          s"${c2._2}:${c1.x} ${c1.y}"
-        }
-
-        // Saving crossing info as: "N:x1 y1|W:x2 y2" ...
-        s"$wkt\t$partitionId\t$data\t${crossingData.mkString("|")}"        
-      }
-    }
-  }
- 
-  def saveToHDFSWithCrossingInfo(edges: RDD[LineString], cells: Map[Int, Cell],
-    name: String)(implicit spark: SparkSession, geofactory: GeometryFactory): Unit = {
-    import spark.implicits._
-    edges.mapPartitionsWithIndex{ (pid, edgesIt) =>
-      val cell = cells(pid)
-
-      val edges = edgesIt
-        .filter(edge => edge.intersects(cell.toPolygon)) // be sure edge intersect cell
-        .map{edge => LEdge(edge.getCoordinates, edge)}.toList.asJava
-
-      val borders = cell.toLEdges.asJava
-      
-      val sweepline = new SimpleMCSweepLineIntersector()
-      val lineIntersector = new RobustLineIntersector()
-      val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
-
-      sweepline.computeIntersections(edges, borders, segmentIntersector)
-
-      val intersections = getIntersectionsOnBorders(borders.asScala.toList)
-
-      matchIntersectedEdgesAndBorders(edges.asScala.toIterator, intersections, pid)
-
-    }.toDF.write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text(name)
-  }
-  // End: Function to mark edges and their intersections with the quadtree cells...
 
   def getLineStrings(polygon: Polygon, polygon_id: Long)
     (implicit geofactory: GeometryFactory): List[LineString] = {

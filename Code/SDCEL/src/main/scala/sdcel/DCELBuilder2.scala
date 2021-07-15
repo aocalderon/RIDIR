@@ -22,18 +22,16 @@ object DCELBuilder2 {
     settings: Settings)
       : RDD[Iterable[Half_edge]] = {
 
-    //val appId = spark.sparkContext.getConf.get("spark.app.id")
-
-    edgesRDD.mapPartitionsWithIndex{ case (index, edgesIt) =>
-      val cell = cells(index).mbr
-      val envelope = cell.getEnvelopeInternal
+    edgesRDD.mapPartitionsWithIndex{ case (pid, edgesIt) =>
+      val cell = cells(pid).mbr
       val edges = edgesIt.toVector
       val (outerEdges, innerEdges) = edges.partition{ edge =>
         cell.intersects(edge)
       }
-      val outer  = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell, index)
+      val outer  = SweepLine2.getHedgesTouchingCell(outerEdges.toVector, cell, pid)
       val inner  = SweepLine2.getHedgesInsideCell(innerEdges.toVector)
-      val hedges = SweepLine2.merge(outer, inner)
+
+      val hedges = SweepLine2.merge(outer, inner, pid)
 
       Iterator(hedges)
     }

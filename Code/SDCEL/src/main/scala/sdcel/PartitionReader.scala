@@ -28,10 +28,6 @@ object PartitionReader {
     val quadtreeBuff = Source.fromFile(qpath)
     // lineages are the first column in the file...
     val lineages = quadtreeBuff.getLines.map(_.split("\t").head).toList
-    if(settings.debug){
-      println(s"Is lineages empty?: ${lineages.isEmpty}")
-      lineages.foreach(println)
-    }
     quadtreeBuff.close
 
     // Reading boundary...
@@ -76,8 +72,10 @@ object PartitionReader {
           val ringId = arr(3).toInt
           val edgeId = arr(4).toInt
           val isHole = arr(5).toBoolean
+          val nedges = arr(6).toInt
+          val cross  = arr(7) 
           val edge = reader.read(wkt).asInstanceOf[LineString]
-          val data = EdgeData(polygonId, ringId, edgeId, isHole, label)
+          val data = EdgeData(polygonId, ringId, edgeId, isHole, label, cross, nedges)
           edge.setUserData(data)
           (partitionId, edge)
         }.toIterator

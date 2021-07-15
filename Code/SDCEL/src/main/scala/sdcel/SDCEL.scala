@@ -91,7 +91,7 @@ object SDCEL {
           Iterator(r)
         }.collect
       }
-      save(s"/tmp/cellsCB_${qtag}.wkt"){
+      save(s"/tmp/edgesCB_${qtag}.wkt"){
         edgesRDDB.mapPartitionsWithIndex{ (pid, it) =>
           val edges = it.toList
           val cell = cells(pid).mbr
