@@ -22,6 +22,7 @@ import DCELOverlay2._
 
 import Utils._
 import LocalDCEL.createLocalDCELs
+import SingleLabelChecker.checkSingleLabel
 
 object SDCEL2 {
   def main(args: Array[String]) = {
@@ -81,21 +82,25 @@ object SDCEL2 {
     log(s"INFO|nEdgesB=${nEdgesRDDB}")
     log2("TIME|read")
 
+    // Creating local dcel layer A...
     val ldcelA = createLocalDCELs(edgesRDDA, cells)
-    //save("/tmp/edgesFA.wkt"){
-    //  ldcelA.map{ hedge => s"${hedge.getPolygon}\n" }.collect
-    //}
+    save("/tmp/edgesFA.wkt"){
+      ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    }
 
+    // Creating local dcel layer B...
     val ldcelB = createLocalDCELs(edgesRDDB, cells)
-    //save("/tmp/edgesFB.wkt"){
-    //  ldcelB.map{ hedge => s"${hedge.getPolygon}\n" }.collect
-    //}
+    save("/tmp/edgesFB.wkt"){
+      ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    }
 
+    // Merge local dcels...
+    
     val sdcel = ldcelA
       .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
 
-        val A = iterA.toList
-        val B = iterB.toList
+        val A = iterA.flatMap{_._1.getNexts}.toList
+        val B = iterB.flatMap{_._1.getNexts}.toList
         val hedges = merge3(A, B)
 
         hedges.toIterator
@@ -105,6 +110,27 @@ object SDCEL2 {
       sdcel.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
     }
     
+    val sdcel2 = checkSingleLabel(ldcelA, sdcel,  "B")
+    val sdcel3 = checkSingleLabel(ldcelB, sdcel2, "A")
+    sdcel3.count()
+    save("/tmp/edgesFD.wkt"){
+      sdcel3.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
+    }
+
+    // Running overlay operations...
+    /*
+    val faces = sdcel.map{ case(hedge, tag) =>
+      val boundary = hedge.getPolygon
+      FaceViz(boundary, tag)
+    }
+
+    val output_path = params.output()
+    overlapOp(faces, intersection, s"${output_path}/edgesInt")
+    //overlapOp(faces, difference,   s"${output_path}/edgesDif")
+    //overlapOp(faces, union,        s"${output_path}/edgesUni")
+    //overlapOp(faces, differenceA,  s"${output_path}/edgesDiA")
+    //overlapOp(faces, differenceB,  s"${output_path}/edgesDiB")
+     */
 
     spark.close
   }

@@ -21,14 +21,14 @@ import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 
 import SweepLine2.{getHedgesInsideCell, getLineSegments}
-import DCELMerger2.{setTwins}
+import DCELMerger2.{setTwins, groupByNext}
 import Utils._
 
 object LocalDCEL {
   def createLocalDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
     (implicit geofactory: GeometryFactory, logger: Logger, spark: SparkSession,
     settings: Settings)
-      : RDD[Half_edge] = {
+      : RDD[(Half_edge, String)] = {
 
     val partitionId = 1
 
@@ -110,7 +110,9 @@ object LocalDCEL {
         inner.map{_.getPolygon.toText}.foreach(println)
       }
 
-      (inner ++ borders).toIterator
+      val hedges = groupByNext((inner).toSet, List.empty[(Half_edge, String)])
+      hedges.toIterator
+      //(inner ++ borders).toIterator
       //it
     }
     //save("/tmp/edgesCross.wkt"){r}

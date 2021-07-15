@@ -464,7 +464,8 @@ object DCELMerger2 {
       hs
     }.flatten.filter{ h =>
       intersections.keySet.contains(h.v2)
-    }.filter(_.data.polygonId != -1).toSet
+    }//.filter(_.data.polygonId != -1)
+      .toSet
 
     if(pid == partitionId){
       //println("h_prime at 3:")

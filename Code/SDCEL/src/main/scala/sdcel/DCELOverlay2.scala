@@ -14,8 +14,8 @@ import Utils._
 object DCELOverlay2 {
   case class FaceViz(boundary: Polygon, tag: String)
 
-  def overlapOp(faces: RDD[FaceViz], op: (Iterator[FaceViz]) => Iterator[List[(String, Geometry)]],
-    output_name: String)(implicit geofactory: GeometryFactory, settings: Settings, spark: SparkSession){
+  def overlapOp(faces: RDD[FaceViz], op: (Iterator[FaceViz]) => Iterator[List[(String, Geometry)]], output_name: String)
+    (implicit geofactory: GeometryFactory, settings: Settings, spark: SparkSession){
 
     val results = faces.mapPartitions{op}
       .flatMap{ _.map{ case(tag, geom) => (tag, geom.toText()) } }
