@@ -137,6 +137,9 @@ object SDCEL2 {
 
     val r_prime = solve(quadtree, cells, non_empties, empties)
     r_prime.foreach(println)
+    //CHECK WHY CELL MANAGER INTERFER WITH THE REST EVEN IF IT DOES NOT APPLY
+    //REVIEW THE SECTION OF UPDATE POLYGON IDS...
+
 /*    // Getting polygon IDs from known partitions...
     val r = updatePolygonIds(r_prime, sdcel)
     val str = r.map{_.toString}.mkString("\n")
