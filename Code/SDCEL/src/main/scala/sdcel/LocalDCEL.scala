@@ -35,7 +35,7 @@ object LocalDCEL {
     val r = edgesRDD.mapPartitionsWithIndex{ (pid, it) =>
       
       val (containedIt, crossingIt) = classifyEdges(it)
-      val crossing = getCrossing(crossingIt.toList)
+      val crossing = getCrossing(crossingIt.toList).filter(_.getLength > 0)
 
       val S = getIntersectionsOnBorder(crossing, "S")
       val W = getIntersectionsOnBorder(crossing, "W")
@@ -261,6 +261,7 @@ object LocalDCEL {
           val coord = new Coordinate(xy(0).toDouble, xy(1).toDouble)
           val split = splitEdge(edge, border, coord)
           split.setUserData(edge.getUserData)
+          
           split
         }
         case 2 => {
@@ -307,13 +308,25 @@ object LocalDCEL {
     // or above that intersection.
     val coords = border match {
       case "N" => {
-        if (start.y >= coord.y) Array(coord, end) else Array(start, coord)
+        if (start.y >= coord.y){
+          Array(coord, end)
+        } else if(start.y < coord.y){
+          Array(start, coord)
+        } else {
+          Array(coord, coord)
+        }
       }
       case "S" => {
         if (start.y <= coord.y) Array(coord, end) else Array(start, coord)
       }
       case "W" => {
-        if (start.x >= coord.x) Array(coord, end) else Array(start, coord)
+        if (start.x >= coord.x){
+          Array(coord, end)
+        } else if(start.x < coord.x){
+          Array(start, coord)
+        } else {
+          Array(coord, coord)
+        }
       }
       case "E" => {
         if (start.x <= coord.x) Array(coord, end) else Array(start, coord)

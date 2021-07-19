@@ -492,5 +492,141 @@ object DCELMerger2 {
 
     h
   }
-  
+
+
+  def intersects4(hedgesA: List[Half_edge], hedgesB: List[Half_edge], partitionId: Int = -1)
+    (implicit geofactory: GeometryFactory)
+      : (List[Half_edge], List[Half_edge]) = {
+    val pid = org.apache.spark.TaskContext.getPartitionId
+
+    val aList = hedgesA.map{ h =>
+      val pts = Array(h.v1, h.v2)
+      HEdge(pts, h)
+    }.asJava
+
+    val bList = hedgesB.map{ h =>
+      val pts = Array(h.v1, h.v2)
+      HEdge(pts, h)
+    }.asJava
+    
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    lineIntersector.setMakePrecise(geofactory.getPrecisionModel)
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+
+    sweepline.computeIntersections(aList, bList, segmentIntersector)
+    /*
+    try{
+      sweepline.computeIntersections(aList, bList, segmentIntersector)
+    } catch{
+      case e: java.lang.IllegalArgumentException => {
+        println(s"PID: ${pid}")
+      }
+    }
+     */
+
+    val aHedges = aList.asScala.flatMap{ a =>
+      val iList = a.getEdgeIntersectionList.iterator.asScala.toList
+      if(iList.size == 0){
+        List(a.h)
+      } else {
+        val coords_prime = iList.map{ i =>
+          val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
+          coord
+        }.toList
+        val original_hedge = a.h
+        val coords = (a.h.v1 +: coords_prime :+ a.h.v2).distinct
+        val hedges = coords.zip(coords.tail).map{ case(a1, a2) =>
+          val l = geofactory.createLineString(Array(a1,a2))
+          l.setUserData(original_hedge.data)
+          val h = Half_edge(l)
+          h
+        }
+        hedges
+      }
+    }.toList
+
+    val bHedges = bList.asScala.flatMap{ a =>
+      val iList = a.getEdgeIntersectionList.iterator.asScala.toList
+      if(iList.size == 0){
+        List(a.h)
+      } else {
+        val coords_prime = iList.map{ i =>
+          val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
+          coord
+        }.toList
+        val original_hedge = a.h
+        val coords = (a.h.v1 +: coords_prime :+ a.h.v2).distinct
+        val hedges = coords.zip(coords.tail).map{ case(a1, a2) =>
+          val l = geofactory.createLineString(Array(a1,a2))
+          l.setUserData(original_hedge.data)
+          val h = Half_edge(l)
+          h
+        }
+        hedges
+      }
+    }.toList
+
+    (aHedges, bHedges)
+
+  }
+
+  def merge4(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)
+      (implicit geofactory: GeometryFactory)
+  : List[(Half_edge,String)] = {
+
+    val pid = org.apache.spark.TaskContext.getPartitionId
+    val partitionId = 34
+
+    val (aList, bList) = intersects4(ha, hb, partitionId)
+    val hedges_prime = (aList ++ bList)
+
+    val (borders, hedges0) = hedges_prime.partition(_.data.polygonId == -1)
+    val hedges = borders.distinct ++ hedges0
+
+    setTwins(hedges)
+
+    if(pid == partitionId){
+      println("Hedges")
+      hedges.foreach{println}
+    }
+
+    sequential(hedges)
+
+    val h = groupByNext(hedges.toSet, List.empty[(Half_edge, String)])
+      .filter(_._2 != "")
+
+    h
+
+  }
+
+  // Sequential implementation of dcel...
+  def sequential(hedges_prime: List[Half_edge], partitionId: Int = -1): Unit = {
+    // Group half-edges by the destination vertex (v2)...
+
+    val hedges = try{
+      hedges_prime ++ hedges_prime.filter(_.twin.isNewTwin).map(_.twin)
+    } catch {
+      case e: java.lang.NullPointerException => {
+        hedges_prime.filter(_.twin != null) ++ hedges_prime.filter(_.twin != null)
+          .filter(_.twin.isNewTwin).map(_.twin)
+      }
+    }
+    val incidents = hedges.groupBy(_.v2).values.toList
+
+    // At each vertex, get their incident half-edges...
+    val h_prime = incidents.map{ hList =>
+      // Sort them by angle...
+      val hs = hList.sortBy(- _.angleAtDest)
+      // Add first incident to complete the sequence...
+      val hs_prime = hs :+ hs.head
+      // zip and tail will pair each half-edge with its next one...
+      hs_prime.zip(hs_prime.tail).foreach{ case(h1, h2) =>
+        h1.next = h2.twin
+        h2.twin.prev = h1
+      }
+
+      hs
+    }.flatten
+  }
 }

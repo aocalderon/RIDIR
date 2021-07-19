@@ -349,7 +349,7 @@ case class Cell(id: Int, lineage: String, mbr: LinearRing){
   }
 }
 
-case class Face(outer: Half_edge) {
+case class Face(outer: Half_edge, label: String = "") {
   val polygonId = outer.data.polygonId
   val ringId = outer.data.ringId
   val isHole = outer.data.isHole

@@ -95,6 +95,8 @@ object EmptyCellManager {
     (implicit geofactory: GeometryFactory, settings: Settings): List[(Point, Int, Int)] = {
 
     // iterate recursively over the set of empty cells...
+    println("Cell")
+    println(empties.head)
     empties match {
       case Nil => result
       case empty +: tail => {

@@ -1,6 +1,6 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{LineString, Point}
+import com.vividsolutions.jts.geom.{Polygon, LineString, Point}
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 
 import org.apache.spark.serializer.KryoSerializer
@@ -14,10 +14,11 @@ import ch.cern.sparkmeasure.TaskMetrics
 
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager._
 
 import PartitionReader._
 import DCELBuilder2.getLDCELs
-import DCELMerger2.{merge2, merge3}
+import DCELMerger2.{merge2, merge3, merge4}
 import DCELOverlay2._
 
 import Utils._
@@ -97,18 +98,30 @@ object SDCEL2 {
     // Merge local dcels...
     val sdcel = ldcelA
       .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
+        val pid = TaskContext.getPartitionId
+        val partitionId = 34
 
-        val A = iterA.flatMap{_._1.getNexts}.toList
-        val B = iterB.flatMap{_._1.getNexts}.toList
-        val hedges = merge3(A, B)
+        val A = iterA.map{_._1.getNexts}.flatten.toList
+        val B = iterB.map{_._1.getNexts}.flatten.toList
+
+        val hedges = merge4(A, B)
+
+        if(pid == partitionId){
+          save("/tmp/edgesHH.wkt"){
+            hedges.map{ hedge => s"${hedge.toString}\n" }
+          }
+        }
 
         hedges.toIterator
       }.cache
     val nSDcel = sdcel.count()
+    logger.info("Done!")
     save("/tmp/edgesFC.wkt"){
       sdcel.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
     }
 
+    /*
+    
     // Checking and solving single labels...
     val sdcel2 = checkSingleLabel(ldcelA, sdcel,  "B")
     val sdcel3 = checkSingleLabel(ldcelB, sdcel2, "A")
@@ -116,7 +129,6 @@ object SDCEL2 {
     save("/tmp/edgesFD.wkt"){
       sdcel3.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
     }
-
     
     // *************************************
     // * START: Dealing with empty cells...
@@ -133,36 +145,83 @@ object SDCEL2 {
     val empties = e.map(_._1).toList
     println(s"Non empties set: ${non_empties.mkString(" ")}")
     println(s"Empties set: ${empties.mkString(" ")}")
-    import edu.ucr.dblab.sdcel.cells.EmptyCellManager._
 
     val r_prime = solve(quadtree, cells, non_empties, empties)
+    println("Solve")
     r_prime.foreach(println)
-    //CHECK WHY CELL MANAGER INTERFER WITH THE REST EVEN IF IT DOES NOT APPLY
-    //REVIEW THE SECTION OF UPDATE POLYGON IDS...
-
-/*    // Getting polygon IDs from known partitions...
-    val r = updatePolygonIds(r_prime, sdcel)
+    // Getting polygon IDs from known partitions...
+    val r = updatePolygonIds(r_prime, sdcel3)
     val str = r.map{_.toString}.mkString("\n")
     println(s"r:\n$str")
-    val sdcel_prime = fixEmptyCells(r, sdcel, cells)
-    // ***********************************
-    // * END: Dealing with empty cells...
-    // ***********************************
-     */
+    val sdcel_prime = fixEmptyCells(r, sdcel3, cells)
+    save("/tmp/edgesFE.wkt"){
+      sdcel_prime.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
+    }
+
+    val faces0 = sdcel_prime.mapPartitionsWithIndex{ (pid, it) =>
+      val partitionId = 39
+      val hedges = it.toList
+      val faces = hedges.map{hedge => Face(hedge._1, hedge._2)}
+      if(pid == partitionId){
+        println("Test!!!")
+        faces.groupBy(_.label)
+          .mapValues{ f =>
+            val polys = f.sortBy(_.outerArea).reverse
+            val outer = polys.head
+            outer.inners = polys.tail.toVector
+            val wkt = outer.getGeometry.toText
+            wkt
+          }//.foreach{println}
+      }
+      faces.groupBy(_.label)
+        .mapValues{ f =>
+          val polys = f.sortBy(_.outerArea).reverse
+          val outer = polys.head
+          outer.inners = polys.tail.toVector
+          outer
+        }.map(_._2).toIterator
+      //it
+    }.cache
+    save("/tmp/edgesFaces.wkt"){
+      faces0.map{f => s"${f.getGeometry.toText}\t${f.label}\n"}.collect
+    }
 
     // Running overlay operations...
-    val faces = sdcel3.map{ case(hedge, tag) =>
+    val faces1 = faces0.flatMap{ face =>
+      val boundary = face.getGeometry
+      val label = face.label
+      val polys = if(boundary.getGeometryType == "Polygon"){
+        val f = FaceViz(boundary.asInstanceOf[Polygon], label)
+        List(f)
+      } else {
+        val n = boundary.getNumGeometries - 1
+        (0 to n).map{ i => 
+          val p = boundary.getGeometryN(i).asInstanceOf[Polygon]
+          FaceViz(p, label)
+        }
+      }
+      polys
+      //flatMap(p => FaceViz(p, label))
+      //FaceViz(poly, label)
+    }
+
+    /*
+    val faces = sdcel_prime.map{ case(hedge, tag) =>
       val boundary = hedge.getPolygon
       FaceViz(boundary, tag)
     }
+     */
 
     val output_path = params.output()
-    overlapOp(faces, intersection, s"${output_path}/edgesInt")
-    overlapOp(faces, difference,   s"${output_path}/edgesDif")
-    overlapOp(faces, union,        s"${output_path}/edgesUni")
-    overlapOp(faces, differenceA,  s"${output_path}/edgesDiA")
-    overlapOp(faces, differenceB,  s"${output_path}/edgesDiB")
+    overlapOp(faces1, intersection, s"${output_path}/edgesInt")
+    overlapOp(faces1, difference,   s"${output_path}/edgesDif")
+    overlapOp(faces1, union,        s"${output_path}/edgesUni")
+    overlapOp(faces1, differenceA,  s"${output_path}/edgesDiA")
+    overlapOp(faces1, differenceB,  s"${output_path}/edgesDiB")
 
+     */
+
+    logger.info("Done!")
     spark.close
   }
 }
