@@ -232,11 +232,13 @@ object DCELPartitioner2 {
   def saveToHDFSWithCrossingInfo(edges: RDD[LineString], cells: Map[Int, Cell],
     name: String)(implicit spark: SparkSession, geofactory: GeometryFactory): Unit = {
     import spark.implicits._
+
     edges.mapPartitionsWithIndex{ (pid, edgesIt) =>
       val cell = cells(pid)
 
       val edges = edgesIt
-        .filter(edge => edge.intersects(cell.toPolygon)) // be sure edge intersect cell
+        .filter(edge => edge.intersects(cell.toPolygon)) // Be sure edge is inside cell
+        //.filter(edge => edge.relate(cell.toPolygon, "1*F000212"))
         .map{edge => LEdge(edge.getCoordinates, edge)}.toList.asJava
 
       val borders = cell.toLEdges.asJava

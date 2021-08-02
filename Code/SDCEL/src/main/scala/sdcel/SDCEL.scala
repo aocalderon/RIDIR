@@ -118,7 +118,6 @@ object SDCEL {
       log(s"INFO|nB=$nB")
     }
     log2("TIME|ldcelB")
-
     
     if(params.debug()){
       save{"/tmp/edgesHA.wkt"}{
@@ -163,6 +162,17 @@ object SDCEL {
       val nSDcel = sdcel.count()
       log2("TIME|merge")
 
+      if(params.debug()){
+        save("/tmp/edgesF.wkt"){
+          sdcel.map{ case(h, tag) =>
+            val wkt = h.getPolygon.toText
+
+            s"$wkt\t$tag\n"
+          }.collect
+        }
+      }
+
+      /*
       // *************************************
       // * START: Dealing with empty cells...
       // *************************************
@@ -190,13 +200,6 @@ object SDCEL {
       // ***********************************
 
       if(params.debug()){
-        save("/tmp/edgesF.wkt"){
-          sdcel.map{ case(h, tag) =>
-            val wkt = h.getPolygon.toText
-
-            s"$wkt\t$tag\n"
-          }.collect
-        }
         save("/tmp/edgesF_prime.wkt"){
           sdcel_prime.map{ case(h, tag) =>
             val wkt = h.getPolygon.toText
@@ -205,7 +208,8 @@ object SDCEL {
           }.collect
         }
       }
-
+       */
+      
       if(params.save()){
         sdcel.map{ case(h, tag) =>
           val wkt = h.getPolygon.toText

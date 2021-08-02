@@ -21,21 +21,21 @@ import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 
 import SweepLine2.{getHedgesInsideCell, getLineSegments}
-import DCELMerger2.{setTwins}
+import DCELMerger2.{setTwins, groupByNext}
 import Utils._
 
 object LocalDCEL {
   def createLocalDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
-    (implicit geofactory: GeometryFactory, logger: Logger, spark: SparkSession,
-    settings: Settings)
-      : RDD[Half_edge] = {
+    (implicit geofactory: GeometryFactory//, logger: Logger, spark: SparkSession, settings: Settings
+    )
+      : RDD[(Half_edge, String)] = {
 
-    val partitionId = 1
+    val partitionId = 0
 
     val r = edgesRDD.mapPartitionsWithIndex{ (pid, it) =>
       
       val (containedIt, crossingIt) = classifyEdges(it)
-      val crossing = getCrossing(crossingIt.toList)
+      val crossing = getCrossing(crossingIt.toList).filter(_.getLength > 0)
 
       val S = getIntersectionsOnBorder(crossing, "S")
       val W = getIntersectionsOnBorder(crossing, "W")
@@ -64,56 +64,9 @@ object LocalDCEL {
 
       merge(inner.filter(_.data.crossingInfo != "None"),  borders)
       
-      if(pid == partitionId){
-        val (containedIt, crossingIt) = classifyEdges(it)
-        val crossing = getCrossing(crossingIt.toList)
-
-        val S = getIntersectionsOnBorder(crossing, "S")
-        val W = getIntersectionsOnBorder(crossing, "W")
-        val N = getIntersectionsOnBorder(crossing, "N")
-        val E = getIntersectionsOnBorder(crossing, "E")
-        val cell = cells(pid)
-        val bordersS = splitBorder(cell.getSouthBorder, S)
-        val bordersW = splitBorder(cell.getWestBorder, W)
-        val bordersN = splitBorder(cell.getNorthBorder, N)
-        val bordersE = splitBorder(cell.getEastBorder, E)
-        val borders = (bordersS ++ bordersW ++ bordersN ++ bordersE).map{Half_edge}
-        setTwins(borders)
-        setNextAndPrevBorders(borders)
-
-        val inner = (containedIt ++ crossing).map{Half_edge}.toList
-        setTwins(inner)
-
-        
-        val inner_segments = sortInnerHedges(inner)
-        //println("Segments")
-        inner_segments.map{ seg =>
-          val ids = seg.hedges.map(_.data.edgeId).mkString(" ")
-          println(s"${seg.polygonId}")
-          println(ids)
-        }
-        setNextAndPrev(inner_segments)
-        val (inner_closed, inner_open) = inner_segments.partition(_.isClose)
-        // closing pointer in polygons fully contained...
-        inner_closed.map{ seg =>
-          seg.last.next = seg.first
-          seg.first.prev = seg.last 
-        }
-
-        //println("inner_segments")
-        inner_segments.map{ inner =>
-          s"${inner.wkt}\t${inner.polygonId}"
-        }.foreach{println}
-
-        //println("Merge")
-        merge(inner.filter(_.data.crossingInfo != "None"),  borders)
-        inner.map{_.getPolygon.toText}.foreach(println)
-      }
-
-      (inner ++ borders).toIterator
-      //it
+      val hedges = groupByNext((inner).toSet, List.empty[(Half_edge, String)])
+      hedges.toIterator
     }
-    //save("/tmp/edgesCross.wkt"){r}
     r
   }
 
@@ -168,23 +121,21 @@ object LocalDCEL {
       .flatMap{ case(pid, hedges_prime) =>
         val hedges = hedges_prime.sortBy(_.data.edgeId).toList
 
-        //println(hedges.head.data.polygonId)
-        //println(hedges.map{_.data.edgeId}.mkString(" "))
-
         val ins = getLineSegments(hedges.tail, List(hedges.head),
           List.empty[List[Half_edge]])
 
         val segs = ins.map{Segment}
         if(segs.head.startId == 0){
-          val lastEdgeId = segs.last.last.data.edgeId
-          val nEdgesPoly = segs.last.last.data.nedges
-          if(lastEdgeId == nEdgesPoly){
+          // If the first edge Id of the polygon is here, we have to check the continuity...
+          val start = segs.head
+          val exts = segs.tail.filter( t => start.first.v1 == t.last.v2 )
+          if(exts.isEmpty){
+            segs
+          } else {
             val head = segs.head
             val last = segs.last
             val new_head = Segment(last.hedges ++ head.hedges)
             new_head +: segs.slice(1, segs.length - 1)
-          } else{
-            segs
           }
         } else {
           segs
@@ -259,6 +210,7 @@ object LocalDCEL {
           val coord = new Coordinate(xy(0).toDouble, xy(1).toDouble)
           val split = splitEdge(edge, border, coord)
           split.setUserData(edge.getUserData)
+          
           split
         }
         case 2 => {
@@ -305,13 +257,25 @@ object LocalDCEL {
     // or above that intersection.
     val coords = border match {
       case "N" => {
-        if (start.y >= coord.y) Array(coord, end) else Array(start, coord)
+        if (start.y >= coord.y){
+          Array(coord, end)
+        } else if(start.y < coord.y){
+          Array(start, coord)
+        } else {
+          Array(coord, coord)
+        }
       }
       case "S" => {
         if (start.y <= coord.y) Array(coord, end) else Array(start, coord)
       }
       case "W" => {
-        if (start.x >= coord.x) Array(coord, end) else Array(start, coord)
+        if (start.x >= coord.x){
+          Array(coord, end)
+        } else if(start.x < coord.x){
+          Array(start, coord)
+        } else {
+          Array(coord, coord)
+        }
       }
       case "E" => {
         if (start.x <= coord.x) Array(coord, end) else Array(start, coord)
@@ -398,5 +362,178 @@ object LocalDCEL {
   private def getNEdges(edge: LineString): Int = {
     val data = edge.getUserData.asInstanceOf[EdgeData]
     data.nedges
+  }
+
+  import scala.io.Source
+  import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
+  import com.vividsolutions.jts.io.WKTReader
+  import PartitionReader.envelope2ring
+  import DCELMerger2.merge4
+
+  def createLocalDCELsTest(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
+    (implicit geofactory: GeometryFactory//, logger: Logger, spark: SparkSession, settings: Settings
+    )
+      : Unit = {
+
+    val partitionId = 0
+    println("TEST")
+    val r = edgesRDD.mapPartitionsWithIndex{ (pid, it) =>
+      println(pid)
+
+      if(pid == partitionId){
+        val (containedIt, crossingIt) = classifyEdges(it)
+        val crossing = getCrossing(crossingIt.toList)
+
+        val S = getIntersectionsOnBorder(crossing, "S")
+        val W = getIntersectionsOnBorder(crossing, "W")
+        val N = getIntersectionsOnBorder(crossing, "N")
+        val E = getIntersectionsOnBorder(crossing, "E")
+        val cell = cells(pid)
+        val bordersS = splitBorder(cell.getSouthBorder, S)
+        val bordersW = splitBorder(cell.getWestBorder, W)
+        val bordersN = splitBorder(cell.getNorthBorder, N)
+        val bordersE = splitBorder(cell.getEastBorder, E)
+        val borders = (bordersS ++ bordersW ++ bordersN ++ bordersE).map{Half_edge}
+
+        println("borders")
+        borders.foreach{println}
+        println("done")
+
+        setTwins(borders)
+        setNextAndPrevBorders(borders)
+
+        val inner = (containedIt ++ crossing).map{Half_edge}.toList
+        setTwins(inner)
+
+        println("Inners")
+        inner.filter(_.data.polygonId == 5598).sortBy(h => (h.data.ringId, h.data.edgeId)).foreach{println}
+
+        //SORT INNERS IS NOT EASY WHEN THERE ARE HOLES...
+        val inner_segments = sortInnerHedges(inner)
+
+        println("Segments")
+        inner_segments.map{ seg =>
+          val ids = seg.hedges.map(_.data.edgeId).mkString(" ")
+          println(s"${seg.polygonId}\t${seg.ringId}")
+          println(ids)
+        }
+        setNextAndPrev(inner_segments)
+        val (inner_closed, inner_open) = inner_segments.partition(_.isClose)
+        // closing pointer in polygons fully contained...
+        inner_closed.map{ seg =>
+          seg.last.next = seg.first
+          seg.first.prev = seg.last 
+        }
+
+        println("inner_open")
+        inner_open.map{ inner =>
+          s"${inner.wkt}\t${inner.polygonId}"
+        }.foreach{println}
+
+        //println("Merge")
+        merge(inner.filter(_.data.crossingInfo != "None"),  borders)
+        //inner.map{_.getPolygon.toText}.foreach(println)
+      }
+      it
+    }.collect
+    //save("/tmp/edgesCross.wkt"){r}
+    //r
+  }
+
+  def main(args: Array[String]) = {
+
+    implicit val model = new PrecisionModel(1000.0)
+    implicit val geofactory = new GeometryFactory(model)
+    implicit val reader = new WKTReader(geofactory)
+    //implicit val settings = Settings(tolerance = 1e-3)
+
+    val bufferA = Source.fromFile("/home/acald013/RIDIR/Datasets/testA.wkt")
+    val A = bufferA.getLines.map{ line =>
+      val arr = line.split("\t")
+      val wkt = arr(0)
+      val partitionId = arr(1).toInt
+      val polygonId = arr(2).toInt
+      val ringId = arr(3).toInt
+      val edgeId = arr(4).toInt
+      val isHole = arr(5).toBoolean
+      val nedges = try { arr(6).toInt }
+      catch { case e: java.lang.ArrayIndexOutOfBoundsException => -1 }
+      val cross  = try { arr(7) }
+      catch { case e: java.lang.ArrayIndexOutOfBoundsException => "" }
+      val edge = reader.read(wkt).asInstanceOf[LineString]
+      val data = EdgeData(polygonId, ringId, edgeId, isHole, "A", cross, nedges)
+      edge.setUserData(data)
+      edge
+    }.toList
+    bufferA.close
+
+    val bufferB = Source.fromFile("/home/acald013/RIDIR/Datasets/testB.wkt")
+    val B = bufferB.getLines.map{ line =>
+      val arr = line.split("\t")
+      val wkt = arr(0)
+      val partitionId = arr(1).toInt
+      val polygonId = arr(2).toInt
+      val ringId = arr(3).toInt
+      val edgeId = arr(4).toInt
+      val isHole = arr(5).toBoolean
+      val nedges = try { arr(6).toInt }
+      catch { case e: java.lang.ArrayIndexOutOfBoundsException => -1 }
+      val cross  = try { arr(7) }
+      catch { case e: java.lang.ArrayIndexOutOfBoundsException => "" }
+      val edge = reader.read(wkt).asInstanceOf[LineString]
+      val data = EdgeData(polygonId, ringId, edgeId, isHole, "B", cross, nedges)
+      edge.setUserData(data)
+      edge
+    }.toList
+    bufferB.close
+
+    val cell_path = "/home/acald013/RIDIR/Datasets/cell.wkt"
+    val boundaryBuff = Source.fromFile(cell_path)
+    val boundaryWkt = boundaryBuff.getLines.next // boundary is the only line in the file...
+    val boundary = reader.read(boundaryWkt).getEnvelopeInternal
+    boundaryBuff.close
+    val cell = Cell(0, "0",envelope2ring(boundary))
+    val cells = Map(0 -> cell)
+
+    implicit val spark = SparkSession.builder().getOrCreate()
+    import spark.implicits._
+
+    val edgesRDDA = spark.sparkContext.parallelize(A, 1)
+    val edgesRDDB = spark.sparkContext.parallelize(B, 1)
+
+    val ldcelA = createLocalDCELs(edgesRDDA, cells)//.filter(_._1.data.ringId == 0)
+    save("/tmp/edgesFA.wkt"){
+      ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    }
+
+    
+    val ldcelB = createLocalDCELs(edgesRDDB, cells)//.filter(_._1.data.ringId == 0)
+    save("/tmp/edgesFB.wkt"){
+      ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    }
+
+    val sdcel = ldcelA
+      .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
+        val pid = TaskContext.getPartitionId
+        val partitionId = 34
+
+        val A = iterA.map{_._1.getNexts}.flatten.toList
+        val B = iterB.map{_._1.getNexts}.flatten.toList
+
+        val hedges = merge4(A, B)
+
+        hedges.toIterator
+      }.filter(_._1.checkValidity).cache
+    val nSDcel = sdcel.count()
+    logger.info("Done!")
+    save("/tmp/edgesFC.wkt"){
+      sdcel.map{ case(hedge, label) =>
+        s"${hedge.getPolygon}\t${hedge.data.polygonId}\t${hedge.data.ringId}\t${label}\n"
+      }.collect
+    }
+    
+
+    println("Done")
+    spark.close
   }
 }

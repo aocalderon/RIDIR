@@ -19,16 +19,12 @@ import edu.ucr.dblab.sdcel.Utils.{Settings, save}
 import edu.ucr.dblab.sdcel.quadtree.{StandardQuadTree, QuadRectangle, Quadtree}
 import edu.ucr.dblab.sdcel.geometries.{Cell, Half_edge}
 
-object EmptyCellManager {
-  // model the data from a empty cell:
-  // point: the reference point to find the required polygon id.
-  // pid: the partition id where the point must be queried.
-  // empty: the partition id of the empty cell.
-  // polyId: the polygon id which the empty cell must be updated.
-  case class EmptyCell(point: Point, pid: Int, empty:Int,
+object EmptyCellManager2 {
+
+  case class EmptyCell(point: Point, pid: Cell, empty:Cell,
     polyId: Int = -1, label: String = "*"){
 
-    override def toString: String = s"$point\t$pid\t$empty\t$polyId\t$label"
+    override def toString: String = s"$point\t${pid.id}\t${empty.id}\t${pid.lineage}\t${empty.lineage}\t$polyId\t$label"
 
     // return a expanded version of the point to help in the intersection call...
     def reference(implicit settings: Settings, geofactory: GeometryFactory): Polygon = {
@@ -38,111 +34,94 @@ object EmptyCellManager {
     }
   }
 
-  def runEmptyCells[T](sdcel: RDD[(Half_edge, String)], quadtree: StandardQuadTree[T], cells: Map[Int, Cell])
-    (implicit geofactory: GeometryFactory, settings: Settings): RDD[(Half_edge, String)]= {
+  case class RCell(id: Int, lineage: String)
+
+  def runEmptyCells[T](sdcel: RDD[(Half_edge, String)], quadtree: StandardQuadTree[T]
+    , cells: Map[Int, Cell])
+    (implicit geofactory: GeometryFactory, settings: Settings)
+      : RDD[(Half_edge, String)]= {
 
     val (ne, e) = sdcel.mapPartitionsWithIndex{ (pid, it) =>
       val faces = it.map(_._1.getPolygon).toList
-      val cell = cells(pid).mbr
-      val non_empty = faces.exists{ _.intersects(cell) }
-      val r = (pid, non_empty)
+      val cell = cells(pid)
+      val non_empty = faces.exists{ _.intersects(cell.mbr) }
+      val r = (cell, non_empty)
       Iterator(r)
-    }.collect().partition{ case(pid, non_empty) => non_empty }
+    }.collect().partition{ case(cell, non_empty) => non_empty }
 
-    val non_empties = ne.map(_._1).toList
-    val empties = e.map(_._1).toList
+    if(e.isEmpty){
+      sdcel
+    } else {
+      val non_empties = ne.map(_._1).toList
+      val empties = e.map(_._1).toList
 
-    val empties_prime = cells.filter{ case(id, cell) => empties.contains(id) }
-      .values.map(cell => (cell.lineage, cell)).toList
-    val emptiesHash = HashMap(empties_prime.map( i => i._1 -> i._2): _* )
-    val nempties_prime = cells.filter{ case(id, cell) => non_empties.contains(id) }
-      .values.map(cell => (cell.lineage, cell)).toList
-    val nemptiesHash = HashMap(nempties_prime.map( i => i._1 -> i._2): _* )
-    val (quadtree_prime, empties3) = cleanQuadtree(quadtree, emptiesHash, nemptiesHash)
+      val empties_prime = empties.map(cell => (cell.lineage, cell)).toList
+      val emptiesHash = HashMap(empties_prime.map( i => i._1 -> i._2): _* )
+      val nempties_prime = non_empties.map(cell => (cell.lineage, cell)).toList
+      val nemptiesHash = HashMap(nempties_prime.map( i => i._1 -> i._2): _* )
+      val (quadtree_prime, empties3) = cleanQuadtree(quadtree, emptiesHash, nemptiesHash)
 
-    save("/tmp/edgesEM.wkt"){
-      empties3.values.toList.map{ cell =>
-        val wkt = cell.wkt
-        val id = cell.id
-        val lineage = cell.lineage
-
-        s"$wkt\t$id\t$lineage\n"
-      }
-    }
-
-    val lineage2id = quadtree_prime.getLeafZones.asScala.map{ leaf =>
-      val id = leaf.partitionId.toInt
-      val lineage = leaf.lineage
-      lineage -> id
-    }.toMap
-    val id2lineage = quadtree_prime.getLeafZones.asScala.map{ leaf =>
-      val id = leaf.partitionId.toInt
-      val lineage = leaf.lineage
-      id -> lineage
-    }.toMap
-
-    val empties_prime2  = empties3.keys.map(key => lineage2id(key)).toList
-    val cells_prime = quadtree_prime.getLeafZones.asScala.map{ leaf =>
-      val ring = envelope2ring(leaf.getEnvelope)
-      val id = leaf.partitionId
-      val lineage = leaf.lineage
-      id.toInt -> Cell(id, lineage, ring)
-    }.toMap
-    val nempties_prime2 = ((0 to quadtree_prime.getLeafZones.size).toSet -- empties_prime2.toSet).toList
-
-    val r_prime = solve(quadtree_prime, cells_prime, nempties_prime2, empties_prime2)
-    println("Solve")
-    println(s"r_prime size = ${r_prime.size}")
-    val pids = r_prime.map(r => id2lineage(r.pid)).distinct.sorted
-    println(s"pids size = ${pids.size}")
-
-    //r_prime.take(5).foreach(println)
-
-
-    // Getting polygon IDs from known partitions...
-    val r = updatePolygonIds(r_prime, sdcel, id2lineage, cells)
-    val str = r.map{_.toString}.mkString("\n")
-    println(s"r:\n$str")
-
-    val sdcel_prime = fixEmptyCells(r, sdcel, cells)
-
-    sdcel_prime
-/*
-    save("/tmp/edgesNQ.wkt"){
-      quadtree_prime.getLeafZones.asScala.map{ leaf =>
-        val wkt = envelope2polygon(leaf.getEnvelope).toText
+      val cells_prime = quadtree_prime.getLeafZones.asScala.map{ leaf =>
+        val ring = envelope2ring(leaf.getEnvelope)
         val id = leaf.partitionId
         val lineage = leaf.lineage
+        id.toInt -> Cell(id, lineage, ring)
+      }.toMap
 
-        s"$wkt\t$id\t$lineage\n"
-      }
+      /*
+       save("/tmp/edgesNQ.wkt"){
+       quadtree_prime.getLeafZones.asScala.map{ leaf =>
+       val wkt = envelope2polygon(leaf.getEnvelope).toText
+       val id = leaf.partitionId
+       val lineage = leaf.lineage
+
+       s"$wkt\t$id\t$lineage\n"
+       }
+       }
+       save("/tmp/edgesEM.wkt"){
+       empties.map{ cell =>
+       val wkt = cell.wkt
+       val id = cell.id
+       val lineage = cell.lineage
+
+       s"$wkt\t$id\t$lineage\n"
+       }
+       }
+       */
+
+      val r_prime = solve(quadtree_prime, cells_prime, non_empties, empties).distinct
+      /*
+       save("/tmp/edgesPL.wkt"){
+       r_prime.map{ r =>
+       val cell = cells.values.filter(_.lineage == r.pid.lineage).head
+       val wkt = cell.wkt
+
+       s"$wkt\n"
+       }.distinct.toList
+       }
+       */
+
+      // Getting polygon IDs from known partitions...
+      val r = updatePolygonIds(r_prime, sdcel, cells)
+      val sdcel_prime = fixEmptyCells(r, sdcel, cells)
+      sdcel_prime
     }
-    save("/tmp/edgesEM.wkt"){
-      empties3.values.toList.map{ cell =>
-        val wkt = cell.wkt
-        val id = cell.id
-        val lineage = cell.lineage
-
-        s"$wkt\t$id\t$lineage\n"
-      }
-    }
-
-    //sdcel
- */
   }
 
+  
   def fixEmptyCells(r: List[EmptyCell], sdcel: RDD[(Half_edge, String)],
     cells: Map[Int, Cell])
     (implicit settings: Settings, geofactory: GeometryFactory):  RDD[(Half_edge, String)]= {
 
     if(!r.isEmpty){
-      val pids = r.map(_.empty).toSet
+      val pids = r.map(_.empty.lineage).toSet
 
-      sdcel.mapPartitionsWithIndex{ (pid, it) =>
-        if(pids.contains(pid)){
-          val empty = r.filter(_.empty == pid).head
+      sdcel.mapPartitionsWithIndex{ (index, it) =>
+        val lineage = cells(index).lineage
+        if(pids.contains(lineage)){
+          val empty = r.filter(_.empty.id == index).head
           
-          val h = cells(pid).toHalf_edge(empty.polyId, empty.label)
+          val h = cells(index).toHalf_edge(empty.polyId, empty.label)
           val tuple = (h, empty.label)
           it ++ Iterator(tuple)
         } else {
@@ -153,16 +132,16 @@ object EmptyCellManager {
       sdcel
     }
   }  
+  
 
   def updatePolygonIds(r: List[EmptyCell], sdcel: RDD[(Half_edge, String)],
-    id2lineage: Map[Int, String], cells: Map[Int, Cell])
+    cells: Map[Int, Cell])
       (implicit settings: Settings, geofactory: GeometryFactory): List[EmptyCell] = {
-    val pids = r.map(r => id2lineage(r.pid)).toSet
-    println(s"pids size = ${pids.size}")
-    sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      val lineage = cells(pid).lineage
-      if(pids.filter(_.size <= lineage.size).exists(l => lineage.substring(0, l.size-1) == l)){
-        val cells  = r.filter(_.pid == pid)
+    val pids = r.map(r => r.pid.lineage).toSet
+    sdcel.mapPartitionsWithIndex{ (index, it) =>
+      val lineage = cells(index).lineage
+      if(pids.contains(lineage)){
+        val cells  = r.filter(_.pid.lineage == lineage)
         val hedges = it.toList
 
         val list = for{
@@ -179,24 +158,25 @@ object EmptyCellManager {
   }
 
   def solve[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
-    non_empties: List[Int], empties: List[Int])
+    non_empties: List[Cell], empties: List[Cell])
     (implicit geofactory: GeometryFactory, settings: Settings): List[EmptyCell] = {
 
-    solveRec(quadtree, cells, empties, non_empties, List.empty[(Point,Int,Int)])
-      .distinct
+    val s = solveRec(quadtree, cells, empties, non_empties, List.empty[(Point,Cell,Cell)])
+    s.distinct
       .map{ case(point, pid, empty) => EmptyCell(point, pid, empty) }
   }
 
   @tailrec
   private def solveRec[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
-    empties: List[Int], non_empties: List[Int], result: List[(Point, Int, Int)])
-    (implicit geofactory: GeometryFactory, settings: Settings): List[(Point, Int, Int)] = {
+    empties: List[Cell], non_empties: List[Cell], result: List[(Point, Cell, Cell)])
+    (implicit geofactory: GeometryFactory, settings: Settings)
+      : List[(Point, Cell, Cell)] = {
 
     // iterate recursively over the set of empty cells...
     empties match {
       case Nil => result
       case empty +: tail => {
-        val cell = cells(empty)
+        val cell = empty
         val (pid, point, pids) = getClosestPath(quadtree, non_empties, cell)
         // remove the complete path of cells solved in the past call...
         val new_empties = tail.toSet.diff(pids.toSet).toList
@@ -207,41 +187,41 @@ object EmptyCellManager {
   }
 
   // helper function to call closest function
-  private def getClosestPath[T](Q: StandardQuadTree[T], NE: List[Int], c: Cell)
+  private def getClosestPath[T](Q: StandardQuadTree[T], NE: List[Cell], c: Cell)
     (implicit geofactory: GeometryFactory, settings: Settings):
-      (Int, Point, List[Int]) = {
+      (Cell, Point, List[Cell]) = {
 
     // just create a fake point and empty list to start the recursion...
     val point_prime = geofactory.createPoint(new Coordinate(0,0))
-    val path_prime  = List.empty[Int]
+    val path_prime  = List.empty[Cell]
     val (pid, path, point) = closest(Q, NE, c, path_prime, point_prime)
 
-    (pid, point, path :+ c.id) // attach the current cell to the path
+    (pid, point, path :+ c) // attach the current cell to the path
   }
 
   @tailrec
   // Recursive function to get the list of empty cells and the non-empty cell and point
   // which is the closest to them...
-  private def closest[T](Q: StandardQuadTree[T], NE: List[Int], c: Cell,
-    path: List[Int], point: Point)
+  private def closest[T](Q: StandardQuadTree[T], NE: List[Cell], c: Cell,
+    path: List[Cell], point: Point)
     (implicit geofactory: GeometryFactory, settings: Settings):
-      (Int, List[Int], Point) = {
+      (Cell, List[Cell], Point) = {
 
     // get cells in the corner and reference point...
     val (cs, point) = getCellsAtCorner(Q, c)
     // if one of the cells is non-empty we can finish...
     if(cs.exists(x => isInNonEmpties(x, NE))){
       val (non_empties, empties) = cs.partition(x => isInNonEmpties(x, NE))
-      val non_empty = non_empties.head.id
-      val ids = empties.map(_.id)
-      (non_empty, path ++ ids, point)
+      val non_empty = non_empties.head
+      
+      (non_empty, path ++ empties, point)
     } else { // if not...
       val new_c = getDeepestCell(cs) // choose the deepest cell...
       // extract the cell parent quadtree...  
       val Q_prime = Quadtree.extract(Q, getLineageParent(new_c))
       // filter the non-empty cells to only the children of the choosen cell parent...
       val new_NE = filterNonEmpties(NE, Q_prime) 
-      val new_path = path ++ cs.map(_.id) // accumulate the set of empty cells involved...
+      val new_path = path ++ cs // accumulate the set of empty cells involved...
       // repeat recursion...
       closest(Q, new_NE, new_c, new_path, point)
     }
@@ -287,22 +267,23 @@ object EmptyCellManager {
     cells.map(cell => (cell.lineage.length, cell)).maxBy(_._1)._2
 
   // Filter the list of non-empty cells with those from the new quadtree...
-  private def filterNonEmpties[T](non_empties: List[Int],
-    quadtree: StandardQuadTree[T]): List[Int] = {
+  private def filterNonEmpties[T](non_empties: List[Cell],
+    quadtree: StandardQuadTree[T]): List[Cell] = {
 
-    val ids = quadtree.getLeafZones.asScala.map(_.partitionId)
-    non_empties.filter(id => ids.contains(id))
+    val ids = quadtree.getLeafZones.asScala.map(_.lineage)
+    non_empties.filter(cell => ids.contains(cell.lineage))
   }
 
   // Test if the cell is in the non-empty list...
-  private def isInNonEmpties(cell: Cell, non_empties: List[Int]): Boolean =
-    non_empties.exists(_ == cell.id)
+  private def isInNonEmpties(cell: Cell, non_empties: List[Cell]): Boolean =
+    non_empties.exists(c => c.lineage == cell.lineage)
 
   def groupByLineage(emptyCells: Vector[Cell])(implicit geofactory: GeometryFactory)
       : (Vector[Cell], Vector[Cell])= {
     val (a, b) = emptyCells
       .map{ cell =>
-        val parent_lineage = cell.lineage.reverse.tail.reverse
+        val lineage = cell.lineage
+        val parent_lineage = lineage.reverse.tail.reverse
         (parent_lineage, cell)
       }
       .groupBy(_._1)
@@ -353,7 +334,7 @@ object EmptyCellManager {
     (implicit geofactory: GeometryFactory):
       (StandardQuadTree[T], HashMap[String, Cell]) = {
 
-    val emptiesByLevel = empties.values.map(cell => (cell.lineage.length(), cell))
+    val emptiesByLevel = empties.values.map(cell => (cell.lineage.size, cell))
       .groupBy(_._1)
       .map(g => g._1 -> g._2.map(_._2).toVector)
       .withDefaultValue(Vector.empty[Cell])
@@ -385,11 +366,11 @@ object EmptyCellManager {
       .getOrCreate()
     import spark.implicits._
 
-/*
     val qpath = args(0)
     val bpath = args(1)
     val (quadtree, cells) = readQuadtree[Int](qpath, bpath)
 
+    /*
     // Testing quadtree creation...
     save("/tmp/edgesQ.wkt"){
       cells.values.map{ cell =>
@@ -421,20 +402,23 @@ object EmptyCellManager {
         s"$wkt\t$id\t$lineage\n"
       }
     }
+     */
 
     // Testing getClosestPath function...
     val non_empties = List(5, 17, 32, 48)
     val empties = (0 to 51).toSet.diff(non_empties.toSet).toList
-    //val result = solveEmptyCells(quadtree, cells, non_empties)
-    val result = solve(quadtree, cells, non_empties , empties)
-    save("/tmp/edgesR.wkt"){
-      result.map{ cell =>
-        val wkt = cells(cell.empty).wkt
-        s"$wkt\t${cell.empty}\t${cell.pid}\n"
+    val ne = non_empties.map(ne => cells(ne))
+    val e  = empties.map(e => cells(e))
+
+    val result = solve(quadtree, cells, ne, e)
+    save("/tmp/edgesP.wkt"){
+      result.map{ ecell =>
+        val wkt = ecell.empty.wkt
+        s"$wkt\t${ecell.empty.id}\t${ecell.pid.id}\t${ecell.pid.lineage}\n"
       }.toList
     }
- */
-
+ 
+    /*
     // Testing clean quadtree...
     import scala.io.Source
     val epath  = "/home/acald013/RIDIR/local_path/CA/P3000/empties.txt"
@@ -485,6 +469,7 @@ object EmptyCellManager {
 
     println(empties2.size)
     println(empties3.size)
+     */
 
     spark.close()
   }

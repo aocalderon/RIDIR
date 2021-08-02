@@ -37,6 +37,7 @@ object DCELBuilder2 {
     }
   }
 
+  /*
   def main(args: Array[String]) = {
     // Starting session...
     logger.info("Starting session...")
@@ -135,6 +136,7 @@ object DCELBuilder2 {
         }.toIterator
     }.flatMap{ case(holes, exteriors) => matchHoles(holes, exteriors)}
   }
+   */
 
   def save(filename: String)(content: Seq[String]): Unit = {
     val start = clocktime

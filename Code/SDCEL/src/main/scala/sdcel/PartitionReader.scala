@@ -43,9 +43,6 @@ object PartitionReader {
       val id = leaf.partitionId.toInt
       val lineage = leaf.lineage
       val envelope = roundEnvelope(leaf.getEnvelope)
-      if(settings.debug){
-        println(s"$lineage\t$id\t$envelope")
-      }
       val mbr = envelope2ring(envelope)
 
       val cell = Cell(id, lineage, mbr)
@@ -72,8 +69,10 @@ object PartitionReader {
           val ringId = arr(3).toInt
           val edgeId = arr(4).toInt
           val isHole = arr(5).toBoolean
-          val nedges = arr(6).toInt
-          val cross  = arr(7) 
+          val nedges = try { arr(6).toInt }
+          catch { case e: java.lang.ArrayIndexOutOfBoundsException => -1 }
+          val cross  = try { arr(7) }
+          catch { case e: java.lang.ArrayIndexOutOfBoundsException => "" } 
           val edge = reader.read(wkt).asInstanceOf[LineString]
           val data = EdgeData(polygonId, ringId, edgeId, isHole, label, cross, nedges)
           edge.setUserData(data)
