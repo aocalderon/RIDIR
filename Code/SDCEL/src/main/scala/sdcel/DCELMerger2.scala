@@ -537,7 +537,7 @@ object DCELMerger2 {
         val original_hedge = a.h
         val coords = (a.h.v1 +: coords_prime :+ a.h.v2).distinct
         val hedges = coords.zip(coords.tail).map{ case(a1, a2) =>
-          val l = geofactory.createLineString(Array(a1,a2))
+          val l = geofactory.createLineString(Array(a1, a2))
           l.setUserData(original_hedge.data)
           val h = Half_edge(l)
           h
@@ -558,7 +558,7 @@ object DCELMerger2 {
         val original_hedge = a.h
         val coords = (a.h.v1 +: coords_prime :+ a.h.v2).distinct
         val hedges = coords.zip(coords.tail).map{ case(a1, a2) =>
-          val l = geofactory.createLineString(Array(a1,a2))
+          val l = geofactory.createLineString(Array(a1, a2))
           l.setUserData(original_hedge.data)
           val h = Half_edge(l)
           h
@@ -576,23 +576,22 @@ object DCELMerger2 {
   : List[(Half_edge,String)] = {
 
     val pid = org.apache.spark.TaskContext.getPartitionId
-    val partitionId = 34
+    val partitionId = 16
 
+    // Getting edge splits...
     val (aList, bList) = intersects4(ha, hb, partitionId)
     val hedges_prime = (aList ++ bList)
 
-    val (borders, hedges0) = hedges_prime.partition(_.data.polygonId == -1)
-    val hedges = borders.distinct ++ hedges0
+    // Remove duplicates...
+    val hedges = hedges_prime.groupBy{h => (h.v1, h.v2)}.values.map(_.head).toList
 
-    setTwins(hedges)
+    // Setting new twins...
+    val hedges2 = setTwins(hedges).filter(_.twin != null)
 
-    if(pid == partitionId){
-      println("Hedges")
-      hedges.foreach{println}
-    }
+    // Running sequential...
+    sequential(hedges2, partitionId)
 
-    sequential(hedges)
-
+    // Extrantinct unique half-edge and label to represent the face...
     val h = groupByNext(hedges.toSet, List.empty[(Half_edge, String)])
       .filter(_._2 != "")
 
@@ -601,7 +600,9 @@ object DCELMerger2 {
   }
 
   // Sequential implementation of dcel...
-  def sequential(hedges_prime: List[Half_edge], partitionId: Int = -1): Unit = {
+  def sequential(hedges_prime: List[Half_edge], partitionId: Int = -1)
+      (implicit geofactory: GeometryFactory): Unit = {
+    val pid = org.apache.spark.TaskContext.getPartitionId
     // Group half-edges by the destination vertex (v2)...
 
     val hedges = try{
@@ -614,10 +615,19 @@ object DCELMerger2 {
     }
     val incidents = hedges.groupBy(_.v2).values.toList
 
+    if(pid == partitionId){
+      save("/tmp/edgesI.wkt",
+        incidents.map{ h =>
+          val i = geofactory.createPoint(h.head.v2)
+          s"${i.toText}\t${h.map(_.wkt).mkString(" ")}\n"
+        }
+      )
+    }
+
     // At each vertex, get their incident half-edges...
     val h_prime = incidents.map{ hList =>
       // Sort them by angle...
-      val hs = hList.sortBy(- _.angleAtDest)
+      val hs = hList.distinct.sortBy(- _.angleAtDest)
       // Add first incident to complete the sequence...
       val hs_prime = hs :+ hs.head
       // zip and tail will pair each half-edge with its next one...

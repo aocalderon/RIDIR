@@ -14,7 +14,7 @@ import ch.cern.sparkmeasure.TaskMetrics
 
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager._
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2._
 
 import PartitionReader._
 import DCELBuilder2.getLDCELs
@@ -73,6 +73,8 @@ object SDCEL2 {
     log(s"INFO|npartitions=${cells.size}")
     log2("TIME|start")
 
+
+
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A").cache
     val nEdgesRDDA = edgesRDDA.count()
@@ -84,81 +86,57 @@ object SDCEL2 {
     log2("TIME|read")
 
     // Creating local dcel layer A...
-    val ldcelA = createLocalDCELs(edgesRDDA, cells)
-    save("/tmp/edgesFA.wkt"){
+    val ldcelA0 = createLocalDCELs(edgesRDDA, cells)//.filter(_._1.checkValidity)
+    //save("/tmp/edgesFA.wkt"){
+    //  ldcelA0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    //}
+    val ldcelA = runEmptyCells(ldcelA0, quadtree, cells)
+    save("/tmp/edgesFAC.wkt"){
       ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     }
 
     // Creating local dcel layer B...
-    val ldcelB = createLocalDCELs(edgesRDDB, cells)
-    save("/tmp/edgesFB.wkt"){
+    val ldcelB0 = createLocalDCELs(edgesRDDB, cells)//.filter(_._1.checkValidity)
+    //save("/tmp/edgesFB.wkt"){
+    //  ldcelB0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    //}
+    val ldcelB = runEmptyCells(ldcelB0, quadtree, cells)
+    save("/tmp/edgesFBC.wkt"){
       ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     }
 
-    // Merge local dcels...
+    // Overlay local dcels...
     val sdcel = ldcelA
       .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
         val pid = TaskContext.getPartitionId
-        val partitionId = 34
+        val partitionId = 16
 
         val A = iterA.map{_._1.getNexts}.flatten.toList
         val B = iterB.map{_._1.getNexts}.flatten.toList
 
         val hedges = merge4(A, B)
 
-        if(pid == partitionId){
-          save("/tmp/edgesHH.wkt"){
-            hedges.map{ hedge => s"${hedge.toString}\n" }
-          }
-        }
-
         hedges.toIterator
-      }.cache
+      }.filter(_._1.checkValidity).cache
     val nSDcel = sdcel.count()
     logger.info("Done!")
     save("/tmp/edgesFC.wkt"){
       sdcel.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
     }
-
-    /*
     
     // Checking and solving single labels...
-    val sdcel2 = checkSingleLabel(ldcelA, sdcel,  "B")
-    val sdcel3 = checkSingleLabel(ldcelB, sdcel2, "A")
+    logger.info("Single label detection")
+    val sdcel2 = checkSingleLabel(ldcelA, sdcel,  "B").cache
+    logger.info("Done!")
+    val sdcel3 = checkSingleLabel(ldcelB, sdcel2, "A").cache
     sdcel3.count()
+    logger.info("Done!")
     save("/tmp/edgesFD.wkt"){
       sdcel3.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
     }
-    
-    // *************************************
-    // * START: Dealing with empty cells...
-    // *************************************
-    val (ne, e) = sdcel3.mapPartitionsWithIndex{ (pid, it) =>
-      val faces = it.map(_._1.getPolygon).toList
-      val cell = cells(pid).mbr
-      val non_empty = faces.exists{ _.intersects(cell) }
-      val r = (pid, non_empty)
-      Iterator(r)
-    }.collect().partition{ case(pid, non_empty) => non_empty }
 
-    val non_empties = ne.map(_._1).toList
-    val empties = e.map(_._1).toList
-    println(s"Non empties set: ${non_empties.mkString(" ")}")
-    println(s"Empties set: ${empties.mkString(" ")}")
-
-    val r_prime = solve(quadtree, cells, non_empties, empties)
-    println("Solve")
-    r_prime.foreach(println)
-    // Getting polygon IDs from known partitions...
-    val r = updatePolygonIds(r_prime, sdcel3)
-    val str = r.map{_.toString}.mkString("\n")
-    println(s"r:\n$str")
-    val sdcel_prime = fixEmptyCells(r, sdcel3, cells)
-    save("/tmp/edgesFE.wkt"){
-      sdcel_prime.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
-    }
-
-    val faces0 = sdcel_prime.mapPartitionsWithIndex{ (pid, it) =>
+    /*
+    val faces0 = sdcel3.mapPartitionsWithIndex{ (pid, it) =>
       val partitionId = 39
       val hedges = it.toList
       val faces = hedges.map{hedge => Face(hedge._1, hedge._2)}
@@ -182,9 +160,9 @@ object SDCEL2 {
         }.map(_._2).toIterator
       //it
     }.cache
-    save("/tmp/edgesFaces.wkt"){
-      faces0.map{f => s"${f.getGeometry.toText}\t${f.label}\n"}.collect
-    }
+    //save("/tmp/edgesFaces.wkt"){
+    //  faces0.map{f => s"${f.getGeometry.toText}\t${f.label}\n"}.collect
+    //}
 
     // Running overlay operations...
     val faces1 = faces0.flatMap{ face =>

@@ -85,6 +85,23 @@ case class Half_edge(edge: LineString) {
     }
   }
 
+  def checkValidity(implicit geofactory: GeometryFactory): Boolean = {
+    try {
+      val coords = (v1 +: getNexts.map{_.v2}).toArray
+      if(coords.size >= 4){
+        geofactory.createPolygon(coords)
+        true
+      } else {
+        false
+      }
+    } catch {
+      case e: java.lang.IllegalArgumentException => {
+        false
+      }
+    }
+    
+  }
+
   def getPolygon(implicit geofactory: GeometryFactory): Polygon = {
     try {
       val coords = (v1 +: getNexts.map{_.v2}).toArray
@@ -93,7 +110,6 @@ case class Half_edge(edge: LineString) {
       } else {
         println("Error creating polygon face. Less than 4 vertices...")
         println(this)
-        println("Retriving empty polygon instead...")
         emptyPolygon
       }
     } catch {
@@ -102,8 +118,6 @@ case class Half_edge(edge: LineString) {
         println(e.getMessage)
         println(coords.mkString(" "))
         println(this)
-        //System.exit(0)
-        //geofactory.createPolygon(coords.toArray)
         emptyPolygon
       }
     }
@@ -228,6 +242,7 @@ case class Segment(hedges: List[Half_edge]) {
   val first = hedges.head
   val last = hedges.last
   val polygonId = first.data.polygonId
+  val ringId = first.data.ringId
   val startId = first.data.edgeId
   val endId = last.data.edgeId
 
@@ -251,7 +266,7 @@ case class Segment(hedges: List[Half_edge]) {
 case class Cell(id: Int, lineage: String, mbr: LinearRing){
   val boundary = mbr.getEnvelopeInternal
 
-  def wkt(implicit geofactory: GeometryFactory) = s"${toPolygon.toText}\t${lineage}\t${id}\n"
+  def wkt(implicit geofactory: GeometryFactory) = s"${toPolygon.toText}\t${lineage}\t${id}"
 
   def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
     geofactory.createPolygon(mbr)
