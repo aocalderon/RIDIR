@@ -23,6 +23,7 @@
 #include <string>
 #include <ctime>
 #include <chrono>
+#include <iomanip>
 
 #include "dcels.h"
 #include "arr_print.h"

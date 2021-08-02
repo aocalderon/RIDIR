@@ -1,6 +1,8 @@
 #ifndef _PRINT_ARR_H_
 #define _PRINT_ARR_H_
 
+#include <iomanip>
+
 typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
 typedef CGAL::Arr_segment_traits_2<Kernel>                Segment_traits_2;
 typedef CGAL::Arr_polyline_traits_2<Segment_traits_2>     Geom_traits_2;
@@ -16,6 +18,8 @@ std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
   typename Arrangement::Halfedge_const_handle          he;
   std::stringstream ss;
 
+  ss << std::fixed;
+  ss << std::setprecision(5);
   ss << "POLYGON (("; //<< circ->source()->point();
   do {
     he = curr;

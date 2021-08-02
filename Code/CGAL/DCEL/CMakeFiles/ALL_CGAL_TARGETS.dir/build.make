@@ -34,19 +34,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/cmake
+CMAKE_COMMAND = /usr/bin/cmake
 
 # The command to remove a file.
-RM = /home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/cmake -E remove -f
+RM = /usr/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
+CMAKE_SOURCE_DIR = /home/and/RIDIR/Code/CGAL/DCEL
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
+CMAKE_BINARY_DIR = /home/and/RIDIR/Code/CGAL/DCEL
 
 # Utility rule file for ALL_CGAL_TARGETS.
 
@@ -67,6 +67,6 @@ CMakeFiles/ALL_CGAL_TARGETS.dir/clean:
 .PHONY : CMakeFiles/ALL_CGAL_TARGETS.dir/clean
 
 CMakeFiles/ALL_CGAL_TARGETS.dir/depend:
-	cd /home/acald013/RIDIR/Code/CGAL/DCEL && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/acald013/RIDIR/Code/CGAL/DCEL /home/acald013/RIDIR/Code/CGAL/DCEL /home/acald013/RIDIR/Code/CGAL/DCEL /home/acald013/RIDIR/Code/CGAL/DCEL /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles/ALL_CGAL_TARGETS.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/and/RIDIR/Code/CGAL/DCEL && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/and/RIDIR/Code/CGAL/DCEL /home/and/RIDIR/Code/CGAL/DCEL /home/and/RIDIR/Code/CGAL/DCEL /home/and/RIDIR/Code/CGAL/DCEL /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles/ALL_CGAL_TARGETS.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ALL_CGAL_TARGETS.dir/depend
 

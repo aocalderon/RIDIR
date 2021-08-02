@@ -39,4 +39,6 @@ endif()
 
 create_single_source_cgal_program( "dcel.cpp" )
 
+create_single_source_cgal_program( "dcel_debug.cpp" )
+
 
