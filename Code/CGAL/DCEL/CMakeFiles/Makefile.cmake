@@ -146,5 +146,4 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/dcel.dir/DependInfo.cmake"
   "CMakeFiles/ALL_CGAL_TARGETS.dir/DependInfo.cmake"
   "CMakeFiles/cgal_check_build_system.dir/DependInfo.cmake"
-  "CMakeFiles/dcel_debug.dir/DependInfo.cmake"
   )

@@ -54,7 +54,6 @@ CMAKE_BINARY_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
 
 # The main recursive "all" target.
 all: CMakeFiles/dcel.dir/all
-all: CMakeFiles/dcel_debug.dir/all
 
 .PHONY : all
 
@@ -67,7 +66,6 @@ preinstall:
 clean: CMakeFiles/dcel.dir/clean
 clean: CMakeFiles/ALL_CGAL_TARGETS.dir/clean
 clean: CMakeFiles/cgal_check_build_system.dir/clean
-clean: CMakeFiles/dcel_debug.dir/clean
 
 .PHONY : clean
 
@@ -151,33 +149,6 @@ cgal_check_build_system: CMakeFiles/cgal_check_build_system.dir/rule
 CMakeFiles/cgal_check_build_system.dir/clean:
 	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/clean
 .PHONY : CMakeFiles/cgal_check_build_system.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/dcel_debug.dir
-
-# All Build rule for target.
-CMakeFiles/dcel_debug.dir/all:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/depend
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num=3,4 "Built target dcel_debug"
-.PHONY : CMakeFiles/dcel_debug.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/dcel_debug.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/dcel_debug.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
-.PHONY : CMakeFiles/dcel_debug.dir/rule
-
-# Convenience name for target.
-dcel_debug: CMakeFiles/dcel_debug.dir/rule
-
-.PHONY : dcel_debug
-
-# clean rule for target.
-CMakeFiles/dcel_debug.dir/clean:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/clean
-.PHONY : CMakeFiles/dcel_debug.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

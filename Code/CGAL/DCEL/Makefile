@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -77,6 +66,17 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -149,19 +149,6 @@ cgal_check_build_system/fast:
 	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/build
 .PHONY : cgal_check_build_system/fast
 
-#=============================================================================
-# Target rules for targets named dcel_debug
-
-# Build rule for target.
-dcel_debug: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 dcel_debug
-.PHONY : dcel_debug
-
-# fast build rule for target.
-dcel_debug/fast:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/build
-.PHONY : dcel_debug/fast
-
 dcel.o: dcel.cpp.o
 
 .PHONY : dcel.o
@@ -189,51 +176,20 @@ dcel.cpp.s:
 	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/dcel.cpp.s
 .PHONY : dcel.cpp.s
 
-dcel_debug.o: dcel_debug.cpp.o
-
-.PHONY : dcel_debug.o
-
-# target to build an object file
-dcel_debug.cpp.o:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/dcel_debug.cpp.o
-.PHONY : dcel_debug.cpp.o
-
-dcel_debug.i: dcel_debug.cpp.i
-
-.PHONY : dcel_debug.i
-
-# target to preprocess a source file
-dcel_debug.cpp.i:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/dcel_debug.cpp.i
-.PHONY : dcel_debug.cpp.i
-
-dcel_debug.s: dcel_debug.cpp.s
-
-.PHONY : dcel_debug.s
-
-# target to generate assembly for a file
-dcel_debug.cpp.s:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/dcel_debug.cpp.s
-.PHONY : dcel_debug.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... dcel"
 	@echo "... ALL_CGAL_TARGETS"
 	@echo "... cgal_check_build_system"
-	@echo "... dcel_debug"
+	@echo "... edit_cache"
 	@echo "... dcel.o"
 	@echo "... dcel.i"
 	@echo "... dcel.s"
-	@echo "... dcel_debug.o"
-	@echo "... dcel_debug.i"
-	@echo "... dcel_debug.s"
 .PHONY : help
 
 

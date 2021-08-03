@@ -9,10 +9,51 @@ typedef CGAL::Arr_polyline_traits_2<Segment_traits_2>     Geom_traits_2;
 typedef Geom_traits_2::Curve_2                            Polyline_2;
 
 //-----------------------------------------------------------------------------
-// Print all vertices in WKT format.
+// Print all vertices in WKT format (single).
 //
 template<class Arrangement>
 std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
+{
+  typename Arrangement::Ccb_halfedge_const_circulator  curr = circ;
+  typename Arrangement::Halfedge_const_handle          he;
+  std::stringstream ss;
+
+  ss << std::fixed;
+  ss << std::setprecision(10);
+  ss << "POLYGON (("; //<< circ->source()->point();
+  do {
+    he = curr;
+    int n = he->curve().number_of_subcurves();
+    if( n > 1 ){
+      Polyline_2 poly = he->curve();
+
+      if(poly[0].left()  == he->source()->point() ||
+	 poly[0].right() == he->source()->point()){
+	for(int i = 0; i < n; i++){
+	  ss << poly[i].source() <<  ", ";
+	}
+      } else {
+	for(int i = n - 1; i >= 0; i--){
+	  ss << poly[i].target() << ", ";
+	}
+      }
+    } else {
+      ss << he->source()->point() << ", ";      
+    }
+    ++curr;
+  } while (curr != circ);
+  ss << curr->source()->point() << ", ";
+  ss.seekp(-2, std::ios_base::end);
+  ss << "))";
+
+  return ss.str();
+}
+
+//-----------------------------------------------------------------------------
+// Print all vertices in WKT format.
+//
+template<class Arrangement>
+std::string get_wkt2 (typename Arrangement::Ccb_halfedge_const_circulator circ)
 {
   typename Arrangement::Ccb_halfedge_const_circulator  curr = circ;
   typename Arrangement::Halfedge_const_handle          he;
@@ -38,7 +79,7 @@ std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
 	}
       }
     } else {
-      ss << he->source()->point() << " " << he->target()->point() <<", ";      
+      ss << he->source()->point() << " " << he->target()->point() << ", ";      
     }
     ++curr;
   } while (curr != circ);
