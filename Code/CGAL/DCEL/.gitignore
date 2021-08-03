@@ -1,5 +1,7 @@
 dcel
+dcel_debug
 CMakeCache.txt
+CMakeFiles/*
 cmake_install.cmake
 CMakeLists.txt
 Makefile
