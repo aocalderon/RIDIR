@@ -101,7 +101,7 @@ object TreeSetSegment {
       case Some(xs: List[LineString]) => Inters(coord) = xs :+ seg
       case None => Inters(coord) = List(seg)
     }
-
+/*
     // The status structure...
     val status: TreeSet[Segment] = TreeSet.empty[Segment](SegmentOrdering)
     for(event <- queue){
@@ -114,7 +114,7 @@ object TreeSetSegment {
       println(s"Status at event $event")
       status.foreach(println)
     }
-
+ */
   }
 
   def getLeft(line: LineString): Coordinate = {
