@@ -19,7 +19,7 @@ std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
   std::stringstream ss;
 
   ss << std::fixed;
-  ss << std::setprecision(5);
+  ss << std::setprecision(10);
   ss << "POLYGON (("; //<< circ->source()->point();
   do {
     he = curr;
