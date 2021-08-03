@@ -35,25 +35,24 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /usr/bin/cmake
+CMAKE_COMMAND = /home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/cmake
 
 # The command to remove a file.
-RM = /usr/bin/cmake -E remove -f
+RM = /home/acald013/opt/cmake/cmake-3.16.4-Linux-x86_64/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/and/RIDIR/Code/CGAL/DCEL
+CMAKE_SOURCE_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/and/RIDIR/Code/CGAL/DCEL
+CMAKE_BINARY_DIR = /home/acald013/RIDIR/Code/CGAL/DCEL
 
 #=============================================================================
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/dcel_debug.dir/all
 all: CMakeFiles/dcel.dir/all
 
 .PHONY : all
@@ -64,66 +63,38 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/dcel_debug.dir/clean
-clean: CMakeFiles/cgal_check_build_system.dir/clean
-clean: CMakeFiles/ALL_CGAL_TARGETS.dir/clean
 clean: CMakeFiles/dcel.dir/clean
+clean: CMakeFiles/ALL_CGAL_TARGETS.dir/clean
+clean: CMakeFiles/cgal_check_build_system.dir/clean
 
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/dcel_debug.dir
+# Target rules for target CMakeFiles/dcel.dir
 
 # All Build rule for target.
-CMakeFiles/dcel_debug.dir/all:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/depend
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num=3,4 "Built target dcel_debug"
-.PHONY : CMakeFiles/dcel_debug.dir/all
+CMakeFiles/dcel.dir/all:
+	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/depend
+	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num=1,2 "Built target dcel"
+.PHONY : CMakeFiles/dcel.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/dcel_debug.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/dcel_debug.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
-.PHONY : CMakeFiles/dcel_debug.dir/rule
+CMakeFiles/dcel.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/dcel.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
+.PHONY : CMakeFiles/dcel.dir/rule
 
 # Convenience name for target.
-dcel_debug: CMakeFiles/dcel_debug.dir/rule
+dcel: CMakeFiles/dcel.dir/rule
 
-.PHONY : dcel_debug
-
-# clean rule for target.
-CMakeFiles/dcel_debug.dir/clean:
-	$(MAKE) -f CMakeFiles/dcel_debug.dir/build.make CMakeFiles/dcel_debug.dir/clean
-.PHONY : CMakeFiles/dcel_debug.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/cgal_check_build_system.dir
-
-# All Build rule for target.
-CMakeFiles/cgal_check_build_system.dir/all:
-	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/depend
-	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num= "Built target cgal_check_build_system"
-.PHONY : CMakeFiles/cgal_check_build_system.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/cgal_check_build_system.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/cgal_check_build_system.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
-.PHONY : CMakeFiles/cgal_check_build_system.dir/rule
-
-# Convenience name for target.
-cgal_check_build_system: CMakeFiles/cgal_check_build_system.dir/rule
-
-.PHONY : cgal_check_build_system
+.PHONY : dcel
 
 # clean rule for target.
-CMakeFiles/cgal_check_build_system.dir/clean:
-	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/clean
-.PHONY : CMakeFiles/cgal_check_build_system.dir/clean
+CMakeFiles/dcel.dir/clean:
+	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/clean
+.PHONY : CMakeFiles/dcel.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/ALL_CGAL_TARGETS.dir
@@ -132,14 +103,14 @@ CMakeFiles/cgal_check_build_system.dir/clean:
 CMakeFiles/ALL_CGAL_TARGETS.dir/all: CMakeFiles/cgal_check_build_system.dir/all
 	$(MAKE) -f CMakeFiles/ALL_CGAL_TARGETS.dir/build.make CMakeFiles/ALL_CGAL_TARGETS.dir/depend
 	$(MAKE) -f CMakeFiles/ALL_CGAL_TARGETS.dir/build.make CMakeFiles/ALL_CGAL_TARGETS.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num= "Built target ALL_CGAL_TARGETS"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num= "Built target ALL_CGAL_TARGETS"
 .PHONY : CMakeFiles/ALL_CGAL_TARGETS.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ALL_CGAL_TARGETS.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/ALL_CGAL_TARGETS.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
 .PHONY : CMakeFiles/ALL_CGAL_TARGETS.dir/rule
 
 # Convenience name for target.
@@ -153,31 +124,31 @@ CMakeFiles/ALL_CGAL_TARGETS.dir/clean:
 .PHONY : CMakeFiles/ALL_CGAL_TARGETS.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/dcel.dir
+# Target rules for target CMakeFiles/cgal_check_build_system.dir
 
 # All Build rule for target.
-CMakeFiles/dcel.dir/all:
-	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/depend
-	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num=1,2 "Built target dcel"
-.PHONY : CMakeFiles/dcel.dir/all
+CMakeFiles/cgal_check_build_system.dir/all:
+	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/depend
+	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles --progress-num= "Built target cgal_check_build_system"
+.PHONY : CMakeFiles/cgal_check_build_system.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/dcel.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/dcel.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/and/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
-.PHONY : CMakeFiles/dcel.dir/rule
+CMakeFiles/cgal_check_build_system.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/cgal_check_build_system.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/acald013/RIDIR/Code/CGAL/DCEL/CMakeFiles 0
+.PHONY : CMakeFiles/cgal_check_build_system.dir/rule
 
 # Convenience name for target.
-dcel: CMakeFiles/dcel.dir/rule
+cgal_check_build_system: CMakeFiles/cgal_check_build_system.dir/rule
 
-.PHONY : dcel
+.PHONY : cgal_check_build_system
 
 # clean rule for target.
-CMakeFiles/dcel.dir/clean:
-	$(MAKE) -f CMakeFiles/dcel.dir/build.make CMakeFiles/dcel.dir/clean
-.PHONY : CMakeFiles/dcel.dir/clean
+CMakeFiles/cgal_check_build_system.dir/clean:
+	$(MAKE) -f CMakeFiles/cgal_check_build_system.dir/build.make CMakeFiles/cgal_check_build_system.dir/clean
+.PHONY : CMakeFiles/cgal_check_build_system.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

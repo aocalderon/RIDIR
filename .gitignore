@@ -11,8 +11,12 @@
 *~
 *#
 
-Code/CGAL/DCEL/CMakeFiles/
+Code/CGAL/DCEL/Makefile
+Code/CGAL/DCEL/CMakeFiles/*
 Code/CGAL/DCEL/dcel
+Code/CGAL/DCEL/dcel_debug
+Code/CGAL/DCEL/cmake_install.cmake
+Code/CGAL/DCEL/CMakeFiles/
 
 Code/Scala/ConcurrencyChecker/target/*
 Code/Scala/ConcurrencyChecker/project/*
