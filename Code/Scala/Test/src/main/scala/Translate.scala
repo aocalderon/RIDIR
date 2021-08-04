@@ -95,24 +95,26 @@ object Translate {
     logger.info("Performing re-projection... Done!")
     logger.info(s"Number of records: ${geometriesRaw.count()}")
 
+    geometriesRaw.take(2).foreach(println)
+
     val output = params.output()
     logger.info(s"Saving to ${output}...")
-    if(partitions < 2){
+//    if(partitions < 2){
       val f = new java.io.PrintWriter(output)
       val wkt = geometriesRaw.collect().map{ polygon =>
         s"${polygon.toText()}\n"
       }.mkString("")
       f.write(wkt)
       f.close()
-    } else {
-      geometriesRaw
+//    } else {
+/*      geometriesRaw
         .map(_.toText).toDF().write
         .mode(SaveMode.Overwrite)
         .option("header", false)
         .option("delimiter", "\t")
         .format("csv")
         .save(output)
-    }
+    }*/
     logger.info(s"Saving to ${output}... Done!")
 
     logger.info("Closing session...")

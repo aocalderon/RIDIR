@@ -4,9 +4,7 @@ import org.apache.spark.sql.functions.{min, max}
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.geotools.referencing.CRS
 import org.geotools.geometry.jts.JTS
-import org.opengis.referencing.crs.CoordinateReferenceSystem
-import org.opengis.referencing.operation.MathTransform
-import com.vividsolutions.jts.geom.{GeometryFactory, Geometry, Coordinate, Polygon}
+import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Geometry, Coordinate, Polygon}
 import com.vividsolutions.jts.io.WKTReader
 import org.slf4j.{Logger, LoggerFactory}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
@@ -15,14 +13,10 @@ import java.io.PrintWriter
 
 object CoordTransformer {
   private val logger: Logger = LoggerFactory.getLogger("myLogger")
+  private val tolerance: Double = 1e-5
+  private val model: PrecisionModel = new PrecisionModel(1/tolerance)
   private val geofactory: GeometryFactory = new GeometryFactory()
-  private val precision: Double = 0.0001
   private var startTime: Long = System.currentTimeMillis()
-
-  def round(n: Double)(m: Int): Double = {
-    val p = math.pow(10, m).toDouble
-    math.round( n * p) / p
-  }
 
   def clocktime = System.currentTimeMillis()
 
@@ -35,28 +29,15 @@ object CoordTransformer {
     val input = params.input()
     val output = params.output()
     val offset = params.offset()
-    val cores = params.cores()
-    val executors = params.executors()
     val sepsg = params.sepsg()
     val tepsg = params.tepsg()
-    val master = params.local() match {
-      case true  => s"local[${cores}]"
-      case false => s"spark://${params.host()}:${params.port()}"
-    }
 
     var timer = clocktime
     var stage = "Session start"
     log(stage, timer, 0, "START")
     val spark = SparkSession.builder()
-      .config("spark.default.parallelism", 3 * cores * executors)
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-      .config("spark.scheduler.mode", "FAIR")
-      .config("spark.cores.max", cores * executors)
-      .config("spark.executor.cores", cores)
-      .config("spark.kryoserializer.buffer.max.mb", "1024")
-      .master(master)
-      .appName("LATrajCleaner")
       .getOrCreate()
     import spark.implicits._
     startTime = spark.sparkContext.startTime
@@ -66,15 +47,18 @@ object CoordTransformer {
     stage = "Read data"
     log(stage, timer, 0, "START")
     val sourcePolygons = spark.read.textFile(input).rdd.zipWithUniqueId().map{ case (line, id) =>
+      val reader = new WKTReader(geofactory)
       val arr = line.split("\t")
       val userData = (0 until arr.size).filter(_ != offset).map(i => arr(i)) ++ List(id.toString())
       val wkt = arr(offset)
-      val polygon = new WKTReader(geofactory).read(wkt)
+      val polygon = reader.read(wkt)
       polygon.setUserData(userData.mkString("\t"))
       polygon
     }
     val nSourcePolygons = sourcePolygons.count()
     log(stage, timer, nSourcePolygons, "END")
+
+    sourcePolygons.take(1).foreach(println)
 
     timer = clocktime
     stage = "Transform coordinates"
@@ -82,12 +66,21 @@ object CoordTransformer {
     val sourceCRS = CRS.decode(sepsg)
     val targetCRS = CRS.decode(tepsg)
     val lenient = true; // allow for some error due to different datums
-    val transform = CRS.findMathTransform(sourceCRS, targetCRS, lenient);
+    val mathTransform = CRS.findMathTransform(sourceCRS, targetCRS, lenient);
+
+    val coords = Array(new Coordinate(10,10), new Coordinate(20, 20), new Coordinate(40, 25))
+    val line = geofactory.createLineString(coords)
+    val t = JTS.transform(line, mathTransform)
+    println("T")
+    println(t.toText)
+
     val targetPolygons = sourcePolygons.map{ polygon =>
-      JTS.transform(polygon, transform).asInstanceOf[Polygon]
+      JTS.transform(polygon, mathTransform).asInstanceOf[Polygon]
     }.cache()
     val nTargetPolygons = targetPolygons.count()
     log(stage, timer, nTargetPolygons, "END")
+
+    targetPolygons.take(1).foreach(println)
 
     timer = clocktime
     stage = "Save transformed polygons"
@@ -114,16 +107,12 @@ object CoordTransformer {
 class CoordTransformerConf(args: Seq[String]) extends ScallopConf(args) {
   val input:      ScallopOption[String]  = opt[String]  (required = true)
   val output:     ScallopOption[String]  = opt[String]  (default  = Some("/tmp/output"))
-  val host:       ScallopOption[String]  = opt[String]  (default = Some("169.235.27.138"))
-  val port:       ScallopOption[String]  = opt[String]  (default = Some("7077"))
   val sepsg:      ScallopOption[String]  = opt[String]  (default = Some("EPSG:4326"))
   val tepsg:      ScallopOption[String]  = opt[String]  (default = Some("EPSG:6423"))
-  val cores:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
-  val executors:  ScallopOption[Int]     = opt[Int]     (default = Some(3))
   val partitions: ScallopOption[Int]     = opt[Int]     (default = Some(512))
   val local:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-  val offset:     ScallopOption[Int]     = opt[Int]     (default = Some(1))
+  val offset:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
 
   verify()
 }

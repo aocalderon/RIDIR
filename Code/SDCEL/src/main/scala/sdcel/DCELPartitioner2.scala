@@ -238,7 +238,7 @@ object DCELPartitioner2 {
 
       val edges = edgesIt
         .filter(edge => edge.intersects(cell.toPolygon)) // Be sure edge is inside cell
-        //.filter(edge => edge.relate(cell.toPolygon, "1*F000212"))
+        .filter(edge => edge.getLength > 0)
         .map{edge => LEdge(edge.getCoordinates, edge)}.toList.asJava
 
       val borders = cell.toLEdges.asJava
