@@ -1,6 +1,6 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{LineString, Point, Coordinate}
+import com.vividsolutions.jts.geom.{Polygon, LineString, Point, Coordinate, Envelope}
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector
 import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
@@ -21,14 +21,14 @@ import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 
 import SweepLine2.{getHedgesInsideCell, getLineSegments}
-import DCELMerger2.{setTwins, groupByNext}
+import DCELMerger2.{setTwins, groupByNext, groupByNextMBR, groupByNextMBRPoly}
 import Utils._
 
 object LocalDCEL {
   def createLocalDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
     (implicit geofactory: GeometryFactory//, logger: Logger, spark: SparkSession, settings: Settings
     )
-      : RDD[(Half_edge, String)] = {
+      : RDD[(Half_edge, String, Envelope, Polygon)] = {
 
     val partitionId = 0
 
@@ -64,7 +64,9 @@ object LocalDCEL {
 
       merge(inner.filter(_.data.crossingInfo != "None"),  borders)
       
-      val hedges = groupByNext((inner).toSet, List.empty[(Half_edge, String)])
+      val hedges = groupByNextMBRPoly((inner).toSet,
+        List.empty[(Half_edge, String, Envelope, Polygon)])
+
       hedges.toIterator
     }
     r
@@ -512,22 +514,23 @@ object LocalDCEL {
       ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     }
 
+    
     val sdcel = ldcelA
       .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
         val pid = TaskContext.getPartitionId
         val partitionId = 34
 
-        val A = iterA.map{_._1.getNexts}.flatten.toList
-        val B = iterB.map{_._1.getNexts}.flatten.toList
+        val A = iterA.toList
+        val B = iterB.toList
 
-        val hedges = merge4(A, B)
+        val hedges = merge4(A, B, cells)
 
         hedges.toIterator
       }.filter(_._1.checkValidity).cache
     val nSDcel = sdcel.count()
     logger.info("Done!")
     save("/tmp/edgesFC.wkt"){
-      sdcel.map{ case(hedge, label) =>
+      sdcel.map{ case(hedge, label, e) =>
         s"${hedge.getPolygon}\t${hedge.data.polygonId}\t${hedge.data.ringId}\t${label}\n"
       }.collect
     }

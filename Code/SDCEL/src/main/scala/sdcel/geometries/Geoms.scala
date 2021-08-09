@@ -1,7 +1,7 @@
 package edu.ucr.dblab.sdcel.geometries
 
 import scala.annotation.tailrec
-import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry}
+import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry, Envelope}
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
 import com.vividsolutions.jts.geomgraph.Edge
 
@@ -14,6 +14,12 @@ case class LEdge(coords: Array[Coordinate], l: LineString) extends Edge(coords)
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
   label: String = "A", crossingInfo: String = "", nedges: Int = -1) {
+
+  private var cellBorder = false
+
+  def setCellBorder(cb: Boolean) = { cellBorder = cb }
+  def getCellBorder(): Boolean = { cellBorder }
+
   override def toString: String =
     s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo"
 }
@@ -36,6 +42,8 @@ case class Half_edge(edge: LineString) {
   var next: Half_edge = null
   var prev: Half_edge = null
   var isNewTwin: Boolean = false
+  var mbr: Envelope = null
+  var poly: Polygon = null
   var MAX_RECURSION: Int = Int.MaxValue
 
   override def toString = s"${edge.toText}\t$data"
@@ -121,7 +129,6 @@ case class Half_edge(edge: LineString) {
         emptyPolygon
       }
     }
-    
   }
 
   def getNextsAsWKT(implicit geofactory: GeometryFactory): String = {
@@ -136,18 +143,73 @@ case class Half_edge(edge: LineString) {
     geofactory.createLineString(coords.toArray).toText
   }
 
-  def getNextsDebug: List[Half_edge] = {
+  def getMinx: Double = { if(this.v1.x < this.v2.x) this.v1.x else this.v2.x }
+  def getMiny: Double = { if(this.v1.y < this.v2.y) this.v1.y else this.v2.y }
+  def getMaxx: Double = { if(this.v1.x > this.v2.x) this.v1.x else this.v2.x }
+  def getMaxy: Double = { if(this.v1.y > this.v2.y) this.v1.y else this.v2.y }
+
+  def getNextsMBR: (List[Half_edge],Envelope) = {
     @tailrec
-    def getNextsTailrec(hedges: List[Half_edge], i: Int): List[Half_edge] = {
+    def getNextsTailrec(hedges: List[Half_edge],
+      minx:Double,miny:Double,maxx:Double,maxy:Double): (List[Half_edge], Envelope) = {
       val next = hedges.last.next
-      //println(next)
-      if( next == null || next == hedges.head || i > 100){
-        hedges
+      if( next == null || next == hedges.head){
+        val mbr = new Envelope(minx,maxx,miny,maxy)
+        hedges.head.mbr = mbr
+        (hedges, mbr)
       } else {
-        getNextsTailrec(hedges :+ next, i+1)
+        val x1 = next.getMinx
+        val minx1 = if(x1 < minx) x1 else minx 
+        val y1 = next.getMiny
+        val miny1 = if(y1 < miny) y1 else miny 
+        val x2 = next.getMaxx
+        val maxx2 = if(x2 > maxx) x2 else maxx 
+        val y2 = next.getMaxy
+        val maxy2 = if(y2 > maxy) y2 else maxy 
+        getNextsTailrec(hedges :+ next, minx1, miny1, maxx2, maxy2)
       }
     }
-    getNextsTailrec(List(this), 0)
+    val minx = Double.MaxValue
+    val miny = Double.MaxValue
+    val maxx = Double.MinValue
+    val maxy = Double.MinValue
+    getNextsTailrec(List(this),minx,miny,maxx,maxy)
+  }
+
+  def getNextsMBRPoly(implicit geofactory: GeometryFactory)
+      : (List[Half_edge],Envelope, Polygon) = {
+    @tailrec
+    def getNextsTailrec(hedges: List[Half_edge], coords: Array[Coordinate],
+      minx:Double,miny:Double,maxx:Double,maxy:Double)(implicit geofactory: GeometryFactory)
+        : (List[Half_edge], Envelope, Polygon) = {
+
+      val next = hedges.last.next
+      if( next == null || next == hedges.head){
+        val mbr = new Envelope(minx,maxx,miny,maxy)
+        hedges.head.mbr = mbr
+        val ring = coords :+ hedges.head.v1
+        val poly = geofactory.createPolygon(ring)
+        hedges.head.poly = poly
+        (hedges, mbr, poly)
+      } else {
+        val x1 = next.getMinx
+        val minx1 = if(x1 < minx) x1 else minx 
+        val y1 = next.getMiny
+        val miny1 = if(y1 < miny) y1 else miny 
+        val x2 = next.getMaxx
+        val maxx2 = if(x2 > maxx) x2 else maxx 
+        val y2 = next.getMaxy
+        val maxy2 = if(y2 > maxy) y2 else maxy
+        val coord = next.v2
+        getNextsTailrec(hedges :+ next, coords :+ coord, minx1, miny1, maxx2, maxy2)
+      }
+    }
+    val minx = Double.MaxValue
+    val miny = Double.MaxValue
+    val maxx = Double.MinValue
+    val maxy = Double.MinValue
+    val coords = Array(this.v1, this.v2)
+    getNextsTailrec(List(this), coords, minx, miny, maxx, maxy)
   }
 
   def getNexts: List[Half_edge] = {
@@ -195,6 +257,7 @@ case class Half_edge(edge: LineString) {
     getNextTailrec(this, this.next).distinct
   }
 
+  //TODO
   def label: String =
     s"${this.data.label}${if(this.data.polygonId < 0) "" else this.data.polygonId}"
 
@@ -216,6 +279,12 @@ case class Half_edge(edge: LineString) {
     val h = Half_edge(edge)
     h.isNewTwin = true
     h
+  }
+
+  def isValid: Boolean = {!isNotValid}
+  
+  def isNotValid: Boolean = {
+    data.polygonId == -1 || data.getCellBorder == true
   }
 
   val emptyPolygon: Polygon = {
@@ -348,10 +417,18 @@ case class Cell(id: Int, lineage: String, mbr: LinearRing){
     val e2 = geofactory.createLineString(Array(sw, nw))
     val e3 = geofactory.createLineString(Array(nw, ne))
     val e4 = geofactory.createLineString(Array(ne, se))
-    e1.setUserData(EdgeData(polyId, 0, 1, false, label))
-    e2.setUserData(EdgeData(polyId, 0, 2, false, label))
-    e3.setUserData(EdgeData(polyId, 0, 3, false, label))
-    e4.setUserData(EdgeData(polyId, 0, 4, false, label))
+    val ed1 = EdgeData(polyId, -1, 1, false, label)
+    ed1.setCellBorder(true)
+    val ed2 = EdgeData(polyId, -1, 2, false, label)
+    ed2.setCellBorder(true)
+    val ed3 = EdgeData(polyId, -1, 3, false, label)
+    ed3.setCellBorder(true)
+    val ed4 = EdgeData(polyId, -1, 4, false, label)
+    ed4.setCellBorder(true)
+    e1.setUserData(ed1)
+    e2.setUserData(ed2)
+    e3.setUserData(ed3)
+    e4.setUserData(ed4)
     val h1 = Half_edge(e1)
     val h2 = Half_edge(e2)
     val h3 = Half_edge(e3)

@@ -4,14 +4,18 @@ import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector
 import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
 import com.vividsolutions.jts.algorithm.RobustLineIntersector
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.{Polygon, Coordinate, Envelope}
 import com.vividsolutions.jts.geomgraph.EdgeIntersection
 import com.vividsolutions.jts.geomgraph.Edge
+import com.vividsolutions.jts.index.strtree._
+
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge, Tag}
+import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge, Tag, Cell}
 
 import Utils._
+import PartitionReader.{envelope2polygon}
+
 
 object DCELMerger2 {
 
@@ -283,31 +287,6 @@ object DCELMerger2 {
     h
   }
 
-  @tailrec
-  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)])
-      : List[(Half_edge, String)] = {
-
-    if(hs.isEmpty) {
-      r
-    } else {
-      val h = hs.head
-
-      val nexts = h.getNexts
-      val labels = nexts.map{_.label}.distinct
-        .filter(_ != "A")
-        .filter(_ != "B").sorted.mkString(" ")
-      if(nexts.isEmpty){
-        r :+ ((h, "Error"))
-      } else {
-        val hs_new = hs -- h.getNexts.toSet
-        //h.tags = h.updateTags
-        val r_new  = r :+ ((h, labels))
-
-        groupByNext(hs_new, r_new)
-      }
-    }
-  }
-
   def save(name: String, content: Seq[String]): Unit = {
     val hf = new java.io.PrintWriter(name)
     hf.write(content.mkString(""))
@@ -571,32 +550,225 @@ object DCELMerger2 {
 
   }
 
-  def merge4(ha: List[Half_edge], hb: List[Half_edge], debug: Boolean = false)
+  def merge4(hleA: List[(Half_edge,String,Envelope, Polygon)],
+    hleB: List[(Half_edge,String,Envelope, Polygon)],
+    cells: Map[Int, Cell],
+    debug: Boolean = false)
       (implicit geofactory: GeometryFactory)
-  : List[(Half_edge,String)] = {
+      : List[(Half_edge,String, Envelope)] = {
 
     val pid = org.apache.spark.TaskContext.getPartitionId
-    val partitionId = 16
+    val partitionId = 31
+
+    if(pid == partitionId){
+      //println("ha")
+      //ha.foreach(println)
+    }
 
     // Getting edge splits...
+    val ha = hleA.map(_._1.getNexts).flatten
+    val hb = hleB.map(_._1.getNexts).flatten
     val (aList, bList) = intersects4(ha, hb, partitionId)
     val hedges_prime = (aList ++ bList)
+
+    if(pid == partitionId){
+      //println("hedges_prime")
+      //hedges_prime.foreach(println)
+    }
 
     // Remove duplicates...
     val hedges = hedges_prime.groupBy{h => (h.v1, h.v2)}.values.map(_.head).toList
 
+    if(pid == partitionId){
+      //println("hedges")
+      //hedges.foreach(println)
+    }
+
     // Setting new twins...
     val hedges2 = setTwins(hedges).filter(_.twin != null)
+    if(pid == partitionId){
+      //println("twins")
+      //hedges.foreach(println)
+    }
 
     // Running sequential...
     sequential(hedges2, partitionId)
+    if(pid == partitionId){
+      //println("sequential")
+      //hedges.foreach(println)
+    }
 
     // Extrantinct unique half-edge and label to represent the face...
-    val h = groupByNext(hedges.toSet, List.empty[(Half_edge, String)])
+    //val h = groupByNext(hedges.toSet, List.empty[(Half_edge, String)])
+    //.filter(_._2 != "")
+
+    val h = groupByNextMBR(hedges.toSet, List.empty[(Half_edge, String, Envelope)])
       .filter(_._2 != "")
+    
+    //if(pid == partitionId){
+      //println("Rtree")
 
-    h
+      //hleB.map{ case(h,l,e,p) =>
+        //s"${envelope2polygon(e)}\t$l"
+        //s"${p.toText}\t$l"
+      //}.foreach(println)
 
+      val Brtree = new STRtree()
+      hleB.foreach{ case(hedge,l,e,p) =>
+        hedge.mbr = e
+        hedge.poly = p
+        Brtree.insert(e, hedge)
+      }
+      val Artree = new STRtree()
+      hleA.foreach{ case(hedge,l,e,p) =>
+        hedge.mbr = e
+        hedge.poly = p
+        Artree.insert(e, hedge)
+      }
+      //println("Done!")
+
+      val (singles, multiples) = h.partition{ case(h,l,e) =>
+        l.split(" ").size == 1
+      }
+      val (singlesA, singlesB) = singles.partition{ case(h,l,e) =>
+        l.substring(0,1) == "A"
+      }
+
+      val newSinglesA = updateLabel(singlesA, Brtree)
+      val newSinglesB = updateLabel(singlesB, Artree)
+
+      val new_h = newSinglesA ++ newSinglesB ++ multiples
+      /*
+      save("/tmp/edgesP34.wkt",
+      new_h.map{ case(h,l,e) =>
+        val wkt = h.getPolygon.toText
+        s"$wkt\t$l\n"
+      })
+       */
+    //} // If partitionId 
+
+    new_h
+    //h
+  }
+
+  def updateLabel(singles: List[(Half_edge, String, Envelope)], rtree: STRtree)
+    (implicit geofactory: GeometryFactory): List[(Half_edge, String, Envelope)] = {
+    val newSingles = singles.map{ case(h,l,e) =>
+      val answers = rtree.query(e).asScala.toList.filter{ b =>
+        b.asInstanceOf[Half_edge].mbr.contains(e)
+      }
+
+      if(answers.isEmpty){
+        //println("From isEmpty")
+        //println(l)
+        (h,l,e)
+        //List(t)
+      } else {
+        val a = answers.map{ b =>
+          val h1 = b.asInstanceOf[Half_edge]
+          val l1 = h1.label
+          /*
+           println(s"SingleA $l")
+           println(h.getPolygon.toText())
+           println(s"From B $l1")
+           println(h1.poly.toText())
+           */
+          val bool = h.getPolygon.coveredBy(h1.poly)
+
+          (bool, l1)
+        }
+
+        //println(s"$l\t$a")
+
+        val tt = a.filter(_._1)
+        val nl = if(tt.isEmpty){
+          l
+        }else{
+          val l2 = tt.head._2
+          List(l, l2).sorted.mkString(" ")
+          //s"$l $l2"
+        }
+
+        (h,nl,e)
+      }
+    }
+    newSingles
+  }
+
+  @tailrec
+  def groupByNextMBRPoly(hs: Set[Half_edge],
+    r: List[(Half_edge, String, Envelope, Polygon)])(implicit geofactory: GeometryFactory)
+      : List[(Half_edge, String, Envelope, Polygon)] = {
+
+    if(hs.isEmpty) {
+      r
+    } else {
+      val h = hs.head
+
+      val (nexts, mbr, poly) = h.getNextsMBRPoly
+      val labels = nexts.map{_.label}.distinct
+        .filter(_ != "A")
+        .filter(_ != "B").sorted.mkString(" ")
+      if(nexts.isEmpty){
+        r :+ ((h, "Error", new Envelope(), null))
+      } else {
+        val hs_new = hs -- nexts.toSet
+        //h.tags = h.updateTags
+        val r_new  = r :+ ((h, labels, mbr, poly))
+
+        groupByNextMBRPoly(hs_new, r_new)
+      }
+    }
+  }
+
+  @tailrec
+  def groupByNextMBR(hs: Set[Half_edge], r: List[(Half_edge, String, Envelope)])
+      : List[(Half_edge, String, Envelope)] = {
+
+    if(hs.isEmpty) {
+      r
+    } else {
+      val h = hs.head
+
+      val (nexts,mbr) = h.getNextsMBR
+      val labels = nexts.map{_.label}.distinct
+        .filter(_ != "A")
+        .filter(_ != "B").sorted.mkString(" ")
+      if(nexts.isEmpty){
+        r :+ ((h, "Error", new Envelope()))
+      } else {
+        val hs_new = hs -- nexts.toSet
+        //h.tags = h.updateTags
+        val r_new  = r :+ ((h, labels, mbr))
+
+        groupByNextMBR(hs_new, r_new)
+      }
+    }
+  }
+
+  @tailrec
+  def groupByNext(hs: Set[Half_edge], r: List[(Half_edge, String)])
+      : List[(Half_edge, String)] = {
+
+    if(hs.isEmpty) {
+      r
+    } else {
+      val h = hs.head
+
+      val nexts = h.getNexts
+      val labels = nexts.map{_.label}.distinct
+        .filter(_ != "A")
+        .filter(_ != "B").sorted.mkString(" ")
+      if(nexts.isEmpty){
+        r :+ ((h, "Error"))
+      } else {
+        val hs_new = hs -- nexts.toSet
+        //h.tags = h.updateTags
+        val r_new  = r :+ ((h, labels))
+
+        groupByNext(hs_new, r_new)
+      }
+    }
   }
 
   // Sequential implementation of dcel...
@@ -615,6 +787,7 @@ object DCELMerger2 {
     }
     val incidents = hedges.groupBy(_.v2).values.toList
 
+      /*
     if(pid == partitionId){
       save("/tmp/edgesI.wkt",
         incidents.map{ h =>
@@ -623,6 +796,7 @@ object DCELMerger2 {
         }
       )
     }
+       */
 
     // At each vertex, get their incident half-edges...
     val h_prime = incidents.map{ hList =>
