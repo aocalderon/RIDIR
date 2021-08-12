@@ -204,8 +204,11 @@ object DCELPartitioner2 {
   }
 
   private def matchIntersectedEdgesAndBorders(edges: Iterator[LEdge],
-    intersections: List[(Coordinate, String)], partitionId: Int): Iterator[String] = {
+    intersections: List[(Coordinate, String)], partitionId: Int)
+      (implicit settings: Settings): Iterator[String] = {
 
+    
+    val scale = settings.scale
     edges.map{ edge =>
       val wkt = edge.l.toText
       val data = edge.l.getUserData
@@ -219,7 +222,10 @@ object DCELPartitioner2 {
         val crossingData = for{
           c1 <- coords
           c2 <- intersections if(c2._1 == c1)
-        } yield {
+            } yield {
+          //val x = round(c1.x, scale)
+          //val y = round(c1.y, scale)
+          
           s"${c2._2}:${c1.x} ${c1.y}"
         }
 
@@ -230,7 +236,7 @@ object DCELPartitioner2 {
   }
  
   def saveToHDFSWithCrossingInfo(edges: RDD[LineString], cells: Map[Int, Cell],
-    name: String)(implicit spark: SparkSession, geofactory: GeometryFactory): Unit = {
+    name: String)(implicit spark: SparkSession, geofactory: GeometryFactory, settings: Settings): Unit = {
     import spark.implicits._
 
     edges.mapPartitionsWithIndex{ (pid, edgesIt) =>

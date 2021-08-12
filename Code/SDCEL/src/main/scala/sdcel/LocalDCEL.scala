@@ -447,7 +447,7 @@ object LocalDCEL {
     implicit val model = new PrecisionModel(1000.0)
     implicit val geofactory = new GeometryFactory(model)
     implicit val reader = new WKTReader(geofactory)
-    //implicit val settings = Settings(tolerance = 1e-3)
+    implicit val settings = Settings(tolerance = 1e-3)
 
     val bufferA = Source.fromFile("/home/acald013/RIDIR/Datasets/testA.wkt")
     val A = bufferA.getLines.map{ line =>

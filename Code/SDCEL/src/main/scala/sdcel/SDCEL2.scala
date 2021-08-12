@@ -85,22 +85,36 @@ object SDCEL2 {
 
     // Creating local dcel layer A...
     val ldcelA0 = createLocalDCELs(edgesRDDA, cells)//.filter(_._1.checkValidity)
+/*
+    save("/tmp/edgesLA.wkt"){
+      ldcelA0.flatMap{ case(h,l,e,p) =>
+        h.getNexts.map(n => s"${n.edge.toText}\t${n.tag}\t${n.data.getCellBorder}\t${n.data.polygonId}\n")
+      }.collect
+    }
+ */
     //save("/tmp/edgesFA.wkt"){
     //  ldcelA0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     //}
     val ldcelA = runEmptyCells(ldcelA0, quadtree, cells).cache
     save("/tmp/edgesFAC.wkt"){
-      ldcelA.map{ hedge => s"${hedge._1.poly}\t${hedge._2}\n" }.collect
+      ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     }
 
     // Creating local dcel layer B...
     val ldcelB0 = createLocalDCELs(edgesRDDB, cells)//.filter(_._1.checkValidity)
+/*
+    save("/tmp/edgesLB.wkt"){
+      ldcelB0.flatMap{ case(h,l,e,p) =>
+        h.getNexts.map(n => s"${n.edge.toText}\t${n.tag}\t${n.data.getCellBorder}\t${n.data.polygonId}\n")
+      }.collect
+    }
+ */
     //save("/tmp/edgesFB.wkt"){
     //  ldcelB0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     //}
     val ldcelB = runEmptyCells(ldcelB0, quadtree, cells).cache
     save("/tmp/edgesFBC.wkt"){
-      ldcelB.map{ hedge => s"${hedge._1.poly}\t${hedge._2}\n" }.collect
+      ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     }
 
     // Overlay local dcels...
@@ -124,40 +138,21 @@ object SDCEL2 {
       sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
     }
 
-    save("/tmp/edgesFG.wkt"){
-      overlay2(sdcel.map{case(h,l,e)=> (h,l)}).map{ case(h,l) =>
-        s"${h.getNextsAsWKT}\t$l\n"
+    val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
+
+    save("/tmp/edgesFD.wkt"){
+      sdcel2.filter(_._1.isClose).map{ case(h,l) =>
+        s"${h.first.getPolygon}\t$l\n"
       }.collect
     }
-
+    
+    save("/tmp/edgesFE.wkt"){
+      val ffinal = mergeSegs(sdcel2).map{ case(l,w) => s"${w.toText}\t$l\n"  }.collect
+      ffinal
+    }
+  
 
     /*
-    // Checking and solving single labels...
-    logger.info("Single label detection")
-    val sdcel2 = checkSingleLabel(ldcelA, sdcel,  "B").cache
-    logger.info("Done!")
-    val sdcel3 = checkSingleLabel(ldcelB, sdcel2, "A").cache
-    sdcel3.count()
-    logger.info("Done!")
-    save("/tmp/edgesFD.wkt"){
-      sdcel3.map{ case(hedge, label) => s"${hedge.getPolygon}\t${label}\n" }.collect
-    }
-
-    save("/tmp/edgesFE.wkt"){
-      sdcel3.mapPartitionsWithIndex{ (pid, it) =>
-        it.flatMap{ case(hedge, label) =>
-          hedge.getNexts
-            .filter(_.isValid)
-            .map(h => (label, h))
-        }.map{ case(l, h) =>
-            val wkt = h.edge.toText
-            val data = h.data.toString
-            s"$wkt\t$data\t$l\t$pid\n"
-        }
-
-      }.collect
-    }
-
     val faces0 = sdcel.mapPartitionsWithIndex{ (pid, it) =>
       val partitionId = 39
       val hedges = it.toList

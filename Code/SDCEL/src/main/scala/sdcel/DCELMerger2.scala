@@ -474,9 +474,10 @@ object DCELMerger2 {
 
 
   def intersects4(hedgesA: List[Half_edge], hedgesB: List[Half_edge], partitionId: Int = -1)
-    (implicit geofactory: GeometryFactory)
+    (implicit geofactory: GeometryFactory, settings: Settings)
       : (List[Half_edge], List[Half_edge]) = {
     val pid = org.apache.spark.TaskContext.getPartitionId
+    val scale = settings.scale
 
     val aList = hedgesA.map{ h =>
       val pts = Array(h.v1, h.v2)
@@ -490,7 +491,7 @@ object DCELMerger2 {
     
     val sweepline = new SimpleMCSweepLineIntersector()
     val lineIntersector = new RobustLineIntersector()
-    lineIntersector.setMakePrecise(geofactory.getPrecisionModel)
+    //lineIntersector.setMakePrecise()
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
     sweepline.computeIntersections(aList, bList, segmentIntersector)
@@ -519,6 +520,9 @@ object DCELMerger2 {
           val l = geofactory.createLineString(Array(a1, a2))
           l.setUserData(original_hedge.data)
           val h = Half_edge(l)
+          h.tag = original_hedge.tag
+          h.source = a1
+          h.target = a2
           h
         }
         hedges
@@ -540,6 +544,9 @@ object DCELMerger2 {
           val l = geofactory.createLineString(Array(a1, a2))
           l.setUserData(original_hedge.data)
           val h = Half_edge(l)
+          h.tag = original_hedge.tag
+          h.source = a1
+          h.target = a2
           h
         }
         hedges
@@ -554,16 +561,11 @@ object DCELMerger2 {
     hleB: List[(Half_edge,String,Envelope, Polygon)],
     cells: Map[Int, Cell],
     debug: Boolean = false)
-      (implicit geofactory: GeometryFactory)
+      (implicit geofactory: GeometryFactory, settings: Settings)
       : List[(Half_edge,String, Envelope)] = {
 
     val pid = org.apache.spark.TaskContext.getPartitionId
-    val partitionId = 31
-
-    if(pid == partitionId){
-      //println("ha")
-      //ha.foreach(println)
-    }
+    val partitionId = 36
 
     // Getting edge splits...
     val ha = hleA.map(_._1.getNexts).flatten
@@ -577,7 +579,7 @@ object DCELMerger2 {
     }
 
     // Remove duplicates...
-    val hedges = hedges_prime.groupBy{h => (h.v1, h.v2)}.values.map(_.head).toList
+    val hedges = hedges_prime.groupBy{h => (h.source, h.target)}.values.map(_.head).toList
 
     if(pid == partitionId){
       //println("hedges")
@@ -730,16 +732,18 @@ object DCELMerger2 {
     } else {
       val h = hs.head
 
-      val (nexts,mbr) = h.getNextsMBR
+      val (nexts,mbr, label) = h.getNextsMBR
+      /*
       val labels = nexts.map{_.label}.distinct
         .filter(_ != "A")
         .filter(_ != "B").sorted.mkString(" ")
+       */
       if(nexts.isEmpty){
         r :+ ((h, "Error", new Envelope()))
       } else {
         val hs_new = hs -- nexts.toSet
         //h.tags = h.updateTags
-        val r_new  = r :+ ((h, labels, mbr))
+        val r_new  = r :+ ((h, label, mbr))
 
         groupByNextMBR(hs_new, r_new)
       }
@@ -785,9 +789,9 @@ object DCELMerger2 {
           .filter(_.twin.isNewTwin).map(_.twin)
       }
     }
-    val incidents = hedges.groupBy(_.v2).values.toList
+    val incidents = hedges.groupBy(_.target).values.toList
 
-      /*
+/*      
     if(pid == partitionId){
       save("/tmp/edgesI.wkt",
         incidents.map{ h =>
@@ -796,7 +800,7 @@ object DCELMerger2 {
         }
       )
     }
-       */
+ */    
 
     // At each vertex, get their incident half-edges...
     val h_prime = incidents.map{ hList =>

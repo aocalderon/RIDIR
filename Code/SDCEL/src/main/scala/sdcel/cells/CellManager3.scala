@@ -132,6 +132,7 @@ object EmptyCellManager2 {
 
           val cell = cells(index)
           val h = cell.toHalf_edge(empty.polyId, empty.label.substring(0, 1))
+          
           val poly = cell.toPolygon
           val tuple = (h, empty.label, poly.getEnvelopeInternal, poly)
           it ++ Iterator(tuple)

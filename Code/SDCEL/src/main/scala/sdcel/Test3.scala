@@ -5,10 +5,11 @@ import com.vividsolutions.jts.geom.{Polygon, LineString, Coordinate}
 import com.vividsolutions.jts.io.WKTReader
 import com.vividsolutions.jts.algorithm.CGAlgorithms
 
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge}
+import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge,Coords}
 import edu.ucr.dblab.sdcel.DCELMerger2.merge2
-import edu.ucr.dblab.sdcel.DCELOverlay2.{overlay3, overlay4}
+import edu.ucr.dblab.sdcel.DCELOverlay2.{overlay3, overlay2}
 import scala.io.Source
+import scala.annotation.tailrec
 
 object Test3 {
   def main(args: Array[String]): Unit = {
@@ -17,88 +18,60 @@ object Test3 {
     implicit val reader = new WKTReader(geofactory)
 
     println("In Test3")
-    val c1 = new Coordinate(5,3)
-    val c2 = new Coordinate(0,3)
-    val c3 = new Coordinate(0,1)
-    val c4 = new Coordinate(0,0)
-    val c5 = new Coordinate(2,0)
-    val c6 = new Coordinate(2,1)
-    val c7 = new Coordinate(4,2)
-    val c8 = new Coordinate(4,0)
-    val c9 = new Coordinate(6,0)
-    val c10 = new Coordinate(6,2)
-    val c11 = new Coordinate(6,3)
+    val c1 = new Coordinate(2,6)
+    val c2 = new Coordinate(1,7)
+    val c3 = new Coordinate(0,5)
+    val c4 = new Coordinate(2,5)
+    val a1 = Array(c1,c2,c3,c4)
 
-    def createHEdge(c1: Coordinate, c2: Coordinate): Half_edge = {
-      val e = geofactory.createLineString(Array(c1,c2))
-      val ed = EdgeData(1,0,1,false)
-      e.setUserData(ed)
-      val h = Half_edge(e)
-      h
+    val c5 = new Coordinate(2,5)
+    val c6 = new Coordinate(4,3)
+    val c7 = new Coordinate(4,5)
+    val c8 = new Coordinate(2,6)
+    val a2 = Array(c5,c6,c7,c8)
+
+    val c9 = new Coordinate(9,1)
+    val c10 = new Coordinate(8,2)
+    val c11 = new Coordinate(5,2)
+    val c12  = new Coordinate(6,1)
+    val a3 = Array(c9,c10,c11,c12)
+
+    val c13 = new Coordinate(6,1)
+    val c14 = new Coordinate(7,0)
+    val c15 = new Coordinate(10,0)
+    val c16 = new Coordinate(9,1)
+    val a4 = Array(c13,c14,c15,c16)
+
+    val a = Set(Coords(a1),Coords(a2),Coords(a3),Coords(a4))
+
+    val l = mergeCoordinates(a.tail, a.head, List.empty[Coords])
+    l.map{c => geofactory.createPolygon(c.getCoords)}.foreach{println}
+  }
+
+  @tailrec
+  def mergeCoordinates(coords: Set[Coords], curr: Coords, r: List[Coords]): List[Coords] = {
+    if(coords.isEmpty){
+      r :+ curr
+    } else if(curr.isClose){
+      val n_r = r :+ curr
+      val n_curr = coords.head
+      val n_coords = coords.tail
+      mergeCoordinates(n_coords, n_curr, n_r)
+    } else {
+      val next = coords.filter(c => curr.touch(c.first)).head
+      val n_coords = coords -- Set(next)
+      val n_curr = Coords(curr.coords ++ next.coords)
+      mergeCoordinates(n_coords, n_curr, r)
     }
+  }
 
-    val h1 = createHEdge(c1, c2)
-    val h2 = createHEdge(c2, c3)
-    val h3 = createHEdge(c3, c4)
-
-    val e4 = geofactory.createLineString(Array(c4,c5))
-    val ed4 = EdgeData(-1,0,1,false)
-    e4.setUserData(ed4)
-    val h4 = Half_edge(e4)
-
-    val h5 = createHEdge(c5, c6)
-    val h6 = createHEdge(c6, c7)
-    val h7 = createHEdge(c7, c8)
-
-    val e8 = geofactory.createLineString(Array(c8,c9))
-    val ed8 = EdgeData(1,0,1,false)
-    ed8.setCellBorder(true)
-    e8.setUserData(ed8)
-    val h8 = Half_edge(e8)
-
-    val h9 = createHEdge(c9, c10)
-    val h10 = createHEdge(c10, c11)
-    val h11 = createHEdge(c11, c1)
-
-    /*
-    h1.next = h2; h2.prev = h1
-    h2.next = h3; h3.prev = h2
-    h3.next = h4; h4.prev = h3
-    h4.next = h5; h5.prev = h4
-    h5.next = h6; h6.prev = h5
-    h6.next = h7; h7.prev = h6
-    h7.next = h8; h8.prev = h7
-    h8.next = h9; h9.prev = h8
-    h9.next = h10;  h10.prev = h9
-    h10.next = h11; h11.prev = h10
-    h11.next = h1;  h1.prev =  h11
-     */
-
-    val list = List(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11)
-    //val list = List(h6, h10)
-    list.foreach{ hh =>
-      h1.next = h2; h2.prev = h1
-      h2.next = h3; h3.prev = h2
-      h3.next = h4; h4.prev = h3
-      h4.next = h5; h5.prev = h4
-      h5.next = h6; h6.prev = h5
-      h6.next = h7; h7.prev = h6
-      h7.next = h8; h8.prev = h7
-      h8.next = h9; h9.prev = h8
-      h9.next = h10;  h10.prev = h9
-      h10.next = h11; h11.prev = h10
-      h11.next = h1;  h1.prev =  h11
-      println(s"run ${hh.edge}")
-      val t = (hh, "A0B0")
-      val it = List(t)
-
-      //overlay3(it).map{ case(h,l) => s"${h.getNextsAsWKT}\t$l" }.foreach(println)
-
-      overlay4(it)
-        .map{ case(s, e, l) => s"${s.edge.toText}\t${e.edge.toText}\t$l" }.foreach(println)
-    }
-
-
+  def createHEdge(c1: Coordinate, c2: Coordinate)
+      (implicit geofactory: GeometryFactory): Half_edge = {
+    val e = geofactory.createLineString(Array(c1,c2))
+    val ed = EdgeData(1,0,1,false)
+    e.setUserData(ed)
+    val h = Half_edge(e)
+    h
   }
 
   def readWKT(filename: String, label: String)
