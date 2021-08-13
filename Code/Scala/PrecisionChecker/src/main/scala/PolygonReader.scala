@@ -27,17 +27,40 @@ object PolygonReader {
       f1.close
     }
 
-    val inputA = "/home/and/RIDIR/Datasets/Phili/philiA.wkt"
+    val inputA = "/home/and/RIDIR/tmp/debug/comparePolys.wkt"
     val inputB = "/home/and/RIDIR/Datasets/Phili/philiB.wkt"
     
     val polysA = read(inputA)
     val polysB = read(inputB)
 
-    val outputA = "/home/and/RIDIR/Code/CGAL/DCEL/data/PH_A.wkt"
-    val outputB = "/home/and/RIDIR/Code/CGAL/DCEL/data/PH_B.wkt"
+    val A = polysA.map{ wkt =>
+      val p = reader.read(wkt).asInstanceOf[Polygon]
+      p
+    }
+    val a = A(0)
+    val b = A(1)
 
-    write(outputA, polysA)
-    write(outputB, polysB)
+    println("a")
+    println(a.toText)
+    a.normalize
+    println("a norm")
+    println(a.toText)
+
+    println("b")
+    println(b.toText)
+    b.normalize
+    println("b norm")
+    println(b.toText)
+
+    val bool = a.equalsExact(b, 1)
+
+    println(bool)
+
+    //val outputA = "/home/and/RIDIR/Code/CGAL/DCEL/data/PH_A.wkt"
+    //val outputB = "/home/and/RIDIR/Code/CGAL/DCEL/data/PH_B.wkt"
+
+    //write(outputA, polysA)
+    //write(outputB, polysB)
 
   }
 }

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+TOLERANCE=1e-5
+
+EXECUTORS=12
+CORES=9
+DMEMORY=30g
+EMEMORY=32g
+SPARK_JARS=$HOME/Spark/2.4/jars/
+JAR=$HOME/RIDIR/Code/Scala/PrecisionChecker/target/scala-2.11/precisionchecker_2.11-0.1.jar
+CLASS="PolygonChecker"
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
+MASTER=local[6]
+
+spark-submit \
+    --jars ${SPARK_JARS}geospark-1.2.0.jar \
+    --master $MASTER --deploy-mode client \
+    --class $CLASS $JAR \
+    #--files $LOG_FILE \
+    #--conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+    #--num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
+    #--tolerance $TOLERANCE
