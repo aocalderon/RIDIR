@@ -6,7 +6,7 @@ import java.io.PrintWriter
 
 object PolygonReader {
   def main(args:Array[String]) = {
-    val scale = 100000.0
+    val scale = 1000000.0
     implicit val model = new PrecisionModel(scale)
     implicit val geofactory = new GeometryFactory(model)
     implicit val reader = new WKTReader(geofactory)
@@ -27,40 +27,17 @@ object PolygonReader {
       f1.close
     }
 
-    val inputA = "/home/and/RIDIR/tmp/debug/comparePolys.wkt"
-    val inputB = "/home/and/RIDIR/Datasets/Phili/philiB.wkt"
+    val inputA = "/home/acald013/Datasets/TX/TexasA.wkt"
+    val inputB = "/home/acald013/Datasets/TX/TexasB.wkt"
     
     val polysA = read(inputA)
     val polysB = read(inputB)
 
-    val A = polysA.map{ wkt =>
-      val p = reader.read(wkt).asInstanceOf[Polygon]
-      p
-    }
-    val a = A(0)
-    val b = A(1)
+    val outputA = "/home/acald013/Datasets/TX/TXA_6dec.wkt"
+    val outputB = "/home/acald013/Datasets/TX/TXB_6dec.wkt"
 
-    println("a")
-    println(a.toText)
-    a.normalize
-    println("a norm")
-    println(a.toText)
-
-    println("b")
-    println(b.toText)
-    b.normalize
-    println("b norm")
-    println(b.toText)
-
-    val bool = a.equalsExact(b, 1)
-
-    println(bool)
-
-    //val outputA = "/home/and/RIDIR/Code/CGAL/DCEL/data/PH_A.wkt"
-    //val outputB = "/home/and/RIDIR/Code/CGAL/DCEL/data/PH_B.wkt"
-
-    //write(outputA, polysA)
-    //write(outputB, polysB)
+    write(outputA, polysA)
+    write(outputB, polysB)
 
   }
 }

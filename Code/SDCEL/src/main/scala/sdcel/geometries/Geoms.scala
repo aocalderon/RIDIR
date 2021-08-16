@@ -348,7 +348,7 @@ case class Coords(coords: Array[Coordinate]){
 
   override def toString: String = coords.toList.toString
 
-  def getCoords: Array[Coordinate] = coords :+ first
+  def getCoords: Array[Coordinate] = if(first == last) coords else coords :+ first
 
   def touch(c: Coordinate, tolerance: Double = 1e-2): Boolean = {
     if(c == last){
@@ -386,8 +386,10 @@ case class Segment(hedges: List[Half_edge]) {
   def line(implicit geofactory: GeometryFactory): String = {
     val coords = hedges.map{_.v1} :+ hedges.last.v2
     val s = geofactory.createLineString(coords.toArray)
-    s"${s.toText}"
+    s"${s.toText}\t${isHole}"
   }
+
+  def isHole: Int = if(hedges.exists(!_.data.isHole)) 0 else 1
 
   def isClose: Boolean = {
     last.v2 == first.v1

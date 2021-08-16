@@ -85,13 +85,13 @@ object SDCEL2 {
 
     // Creating local dcel layer A...
     val ldcelA0 = createLocalDCELs(edgesRDDA, cells)//.filter(_._1.checkValidity)
-/*
+    /*
     save("/tmp/edgesLA.wkt"){
       ldcelA0.flatMap{ case(h,l,e,p) =>
         h.getNexts.map(n => s"${n.edge.toText}\t${n.tag}\t${n.data.getCellBorder}\t${n.data.polygonId}\n")
       }.collect
     }
- */
+     */
     //save("/tmp/edgesFA.wkt"){
     //  ldcelA0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
     //}
@@ -131,25 +131,20 @@ object SDCEL2 {
         val hedges = merge4(A, B, cells)
 
         hedges.toIterator
-      }.filter(_._1.checkValidity).cache
-    val nSDcel = sdcel.count()
-    logger.info("Done!")
-    save("/tmp/edgesFC.wkt"){
-      sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
-    }
+      }//.filter(_._1.checkValidity)
+      //.cache
+    //val nSDcel = sdcel.count()
+    //logger.info("Done!")
+    //save("/tmp/edgesFC.wkt"){
+    //  sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
+    //}
 
-    val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
-
-    save("/tmp/edgesFD.wkt"){
-      sdcel2.filter(_._1.isClose).map{ case(h,l) =>
-        s"${h.first.getPolygon}\t$l\n"
-      }.collect
-    }
-    
+    val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)})
     save("/tmp/edgesFE.wkt"){
       val ffinal = mergeSegs(sdcel2).map{ case(l,w) => s"${w.toText}\t$l\n"  }.collect
       ffinal
     }
+
   
 
     /*

@@ -64,7 +64,7 @@ std::string getTime(){
 // Defining a functor for creating the face label...
 struct Overlay_label{
   string operator() (string a, string b) const {
-    return a + "|" + b;
+    return a + " " + b;
   }
 };
 
@@ -99,6 +99,8 @@ int main(int argc, char* argv[]) {
     char* filename1;
     char* filename2;
     char operation = 0;
+    int precision = 5;
+    
     int c;
     while ((c = getopt (argc, argv, "a:b:o:d")) != -1){
       switch (c){
@@ -121,6 +123,8 @@ int main(int argc, char* argv[]) {
 	abort ();
       }
     }
+
+    //
 
     //-------------------------------------------------------------------------------------------------
     ifstream isA( filename1 );
@@ -175,6 +179,24 @@ int main(int argc, char* argv[]) {
     int milliSecondsElapsed = getMilliSpan(start);
     double timeA = milliSecondsElapsed / 1000.0;
     std::cout << getTime() << "Time for A: " << timeA << " s." << std::endl;
+
+    if(debug){
+      ArrangementA_2::Face_iterator  a_fit;
+      ofstream wkt;
+      wkt.open ("A.wkt");
+      std::cout << getTime() << "Saving faces to A.wkt..." << endl;
+      int nfaces = 0;
+      for (a_fit = arr1.faces_begin(); a_fit != arr1.faces_end(); ++a_fit){
+	if(!a_fit->is_unbounded()){
+	  string w = get_face_wkt2<ArrangementRes_2> (a_fit, precision);
+	  wkt << w;
+	  nfaces++;
+	}
+      }
+      wkt.close();
+      std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
+    }
+    
     //------------------------------------------------------------------------------------------------
 
     ifstream isB( filename2 );
@@ -226,6 +248,23 @@ int main(int argc, char* argv[]) {
     milliSecondsElapsed = getMilliSpan(start);
     double timeB = milliSecondsElapsed / 1000.0;
     std::cout << getTime() << "Time for B: " << timeB << " s." << std::endl;
+    if(debug){
+      ArrangementB_2::Face_iterator  b_fit;
+      ofstream wkt;
+      wkt.open ("B.wkt");
+      std::cout << getTime() << "Saving faces to B.wkt..." << endl;
+      int nfaces = 0;
+      for (b_fit = arr2.faces_begin(); b_fit != arr2.faces_end(); ++b_fit){
+	if(!b_fit->is_unbounded()){
+	  string w = get_face_wkt2<ArrangementRes_2> (b_fit, precision);
+	  wkt << w;
+	  nfaces++;
+	}
+      }
+      wkt.close();
+      std::cout << getTime() << "Done! " << nfaces << " faces saved." << std::endl;
+    }
+    
     //------------------------------------------------------------------------------------------------
 
     // Compute the overlay of the two arrangements.
@@ -249,7 +288,7 @@ int main(int argc, char* argv[]) {
       int nfaces = 0;
       for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
 	if(!res_fit->is_unbounded()){
-	  string w = get_face_wkt<ArrangementRes_2> (res_fit);
+	  string w = get_face_wkt<ArrangementRes_2> (res_fit, precision);
 	  wkt << w;
 	  nfaces++;
 	}
@@ -294,7 +333,7 @@ int main(int argc, char* argv[]) {
 	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
 		nlabels++;
 	      if(nlabels == 2){
-		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		std::string w = get_face_wkt<ArrangementRes_2> (f, precision);
 		if(debug)
 		  wkt << w;
 		nfaces++;
@@ -324,7 +363,7 @@ int main(int argc, char* argv[]) {
 	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
 		nlabels++;
 	      if(nlabels == 1 || nlabels == 2){
-		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		std::string w = get_face_wkt<ArrangementRes_2> (f, precision);
 		if(debug)
 		  wkt << w;
 		nfaces++;
@@ -354,7 +393,7 @@ int main(int argc, char* argv[]) {
 	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
 		nlabels++;
 	      if(nlabels == 1){
-		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		std::string w = get_face_wkt<ArrangementRes_2> (f, precision);
 		if(debug)
 		  wkt << w;
 		nfaces++;
@@ -384,7 +423,7 @@ int main(int argc, char* argv[]) {
 	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
 		nlabels++;
 	      if(nlabels == 1 && data.find('A') != std::string::npos){
-		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		std::string w = get_face_wkt<ArrangementRes_2> (f, precision);
 		if(debug)
 		  wkt << w;
 		nfaces++;
@@ -414,7 +453,7 @@ int main(int argc, char* argv[]) {
 	      for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
 		nlabels++;
 	      if(nlabels == 1 && data.find('B') != std::string::npos){
-		std::string w = get_face_wkt<ArrangementRes_2> (f);
+		std::string w = get_face_wkt<ArrangementRes_2> (f, precision);
 		if(debug)
 		  wkt << w;
 		nfaces++;

@@ -35,4 +35,4 @@ spark-submit \
     --quadtree $QUADTREE_PATH --boundary $BOUNDARY_PATH \
     --apath $HDFS_PATH/edgesA \
     --bpath $HDFS_PATH/edgesB \
-    --tolerance $TOLERANCE --debug --save
+    --tolerance $TOLERANCE --debug --save --readid

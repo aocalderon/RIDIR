@@ -19,27 +19,37 @@ object DCELOverlay2 {
   def mergeSegs(sdcel: RDD[(Segment, String)])
       (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String, Polygon)] = {
 
-    val a = sdcel.filter{!_._1.isClose}.map{ case(s,l) => (l,List(s.line)) }
+    val a = sdcel//.filter{!_._1.isClose}
+      .map{ case(s,l) => (l,List(s.line)) }
       .reduceByKey{ case(a, b) => a ++ b }
-    a//.flatMap{ case(l, ss) => ss.map{s => (s,l)}}
-    .mapPartitions{ it =>
+      .mapPartitions{ it =>
         val reader = new WKTReader(geofactory)
-        it.flatMap{ case(l,ss) =>
-          val lines = ss.map(s => reader.read(s).asInstanceOf[LineString])
+        it.flatMap{ case(l,ss) =>          
+          val lines = ss.map{ s =>
+            val arr = s.split("\t")
+            val s1 = arr(0)
+            val s2 = arr(1) // is part of a hole?
+            val seg = reader.read(s1).asInstanceOf[LineString]
+            seg.setUserData(s2)
+            seg
+          }
           //lines
           val ps = mergeLines(lines)
           ps.map{ p => (l,p) }
         }
       }
-
+    a
   }
 
   def mergeLines(lines: List[LineString])
     (implicit geofactory: GeometryFactory, settings: Settings): List[Polygon] = {
     val coords = lines.map(l => Coords(l.getCoordinates)).toSet
     val C = mergeCoordinates(coords.tail, coords.head, List.empty[Coords])
+    val S = if(lines.exists(x => !(x.getUserData.toString == "1") )) 1 else 0 //is hole?
     C.filter(_.getCoords.size >= 4).map{c =>
-      geofactory.createPolygon(c.getCoords)
+      val poly = geofactory.createPolygon(c.getCoords)
+      poly.setUserData(S)
+      poly
     }
   }
 
@@ -67,7 +77,7 @@ object DCELOverlay2 {
         }
       }
       val n_coords = coords -- Set(next)
-      val n_curr = Coords(curr.coords ++ next.coords)
+      val n_curr = Coords(curr.coords ++ next.coords.tail)
       mergeCoordinates(n_coords, n_curr, r)
     }
   }
@@ -82,11 +92,11 @@ object DCELOverlay2 {
             -1)
           if(pid == partitionId){
             if(label == labelId){
-              println(s"$labelId is valid? ${hedge.isValid}")
-              println(hedge)
-              println(hedge.prev)
-              println("Seg")
-              s.foreach(println)
+              //println(s"$labelId is valid? ${hedge.isValid}")
+              //println(hedge)
+              //println(hedge.prev)
+              //println("Seg")
+              //s.foreach(println)
             }
           }
           

@@ -17,7 +17,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import edu.ucr.dblab.sdcel.quadtree._
 
-import DCELPartitioner2.{read, saveToHDFSWithCrossingInfo}
+import DCELPartitioner2.{read, read2, saveToHDFSWithCrossingInfo}
 import PartitionReader.readQuadtree
 import Utils._
 
@@ -45,10 +45,10 @@ object DCELPartitionerByQuadtree {
     log("TIME|Start")
 
     // Reading data...
-    val edgesRDDA = read(params.input1())
+    val edgesRDDA = if(!params.readid()) read(params.input1()) else read2(params.input1())
     val nEdgesRDDA = edgesRDDA.getRawSpatialRDD.count()
     log(s"INFO|edgesA=$nEdgesRDDA")
-    val edgesRDDB = read(params.input2())
+    val edgesRDDB = if(!params.readid()) read(params.input2()) else read2(params.input2())
     val nEdgesRDDB = edgesRDDB.getRawSpatialRDD.count()
     log(s"INFO|edgesB=$nEdgesRDDB")
     val edgesRDD = edgesRDDA.getRawSpatialRDD.rdd  union edgesRDDB.getRawSpatialRDD.rdd
