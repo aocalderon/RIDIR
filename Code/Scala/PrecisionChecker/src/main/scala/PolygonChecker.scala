@@ -29,8 +29,8 @@ object PolygonChecker {
       .getOrCreate()
     import spark.implicits._
 
-    val inputA = "/home/and/Datasets/RIDIR/PH/PH_faces_parallel.wkt"
-    //val inputA = "/home/and/Datasets/RIDIR/TX/TX_faces_parallel.wkt"
+    //val inputA = "/home/and/Datasets/RIDIR/PH/PH_faces_parallel.wkt"
+    val inputA = "file:///home/acald013/Datasets/TX/TX_faces_parallel.wkt"
     val polysARaw = read(inputA)
     val polysARDD = new SpatialRDD[Polygon]()
     polysARDD.setRawSpatialRDD(polysARaw)
@@ -39,8 +39,8 @@ object PolygonChecker {
     val polysA = polysARDD.spatialPartitionedRDD.rdd.cache
     println("A read")
   
-    val inputB = "/home/and/Datasets/RIDIR/PH/PH_faces_sequential.wkt"
-    //val inputB = "/home/and/Datasets/RIDIR/TX/TX_faces_sequential.wkt"
+    //val inputB = "/home/and/Datasets/RIDIR/PH/PH_faces_sequential.wkt"
+    val inputB = "file:///home/acald013/Datasets/TX/TX_faces_sequential.wkt"
     val polysBRaw = read(inputB)
     val polysBRDD = new SpatialRDD[Polygon]()
     polysBRDD.setRawSpatialRDD(polysBRaw)
@@ -59,7 +59,7 @@ object PolygonChecker {
           } yield {
         a.normalize()
         b.normalize()
-        val ee1 = a.equalsExact(b, 0.01)
+        val ee1 = a.equalsExact(b, 10)
         val labA = a.getUserData.toString
         val labB = b.getUserData.toString
 

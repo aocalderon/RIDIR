@@ -10,6 +10,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val quadtree:    ScallopOption[String]  = opt[String]  (default = Some(""))
   val boundary:    ScallopOption[String]  = opt[String]  (default = Some(""))
   val bycapacity:  ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val readid:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
 
   val fraction:    ScallopOption[Double]  = opt[Double]  (default = Some(0.01))

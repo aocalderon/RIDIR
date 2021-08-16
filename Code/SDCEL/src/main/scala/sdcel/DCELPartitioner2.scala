@@ -49,6 +49,36 @@ object DCELPartitioner2 {
     edgesRDD
   }
 
+  def read2(input: String)
+    (implicit spark: SparkSession, geofactory: GeometryFactory, settings: Settings):
+      SpatialRDD[LineString] = {
+
+    val polys = spark.read.textFile(input).rdd.persist
+    if(settings.debug){
+      val nPolys = polys.count
+      logger.info(s"TIME|npolys$nPolys")
+    }
+    val edgesRaw = polys.mapPartitionsWithIndex{ case(index, lines) =>
+      val reader = new WKTReader(geofactory)
+      lines.flatMap{ line =>
+        val arr = line.split("\t")
+        val wkt = arr(0)
+        val id  = arr(1).tail.toLong
+        val geom = reader.read(wkt).asInstanceOf[Polygon]
+          (0 until geom.getNumGeometries).map{ i =>
+            (geom.getGeometryN(i).asInstanceOf[Polygon], id)
+          }.flatMap{ case(polygon, id) =>
+            getLineStrings(polygon, id)
+          }.toIterator
+      }
+    }.persist
+    val edgesRDD = new SpatialRDD[LineString]()
+    edgesRDD.setRawSpatialRDD(edgesRaw)
+    edgesRDD.analyze()
+
+    edgesRDD
+  }
+
   def main(args: Array[String]) = {
     // Starting session...
     implicit val spark = SparkSession.builder()

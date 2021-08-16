@@ -12,14 +12,14 @@ typedef Geom_traits_2::Curve_2                            Polyline_2;
 // Print all vertices in WKT format (single).
 //
 template<class Arrangement>
-std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
+std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ, int precision)
 {
   typename Arrangement::Ccb_halfedge_const_circulator  curr = circ;
   typename Arrangement::Halfedge_const_handle          he;
   std::stringstream ss;
 
   ss << std::fixed;
-  ss << std::setprecision(10);
+  ss << std::setprecision(precision);
   ss << "POLYGON (("; //<< circ->source()->point();
   do {
     he = curr;
@@ -49,19 +49,28 @@ std::string get_wkt (typename Arrangement::Ccb_halfedge_const_circulator circ)
   return ss.str();
 }
 
+
 //-----------------------------------------------------------------------------
-// Print all vertices in WKT format.
+// Print the boundary description of an arrangement face in WKT format.
 //
 template<class Arrangement>
-std::string get_wkt2 (typename Arrangement::Ccb_halfedge_const_circulator circ)
+std::string get_face_wkt (typename Arrangement::Face_const_handle f, int precision)
+{
+  // Print the outer boundary.
+  // + "\t" + f->data() 
+  return get_wkt<Arrangement> (f->outer_ccb(), precision) + "\t" + f->data() + "\n";
+}
+
+template<class Arrangement>
+std::string get_coords (typename Arrangement::Ccb_halfedge_const_circulator circ, int precision)
 {
   typename Arrangement::Ccb_halfedge_const_circulator  curr = circ;
   typename Arrangement::Halfedge_const_handle          he;
   std::stringstream ss;
 
   ss << std::fixed;
-  ss << std::setprecision(10);
-  ss << "POLYGON (("; //<< circ->source()->point();
+  ss << std::setprecision(precision);
+  ss << "("; 
   do {
     he = curr;
     int n = he->curve().number_of_subcurves();
@@ -71,20 +80,21 @@ std::string get_wkt2 (typename Arrangement::Ccb_halfedge_const_circulator circ)
       if(poly[0].left()  == he->source()->point() ||
 	 poly[0].right() == he->source()->point()){
 	for(int i = 0; i < n; i++){
-	  ss << poly[i].source() << " " << poly[i].target() << ", ";
+	  ss << poly[i].source() <<  ", ";
 	}
       } else {
 	for(int i = n - 1; i >= 0; i--){
-	  ss << poly[i].target() << " " << poly[i].source() << ", ";
+	  ss << poly[i].target() << ", ";
 	}
       }
     } else {
-      ss << he->source()->point() << " " << he->target()->point() << ", ";      
+      ss << he->source()->point() << ", ";      
     }
     ++curr;
   } while (curr != circ);
+  ss << curr->source()->point() << ", ";
   ss.seekp(-2, std::ios_base::end);
-  ss << "))";
+  ss << ")";
 
   return ss.str();
 }
@@ -93,11 +103,21 @@ std::string get_wkt2 (typename Arrangement::Ccb_halfedge_const_circulator circ)
 // Print the boundary description of an arrangement face in WKT format.
 //
 template<class Arrangement>
-std::string get_face_wkt (typename Arrangement::Face_const_handle f)
+std::string get_face_wkt2 (typename Arrangement::Face_const_handle f, int precision)
 {
-  // Print the outer boundary.
-  // + "\t" + f->data() 
-  return get_wkt<Arrangement> (f->outer_ccb()) + "\t" + f->data() + "\n";
+  std::stringstream wkt;
+  wkt << "POLYGON (";
+ 
+  wkt << get_coords<Arrangement> (f->outer_ccb(), precision) << ",";
+  typename Arrangement::Hole_const_iterator  hole;
+  for (hole = f->holes_begin(); hole != f->holes_end(); ++hole){
+    std::cout << ".";
+    wkt << get_coords<Arrangement> (*hole, precision) << ",";
+  }
+  wkt.seekp(-1, std::ios_base::end);
+  wkt << ")" << "\t" << f->data() << "\n";
+
+  return wkt.str();
 }
 
 //-----------------------------------------------------------------------------

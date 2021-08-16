@@ -72,6 +72,7 @@ object LocalDCEL {
     r
   }
 
+  /*
   // Sequential implementation of dcel...
   def sequential(hedges_prime: List[Half_edge], partitionId: Int = -1): Unit = {
     // Group half-edges by the destination vertex (v2)...
@@ -93,6 +94,7 @@ object LocalDCEL {
       hs
     }.flatten
   }
+   */
 
   def merge(crossing0: List[Half_edge], borders0: List[Half_edge]): Unit = {
     val crossing = crossing0 ++ crossing0.filter(_.twin.isNewTwin).map(_.twin)
@@ -146,6 +148,7 @@ object LocalDCEL {
 
     segs
   }
+
   @tailrec
   def getLineSegments(hedges: List[Half_edge], segment: List[Half_edge],
     segments: List[List[Half_edge]]): List[List[Half_edge]] = {
