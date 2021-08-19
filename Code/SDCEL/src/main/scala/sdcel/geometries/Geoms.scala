@@ -16,12 +16,15 @@ case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
   label: String = "A", crossingInfo: String = "", nedges: Int = -1) {
 
   private var cellBorder = false
-
   def setCellBorder(cb: Boolean) = { cellBorder = cb }
   def getCellBorder(): Boolean = { cellBorder }
 
+  private var wkt: String = ""
+  def setWKT(w: String) = { wkt = w }
+  def getWKT: String = { wkt }
+
   override def toString: String =
-    s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo"
+    s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo\t$wkt"
 }
 
 case class Half_edge(edge: LineString) {
@@ -310,7 +313,8 @@ case class Half_edge(edge: LineString) {
     val edge = geofactory.createLineString(Array(v2, v1))
     // I need mark if the twin is for a border edge...
     val code = if(this.data.polygonId == -1) -1 else -2
-    edge.setUserData(this.data.copy(polygonId = code))
+    val new_data = this.data.copy(polygonId = code)
+    edge.setUserData(new_data)
     val h = Half_edge(edge)
     h.isNewTwin = true
     h
@@ -342,13 +346,22 @@ case class Vertex(coord: Coordinate, hedges: List[Half_edge] = List.empty[Half_e
   def toPoint(implicit geofactory: GeometryFactory): Point = geofactory.createPoint(coord)
 }
 
+case class Coord(coord: Coordinate, valid: Boolean)
+
 case class Coords(coords: Array[Coordinate]){
+  val size = coords.size
   val first = coords.head
   val last  = coords.last
 
   override def toString: String = coords.toList.toString
 
-  def getCoords: Array[Coordinate] = if(first == last) coords else coords :+ first
+  def getCoords: Array[Coordinate] = {
+    if(first == last){
+      coords
+    } else {
+      coords :+ first
+    }
+  }
 
   def touch(c: Coordinate, tolerance: Double = 1e-2): Boolean = {
     if(c == last){
@@ -384,9 +397,43 @@ case class Segment(hedges: List[Half_edge]) {
   }
 
   def line(implicit geofactory: GeometryFactory): String = {
-    val coords = hedges.map{_.v1} :+ hedges.last.v2
-    val s = geofactory.createLineString(coords.toArray)
-    s"${s.toText}\t${isHole}"
+    if(isClose){
+      val coords = hedges.map{_.v1} :+ hedges.last.v2
+      val s = geofactory.createLineString(coords.toArray)
+      s"${s.toText}\t${isHole}\tN"      
+    } else {
+      val extremeToRemove = if(hedges.size > 1){
+        if(first.data.crossingInfo != "None" &&
+          last.data.crossingInfo != "None"){
+          "B"
+        } else if(first.data.crossingInfo != "None"){
+          "S"
+        } else if(last.data.crossingInfo != "None"){
+          "E"
+        } else {
+          "X"
+        }
+      } else {
+        val cinfo = first.data.crossingInfo
+        val arr = cinfo.split("\\|")
+        if(arr.size > 1){
+          "B"
+        } else {
+          val arr2 = arr.head.split(":")
+          val xy = arr2(1).split(" ")
+          val C = new Coordinate(xy(0).toDouble, xy(1).toDouble)
+          if(C.distance(first.v1) < C.distance(first.v2)){
+            "S"
+          } else {
+            "E"
+          }
+        }
+      }
+
+      val coords = hedges.map{_.v1} :+ hedges.last.v2
+      val s = geofactory.createLineString(coords.toArray)
+      s"${s.toText}\t${isHole}\t${extremeToRemove}"
+    }
   }
 
   def isHole: Int = if(hedges.exists(!_.data.isHole)) 0 else 1

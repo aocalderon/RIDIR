@@ -252,10 +252,7 @@ object DCELPartitioner2 {
         val crossingData = for{
           c1 <- coords
           c2 <- intersections if(c2._1 == c1)
-            } yield {
-          //val x = round(c1.x, scale)
-          //val y = round(c1.y, scale)
-          
+            } yield {          
           s"${c2._2}:${c1.x} ${c1.y}"
         }
 
@@ -272,9 +269,14 @@ object DCELPartitioner2 {
     edges.mapPartitionsWithIndex{ (pid, edgesIt) =>
       val cell = cells(pid)
 
+      val cellP = cell.toPolygon
       val edges = edgesIt
-        .filter(edge => edge.intersects(cell.toPolygon)) // Be sure edge is inside cell
+        .filter(edge => edge.intersects(cellP)) // Be sure edge is inside cell
         .filter(edge => edge.getLength > 0)
+        //.filterNot(edge => edge.getStartPoint.touches(cellP) &&
+        //  !edge.getEndPoint.intersects(cellP))
+        //.filterNot(edge => edge.getEndPoint.touches(cellP) &&
+        //  !edge.getStartPoint.intersects(cellP))
         .map{edge => LEdge(edge.getCoordinates, edge)}.toList.asJava
 
       val borders = cell.toLEdges.asJava

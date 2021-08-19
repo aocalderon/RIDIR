@@ -9,7 +9,7 @@ import org.apache.spark.rdd.RDD
 
 import scala.annotation.tailrec
 
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, Segment, Coords}
+import edu.ucr.dblab.sdcel.geometries.{Half_edge, Segment, Coords, Coord}
 
 import Utils._
 
@@ -29,8 +29,9 @@ object DCELOverlay2 {
             val arr = s.split("\t")
             val s1 = arr(0)
             val s2 = arr(1) // is part of a hole?
+            val s3 = arr(2) // I need to remove a coordinate later...
             val seg = reader.read(s1).asInstanceOf[LineString]
-            seg.setUserData(s2)
+            seg.setUserData(s"$s2\t$s3")
             seg
           }
           //lines
@@ -43,12 +44,27 @@ object DCELOverlay2 {
 
   def mergeLines(lines: List[LineString])
     (implicit geofactory: GeometryFactory, settings: Settings): List[Polygon] = {
-    val coords = lines.map(l => Coords(l.getCoordinates)).toSet
+    
+    val coords = lines.map{ line =>
+      val flag: String = {
+        val arr = line.getUserData.toString.split("\t")
+        arr(1)
+      }
+      val coords = line.getCoordinates
+      val start = coords.head
+      val end = coords.last
+      val middle = coords.slice(1, coords.size - 1).map(c => Coord(c, true))
+      val mycoords = flag match {
+        case "B" => Coord(start, false) +: middle :+ Coord(end, false)
+        case "S" => Coord(start, false) +: middle :+ Coord(end, true)
+        case "E" => Coord(start, true) +: middle :+ Coord(end, false)
+        case _ => Coord(start, true) +: middle :+ Coord(end, true)
+      }
+      Coords(coords)
+    }.toSet
     val C = mergeCoordinates(coords.tail, coords.head, List.empty[Coords])
-    val S = if(lines.exists(x => !(x.getUserData.toString == "1") )) 1 else 0 //is hole?
     C.filter(_.getCoords.size >= 4).map{c =>
       val poly = geofactory.createPolygon(c.getCoords)
-      poly.setUserData(S)
       poly
     }
   }
@@ -87,19 +103,9 @@ object DCELOverlay2 {
       val partitionId = -1
       val labelId = ""
       it.flatMap{ case(hedge, label) =>
+
         if(hedge.isValid){
-          val s = getValidSegments2(hedge, hedge.prev, List(hedge), List.empty[Segment],
-            -1)
-          if(pid == partitionId){
-            if(label == labelId){
-              //println(s"$labelId is valid? ${hedge.isValid}")
-              //println(hedge)
-              //println(hedge.prev)
-              //println("Seg")
-              //s.foreach(println)
-            }
-          }
-          
+          val s = getValidSegments2(hedge, hedge.prev, List(hedge), List.empty[Segment])
           s.map(h => (h, label))
         } else {
           val valid = getNextValidOrStop(hedge.next, hedge, hedge)
@@ -173,9 +179,9 @@ object DCELOverlay2 {
         if(valid == hstop){
           valid.next = null
           if(valid.isValid){
-            val list = listH :+ hcurr
+            val list = listH //:+ hcurr
             val s1 = Segment(list)
-            val s2 = Segment(List(valid, valid))
+            val s2 = Segment(List(valid))
             listS ++ List(s1,s2)
           } else {
             val s = Segment(listH)

@@ -141,10 +141,12 @@ object SDCEL2 {
 
     val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)})
     save("/tmp/edgesFE.wkt"){
-      val ffinal = mergeSegs(sdcel2).map{ case(l,w) => s"${w.toText}\t$l\n"  }.collect
+      val ffinal = mergeSegs(sdcel2).map{ case(l,w) =>
+
+        s"${w.toText}\t$l\t${w.getUserData}\n"
+      }.collect
       ffinal
     }
-
   
 
     /*

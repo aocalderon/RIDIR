@@ -26,8 +26,7 @@ import Utils._
 
 object LocalDCEL {
   def createLocalDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell])
-    (implicit geofactory: GeometryFactory//, logger: Logger, spark: SparkSession, settings: Settings
-    )
+    (implicit geofactory: GeometryFactory)
       : RDD[(Half_edge, String, Envelope, Polygon)] = {
 
     val partitionId = 0
@@ -97,6 +96,17 @@ object LocalDCEL {
    */
 
   def merge(crossing0: List[Half_edge], borders0: List[Half_edge]): Unit = {
+    // Remove duplicates...
+    /*
+    val repeated = for{
+      b <- borders0
+      e <- crossing0 if(b.v1 == e.v1 && b.v2 == e.v2)
+    } yield {
+      b
+    }
+    val borders1 = borders0.filterNot(b => repeated.contains(b))
+     */
+
     val crossing = crossing0 ++ crossing0.filter(_.twin.isNewTwin).map(_.twin)
     val vertices = borders0.map(_.v2)
     val borders =  borders0 ++ borders0.filter(_.twin.isNewTwin).map(_.twin)
@@ -195,14 +205,16 @@ object LocalDCEL {
   def getCrossing(crossing: List[LineString])
     (implicit geofactory: GeometryFactory): List[LineString] = {
 
-    crossing.filter{ edge =>
-      // Remove edges that touch the same border twice...
-      // They will be repeated in the borders edges...
-      val crossing_info = getCrossingInfo(edge).split("\\|")
-      val borders = crossing_info.map(_.split(":")(0)).toList
-      val borders_dist = borders.distinct
-      borders.size == borders_dist.size
-    }.map{ edge =>
+    crossing
+      .filter{ edge =>
+        // Remove edges that touch the same border twice...
+        // They will be repeated in the borders edges...
+        val crossing_info = getCrossingInfo(edge).split("\\|")
+        val borders = crossing_info.map(_.split(":")(0)).toList
+        val borders_dist = borders.distinct
+        borders.size == borders_dist.size
+      }
+      .map{ edge =>
       val crossing_info = getCrossingInfo(edge).split("\\|")
       val nsplits = crossing_info.size
 
@@ -214,7 +226,9 @@ object LocalDCEL {
           val xy = arr(1).split(" ") 
           val coord = new Coordinate(xy(0).toDouble, xy(1).toDouble)
           val split = splitEdge(edge, border, coord)
-          split.setUserData(edge.getUserData)
+          val data = edge.getUserData.asInstanceOf[EdgeData]
+          data.setWKT(edge.toText)
+          split.setUserData(data)
           
           split
         }
@@ -243,7 +257,9 @@ object LocalDCEL {
             split
           }
 
-          split.setUserData(edge.getUserData)
+          val data = edge.getUserData.asInstanceOf[EdgeData]
+          data.setWKT(edge.toText)
+          split.setUserData(data)
           split
         }
       }
