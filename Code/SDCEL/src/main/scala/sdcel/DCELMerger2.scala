@@ -495,15 +495,6 @@ object DCELMerger2 {
     val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
 
     sweepline.computeIntersections(aList, bList, segmentIntersector)
-    /*
-    try{
-      sweepline.computeIntersections(aList, bList, segmentIntersector)
-    } catch{
-      case e: java.lang.IllegalArgumentException => {
-        println(s"PID: ${pid}")
-      }
-    }
-     */
 
     val aHedges = aList.asScala.flatMap{ a =>
       val iList = a.getEdgeIntersectionList.iterator.asScala.toList
@@ -512,17 +503,20 @@ object DCELMerger2 {
       } else {
         val coords_prime = iList.map{ i =>
           val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
-          coord
+          Vertex(coord)
         }.toList
         val original_hedge = a.h
-        val coords = (a.h.v1 +: coords_prime :+ a.h.v2).distinct
+        val cp = coords_prime.filterNot(_.coord == a.h.orig.coord).filterNot(_.coord == a.h.dest.coord)
+        val coords = (a.h.orig +: cp :+ a.h.dest)
         val hedges = coords.zip(coords.tail).map{ case(a1, a2) =>
-          val l = geofactory.createLineString(Array(a1, a2))
+          val l = geofactory.createLineString(Array(a1.coord, a2.coord))
           l.setUserData(original_hedge.data)
           val h = Half_edge(l)
           h.tag = original_hedge.tag
-          h.source = a1
-          h.target = a2
+          h.orig = a1
+          h.dest = a2
+          h.source = a1.coord
+          h.target = a2.coord
           h
         }
         hedges
@@ -536,17 +530,20 @@ object DCELMerger2 {
       } else {
         val coords_prime = iList.map{ i =>
           val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
-          coord
+          Vertex(coord)
         }.toList
         val original_hedge = a.h
-        val coords = (a.h.v1 +: coords_prime :+ a.h.v2).distinct
+        val cp = coords_prime.filterNot(_.coord == a.h.orig.coord).filterNot(_.coord == a.h.dest.coord)
+        val coords = (a.h.orig +: cp :+ a.h.dest).distinct
         val hedges = coords.zip(coords.tail).map{ case(a1, a2) =>
-          val l = geofactory.createLineString(Array(a1, a2))
+          val l = geofactory.createLineString(Array(a1.coord, a2.coord))
           l.setUserData(original_hedge.data)
           val h = Half_edge(l)
           h.tag = original_hedge.tag
-          h.source = a1
-          h.target = a2
+          h.orig = a1
+          h.dest = a2
+          h.source = a1.coord
+          h.target = a2.coord
           h
         }
         hedges
@@ -565,18 +562,26 @@ object DCELMerger2 {
       : List[(Half_edge,String, Envelope)] = {
 
     val pid = org.apache.spark.TaskContext.getPartitionId
-    val partitionId = 36
+    val partitionId = 26
 
     // Getting edge splits...
     val ha = hleA.map(_._1.getNexts).flatten
     val hb = hleB.map(_._1.getNexts).flatten
-    val (aList, bList) = intersects4(ha, hb, partitionId)
-    val hedges_prime = (aList ++ bList)
 
     if(pid == partitionId){
-      //println("hedges_prime")
-      //hedges_prime.foreach(println)
+      println("ha")
+      ha.foreach(println)
     }
+
+    val (aList, bList) = intersects4(ha, hb, partitionId)
+
+    if(pid == partitionId){
+      println("aList")
+      aList.foreach(println)
+    }
+
+    val hedges_prime = (aList ++ bList)
+
 
     // Remove duplicates...
     val hedges = hedges_prime.groupBy{h => (h.source, h.target)}.values.map(_.head).toList

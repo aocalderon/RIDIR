@@ -42,27 +42,6 @@ object Test3 {
     val c16 = new Coordinate(9,1)
     val a4 = Array(c13,c14,c15,c16)
 
-    val a = Set(Coords(a1),Coords(a2),Coords(a3),Coords(a4))
-
-    val l = mergeCoordinates(a.tail, a.head, List.empty[Coords])
-    l.map{c => geofactory.createPolygon(c.getCoords)}.foreach{println}
-  }
-
-  @tailrec
-  def mergeCoordinates(coords: Set[Coords], curr: Coords, r: List[Coords]): List[Coords] = {
-    if(coords.isEmpty){
-      r :+ curr
-    } else if(curr.isClose){
-      val n_r = r :+ curr
-      val n_curr = coords.head
-      val n_coords = coords.tail
-      mergeCoordinates(n_coords, n_curr, n_r)
-    } else {
-      val next = coords.filter(c => curr.touch(c.first)).head
-      val n_coords = coords -- Set(next)
-      val n_curr = Coords(curr.coords ++ next.coords)
-      mergeCoordinates(n_coords, n_curr, r)
-    }
   }
 
   def createHEdge(c1: Coordinate, c2: Coordinate)

@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     char* filename1;
     char* filename2;
     char operation = 0;
-    int precision = 3;
+    int precision = 4;
     
     int c;
     while ((c = getopt (argc, argv, "a:b:o:d")) != -1){

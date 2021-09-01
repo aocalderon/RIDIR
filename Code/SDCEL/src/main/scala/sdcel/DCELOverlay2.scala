@@ -20,7 +20,7 @@ object DCELOverlay2 {
       (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String, Polygon)] = {
 
     val a = sdcel//.filter{!_._1.isClose}
-      .map{ case(s,l) => (l,List(s.line)) }
+      .map{ case(s,l) => (l,List(s.getLine)) }
       .reduceByKey{ case(a, b) => a ++ b }
       .mapPartitions{ it =>
         val reader = new WKTReader(geofactory)
@@ -31,26 +31,60 @@ object DCELOverlay2 {
             val s2 = arr(1) // is part of a hole?
             val s3 = arr(2) // I need to remove a coordinate later...
             val seg = reader.read(s1).asInstanceOf[LineString]
-            seg.setUserData(s"$s2\t$s3")
+            seg.setUserData(s"$s2\t$s3") // ishole, flag
             seg
           }
           //lines
-          val ps = mergeLines(lines)
+          val ps = mergeLines(lines, l)
           ps.map{ p => (l,p) }
         }
       }
     a
   }
 
-  def mergeLines(lines: List[LineString])
+  def mergeSegsTest(sdcel: RDD[(Segment, String)])
+      (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String, LineString)] = {
+
+    val a = sdcel//.filter{!_._1.isClose}
+      .map{ case(s,l) => (l,List(s.getLine)) }
+      .reduceByKey{ case(a, b) => a ++ b }
+      .mapPartitions{ it =>
+        val reader = new WKTReader(geofactory)
+        it.flatMap{ case(l,ss) =>          
+          val lines = ss.map{ s =>
+            val arr = s.split("\t")
+            val s1 = arr(0)
+            val s2 = arr(1) // is part of a hole?
+            val s3 = arr(2) // I need to remove a coordinate later...
+            val seg = reader.read(s1).asInstanceOf[LineString]
+            seg.setUserData(s"$s2\t$s3") // ishole, flag
+            seg
+          }
+          //lines
+          //val ps = mergeLines(lines, l)
+          lines.map{ p => (l,p) }
+        }
+      }
+    a
+  }
+
+  def mergeLines(lines: List[LineString], label:String = "")
     (implicit geofactory: GeometryFactory, settings: Settings): List[Polygon] = {
-    
+    val pid = org.apache.spark.TaskContext.getPartitionId
+    val partitionId = -1
+
     val coords = lines.map{ line =>
-      val flag: String = {
+      val flag = {
         val arr = line.getUserData.toString.split("\t")
         arr(1)
       }
+
       val coords = line.getCoordinates
+
+      //if(label == "A178 B173"){
+      //  println(s"$line\t$flag")
+      //}
+
       val start = coords.head
       val end = coords.last
       val middle = coords.slice(1, coords.size - 1).map(c => Coord(c, true))
@@ -60,9 +94,11 @@ object DCELOverlay2 {
         case "E" => Coord(start, true) +: middle :+ Coord(end, false)
         case _ => Coord(start, true) +: middle :+ Coord(end, true)
       }
-      Coords(coords)
+      Coords(mycoords)
     }.toSet
+
     val C = mergeCoordinates(coords.tail, coords.head, List.empty[Coords])
+
     C.filter(_.getCoords.size >= 4).map{c =>
       val poly = geofactory.createPolygon(c.getCoords)
       poly
@@ -81,13 +117,13 @@ object DCELOverlay2 {
       mergeCoordinates(n_coords, n_curr, n_r)
     } else {
       val next = try {
-        coords.filter(c => curr.touch(c.first)).head
+        coords.filter(c => curr.touch(c.first.coord)).head
       } catch {
         case e: java.util.NoSuchElementException => {
           println("Coords")
-          coords.map{C => geofactory.createLineString(C.coords).toText}.foreach(println)
+          coords.map{C => geofactory.createLineString(C.coords.map(_.coord)).toText}.foreach(println)
           println("Current")
-          println(geofactory.createLineString(curr.coords).toText)
+          println(geofactory.createLineString(curr.coords.map(_.coord)).toText)
           System.exit(1)
           curr
         }
@@ -100,8 +136,8 @@ object DCELOverlay2 {
 
   def overlay4(sdcel: RDD[(Half_edge, String)]): RDD[(Segment, String)] = {
     sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      val partitionId = -1
-      val labelId = ""
+      val partitionId = 31
+      val labelId = "A178 B173"
       it.flatMap{ case(hedge, label) =>
 
         if(hedge.isValid){
@@ -112,8 +148,8 @@ object DCELOverlay2 {
           if(valid == hedge){
             List.empty[(Segment, String)]
           } else {
-            getValidSegments2(valid, valid.prev, List(valid), List.empty[Segment])
-              .map(h => (h, label))
+            val s = getValidSegments2(valid, valid.prev, List(valid), List.empty[Segment])
+            s.map(h => (h, label))
           }
         }
       }
