@@ -68,26 +68,26 @@ object EmptyCellManager2 {
         id.toInt -> Cell(id, lineage, ring)
       }.toMap
 
-      /*
-       save("/tmp/edgesNQ.wkt"){
-       quadtree_prime.getLeafZones.asScala.map{ leaf =>
-       val wkt = envelope2polygon(leaf.getEnvelope).toText
-       val id = leaf.partitionId
-       val lineage = leaf.lineage
+      
+      save("/tmp/edgesNQ.wkt"){
+        quadtree_prime.getLeafZones.asScala.map{ leaf =>
+          val wkt = envelope2polygon(leaf.getEnvelope).toText
+          val id = leaf.partitionId
+          val lineage = leaf.lineage
 
-       s"$wkt\t$id\t$lineage\n"
-       }
-       }
-       save("/tmp/edgesEM.wkt"){
-       empties.map{ cell =>
-       val wkt = cell.wkt
-       val id = cell.id
-       val lineage = cell.lineage
+          s"$wkt\t$id\t$lineage\n"
+        }
+      }
+      save("/tmp/edgesEM.wkt"){
+        empties.map{ cell =>
+          val wkt = cell.wkt
+          val id = cell.id
+          val lineage = cell.lineage
 
-       s"$wkt\t$id\t$lineage\n"
-       }
-       }
-       */
+          s"$wkt\t$id\t$lineage\n"
+        }
+      }
+       
 
       val r_prime = solve(quadtree_prime, cells_prime, non_empties, empties).distinct
       /*
@@ -107,12 +107,13 @@ object EmptyCellManager2 {
       //println("r")
       //r.foreach(println)
 
-      val sdcel_prime = fixEmptyCells(r, sdcel, cells)
+      //val sdcel_prime = fixEmptyCells(r, sdcel, cells)
 
       //println("sdcel_prime")
       //sdcel_prime.foreach(println)
 
-      sdcel_prime
+      //sdcel_prime
+      sdcel
     }
   }
 

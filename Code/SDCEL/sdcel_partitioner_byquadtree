@@ -26,6 +26,7 @@ spark-submit \
     --master $MASTER \
     --files $LOG_FILE \
     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+    --conf spark.driver.maxResultSize=2G \
     --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
@@ -35,4 +36,5 @@ spark-submit \
     --quadtree $QUADTREE_PATH --boundary $BOUNDARY_PATH \
     --apath $HDFS_PATH/edgesA \
     --bpath $HDFS_PATH/edgesB \
-    --tolerance $TOLERANCE --debug --save --readid
+    --tolerance $TOLERANCE --save
+#--debug --readid

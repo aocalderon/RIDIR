@@ -36,35 +36,43 @@ object DCELOverlay2 {
           }
           //lines
           val ps = mergeLines(lines, l)
-          ps.map{ p => (l,p) }
+          //ps.map{ p => (l,p) }
+          ps.map{ p => (l,p) }.groupBy(_._1).map{ case(lab, list) =>
+            val polys = list.map(_._2).sortBy(_.getArea)(Ordering[Double].reverse)
+            
+            val outer0 = polys.head.getExteriorRing.getCoordinates
+            val outer = outer0 //:+ outer0.head
+            val shell = geofactory.createLinearRing(outer)
+            val O = geofactory.createPolygon(shell)
+
+            val inners = polys.tail.map{ poly =>
+              val inner0 = poly.getExteriorRing.getCoordinates
+              val inner = inner0 //:+ inner0.head
+              geofactory.createLinearRing(inner)
+            }.toArray
+
+            val (holes, noholes) = inners.partition{ i =>
+              i.getInteriorPoint.coveredBy(O)
+            }
+
+            val p = geofactory.createPolygon(shell, holes)
+            val p2 = noholes.map{ nh =>
+              geofactory.createPolygon(nh)
+            }
+            val ps = p +: p2
+
+            ps.map{ p => (lab, p)}
+          }.flatten
         }
       }
     a
   }
 
   def mergeSegsTest(sdcel: RDD[(Segment, String)])
-      (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String, LineString)] = {
+      (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String)] = {
 
     val a = sdcel//.filter{!_._1.isClose}
-      .map{ case(s,l) => (l,List(s.getLine)) }
-      .reduceByKey{ case(a, b) => a ++ b }
-      .mapPartitions{ it =>
-        val reader = new WKTReader(geofactory)
-        it.flatMap{ case(l,ss) =>          
-          val lines = ss.map{ s =>
-            val arr = s.split("\t")
-            val s1 = arr(0)
-            val s2 = arr(1) // is part of a hole?
-            val s3 = arr(2) // I need to remove a coordinate later...
-            val seg = reader.read(s1).asInstanceOf[LineString]
-            seg.setUserData(s"$s2\t$s3") // ishole, flag
-            seg
-          }
-          //lines
-          //val ps = mergeLines(lines, l)
-          lines.map{ p => (l,p) }
-        }
-      }
+      .map{ case(s,l) => (l) }
     a
   }
 
@@ -140,6 +148,25 @@ object DCELOverlay2 {
       val labelId = "A178 B173"
       it.flatMap{ case(hedge, label) =>
 
+        if(hedge.isValid){
+          val s = getValidSegments2(hedge, hedge.prev, List(hedge), List.empty[Segment])
+          s.map(h => (h, label))
+        } else {
+          val valid = getNextValidOrStop(hedge.next, hedge, hedge)
+          if(valid == hedge){
+            List.empty[(Segment, String)]
+          } else {
+            val s = getValidSegments2(valid, valid.prev, List(valid), List.empty[Segment])
+            s.map(h => (h, label))
+          }
+        }
+      }
+    }
+  }
+
+  def overlay4Test(sdcel: RDD[(Half_edge, String)]): RDD[(Segment, String)] = {
+    sdcel.mapPartitionsWithIndex{ (pid, it) =>
+      it.flatMap{ case(hedge, label) =>
         if(hedge.isValid){
           val s = getValidSegments2(hedge, hedge.prev, List(hedge), List.empty[Segment])
           s.map(h => (h, label))

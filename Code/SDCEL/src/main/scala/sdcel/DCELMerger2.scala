@@ -562,29 +562,52 @@ object DCELMerger2 {
       : List[(Half_edge,String, Envelope)] = {
 
     val pid = org.apache.spark.TaskContext.getPartitionId
-    val partitionId = 26
+    val partitionId = 29
 
     // Getting edge splits...
-    val ha = hleA.map(_._1.getNexts).flatten
-    val hb = hleB.map(_._1.getNexts).flatten
+    val ha = hleA.map{ case(hs,lab,env,pol) =>
+      hs.getNexts.map{ h =>
+        h.tag = lab
+        h
+      }
+    }.flatten
+    val hb = hleB.map{ case(hs,lab,env,pol) =>
+      hs.getNexts.map{ h =>
+        h.tag = lab
+        h
+      }
+    }.flatten
 
     if(pid == partitionId){
-      println("ha")
-      ha.foreach(println)
+      //println("ha")
+      //ha.map{ a => s"${a}\t${a.tag}"}.foreach(println)
+      //println("hb")
+      //hb.foreach(println)
     }
 
     val (aList, bList) = intersects4(ha, hb, partitionId)
 
     if(pid == partitionId){
-      println("aList")
-      aList.foreach(println)
+      //println("aList")
+      //aList.foreach(println)
     }
 
     val hedges_prime = (aList ++ bList)
 
-
     // Remove duplicates...
-    val hedges = hedges_prime.groupBy{h => (h.source, h.target)}.values.map(_.head).toList
+    val hedges = hedges_prime.groupBy{h => (h.source, h.target)}.values.map{ hs =>
+      if(hs.size == 1){
+        val h = hs.head
+        h
+      } else {
+        val h = hs.head
+        val l = hs.last
+        val t1 = h.tag
+        val t2 = l.tag
+        h.tag = List(t1, t2).sorted.mkString(" ")
+        h 
+      }
+    }.toList
 
     if(pid == partitionId){
       //println("hedges")
@@ -606,9 +629,6 @@ object DCELMerger2 {
     }
 
     // Extrantinct unique half-edge and label to represent the face...
-    //val h = groupByNext(hedges.toSet, List.empty[(Half_edge, String)])
-    //.filter(_._2 != "")
-
     val h = groupByNextMBR(hedges.toSet, List.empty[(Half_edge, String, Envelope)])
       .filter(_._2 != "")
     

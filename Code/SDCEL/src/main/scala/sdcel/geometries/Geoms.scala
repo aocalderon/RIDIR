@@ -66,7 +66,7 @@ case class Half_edge(edge: LineString) {
   var target: Coordinate = v2
   var MAX_RECURSION: Int = Int.MaxValue
 
-  override def toString = s"${edge.toText}\t$data\t${orig.valid} ${dest.valid}"
+  override def toString = s"${edge.toText}\t$data\t${tag}"
 
   def getPolygonId(): Int = {
     @tailrec
@@ -212,7 +212,12 @@ case class Half_edge(edge: LineString) {
       if( next == null || next == hedges.head){
         val mbr = new Envelope(minx,maxx,miny,maxy)
         hedges.head.mbr = mbr
-        (hedges, mbr, tags.toList.sorted.mkString(" "))
+        val ftag = if(tags.exists(_.split(" ").size > 1)){
+          tags.filter(_.split(" ").size > 1).head
+        } else {
+          tags.toList.sorted.mkString(" ")
+        }
+        (hedges, mbr, ftag)
       } else {
         val x1 = next.getMinx
         val minx1 = if(x1 < minx) x1 else minx 
@@ -329,7 +334,7 @@ case class Half_edge(edge: LineString) {
   }
 
   //TODO
-  def label: String =
+  def label: String = 
     s"${this.data.label}${if(this.data.polygonId < 0) "" else this.data.polygonId}"
 
   val angleAtOrig = math.toDegrees(hangle(v1.x - v2.x, v1.y - v2.y))
@@ -352,6 +357,15 @@ case class Half_edge(edge: LineString) {
     edge.setUserData(new_data)
     val h = Half_edge(edge)
     h.isNewTwin = true
+    h.orig = this.dest
+    h.dest = this.orig
+    h
+  }
+
+  def reverseHole(implicit geofactory: GeometryFactory): Half_edge = {
+    val edge = geofactory.createLineString(Array(v2, v1))
+    edge.setUserData(this.data)
+    val h = Half_edge(edge)
     h.orig = this.dest
     h.dest = this.orig
     h

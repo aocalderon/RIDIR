@@ -33,12 +33,12 @@ object PolygonChecker3 {
     println("Start")
 
     val inputA = "file:///home/acald013/Datasets/CA/CGAL2/edgesFE.wkt"
-    //val inputA = "/home/and/Datasets/RIDIR/TX/TX_faces_parallel.wkt"
+    //val inputA = "file:///home/acald013/Datasets/PH/edgesFE.wkt"
     val polysA = read(inputA, "par")
     println("A read")
   
     val inputB = "file:///home/acald013/Datasets/CA/CGAL2/faces.wkt"
-    //val inputB = "/home/and/Datasets/RIDIR/TX/faces.wkt"
+    //val inputB = "file:///home/acald013/Datasets/PH/faces.wkt"
     val polysB = read(inputB, "seq")
     println("B read")
 
@@ -89,9 +89,13 @@ object PolygonChecker3 {
               println("p22")
               println(p22)
             }
+
+            /***/
             val p2 = norm2(p22)
             //val p2 = process(w._3, reader, lab)
             val b = p1.equalsExact(p2, 1)
+            /***/
+
             if(lab == "A204 B62"){
               println("p2")
               println(p2)
@@ -99,7 +103,6 @@ object PolygonChecker3 {
             }
             b
           }
-
 
           (lab, ps.exists(_ == true), p1.toText)
         }
@@ -140,7 +143,7 @@ object PolygonChecker3 {
   }
 
   def norm2(poly: Polygon)(implicit geofactory: GeometryFactory): Polygon = {
-    val coords = poly.getCoordinates
+    val coords = poly.getExteriorRing.getCoordinates
     val minX = coords.minBy(_.x)
     val minXs = coords.filter(_.x == minX.x)
     val start = minXs.minBy(_.y)
