@@ -1,0 +1,51 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis version="3.22.2-Białowieża">
+  <identifier></identifier>
+  <parentidentifier></parentidentifier>
+  <language></language>
+  <type>dataset</type>
+  <title></title>
+  <abstract>The TIGER/Line Files are shapefiles and related database files (.dbf) that are an extract of selected geographic and cartographic information from the U.S. Census Bureau's Master Address File / Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) Database (MTDB). The MTDB represents a seamless national file with no overlaps or gaps between parts, however, each TIGER/Line File is designed to stand alone as an independent data set, or they can be combined to cover the entire nation. Census tracts are small, relatively permanent statistical subdivisions of a county or equivalent entity, and were defined by local participants as part of the Census 2000 Participant Statistical Areas Program (PSAP). The Census Bureau delineated the census tracts in situations where no local participant existed or where all the potential participants declined to participate. The primary purpose of census tracts is to provide a stable set of geographic units for the presentation of census data and comparison back to previous decennial censuses. Census tracts generally have a population size between 1,500 and 8,000 people, with an optimum size of 4,000 people. When first delineated, census tracts were designed to be homogeneous with respect to population characteristics, economic status, and living conditions. The spatial size of census tracts varies widely depending on the density of settlement. Physical changes in street patterns caused by highway construction, new development, etc. may require boundary revisions before a census. In addition, census tracts occasionally are split due to population growth, or combined as a result of substantial population decline. Census tract boundaries generally follow visible and identifiable features. They may follow legal boundaries such as minor civil division (MCD) or incorporated place boundaries in some States and situations to allow for census tract-to-governmental unit relationships where the governmental boundaries tend to remain unchanged between censuses. State and county boundaries are always census tract boundaries in the standard census geographic hierarchy. In a few rare instances, a census tract may consist of noncontiguous areas. These noncontiguous areas may occur where the census tracts are coextensive with all or parts of legal entities that are themselves noncontiguous. 
+
+In order for others to use the information in the Census MAF/TIGER database in a geographic information system (GIS) or for other geographic applications, the Census Bureau releases to the public extracts of the database in the form of TIGER/Line Shapefiles.</abstract>
+  <keywords vocabulary="gmd:topicCategory">
+    <keyword>boundaries</keyword>
+    <keyword>State or equivalent entity</keyword>
+  </keywords>
+  <contact>
+    <contactAddress>
+      <type>Mailing address</type>
+      <address>4600 Silver Hill Road, Stop 7400</address>
+      <city>Washington</city>
+      <administrativearea>DC</administrativearea>
+      <postalcode>20233-7400</postalcode>
+      <country>United States</country>
+    </contactAddress>
+    <name>U.S. Department of Commerce, U.S. Census Bureau, Geography Division, Geographic Products Branch</name>
+    <organization>U.S. Department of Commerce, U.S. Census Bureau, Geography Division, Geographic Products Branch</organization>
+    <position></position>
+    <voice>301-763-1128</voice>
+    <fax>301-763-4710</fax>
+    <email>geo.tiger@census.gov</email>
+    <role>Point of contact</role>
+  </contact>
+  <links/>
+  <fees></fees>
+  <constraints type="Access">None</constraints>
+  <rights>The TIGER/Line Shapefile products are not copyrighted however TIGER/Line and Census TIGER are registered trademarks of the U.S. Census Bureau. These products are free to use in a product or publication, however acknowledgement must be given to the U.S. Census Bureau as the source. The boundary information in the TIGER/Line Shapefiles are for statistical data collection and tabulation purposes only; their depiction and designation for statistical purposes does not constitute a determination of jurisdictional authority or rights of ownership or entitlement and they are not legal land descriptions.Coordinates in the TIGER/Line shapefiles have six implied decimal places, but the positional accuracy of these coordinates is not as great as the six decimal places suggest.</rights>
+  <encoding></encoding>
+  <crs>
+    <spatialrefsys>
+      <wkt></wkt>
+      <proj4></proj4>
+      <srsid>0</srsid>
+      <srid>0</srid>
+      <authid></authid>
+      <description></description>
+      <projectionacronym></projectionacronym>
+      <ellipsoidacronym></ellipsoidacronym>
+      <geographicflag>false</geographicflag>
+    </spatialrefsys>
+  </crs>
+  <extent/>
+</qgis>

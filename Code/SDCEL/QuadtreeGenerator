@@ -2,12 +2,12 @@
 
 NPARTITIONS=$1
 
-#INPUT1=CA/CaliA.wkt
-#INPUT2=CA/CaliB.wkt
-INPUT1=TX/TexasA.wkt
-INPUT2=TX/TexasB.wkt
+INPUT1=CA/CGAL/A.wkt
+INPUT2=CA/CGAL/B.wkt
+#INPUT1=TX/TexasA.wkt
+#INPUT2=TX/TexasB.wkt
 
-LOCAL_PATH=$HOME/RIDIR/local_path/TX
+LOCAL_PATH=$HOME/RIDIR/local_path/CA/Debug/
 TOLERANCE=1e-8
 
 
