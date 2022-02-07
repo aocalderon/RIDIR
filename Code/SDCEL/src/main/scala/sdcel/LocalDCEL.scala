@@ -29,7 +29,7 @@ object LocalDCEL {
     (implicit geofactory: GeometryFactory)
       : RDD[(Half_edge, String, Envelope, Polygon)] = {
 
-    val partitionId = 0
+    val partitionId = 29
 
     val r = edgesRDD.mapPartitionsWithIndex{ (pid, it) =>
       
@@ -42,15 +42,19 @@ object LocalDCEL {
       val E = getIntersectionsOnBorder(crossing, "E")
       val cell = cells(pid)
       val bordersS = splitBorder(cell.getSouthBorder, S)
-      val bordersW = splitBorder(cell.getWestBorder, W)
-      val bordersN = splitBorder(cell.getNorthBorder, N)
       val bordersE = splitBorder(cell.getEastBorder, E)
-      val borders = (bordersS ++ bordersW ++ bordersN ++ bordersE).map{Half_edge}
+      val bordersN = splitBorder(cell.getNorthBorder, N)
+      val bordersW = splitBorder(cell.getWestBorder, W)
+      val borders = (bordersS ++ bordersE ++ bordersN ++ bordersW).map{Half_edge}
       setTwins(borders)
       setNextAndPrevBorders(borders)
 
       val inner = (containedIt ++ crossing).map{Half_edge}.toList
       setTwins(inner)
+
+      //if(pid == partitionId){
+        //inner.foreach{println}
+      //}
 
       val inner_segments = sortInnerHedges(inner)
       setNextAndPrev(inner_segments)
@@ -225,9 +229,10 @@ object LocalDCEL {
           val border = arr(0)
           val xy = arr(1).split(" ") 
           val coord = new Coordinate(xy(0).toDouble, xy(1).toDouble)
-          val split = splitEdge(edge, border, coord)
+          val (split, invalidVertex) = splitEdge2(edge, border, coord)
           val data = edge.getUserData.asInstanceOf[EdgeData]
           data.setWKT(edge.toText)
+          data.setInvalidVertex(invalidVertex)
           split.setUserData(data)
           
           split
@@ -243,9 +248,9 @@ object LocalDCEL {
           }.sortBy{_.distance(edge.getStartPoint.getCoordinate)}
           val c1 = intersections(0)
           val c2 = intersections(1)
-          val split = if(c1 != c2){
+          val (split, invalidVertex) = if(c1 != c2){
             val split = geofactory.createLineString(Array(c1, c2))
-            split
+            (split, 3) // Both coordinates are invalid
           } else {
             // If the two coords are the same is because the edge touch just a corner.
             // We select a coord and solve it as an edge with a single intersection point.
@@ -253,12 +258,13 @@ object LocalDCEL {
             val border = arr(0)
             val xy = arr(1).split(" ")
             val coord = new Coordinate(xy(0).toDouble, xy(1).toDouble)
-            val split = splitEdge(edge, border, c1)
-            split
+            val (split, invalidVertex) = splitEdge2(edge, border, c1)
+            (split, invalidVertex)
           }
 
           val data = edge.getUserData.asInstanceOf[EdgeData]
           data.setWKT(edge.toText)
+          data.setInvalidVertex(invalidVertex)
           split.setUserData(data)
           split
         }
@@ -278,32 +284,120 @@ object LocalDCEL {
     // or above that intersection.
     val coords = border match {
       case "N" => {
-        if (start.y >= coord.y){
+        if (start.y > coord.y)
           Array(coord, end)
-        } else if(start.y < coord.y){
+        else if(start.y < coord.y)
           Array(start, coord)
-        } else {
-          Array(coord, coord)
+        else {
+          if(end.y < coord.y)
+            Array(coord, end)
+          else
+            Array(coord, coord)
         }
       }
       case "S" => {
-        if (start.y <= coord.y) Array(coord, end) else Array(start, coord)
+        if (start.y < coord.y)
+          Array(coord, end)
+        else if(start.y > coord.y)
+          Array(start, coord)
+        else{
+          if(end.y > coord.y)
+            Array(coord, end)
+          else
+            Array(coord, coord)
+        }
       }
       case "W" => {
-        if (start.x >= coord.x){
+        if (start.x < coord.x)
           Array(coord, end)
-        } else if(start.x < coord.x){
+        else if(start.x > coord.x)
           Array(start, coord)
-        } else {
-          Array(coord, coord)
+        else {
+          if(end.x > coord.x)
+            Array(coord, end)
+          else
+            Array(coord, coord)
         }
       }
       case "E" => {
-        if (start.x <= coord.x) Array(coord, end) else Array(start, coord)
+        if (start.x > coord.x)
+          Array(coord, end)
+        else if(start.x < coord.x)
+          Array(start, coord)
+        else {
+          if(end.x < coord.x)
+            Array(coord, end)
+          else
+            Array(coord, coord)
+        }
       }
     }
 
     geofactory.createLineString(coords)
+  }
+
+  // Return the section of a edge crossing a border depending on its orientation...
+  def splitEdge2(edge: LineString, border: String, coord: Coordinate)
+    (implicit geofactory: GeometryFactory): (LineString, Int) = {
+
+    val start = edge.getStartPoint.getCoordinate
+    val end   = edge.getEndPoint.getCoordinate
+    
+    // Use the border side to infer the orientation...
+    // for example, if edge intersects north we ask if the start of the edge is below
+    // or above that intersection.
+    val (coords, invalidVertices) = border match {
+      case "N" => {
+        if (start.y > coord.y)
+          (Array(coord, end), 1)
+        else if(start.y < coord.y)
+          (Array(start, coord), 2)
+        else {
+          if(end.y < coord.y)
+            (Array(coord, end), 0)
+          else
+            (Array(coord, coord), 3)
+        }
+      }
+      case "S" => {
+        if (start.y < coord.y)
+          (Array(coord, end), 1)
+        else if(start.y > coord.y)
+          (Array(start, coord), 2)
+        else{
+          if(end.y > coord.y)
+            (Array(start, end), 0)
+          else
+            (Array(coord, coord), 3)
+        }
+      }
+      case "W" => {
+        if (start.x < coord.x)
+          (Array(coord, end), 1)
+        else if(start.x > coord.x)
+          (Array(start, coord), 2)
+        else {
+          if(end.x > coord.x)
+            (Array(start, end),0)
+          else
+            (Array(coord, coord), 3)
+        }
+      }
+      case "E" => {
+        if (start.x > coord.x)
+          (Array(coord, end),1)
+        else if(start.x < coord.x)
+          (Array(start, coord),2)
+        else {
+          if(end.x < coord.x)
+            (Array(start, end),0)
+          else
+            (Array(coord, coord),3)
+        }
+      }
+    }
+
+    (geofactory.createLineString(coords), invalidVertices)
   }
 
   // Split a border by a list of coordinates...
@@ -343,7 +437,7 @@ object LocalDCEL {
     }
   }
 
-  // Return list of coordinate intersection on a particular border (S,W,N or E)...
+  // Return list of coordinate intersection on a particular border (S,E,N or W)...
   def getIntersectionsOnBorder(edges: List[LineString], border: String):
       List[Coordinate] = {
 
@@ -361,9 +455,9 @@ object LocalDCEL {
 
     border match {
       case "S" => intersections.sortBy(_.x)
-      case "W" => intersections.sortBy(_.y)
+      case "E" => intersections.sortBy(_.y)
       case "N" => intersections.sortBy(_.x)(Ordering[Double].reverse)
-      case "E" => intersections.sortBy(_.y)(Ordering[Double].reverse)
+      case "W" => intersections.sortBy(_.y)(Ordering[Double].reverse)
     }
   }
 

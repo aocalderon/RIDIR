@@ -2,13 +2,17 @@
 
 NPARTITIONS=$1
 
-INPUT1=CA/CGAL/A.wkt
-INPUT2=CA/CGAL/B.wkt
-#INPUT1=TX/TexasA.wkt
-#INPUT2=TX/TexasB.wkt
+#INPUT1=gadm/raw/level0
+#INPUT2=gadm/raw/level1
+#INPUT1=NC/A.wkt
+#INPUT2=NC/B.wkt
+INPUT1=CA/CGAL2/A.wkt
+INPUT2=CA/CGAL2/B.wkt
+#INPUT1=TX/CGAL/A.wkt
+#INPUT2=TX/CGAL/B.wkt
 
-LOCAL_PATH=$HOME/RIDIR/local_path/CA/Debug/
-TOLERANCE=1e-8
+LOCAL_PATH=$HOME/RIDIR/local_path/CA/CGAL2/
+TOLERANCE=1e-4
 
 
 LOCAL_DIR="$LOCAL_PATH/P$NPARTITIONS"
@@ -23,7 +27,7 @@ SPARK_JARS=$HOME/Spark/2.4/jars/
 JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
 CLASS="edu.ucr.dblab.sdcel.QuadtreeGenerator"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
-MASTER=local[10]
+MASTER=yarn
 
 spark-submit \
     --master $MASTER \

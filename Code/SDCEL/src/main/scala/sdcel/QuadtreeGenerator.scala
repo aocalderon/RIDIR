@@ -33,7 +33,8 @@ object QuadtreeGenerator {
     }
     val edgesRaw = polys.mapPartitionsWithIndex{ case(index, lines) =>
       val reader = new WKTReader(geofactory)
-      lines.flatMap{ line =>
+      lines.flatMap{ line0 =>
+        val line = line0.split("\t")(0)
         val geom = reader.read(line.replaceAll("\"", ""))
           (0 until geom.getNumGeometries).map{ i =>
             geom.getGeometryN(i).asInstanceOf[Polygon]

@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     char* filename1;
     char* filename2;
     char operation = 0;
-    int precision = 3;
+    int precision = 5;
     
     int c;
     while ((c = getopt (argc, argv, "a:b:o:d")) != -1){
@@ -288,7 +288,7 @@ int main(int argc, char* argv[]) {
       int nfaces = 0;
       for (res_fit = overlay_arr.faces_begin(); res_fit != overlay_arr.faces_end(); ++res_fit){
 	if(!res_fit->is_unbounded()){
-	  string w = get_face_wkt<ArrangementRes_2> (res_fit, precision);
+	  string w = get_face_wkt2<ArrangementRes_2> (res_fit, precision);
 	  wkt << w;
 	  nfaces++;
 	}

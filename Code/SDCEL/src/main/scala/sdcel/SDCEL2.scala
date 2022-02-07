@@ -84,41 +84,52 @@ object SDCEL2 {
     log2("TIME|read")
 
     // Creating local dcel layer A...
-    val ldcelA0 = createLocalDCELs(edgesRDDA, cells)//.filter(_._1.checkValidity)
+    val ldcelA0 = createLocalDCELs(edgesRDDA, cells)
+
     /*
     save("/tmp/edgesLA.wkt"){
       ldcelA0.flatMap{ case(h,l,e,p) =>
-        h.getNexts.map(n => s"${n.edge.toText}\t${n.tag}\t${n.data.getCellBorder}\t${n.data.polygonId}\n")
+        h.getNexts.map(n => s"$n\t$l\n")
       }.collect
     }
      */
-    //save("/tmp/edgesFA.wkt"){
-    //  ldcelA0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
-    //}
+
+    /*
+    save("/tmp/edgesFA.wkt"){
+      ldcelA0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    }
+     */
+
     val ldcelA = runEmptyCells(ldcelA0, quadtree, cells).cache
     save("/tmp/edgesFAC.wkt"){
-      ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+      ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
     }
 
     // Creating local dcel layer B...
-    val ldcelB0 = createLocalDCELs(edgesRDDB, cells)//.filter(_._1.checkValidity)
-/*
+    val ldcelB0 = createLocalDCELs(edgesRDDB, cells)
+
+    /*
     save("/tmp/edgesLB.wkt"){
-      ldcelB0.flatMap{ case(h,l,e,p) =>
-        h.getNexts.map(n => s"${n.edge.toText}\t${n.tag}\t${n.data.getCellBorder}\t${n.data.polygonId}\n")
+      ldcelB0.filter(_._4.getNumPoints == 0).map{ case(h,l,e,p) =>
+        s"${h}\t$l\n"
       }.collect
     }
- */
-    //save("/tmp/edgesFB.wkt"){
-    //  ldcelB0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
-    //}
+     */
+
+    /*
+    save("/tmp/edgesFB.wkt"){
+      ldcelB0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+    }
+    */
+
     val ldcelB = runEmptyCells(ldcelB0, quadtree, cells).cache
     save("/tmp/edgesFBC.wkt"){
-      ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
+      ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
     }
 
     // Overlay local dcels...
-    val sdcel = ldcelA
+    
+    val sdcel = ldcelB
       .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
         val pid = TaskContext.getPartitionId
         val partitionId = 16
@@ -132,14 +143,26 @@ object SDCEL2 {
 
         hedges.toIterator
       }//.filter(_._1.checkValidity)
-      //.cache
-    //val nSDcel = sdcel.count()
-    //logger.info("Done!")
-    //save("/tmp/edgesFC.wkt"){
-    //  sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
-    //}
+      .cache
+    val nSDcel = sdcel.count()
+    logger.info("Done!")
+    save("/tmp/edgesFC.wkt"){
+      sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
+    }
+    
 
-    val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)})
+    val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
+    
+    save("/tmp/edgesFE.wkt"){
+      val ffinal = sdcel2.map{ case(h,l) =>
+
+        s"${h.wkt}\t$l\n"
+      }.collect
+      ffinal
+    }
+    
+
+    /*
     save("/tmp/edgesFE.wkt"){
       val ffinal = mergeSegs(sdcel2).map{ case(l,w) =>
 
@@ -147,7 +170,7 @@ object SDCEL2 {
       }.collect
       ffinal
     }
-  
+     */  
 
     /*
     val faces0 = sdcel.mapPartitionsWithIndex{ (pid, it) =>

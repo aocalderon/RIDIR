@@ -5,6 +5,8 @@ import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry, Envel
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
 import com.vividsolutions.jts.geomgraph.Edge
 
+import edu.ucr.dblab.sdcel.Utils.logger
+
 case class Tag(label: String, pid: Int){
   override def toString: String = s"$label$pid"
 }
@@ -13,7 +15,7 @@ case class HEdge(coords: Array[Coordinate], h: Half_edge) extends Edge(coords)
 case class LEdge(coords: Array[Coordinate], l: LineString) extends Edge(coords)
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
-  label: String = "A", crossingInfo: String = "", nedges: Int = -1) {
+  label: String = "A", crossingInfo: String = "None", nedges: Int = -1) {
 
   private var cellBorder = false
   def setCellBorder(cb: Boolean) = { cellBorder = cb }
@@ -23,8 +25,12 @@ case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
   def setWKT(w: String) = { wkt = w }
   def getWKT: String = { wkt }
 
+  private var invalidVertex: Int = 0
+  def setInvalidVertex(iv: Int) = { invalidVertex = iv }
+  def getInvalidVertex: Int = { invalidVertex }
+
   override def toString: String =
-    s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo\t$wkt"
+    s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo"
 }
 
 case class Half_edge(edge: LineString) {
@@ -32,12 +38,20 @@ case class Half_edge(edge: LineString) {
   val coords = edge.getCoordinates
   val v1 = coords(0)
   val v2 = coords(1)
-  val orig = Vertex(v1)
-  val dest = Vertex(v2)
   val data = if(edge.getUserData.isInstanceOf[EdgeData])
     edge.getUserData.asInstanceOf[EdgeData]
   else
     EdgeData(-1,-1,-1,false)
+  //val orig = Vertex(v1)
+  //val dest = Vertex(v2)
+
+  var (orig, dest) = data.getInvalidVertex match {
+    case 0 => (Vertex(v1), Vertex(v2))
+    case 1 => (Vertex(v1, false), Vertex(v2))
+    case 2 => (Vertex(v1), Vertex(v2, false))
+    case 3 => (Vertex(v1, false), Vertex(v2, false))
+  }
+
   val wkt = edge.toText()
   var original_coords: Array[Coordinate] = Array.empty[Coordinate]
   var tags: List[Tag] = List.empty[Tag]
@@ -52,7 +66,7 @@ case class Half_edge(edge: LineString) {
   var target: Coordinate = v2
   var MAX_RECURSION: Int = Int.MaxValue
 
-  override def toString = s"${edge.toText}\t$data"
+  override def toString = s"${edge.toText}\t$data\t${tag}"
 
   def getPolygonId(): Int = {
     @tailrec
@@ -80,6 +94,21 @@ case class Half_edge(edge: LineString) {
     }
 
     polyId(this)
+  }
+
+  def hasCrossingInfo: Boolean = data.crossingInfo != "None"
+
+  def getCrossingCoord: Option[Coordinate] = {
+    if(hasCrossingInfo){
+      val info = data.crossingInfo
+      val cross = info.split("\\|").head
+      val arr = cross.split(":")
+      val xy = arr(1).split(" ")
+      val coord = new Coordinate(xy(0).toDouble, xy(1).toDouble)
+      Some(coord)
+    } else {
+      None
+    }
   }
 
   def getTag: String = tags.sortBy(_.label).mkString(" ")
@@ -144,8 +173,8 @@ case class Half_edge(edge: LineString) {
     } catch {
       case e: java.lang.IllegalArgumentException => {
         println("Error creating polygon face...")
-        println(e.getMessage)
-        println(coords.mkString(" "))
+        //println(e.getMessage)
+        //println(coords.mkString(" "))
         println(this)
         emptyPolygon
       }
@@ -183,7 +212,12 @@ case class Half_edge(edge: LineString) {
       if( next == null || next == hedges.head){
         val mbr = new Envelope(minx,maxx,miny,maxy)
         hedges.head.mbr = mbr
-        (hedges, mbr, tags.toList.sorted.mkString(" "))
+        val ftag = if(tags.exists(_.split(" ").size > 1)){
+          tags.filter(_.split(" ").size > 1).head
+        } else {
+          tags.toList.sorted.mkString(" ")
+        }
+        (hedges, mbr, ftag)
       } else {
         val x1 = next.getMinx
         val minx1 = if(x1 < minx) x1 else minx 
@@ -211,15 +245,21 @@ case class Half_edge(edge: LineString) {
       : (List[Half_edge],Envelope, Polygon) = {
     @tailrec
     def getNextsTailrec(hedges: List[Half_edge], coords: Array[Coordinate],
-      minx:Double,miny:Double,maxx:Double,maxy:Double, tag: String)(implicit geofactory: GeometryFactory)
-        : (List[Half_edge], Envelope, Polygon) = {
+      minx:Double,miny:Double,maxx:Double,maxy:Double, tag: String)
+      (implicit geofactory: GeometryFactory): (List[Half_edge], Envelope, Polygon) = {
 
       val next = hedges.last.next
       if( next == null || next == hedges.head){
         val mbr = new Envelope(minx,maxx,miny,maxy)
         hedges.head.mbr = mbr
         val ring = coords :+ hedges.head.v1
-        val poly = geofactory.createPolygon(ring)
+        val poly = if(ring.size >= 4)
+          geofactory.createPolygon(ring)
+        else{
+          logger.info(s"${hedges.head.toString}")
+          hedges.foreach(println)
+          geofactory.createPolygon(Array.empty[Coordinate])
+        }
         hedges.head.poly = poly
         //val hs = hedges.map{ h => h.tag = tag; h}
         (hedges, mbr, poly)
@@ -294,7 +334,7 @@ case class Half_edge(edge: LineString) {
   }
 
   //TODO
-  def label: String =
+  def label: String = 
     s"${this.data.label}${if(this.data.polygonId < 0) "" else this.data.polygonId}"
 
   val angleAtOrig = math.toDegrees(hangle(v1.x - v2.x, v1.y - v2.y))
@@ -317,6 +357,17 @@ case class Half_edge(edge: LineString) {
     edge.setUserData(new_data)
     val h = Half_edge(edge)
     h.isNewTwin = true
+    h.orig = this.dest
+    h.dest = this.orig
+    h
+  }
+
+  def reverseHole(implicit geofactory: GeometryFactory): Half_edge = {
+    val edge = geofactory.createLineString(Array(v2, v1))
+    edge.setUserData(this.data)
+    val h = Half_edge(edge)
+    h.orig = this.dest
+    h.dest = this.orig
     h
   }
 
@@ -332,23 +383,19 @@ case class Half_edge(edge: LineString) {
   }
 }
 
-case class Vertex(coord: Coordinate, hedges: List[Half_edge] = List.empty[Half_edge]) {
+case class Vertex(coord: Coordinate, valid: Boolean = true) {
   val x = coord.x
   val y = coord.y
-
-  def hedgesNum: Int = hedges.size
-
-  def getIncidentHedges: List[Half_edge] = {
-    this.hedges.filter(h => h.dest.x == x && h.dest.y == y)
-      .sortBy(_.angleAtDest)(Ordering[Double].reverse)
-  }
 
   def toPoint(implicit geofactory: GeometryFactory): Point = geofactory.createPoint(coord)
 }
 
-case class Coord(coord: Coordinate, valid: Boolean)
+case class Coord(coord: Coordinate, valid: Boolean){
 
-case class Coords(coords: Array[Coordinate]){
+  override def toString: String = s"(${coord.x} ${coord.y} $valid)"
+}
+
+case class Coords(coords: Array[Coord]){
   val size = coords.size
   val first = coords.head
   val last  = coords.last
@@ -356,10 +403,24 @@ case class Coords(coords: Array[Coordinate]){
   override def toString: String = coords.toList.toString
 
   def getCoords: Array[Coordinate] = {
+    /*
     if(first == last){
-      coords
+      coords.map(_.coord)
     } else {
-      coords :+ first
+      val c = coords.filter(_.valid).map(_.coord)
+      c :+ c.head
+    }
+     */
+
+    val C = coords.filter(_.valid).map(_.coord)
+    if(C.isEmpty){
+      coords.map(_.coord)
+    } else {
+      val new_coords = if(C.head == C.last)
+        C
+      else
+        if(C.isEmpty) C else C :+ C.head
+      new_coords
     }
   }
 
@@ -367,16 +428,30 @@ case class Coords(coords: Array[Coordinate]){
     if(c == last){
       true
     } else {
-      val rx = last.x
-      val ry = last.y
+      val rx = last.coord.x
+      val ry = last.coord.y
       val bool = rx - tolerance < c.x && c.x < rx + tolerance &&
       ry - tolerance < c.y && c.y < ry + tolerance
       bool
     }
   }
 
+  def toWKT(implicit geofactory: GeometryFactory): String = {
+    val wkt = geofactory.createLineString(coords.map(_.coord))
+
+    s"$wkt"
+  }
+
+  def toWKT2(implicit geofactory: GeometryFactory): String = {
+    val C = coords.filter(_.valid).map(_.coord)
+    val new_coords = if(C.head == C.last) C else C :+ C.head
+    val wkt = geofactory.createPolygon(new_coords)
+
+    s"$wkt"
+  }
+
   def isClose: Boolean = {
-    this.touch(first)
+    this.touch(first.coord)
   }
 }
 
@@ -394,6 +469,29 @@ case class Segment(hedges: List[Half_edge]) {
     val coords = hedges.map{_.v1} :+ hedges.last.v2
     val s = geofactory.createLineString(coords.toArray)
     s"${s.toText}\t${first.data}"
+  }
+
+  def getLine(implicit geofactory: GeometryFactory): String = {
+    if(isClose){
+      val coords = hedges.map{_.v1} :+ hedges.last.v2
+      val s = geofactory.createLineString(coords.toArray)
+      s"${s.toText}\t${isHole}\tN"      
+    } else {
+      val extremeToRemove = 
+        if(first.orig.valid && last.dest.valid){
+          "N"
+        } else if(!first.orig.valid && last.dest.valid){
+          "S"
+        } else if(first.orig.valid && !last.dest.valid){
+          "E"
+        } else {
+          "B"
+        }
+
+      val coords = hedges.map{_.v1} :+ hedges.last.v2
+      val s = geofactory.createLineString(coords.toArray)
+      s"${s.toText}\t${isHole}\t${extremeToRemove}"
+    }
   }
 
   def line(implicit geofactory: GeometryFactory): String = {
@@ -415,17 +513,21 @@ case class Segment(hedges: List[Half_edge]) {
         }
       } else {
         val cinfo = first.data.crossingInfo
-        val arr = cinfo.split("\\|")
-        if(arr.size > 1){
-          "B"
+        if(cinfo == "None"){
+          "X"
         } else {
-          val arr2 = arr.head.split(":")
-          val xy = arr2(1).split(" ")
-          val C = new Coordinate(xy(0).toDouble, xy(1).toDouble)
-          if(C.distance(first.v1) < C.distance(first.v2)){
-            "S"
+          val arr = cinfo.split("\\|")
+          if(arr.size > 1){
+            "B"
           } else {
-            "E"
+            val arr2 = arr.head.split(":")
+            val xy = arr2(1).split(" ")
+            val C = new Coordinate(xy(0).toDouble, xy(1).toDouble)
+            if(C.distance(first.v1) < C.distance(first.v2)){
+              "S"
+            } else {
+              "E"
+            }
           }
         }
       }
@@ -457,48 +559,48 @@ case class Cell(id: Int, lineage: String, mbr: LinearRing){
   }
 
   def getSouthBorder(implicit geofactory: GeometryFactory): LineString = {
-    val se = new Coordinate(boundary.getMinX, boundary.getMinY)
-    val sw = new Coordinate(boundary.getMaxX, boundary.getMinY)
-    val S = geofactory.createLineString(Array(se, sw))
+    val sw = new Coordinate(boundary.getMinX, boundary.getMinY)
+    val se = new Coordinate(boundary.getMaxX, boundary.getMinY)
+    val S = geofactory.createLineString(Array(sw, se))
     S
   }
-  def getWestBorder(implicit geofactory: GeometryFactory): LineString = {
-    val sw = new Coordinate(boundary.getMaxX, boundary.getMinY)
-    val nw = new Coordinate(boundary.getMaxX, boundary.getMaxY)
-    val W = geofactory.createLineString(Array(sw, nw))
-    W
+  def getEastBorder(implicit geofactory: GeometryFactory): LineString = {
+    val se = new Coordinate(boundary.getMaxX, boundary.getMinY)
+    val ne = new Coordinate(boundary.getMaxX, boundary.getMaxY)
+    val E = geofactory.createLineString(Array(se, ne))
+    E
   }
   def getNorthBorder(implicit geofactory: GeometryFactory): LineString = {
-    val nw = new Coordinate(boundary.getMaxX, boundary.getMaxY)
-    val ne = new Coordinate(boundary.getMinX, boundary.getMaxY)
-    val N = geofactory.createLineString(Array(nw, ne))
+    val ne = new Coordinate(boundary.getMaxX, boundary.getMaxY)
+    val nw = new Coordinate(boundary.getMinX, boundary.getMaxY)
+    val N = geofactory.createLineString(Array(ne, nw))
     N
   }
-  def getEastBorder(implicit geofactory: GeometryFactory): LineString = {
-    val se = new Coordinate(boundary.getMinX, boundary.getMinY)
-    val ne = new Coordinate(boundary.getMinX, boundary.getMaxY)
-    val E = geofactory.createLineString(Array(ne, se))
-    E
+  def getWestBorder(implicit geofactory: GeometryFactory): LineString = {
+    val nw = new Coordinate(boundary.getMinX, boundary.getMaxY)
+    val sw = new Coordinate(boundary.getMinX, boundary.getMinY)
+    val W = geofactory.createLineString(Array(nw, sw))
+    W
   }
 
   def toLEdges(implicit geofactory: GeometryFactory): List[LEdge] = {
-    val se = new Coordinate(boundary.getMinX, boundary.getMinY)
-    val sw = new Coordinate(boundary.getMaxX, boundary.getMinY)
-    val nw = new Coordinate(boundary.getMaxX, boundary.getMaxY)
-    val ne = new Coordinate(boundary.getMinX, boundary.getMaxY)
-    val S = geofactory.createLineString(Array(se, sw))
-    val W = geofactory.createLineString(Array(sw, nw))
-    val N = geofactory.createLineString(Array(nw, ne))
-    val E = geofactory.createLineString(Array(ne, se))
+    val sw = new Coordinate(boundary.getMinX, boundary.getMinY)
+    val se = new Coordinate(boundary.getMaxX, boundary.getMinY)
+    val ne = new Coordinate(boundary.getMaxX, boundary.getMaxY)
+    val nw = new Coordinate(boundary.getMinX, boundary.getMaxY)
+    val S = geofactory.createLineString(Array(sw, se))
+    val E = geofactory.createLineString(Array(se, ne))
+    val N = geofactory.createLineString(Array(ne, nw))
+    val W = geofactory.createLineString(Array(nw, sw))
     S.setUserData("S")
-    W.setUserData("W")
-    N.setUserData("N")
     E.setUserData("E")
+    N.setUserData("N")
+    W.setUserData("W")
     val lS = LEdge(S.getCoordinates, S)
-    val lW = LEdge(W.getCoordinates, W)
-    val lN = LEdge(N.getCoordinates, N)
     val lE = LEdge(E.getCoordinates, E)
-    List(lS, lW, lN, lE)
+    val lN = LEdge(N.getCoordinates, N)
+    val lW = LEdge(W.getCoordinates, W)
+    List(lS, lE, lN, lW)
   }
 
   def toHalf_edges(implicit geofactory: GeometryFactory): List[Half_edge] = {

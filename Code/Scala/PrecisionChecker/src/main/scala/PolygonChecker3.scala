@@ -17,7 +17,7 @@ import collection.JavaConverters._
 import scala.io.Source
 import java.io.PrintWriter
 
-object PolygonChecker2 {
+object PolygonChecker3 {
   case class Record(label: String, wkt: String, tag: String)
 
   def main(args:Array[String]) = {
@@ -30,26 +30,17 @@ object PolygonChecker2 {
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
     import spark.implicits._
+    println("Start")
 
-    val inputA = "/home/and/Datasets/RIDIR/PH/edgesFE.wkt"
-    //val inputA = "/home/and/Datasets/RIDIR/TX/TX_faces_parallel.wkt"
+    val inputA = "file:///home/acald013/Datasets/CA/CGAL2/edgesFE.wkt"
+    //val inputA = "file:///home/acald013/Datasets/PH/edgesFE.wkt"
     val polysA = read(inputA, "par")
     println("A read")
-    write("/home/and/tmp/A.wkt",
-      polysA.rdd.map{ rec =>
-        s"${rec.wkt}\t${rec.label}\n"
-      }.collect
-    )
   
-    val inputB = "/home/and/Datasets/RIDIR/PH/faces.wkt"
-    //val inputB = "/home/and/Datasets/RIDIR/TX/faces.wkt"
+    val inputB = "file:///home/acald013/Datasets/CA/CGAL2/faces.wkt"
+    //val inputB = "file:///home/acald013/Datasets/PH/faces.wkt"
     val polysB = read(inputB, "seq")
     println("B read")
-    write("/home/and/tmp/B.wkt",
-      polysB.rdd.map{ rec =>
-        s"${rec.wkt}\t${rec.label}\n"
-      }.collect
-    )
 
     polysA//.filter($"label" === "A204 B62")
       .show
@@ -71,13 +62,47 @@ object PolygonChecker2 {
         val reader = new WKTReader(geofactory)
         it.map{ case(k, l) =>
           val lab = k._1
-          val p1 = process(k._2, reader, lab)
-
-          val ps = l.map{ w =>
-            val p2 = process(w._3, reader, lab)
-            p1.equalsExact(p2, 10)
+          //val p1 = process(k._2, reader, lab)
+          if(lab == "A204 B62"){
+            println("wkt")
+            println(k._2)
+          }
+          val p11 = reader.read(k._2).asInstanceOf[Polygon]
+          if(lab == "A204 B62"){
+            println("p11")
+            println(p11)
+          }
+          val p1 = norm2(p11)
+          if(lab == "A204 B62"){
+            println("p1")
+            println(p1)
+            println
           }
 
+          val ps = l.map{ w =>
+            if(lab == "A204 B62"){
+              println("wkt2")
+              println(w._3)
+            }
+            val p22 = reader.read(w._3).asInstanceOf[Polygon]
+            if(lab == "A204 B62"){
+              println("p22")
+              println(p22)
+            }
+
+            /***/
+            val p2 = norm2(p22)
+            //val p2 = process(w._3, reader, lab)
+            val b = p1.equalsExact(p2, 1)
+            /***/
+
+            if(lab == "A204 B62"){
+              println("p2")
+              println(p2)
+              println(b)
+            }
+            b
+          }
 
           (lab, ps.exists(_ == true), p1.toText)
         }
@@ -112,37 +137,24 @@ object PolygonChecker2 {
     (implicit geofactory: GeometryFactory): Polygon = {
 
     val p1_prime = reader.read(wkt).asInstanceOf[Polygon]
-    if(lab == "A204 B62"){
-      println("p1_prime")
-      println(p1_prime)
-    }
-    p1_prime.normalize
-    if(lab == "A204 B62"){
-      println("p1_prime")
-      println(p1_prime)
-    }
-    /*
-    val coords = p1_prime.getExteriorRing.getCoordinates
-    val coords2 = if(CGAlgorithms.isCCW(coords)){
-      coords
-    } else {
-      println(lab)
-      val cs = coords.reverse
-      cs.foreach{println}
-      cs
-    }
-    val p1 = geofactory.createPolygon(coords2)
-    if(lab == "A204 B62"){
-      println("isCCW")
-      println(p1)
-    }
-    p1.normalize()
-    if(lab == "A204 B62"){
-      println("normalize")
-      println(p1)
-    }
-     */
-    p1_prime
+    //p1_prime.normalize
+    val p1 = norm2(p1_prime)
+    p1
+  }
+
+  def norm2(poly: Polygon)(implicit geofactory: GeometryFactory): Polygon = {
+    val coords = poly.getExteriorRing.getCoordinates
+    val minX = coords.minBy(_.x)
+    val minXs = coords.filter(_.x == minX.x)
+    val start = minXs.minBy(_.y)
+
+    val coords2 = coords.slice(0, coords.size - 1)
+    val i = coords2.indexOf(start)
+    val (tail, head) = coords2.splitAt(i)
+
+    val new_coords = head ++ tail :+ start
+
+    geofactory.createPolygon(new_coords)
   }
 
   def read(filename: String, tag: String)
@@ -150,15 +162,14 @@ object PolygonChecker2 {
     import spark.implicits._
     val polys = spark.read.option("delimiter","\t").option("header","false")
       .csv(filename).mapPartitions{ it =>
-        val reader = new WKTReader(geofactory)
         it.map{ row =>
           val wkt = row.getString(0)
-          val p = reader.read(wkt).asInstanceOf[Polygon]
-          val c1 = p.getCoordinates
-          val c2 = if(CGAlgorithms.isCCW(c1)) c1.reverse else c1
-          val p2 = geofactory.createPolygon(c2)
+          //val p = reader.read(wkt).asInstanceOf[Polygon]
+          //val c1 = p.getCoordinates
+          //val c2 = if(CGAlgorithms.isCCW(c1)) c1.reverse else c1
+          //val p2 = geofactory.createPolygon(c1)
           val lab = row.getString(1).trim()
-          Record(lab, p2.toText, tag)
+          Record(lab, wkt /*p2.toText*/, tag)
         }
       }
     polys
