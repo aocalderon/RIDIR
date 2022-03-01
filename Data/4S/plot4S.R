@@ -12,3 +12,5 @@ p = ggplot(data3, aes(x = Part, y = Time)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(x="Number of partitions", y="Time [s]", title=paste0("Performance during SDCEL computation"))
 plot(p)
+
+ggsave(paste0("perf.pdf"), width = 8, height = 5)
