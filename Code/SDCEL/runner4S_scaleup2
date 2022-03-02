@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PS=1000
+EX=(12 9 6 3)
+DS=(4 3 2 1)
+
+for n in $(seq 1 $1)
+do
+    for i in "${!EX[@]}" 
+    do
+	echo "Run $n ./runner4S_scaleup Test/S${DS[i]} /home/acald013/RIDIR/local_path/S/P$PS/ 1e-6 \"${EX[i]}|${DS[i]}\" ${EX[i]}"
+	./runner4S_scaleup Test/S${DS[i]} /home/acald013/RIDIR/local_path/S/P$PS/ 1e-6 "${EX[i]}|${DS[i]}" ${EX[i]}
+    done
+done

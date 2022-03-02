@@ -37,6 +37,7 @@ object Utils {
   def log2(msg: String)(implicit prev: Tick, logger: Logger, settings: Settings): Unit = {
     val now = System.currentTimeMillis
     val duration = now - prev.t
+    
     logger.info(s"${settings.appId}|$duration|$msg")
     prev.t = now
   }

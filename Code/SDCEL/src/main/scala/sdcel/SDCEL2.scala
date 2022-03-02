@@ -71,7 +71,7 @@ object SDCEL2 {
       }
     }
     log(s"INFO|npartitions=${cells.size}")
-    log2("TIME|start")
+    log2(s"TIME|start|$qtag")
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A").cache
@@ -81,7 +81,7 @@ object SDCEL2 {
     val edgesRDDB = readEdges(params.input2(), quadtree, "B").cache
     val nEdgesRDDB = edgesRDDB.count()
     log(s"INFO|nEdgesB=${nEdgesRDDB}")
-    log2("TIME|read")
+    log2(s"TIME|read|$qtag")
 
     // Creating local dcel layer A...
     val ldcelA0 = createLocalDCELs(edgesRDDA, cells)
@@ -152,7 +152,9 @@ object SDCEL2 {
     
 
     val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
-    
+
+    log2(s"TIME|end|$qtag")
+
     save("/tmp/edgesFE.wkt"){
       val ffinal = sdcel2.map{ case(h,l) =>
 

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PS=2000
+EX=(12 9 6 3)
+
+for n in $(seq 1 $1)
+do
+    for E in "${EX[@]}"
+    do
+	echo "Run $n ./runner4S_speedup Test/S/P$PS /home/acald013/RIDIR/local_path/S/P$PS/ 1e-6 $E $E"
+	./runner4S_speedup Test/S/P$PS /home/acald013/RIDIR/local_path/S/P$PS/ 1e-6 $E $E
+    done
+done
