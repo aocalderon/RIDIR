@@ -101,9 +101,11 @@ object SDCEL2 {
      */
 
     val ldcelA = runEmptyCells(ldcelA0, quadtree, cells).cache
-    save("/tmp/edgesFAC.wkt"){
-      ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
-    }
+    log2(s"TIME|layer1|$qtag")
+
+    //save("/tmp/edgesFAC.wkt"){
+    //  ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
+    //}
 
     // Creating local dcel layer B...
     val ldcelB0 = createLocalDCELs(edgesRDDB, cells)
@@ -123,9 +125,11 @@ object SDCEL2 {
     */
 
     val ldcelB = runEmptyCells(ldcelB0, quadtree, cells).cache
-    save("/tmp/edgesFBC.wkt"){
-      ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
-    }
+    log2(s"TIME|layer2|$qtag")
+
+    //save("/tmp/edgesFBC.wkt"){
+    //  ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
+    //}
 
     // Overlay local dcels...
     
@@ -145,15 +149,13 @@ object SDCEL2 {
       }//.filter(_._1.checkValidity)
       .cache
     val nSDcel = sdcel.count()
-    logger.info("Done!")
-    save("/tmp/edgesFC.wkt"){
-      sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
-    }
-    
+
+    //save("/tmp/edgesFC.wkt"){
+    //  sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
+    //}
 
     val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
-
-    log2(s"TIME|end|$qtag")
+    log2(s"TIME|overlay|$qtag")
 
     save("/tmp/edgesFE.wkt"){
       val ffinal = sdcel2.map{ case(h,l) =>
@@ -237,8 +239,7 @@ object SDCEL2 {
     overlapOp(faces1, differenceB,  s"${output_path}/edgesDiB")
      */
 
-
-    logger.info("Done!")
+    log2(s"TIME|end|$qtag")
     spark.close
   }
 }

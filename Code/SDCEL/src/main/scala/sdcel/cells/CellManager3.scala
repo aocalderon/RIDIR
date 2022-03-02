@@ -68,7 +68,8 @@ object EmptyCellManager2 {
         id.toInt -> Cell(id, lineage, ring)
       }.toMap
 
-      
+
+      /*
       save("/tmp/edgesNQ.wkt"){
         quadtree_prime.getLeafZones.asScala.map{ leaf =>
           val wkt = envelope2polygon(leaf.getEnvelope).toText
@@ -87,6 +88,7 @@ object EmptyCellManager2 {
           s"$wkt\t$id\t$lineage\n"
         }
       }
+       */
        
 
       val r_prime = solve(quadtree_prime, cells_prime, non_empties, empties).distinct
