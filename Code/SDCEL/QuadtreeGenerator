@@ -2,6 +2,9 @@
 
 NPARTITIONS=$1
 
+INPUT1=Test/S3/A.wkt
+INPUT2=Test/S3/B.wkt
+
 #INPUT1=gadm/raw/level0
 #INPUT2=gadm/raw/level1
 #INPUT1=NC/A.wkt
@@ -10,10 +13,10 @@ NPARTITIONS=$1
 #INPUT2=CA/CGAL2/B.wkt
 #INPUT1=TX/CGAL/A.wkt
 #INPUT2=TX/CGAL/B.wkt
-INPUT1=Test/S/A.wkt
-INPUT2=Test/S/B.wkt
+#INPUT1=Test/S/A.wkt
+#INPUT2=Test/S/B.wkt
 
-LOCAL_PATH=$HOME/RIDIR/local_path/S/
+LOCAL_PATH=$HOME/RIDIR/local_path/S3/
 TOLERANCE=1e-6
 
 
