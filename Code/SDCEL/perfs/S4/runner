@@ -1,0 +1,13 @@
+#!/bin/bash
+
+COMMAND="sdcel2_debug"
+DATASET="S"
+PS=(100 250 500 750 1000 2000 3000 4000 5000)
+for n in $(seq 1 $1)
+do
+    for P in "${PS[@]}"
+    do
+	echo "Run $n ./$COMMAND Test/$DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ 1e-6 $P"
+	./$COMMAND Test/$DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ 1e-6 $P	
+    done
+done
