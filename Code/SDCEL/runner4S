@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#PS=(1000 2000 3000 4000 5000)
-PS=(750)
+PS=(500 750 1000 2000 3000 4000 5000)
+#PS=(750)
 for n in $(seq 1 $1)
 do
     for P in "${PS[@]}"
     do
-	echo "Run $n ./sdcel2_debug Test/S/P$P /home/acald013/RIDIR/local_path/S/P$P/ 1e-6"
-	./sdcel2_debug Test/S/P$P /home/acald013/RIDIR/local_path/S/P$P/ 1e-6
+	echo "Run $n ./sdcel2_debug Test/S/P$P /home/acald013/RIDIR/local_path/S/P$P/ 1e-6 $P"
+	./sdcel2_debug Test/S/P$P /home/acald013/RIDIR/local_path/S/P$P/ 1e-6 $P
     done
 done
