@@ -1,0 +1,18 @@
+#!/bin/bash
+
+NPARTITIONS=$1
+
+HDFS_PATH=$2
+INPUT1=$HDFS_PATH/A.wkt
+INPUT2=$HDFS_PATH/B.wkt
+LOCAL_PATH=$HOME/RIDIR/local_path/$HDFS_PATH
+
+TOLERANCE=$3
+
+echo "Making folders..."
+hdfs dfs -mkdir $HDFS_PATH/P$NPARTITIONS
+mkdir $LOCAL_PATH
+echo "Creating quadtree..."
+./QuadtreeGenerator $NPARTITIONS $HDFS_PATH $TOLERANCE
+echo "Partitioning edges..."
+./sdcel_partitioner_byquadtree $HDFS_PATH/A.wkt $HDFS_PATH/B.wkt $HDFS_PATH/P$NPARTITIONS $LOCAL_PATH/P$NPARTITIONS/quadtree.wkt $LOCAL_PATH/P$NPARTITIONS/boundary.wkt $TOLERANCE

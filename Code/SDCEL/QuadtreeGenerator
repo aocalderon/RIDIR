@@ -2,8 +2,15 @@
 
 NPARTITIONS=$1
 
-INPUT1=Test/S2/A.wkt
-INPUT2=Test/S2/B.wkt
+HDFS_PATH=$2
+INPUT1=$HDFS_PATH/A.wkt
+INPUT2=$HDFS_PATH/B.wkt
+LOCAL_PATH=$HOME/RIDIR/local_path/$HDFS_PATH
+
+TOLERANCE=$3
+
+#INPUT1=Test/S2/A.wkt
+#INPUT2=Test/S2/B.wkt
 
 #INPUT1=gadm/raw/level0
 #INPUT2=gadm/raw/level1
@@ -15,10 +22,6 @@ INPUT2=Test/S2/B.wkt
 #INPUT2=TX/CGAL/B.wkt
 #INPUT1=Test/S/A.wkt
 #INPUT2=Test/S/B.wkt
-
-LOCAL_PATH=$HOME/RIDIR/local_path/S2/
-TOLERANCE=1e-6
-
 
 LOCAL_DIR="$LOCAL_PATH/P$NPARTITIONS"
 echo "Checking $LOCAL_DIR ..."

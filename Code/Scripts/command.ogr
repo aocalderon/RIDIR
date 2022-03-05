@@ -1,0 +1,13 @@
+#!/bin/bash
+
+INPUT=$1
+OUTPUT=$2
+GEOID=$3
+
+rm -fR $OUTPUT
+echo "ogr2ogr -f CSV $OUTPUT $INPUT.shp -sql \"SELECT $GEOID AS geoid FROM $INPUT\" -lco GEOMETRY=AS_WKT -lco SEPARATOR=TAB -t_srs EPSG:6414"
+ogr2ogr -f CSV $OUTPUT $INPUT.shp -sql "SELECT $GEOID FROM $INPUT" -lco GEOMETRY=AS_WKT -lco SEPARATOR=TAB -t_srs EPSG:6414
+echo "tail -n +2 $OUTPUT/$INPUT.csv | sed 's/\"//g' > $OUTPUT.wkt"
+tail -n +2 $OUTPUT/$INPUT.csv | sed 's/"//g' > $OUTPUT.wkt
+head -n 1 $OUTPUT/$INPUT.csv
+

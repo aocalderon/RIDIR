@@ -157,6 +157,7 @@ object SDCEL2 {
     val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
     log2(s"TIME|overlay|$qtag")
 
+    /*
     save("/tmp/edgesFE.wkt"){
       val ffinal = sdcel2.map{ case(h,l) =>
 
@@ -164,6 +165,7 @@ object SDCEL2 {
       }.collect
       ffinal
     }
+     */
     
 
     /*

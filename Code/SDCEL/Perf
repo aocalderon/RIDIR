@@ -1,0 +1,16 @@
+#!/bin/bash
+
+PS=(1000 2000 3000 4000 5000)
+#PS=(5000)
+HDFS_PATH=$1
+TOLERANCE=$2
+N=$3
+
+for n in $(seq 1 $N)
+do
+    for P in "${PS[@]}"
+    do
+	echo "Run $n ./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE $P"
+	./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE $P
+    done
+done
