@@ -11,7 +11,7 @@ TOLERANCE=$3
 
 echo "Making folders..."
 hdfs dfs -mkdir $HDFS_PATH/P$NPARTITIONS
-mkdir $LOCAL_PATH
+mkdir -p $LOCAL_PATH
 echo "Creating quadtree..."
 ./QuadtreeGenerator $NPARTITIONS $HDFS_PATH $TOLERANCE
 echo "Partitioning edges..."
