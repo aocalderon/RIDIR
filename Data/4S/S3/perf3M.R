@@ -12,7 +12,7 @@ data2 = data1 %>%
   filter(stage == "layer1" | stage == "layer2" | stage == "overlay") %>%
   select(time, stage, partitions, appId) %>%
   mutate(time = as.numeric(time) / 1000.0) %>%
-  mutate(partitions = fct_relevel(partitions, "500", "750", "1000", "2000", "3000", "4000", "5000")) %>%
+  mutate(partitions = fct_relevel(partitions, "100", "250", "500", "750", "1000", "2000", "3000", "4000", "5000")) %>%
   add_column(size = "3.75M")
 
 data3 = data2 %>%

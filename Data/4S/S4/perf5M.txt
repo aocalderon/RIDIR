@@ -978,3 +978,133 @@ Run 9 ./sdcel2_debug Test/S/P5000 /home/acald013/RIDIR/local_path/S/P5000/ 1e-6 
 2022-03-04 10:23:55,546|168469|application_1639015019875_0769|24034|TIME|overlay|5000
 2022-03-04 10:24:16,947|189870|Saved /tmp/edgesFE.wkt in 1.25s [108118 records].
 2022-03-04 10:24:16,947|189870|application_1639015019875_0769|21401|TIME|end|5000
+Run 1 ./sdcel2_debug Test/S/P100 /home/acald013/RIDIR/local_path/S/P100/ 1e-6 100
+2022-03-09 16:49:30,415|13432|application_1639015019875_0833|13676|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P100/edgesA --input2 Test/S/P100/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P100//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P100//boundary.wkt --tolerance 1e-6 --qtag 100 --debug --local
+2022-03-09 16:49:30,478|13495|application_1639015019875_0833|INFO|scale=1000000.0
+2022-03-09 16:49:30,529|13546|Saved /tmp/edgesCells_100.wkt in 0.00s [259 records].
+2022-03-09 16:49:30,529|13546|application_1639015019875_0833|INFO|npartitions=259
+2022-03-09 16:49:30,530|13547|application_1639015019875_0833|115|TIME|start|100
+2022-03-09 16:49:42,621|25638|application_1639015019875_0833|INFO|nEdgesA=2873276
+2022-03-09 16:49:45,612|28629|application_1639015019875_0833|INFO|nEdgesB=4903689
+2022-03-09 16:49:45,612|28629|application_1639015019875_0833|15082|TIME|read|100
+2022-03-09 16:50:46,768|89785|application_1639015019875_0833|61155|TIME|layer1|100
+2022-03-09 16:51:39,318|142335|application_1639015019875_0833|52551|TIME|layer2|100
+2022-03-09 16:54:42,967|325984|application_1639015019875_0833|183649|TIME|overlay|100
+2022-03-09 16:54:42,967|325984|application_1639015019875_0833|0|TIME|end|100
+Run 1 ./sdcel2_debug Test/S/P250 /home/acald013/RIDIR/local_path/S/P250/ 1e-6 250
+2022-03-09 16:54:59,964|13396|application_1639015019875_0834|13635|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P250/edgesA --input2 Test/S/P250/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P250//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P250//boundary.wkt --tolerance 1e-6 --qtag 250 --debug --local
+2022-03-09 16:55:00,048|13480|application_1639015019875_0834|INFO|scale=1000000.0
+2022-03-09 16:55:00,136|13568|Saved /tmp/edgesCells_250.wkt in 0.00s [676 records].
+2022-03-09 16:55:00,137|13569|application_1639015019875_0834|INFO|npartitions=676
+2022-03-09 16:55:00,137|13569|application_1639015019875_0834|173|TIME|start|250
+2022-03-09 16:55:13,916|27348|application_1639015019875_0834|INFO|nEdgesA=2877537
+2022-03-09 16:55:19,014|32446|application_1639015019875_0834|INFO|nEdgesB=4908268
+2022-03-09 16:55:19,014|32446|application_1639015019875_0834|18877|TIME|read|250
+2022-03-09 16:55:34,158|47590|application_1639015019875_0834|15144|TIME|layer1|250
+2022-03-09 16:55:53,795|67227|application_1639015019875_0834|19637|TIME|layer2|250
+2022-03-09 16:57:04,543|137975|application_1639015019875_0834|70748|TIME|overlay|250
+2022-03-09 16:57:04,543|137975|application_1639015019875_0834|0|TIME|end|250
+Run 2 ./sdcel2_debug Test/S/P100 /home/acald013/RIDIR/local_path/S/P100/ 1e-6 100
+2022-03-09 16:57:21,644|13470|application_1639015019875_0835|13708|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P100/edgesA --input2 Test/S/P100/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P100//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P100//boundary.wkt --tolerance 1e-6 --qtag 100 --debug --local
+2022-03-09 16:57:21,706|13532|application_1639015019875_0835|INFO|scale=1000000.0
+2022-03-09 16:57:21,761|13587|Saved /tmp/edgesCells_100.wkt in 0.00s [259 records].
+2022-03-09 16:57:21,761|13587|application_1639015019875_0835|INFO|npartitions=259
+2022-03-09 16:57:21,761|13587|application_1639015019875_0835|117|TIME|start|100
+2022-03-09 16:57:34,252|26078|application_1639015019875_0835|INFO|nEdgesA=2873276
+2022-03-09 16:57:37,667|29493|application_1639015019875_0835|INFO|nEdgesB=4903689
+2022-03-09 16:57:37,667|29493|application_1639015019875_0835|15906|TIME|read|100
+2022-03-09 16:58:31,920|83746|application_1639015019875_0835|54253|TIME|layer1|100
+2022-03-09 16:59:32,326|144152|application_1639015019875_0835|60406|TIME|layer2|100
+2022-03-09 17:02:31,054|322880|application_1639015019875_0835|178728|TIME|overlay|100
+2022-03-09 17:02:31,055|322881|application_1639015019875_0835|1|TIME|end|100
+Run 2 ./sdcel2_debug Test/S/P250 /home/acald013/RIDIR/local_path/S/P250/ 1e-6 250
+2022-03-09 17:02:48,218|13567|application_1639015019875_0836|13815|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P250/edgesA --input2 Test/S/P250/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P250//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P250//boundary.wkt --tolerance 1e-6 --qtag 250 --debug --local
+2022-03-09 17:02:48,304|13653|application_1639015019875_0836|INFO|scale=1000000.0
+2022-03-09 17:02:48,400|13749|Saved /tmp/edgesCells_250.wkt in 0.00s [676 records].
+2022-03-09 17:02:48,400|13749|application_1639015019875_0836|INFO|npartitions=676
+2022-03-09 17:02:48,400|13749|application_1639015019875_0836|182|TIME|start|250
+2022-03-09 17:03:01,709|27058|application_1639015019875_0836|INFO|nEdgesA=2877537
+2022-03-09 17:03:06,230|31579|application_1639015019875_0836|INFO|nEdgesB=4908268
+2022-03-09 17:03:06,230|31579|application_1639015019875_0836|17830|TIME|read|250
+2022-03-09 17:03:20,576|45925|application_1639015019875_0836|14346|TIME|layer1|250
+2022-03-09 17:03:43,502|68851|application_1639015019875_0836|22926|TIME|layer2|250
+2022-03-09 17:04:58,272|143621|application_1639015019875_0836|74770|TIME|overlay|250
+2022-03-09 17:04:58,272|143621|application_1639015019875_0836|0|TIME|end|250
+Run 3 ./sdcel2_debug Test/S/P100 /home/acald013/RIDIR/local_path/S/P100/ 1e-6 100
+2022-03-09 17:05:15,373|13537|application_1639015019875_0837|13794|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P100/edgesA --input2 Test/S/P100/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P100//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P100//boundary.wkt --tolerance 1e-6 --qtag 100 --debug --local
+2022-03-09 17:05:15,434|13598|application_1639015019875_0837|INFO|scale=1000000.0
+2022-03-09 17:05:15,488|13652|Saved /tmp/edgesCells_100.wkt in 0.00s [259 records].
+2022-03-09 17:05:15,489|13653|application_1639015019875_0837|INFO|npartitions=259
+2022-03-09 17:05:15,489|13653|application_1639015019875_0837|116|TIME|start|100
+2022-03-09 17:05:27,618|25782|application_1639015019875_0837|INFO|nEdgesA=2873276
+2022-03-09 17:05:30,472|28636|application_1639015019875_0837|INFO|nEdgesB=4903689
+2022-03-09 17:05:30,473|28637|application_1639015019875_0837|14984|TIME|read|100
+2022-03-09 17:06:51,285|109449|application_1639015019875_0837|80812|TIME|layer1|100
+2022-03-09 17:07:49,971|168135|application_1639015019875_0837|58686|TIME|layer2|100
+2022-03-09 17:10:50,971|349135|application_1639015019875_0837|181000|TIME|overlay|100
+2022-03-09 17:10:50,971|349135|application_1639015019875_0837|0|TIME|end|100
+Run 3 ./sdcel2_debug Test/S/P250 /home/acald013/RIDIR/local_path/S/P250/ 1e-6 250
+2022-03-09 17:11:07,780|13278|application_1639015019875_0838|13527|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P250/edgesA --input2 Test/S/P250/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P250//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P250//boundary.wkt --tolerance 1e-6 --qtag 250 --debug --local
+2022-03-09 17:11:07,863|13361|application_1639015019875_0838|INFO|scale=1000000.0
+2022-03-09 17:11:07,951|13449|Saved /tmp/edgesCells_250.wkt in 0.00s [676 records].
+2022-03-09 17:11:07,952|13450|application_1639015019875_0838|INFO|npartitions=676
+2022-03-09 17:11:07,952|13450|application_1639015019875_0838|172|TIME|start|250
+2022-03-09 17:11:21,397|26895|application_1639015019875_0838|INFO|nEdgesA=2877537
+2022-03-09 17:11:25,872|31370|application_1639015019875_0838|INFO|nEdgesB=4908268
+2022-03-09 17:11:25,872|31370|application_1639015019875_0838|17920|TIME|read|250
+2022-03-09 17:11:43,417|48915|application_1639015019875_0838|17545|TIME|layer1|250
+2022-03-09 17:12:03,354|68852|application_1639015019875_0838|19937|TIME|layer2|250
+2022-03-09 17:12:59,518|125016|application_1639015019875_0838|56164|TIME|overlay|250
+2022-03-09 17:12:59,518|125016|application_1639015019875_0838|0|TIME|end|250
+Run 1 ./sdcel2_debug Test/S/P100 /home/acald013/RIDIR/local_path/S/P100/ 1e-6 100
+2022-03-09 17:23:12,552|13510|application_1639015019875_0839|13751|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P100/edgesA --input2 Test/S/P100/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P100//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P100//boundary.wkt --tolerance 1e-6 --qtag 100 --debug --local
+2022-03-09 17:23:12,613|13571|application_1639015019875_0839|INFO|scale=1000000.0
+2022-03-09 17:23:12,669|13627|Saved /tmp/edgesCells_100.wkt in 0.00s [259 records].
+2022-03-09 17:23:12,669|13627|application_1639015019875_0839|INFO|npartitions=259
+2022-03-09 17:23:12,669|13627|application_1639015019875_0839|117|TIME|start|100
+2022-03-09 17:23:24,841|25799|application_1639015019875_0839|INFO|nEdgesA=2873276
+2022-03-09 17:23:27,754|28712|application_1639015019875_0839|INFO|nEdgesB=4903689
+2022-03-09 17:23:27,754|28712|application_1639015019875_0839|15085|TIME|read|100
+2022-03-09 17:24:26,507|87465|application_1639015019875_0839|58753|TIME|layer1|100
+2022-03-09 17:25:56,051|177009|application_1639015019875_0839|89544|TIME|layer2|100
+2022-03-09 17:29:06,902|367860|application_1639015019875_0839|190851|TIME|overlay|100
+2022-03-09 17:29:06,902|367860|application_1639015019875_0839|0|TIME|end|100
+Run 1 ./sdcel2_debug Test/S/P250 /home/acald013/RIDIR/local_path/S/P250/ 1e-6 250
+2022-03-09 17:29:23,724|13343|application_1639015019875_0840|13587|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P250/edgesA --input2 Test/S/P250/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P250//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P250//boundary.wkt --tolerance 1e-6 --qtag 250 --debug --local
+2022-03-09 17:29:23,808|13427|application_1639015019875_0840|INFO|scale=1000000.0
+2022-03-09 17:29:23,899|13518|Saved /tmp/edgesCells_250.wkt in 0.00s [676 records].
+2022-03-09 17:29:23,900|13519|application_1639015019875_0840|INFO|npartitions=676
+2022-03-09 17:29:23,900|13519|application_1639015019875_0840|176|TIME|start|250
+2022-03-09 17:29:37,262|26881|application_1639015019875_0840|INFO|nEdgesA=2877537
+2022-03-09 17:29:41,577|31196|application_1639015019875_0840|INFO|nEdgesB=4908268
+2022-03-09 17:29:41,577|31196|application_1639015019875_0840|17677|TIME|read|250
+2022-03-09 17:29:56,544|46163|application_1639015019875_0840|14967|TIME|layer1|250
+2022-03-09 17:30:18,005|67624|application_1639015019875_0840|21461|TIME|layer2|250
+2022-03-09 17:31:21,916|131535|application_1639015019875_0840|63911|TIME|overlay|250
+2022-03-09 17:31:21,916|131535|application_1639015019875_0840|0|TIME|end|250
+Run 2 ./sdcel2_debug Test/S/P100 /home/acald013/RIDIR/local_path/S/P100/ 1e-6 100
+2022-03-09 17:31:39,002|13387|application_1639015019875_0841|13640|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P100/edgesA --input2 Test/S/P100/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P100//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P100//boundary.wkt --tolerance 1e-6 --qtag 100 --debug --local
+2022-03-09 17:31:39,063|13448|application_1639015019875_0841|INFO|scale=1000000.0
+2022-03-09 17:31:39,121|13506|Saved /tmp/edgesCells_100.wkt in 0.00s [259 records].
+2022-03-09 17:31:39,121|13506|application_1639015019875_0841|INFO|npartitions=259
+2022-03-09 17:31:39,121|13506|application_1639015019875_0841|119|TIME|start|100
+2022-03-09 17:31:51,332|25717|application_1639015019875_0841|INFO|nEdgesA=2873276
+2022-03-09 17:31:54,414|28799|application_1639015019875_0841|INFO|nEdgesB=4903689
+2022-03-09 17:31:54,415|28800|application_1639015019875_0841|15294|TIME|read|100
+2022-03-09 17:33:20,921|115306|application_1639015019875_0841|86506|TIME|layer1|100
+2022-03-09 17:34:18,431|172816|application_1639015019875_0841|57510|TIME|layer2|100
+2022-03-09 17:37:16,290|350675|application_1639015019875_0841|177859|TIME|overlay|100
+2022-03-09 17:37:16,290|350675|application_1639015019875_0841|0|TIME|end|100
+Run 2 ./sdcel2_debug Test/S/P250 /home/acald013/RIDIR/local_path/S/P250/ 1e-6 250
+2022-03-09 17:37:33,522|13525|application_1639015019875_0842|13900|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Test/S/P250/edgesA --input2 Test/S/P250/edgesB --quadtree /home/acald013/RIDIR/local_path/S/P250//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/S/P250//boundary.wkt --tolerance 1e-6 --qtag 250 --debug --local
+2022-03-09 17:37:33,606|13609|application_1639015019875_0842|INFO|scale=1000000.0
+2022-03-09 17:37:33,697|13700|Saved /tmp/edgesCells_250.wkt in 0.00s [676 records].
+2022-03-09 17:37:33,698|13701|application_1639015019875_0842|INFO|npartitions=676
+2022-03-09 17:37:33,698|13701|application_1639015019875_0842|176|TIME|start|250
+2022-03-09 17:37:46,871|26874|application_1639015019875_0842|INFO|nEdgesA=2877537
+2022-03-09 17:37:50,763|30766|application_1639015019875_0842|INFO|nEdgesB=4908268
+2022-03-09 17:37:50,763|30766|application_1639015019875_0842|17065|TIME|read|250
+2022-03-09 17:38:09,330|49333|application_1639015019875_0842|18567|TIME|layer1|250
+2022-03-09 17:38:46,336|86339|application_1639015019875_0842|37006|TIME|layer2|250
+2022-03-09 17:39:46,669|146672|application_1639015019875_0842|60333|TIME|overlay|250
+2022-03-09 17:39:46,670|146673|application_1639015019875_0842|1|TIME|end|250

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+Abbreviation=$1
+ANSICode=$2
+
+EPSG=6414
+DATA2000="tl_2010_${ANSICode}_tract00"
+DATA2010="tl_2010_${ANSICode}_tract10"
+URL2000="https://www2.census.gov/geo/tiger/TIGER2010/TRACT/2000/${DATA2000}.zip"
+URL2010="https://www2.census.gov/geo/tiger/TIGER2010/TRACT/2010/${DATA2010}.zip"
+
+mkdir $Abbreviation
+wget -P $Abbreviation $URL2000
+unzip -o "${Abbreviation}/${DATA2000}.zip" -d $Abbreviation
+wget -P $Abbreviation $URL2010
+unzip -o "${Abbreviation}/${DATA2010}.zip" -d $Abbreviation
+
+cd $Abbreviation
+
+OUTPUT="${Abbreviation}2000"
+INPUT="${DATA2000}"
+GEOID="CTIDFP00"
+rm -fR $OUTPUT
+echo "ogr2ogr -f CSV $OUTPUT $INPUT.shp -sql \"SELECT $GEOID AS geoid FROM $INPUT\" -lco GEOMETRY=AS_WKT -lco SEPARATOR=TAB -t_srs EPSG:$EPSG"
+ogr2ogr -f CSV $OUTPUT $INPUT.shp -sql "SELECT $GEOID FROM $INPUT" -lco GEOMETRY=AS_WKT -lco SEPARATOR=TAB -t_srs EPSG:6414
+echo "tail -n +2 $OUTPUT/$INPUT.csv | sed 's/\"//g' > $OUTPUT.wkt"
+tail -n +2 $OUTPUT/$INPUT.csv | sed 's/"//g' > $OUTPUT.wkt
+head -n 1 $OUTPUT/$INPUT.csv
+
+OUTPUT="${Abbreviation}2010"
+INPUT="${DATA2010}"
+GEOID="GEOID10"
+rm -fR $OUTPUT
+echo "ogr2ogr -f CSV $OUTPUT $INPUT.shp -sql \"SELECT $GEOID AS geoid FROM $INPUT\" -lco GEOMETRY=AS_WKT -lco SEPARATOR=TAB -t_srs EPSG:$EPSG"
+ogr2ogr -f CSV $OUTPUT $INPUT.shp -sql "SELECT $GEOID FROM $INPUT" -lco GEOMETRY=AS_WKT -lco SEPARATOR=TAB -t_srs EPSG:6414
+echo "tail -n +2 $OUTPUT/$INPUT.csv | sed 's/\"//g' > $OUTPUT.wkt"
+tail -n +2 $OUTPUT/$INPUT.csv | sed 's/"//g' > $OUTPUT.wkt
+head -n 1 $OUTPUT/$INPUT.csv
