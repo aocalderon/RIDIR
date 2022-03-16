@@ -61,7 +61,8 @@ object SDCEL2 {
     val qtag = params.qtag()
     if(params.debug()){
       log(s"INFO|scale=${settings.scale}")
-      save{s"/tmp/edgesCells_${qtag}.wkt"}{
+      val ftag = qtag.split("_")(0)
+      save{s"/tmp/edgesCells_${ftag}.wkt"}{
         cells.values.map{ cell =>
           val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
           val id = cell.id
@@ -84,7 +85,9 @@ object SDCEL2 {
     log2(s"TIME|read|$qtag")
 
     // Creating local dcel layer A...
-    val ldcelA0 = createLocalDCELs(edgesRDDA, cells)
+    val ldcelA0 = createLocalDCELs(edgesRDDA, cells).cache
+    ldcelA0.count()
+    log2(s"TIME|layer1P|$qtag")
 
     /*
     save("/tmp/edgesLA.wkt"){
@@ -101,14 +104,17 @@ object SDCEL2 {
      */
 
     val ldcelA = runEmptyCells(ldcelA0, quadtree, cells).cache
-    log2(s"TIME|layer1|$qtag")
+    ldcelA.count()
+    log2(s"TIME|layer1S|$qtag")
 
     //save("/tmp/edgesFAC.wkt"){
     //  ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
     //}
 
     // Creating local dcel layer B...
-    val ldcelB0 = createLocalDCELs(edgesRDDB, cells)
+    val ldcelB0 = createLocalDCELs(edgesRDDB, cells).cache
+    ldcelB0.count()
+    log2(s"TIME|layer2P|$qtag")
 
     /*
     save("/tmp/edgesLB.wkt"){
@@ -125,7 +131,8 @@ object SDCEL2 {
     */
 
     val ldcelB = runEmptyCells(ldcelB0, quadtree, cells).cache
-    log2(s"TIME|layer2|$qtag")
+    ldcelB.count()
+    log2(s"TIME|layer2S|$qtag")
 
     //save("/tmp/edgesFBC.wkt"){
     //  ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
@@ -149,13 +156,15 @@ object SDCEL2 {
       }//.filter(_._1.checkValidity)
       .cache
     val nSDcel = sdcel.count()
+    log2(s"TIME|overlayP|$qtag")
 
     //save("/tmp/edgesFC.wkt"){
     //  sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
     //}
 
     val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
-    log2(s"TIME|overlay|$qtag")
+    sdcel2.count()
+    log2(s"TIME|overlayS|$qtag")
 
     /*
     save("/tmp/edgesFE.wkt"){

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PS=(1000 2000 3000 4000 5000)
+PS=(100 250 500 750 1000 2000 3000 4000 5000 6000 7000)
 #PS=(5000)
 HDFS_PATH=$1
 TOLERANCE=$2
@@ -10,7 +10,7 @@ for n in $(seq 1 $N)
 do
     for P in "${PS[@]}"
     do
-	echo "Run $n ./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE $P"
-	./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE $P
+	echo "Run $n ./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE \"${P}_${HDFS_PATH}_${TOLERANCE}_${n}\""
+	./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE "${P}_${HDFS_PATH}_${TOLERANCE}_${n}"
     done
 done
