@@ -1,0 +1,12 @@
+#!/bin/bash
+
+FILENAME=$1
+cat $FILENAME | while read line; do
+    s=(${line//|/ })
+    echo "./StateDownloader ${s[1]} ${s[0]}"
+    ./StateDownloader ${s[1]} ${s[0]}
+done
+
+# To collect all the states...
+# cat **/*2010.wkt > US2010.wkt
+# cat **/*2000.wkt > US2000.wkt

@@ -26,3 +26,9 @@ partitions	stage	size	time
 5000	layer1	5M	40.7315
 5000	layer2	5M	41.7143
 5000	overlay	5M	25.4616
+6000	layer1	5M	56.011199999999995
+6000	layer2	5M	55.0318
+6000	overlay	5M	30.3156
+7000	layer1	5M	82.6948
+7000	layer2	5M	81.8386
+7000	overlay	5M	36.2596
