@@ -1,0 +1,96 @@
+Run 1 ./sdcel2_debug Census/US/P5000 /home/acald013/RIDIR/local_path/Census/US/P5000/ 1e-6 "5000_Census/US_1e-6_1"
+2022-03-16 21:49:00,308|13510|application_1639015019875_1071|13762|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/US/P5000/edgesA --input2 Census/US/P5000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/US/P5000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/US/P5000//boundary.wkt --tolerance 1e-6 --qtag 5000_Census/US_1e-6_1 --debug --local
+2022-03-16 21:49:00,578|13780|application_1639015019875_1071|INFO|scale=1000000.0
+2022-03-16 21:49:01,010|14212|Saved /tmp/edgesCells_5000.wkt in 0.02s [12598 records].
+2022-03-16 21:49:01,010|14212|application_1639015019875_1071|INFO|npartitions=12598
+2022-03-16 21:49:01,010|14212|application_1639015019875_1071|702|TIME|start|5000_Census/US_1e-6_1
+2022-03-16 21:49:58,949|72151|application_1639015019875_1071|INFO|nEdgesA=36407327
+2022-03-16 21:50:52,558|125760|application_1639015019875_1071|INFO|nEdgesB=37840807
+2022-03-16 21:50:52,559|125761|application_1639015019875_1071|111549|TIME|read|5000_Census/US_1e-6_1
+2022-03-16 21:52:18,524|211726|application_1639015019875_1071|85965|TIME|layer1P|5000_Census/US_1e-6_1
+2022-03-16 21:52:58,246|251448|application_1639015019875_1071|39722|TIME|layer1S|5000_Census/US_1e-6_1
+2022-03-16 21:54:42,497|355699|application_1639015019875_1071|104251|TIME|layer2P|5000_Census/US_1e-6_1
+2022-03-16 21:55:24,410|397612|application_1639015019875_1071|41913|TIME|layer2S|5000_Census/US_1e-6_1
+2022-03-16 21:57:46,174|539376|application_1639015019875_1071|141764|TIME|overlayP|5000_Census/US_1e-6_1
+2022-03-16 22:00:11,408|684610|application_1639015019875_1071|145234|TIME|overlayS|5000_Census/US_1e-6_1
+2022-03-16 22:00:11,408|684610|application_1639015019875_1071|0|TIME|end|5000_Census/US_1e-6_1
+Run 1 ./sdcel2_debug Census/US/P6000 /home/acald013/RIDIR/local_path/Census/US/P6000/ 1e-6 "6000_Census/US_1e-6_1"
+2022-03-16 22:00:29,060|13616|application_1639015019875_1072|13861|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/US/P6000/edgesA --input2 Census/US/P6000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/US/P6000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/US/P6000//boundary.wkt --tolerance 1e-6 --qtag 6000_Census/US_1e-6_1 --debug --local
+2022-03-16 22:00:29,335|13891|application_1639015019875_1072|INFO|scale=1000000.0
+2022-03-16 22:00:29,801|14357|Saved /tmp/edgesCells_6000.wkt in 0.03s [15112 records].
+2022-03-16 22:00:29,801|14357|application_1639015019875_1072|INFO|npartitions=15112
+2022-03-16 22:00:29,802|14358|application_1639015019875_1072|743|TIME|start|6000_Census/US_1e-6_1
+2022-03-16 22:01:33,420|77976|application_1639015019875_1072|INFO|nEdgesA=36422730
+2022-03-16 22:02:32,208|136764|application_1639015019875_1072|INFO|nEdgesB=37856994
+2022-03-16 22:02:32,208|136764|application_1639015019875_1072|122406|TIME|read|6000_Census/US_1e-6_1
+2022-03-16 22:03:59,161|223717|application_1639015019875_1072|86953|TIME|layer1P|6000_Census/US_1e-6_1
+2022-03-16 22:04:56,317|280873|application_1639015019875_1072|57156|TIME|layer1S|6000_Census/US_1e-6_1
+2022-03-16 22:06:36,951|381507|application_1639015019875_1072|100634|TIME|layer2P|6000_Census/US_1e-6_1
+2022-03-16 22:07:32,331|436887|application_1639015019875_1072|55380|TIME|layer2S|6000_Census/US_1e-6_1
+2022-03-16 22:09:42,792|567348|application_1639015019875_1072|130461|TIME|overlayP|6000_Census/US_1e-6_1
+2022-03-16 22:11:38,481|683037|application_1639015019875_1072|115689|TIME|overlayS|6000_Census/US_1e-6_1
+2022-03-16 22:11:38,481|683037|application_1639015019875_1072|0|TIME|end|6000_Census/US_1e-6_1
+Run 1 ./sdcel2_debug Census/US/P7000 /home/acald013/RIDIR/local_path/Census/US/P7000/ 1e-6 "7000_Census/US_1e-6_1"
+2022-03-16 22:11:55,836|13332|application_1639015019875_1073|13575|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/US/P7000/edgesA --input2 Census/US/P7000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/US/P7000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/US/P7000//boundary.wkt --tolerance 1e-6 --qtag 7000_Census/US_1e-6_1 --debug --local
+2022-03-16 22:11:56,152|13648|application_1639015019875_1073|INFO|scale=1000000.0
+2022-03-16 22:11:56,728|14224|Saved /tmp/edgesCells_7000.wkt in 0.04s [17515 records].
+2022-03-16 22:11:56,728|14224|application_1639015019875_1073|INFO|npartitions=17515
+2022-03-16 22:11:56,728|14224|application_1639015019875_1073|892|TIME|start|7000_Census/US_1e-6_1
+2022-03-16 22:13:07,718|85214|application_1639015019875_1073|INFO|nEdgesA=36435983
+2022-03-16 22:14:12,295|149791|application_1639015019875_1073|INFO|nEdgesB=37870839
+2022-03-16 22:14:12,296|149792|application_1639015019875_1073|135568|TIME|read|7000_Census/US_1e-6_1
+2022-03-16 22:15:44,675|242171|application_1639015019875_1073|92379|TIME|layer1P|7000_Census/US_1e-6_1
+2022-03-16 22:16:55,992|313488|application_1639015019875_1073|71317|TIME|layer1S|7000_Census/US_1e-6_1
+2022-03-16 22:18:29,605|407101|application_1639015019875_1073|93613|TIME|layer2P|7000_Census/US_1e-6_1
+2022-03-16 22:19:37,815|475311|application_1639015019875_1073|68210|TIME|layer2S|7000_Census/US_1e-6_1
+2022-03-16 22:21:47,340|604836|application_1639015019875_1073|129525|TIME|overlayP|7000_Census/US_1e-6_1
+2022-03-16 22:23:35,133|712629|application_1639015019875_1073|107793|TIME|overlayS|7000_Census/US_1e-6_1
+2022-03-16 22:23:35,134|712630|application_1639015019875_1073|1|TIME|end|7000_Census/US_1e-6_1
+Run 1 ./sdcel2_debug Census/US/P8000 /home/acald013/RIDIR/local_path/Census/US/P8000/ 1e-6 "8000_Census/US_1e-6_1"
+2022-03-16 22:23:53,153|13754|application_1639015019875_1074|14009|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/US/P8000/edgesA --input2 Census/US/P8000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/US/P8000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/US/P8000//boundary.wkt --tolerance 1e-6 --qtag 8000_Census/US_1e-6_1 --debug --local
+2022-03-16 22:23:53,530|14131|application_1639015019875_1074|INFO|scale=1000000.0
+2022-03-16 22:23:54,206|14807|Saved /tmp/edgesCells_8000.wkt in 0.04s [20197 records].
+2022-03-16 22:23:54,207|14808|application_1639015019875_1074|INFO|npartitions=20197
+2022-03-16 22:23:54,207|14808|application_1639015019875_1074|1054|TIME|start|8000_Census/US_1e-6_1
+2022-03-16 22:25:11,277|91878|application_1639015019875_1074|INFO|nEdgesA=36449892
+2022-03-16 22:26:21,410|162011|application_1639015019875_1074|INFO|nEdgesB=37885496
+2022-03-16 22:26:21,410|162011|application_1639015019875_1074|147203|TIME|read|8000_Census/US_1e-6_1
+2022-03-16 22:27:52,038|252639|application_1639015019875_1074|90628|TIME|layer1P|8000_Census/US_1e-6_1
+2022-03-16 22:29:15,190|335791|application_1639015019875_1074|83152|TIME|layer1S|8000_Census/US_1e-6_1
+2022-03-16 22:30:58,093|438694|application_1639015019875_1074|102903|TIME|layer2P|8000_Census/US_1e-6_1
+2022-03-16 22:32:27,864|528465|application_1639015019875_1074|89770|TIME|layer2S|8000_Census/US_1e-6_1
+2022-03-16 22:34:46,630|667231|application_1639015019875_1074|138767|TIME|overlayP|8000_Census/US_1e-6_1
+2022-03-16 22:37:03,911|804512|application_1639015019875_1074|137281|TIME|overlayS|8000_Census/US_1e-6_1
+2022-03-16 22:37:03,911|804512|application_1639015019875_1074|0|TIME|end|8000_Census/US_1e-6_1
+Run 1 ./sdcel2_debug Census/US/P9000 /home/acald013/RIDIR/local_path/Census/US/P9000/ 1e-6 "9000_Census/US_1e-6_1"
+2022-03-16 22:37:21,578|13500|application_1639015019875_1075|13744|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/US/P9000/edgesA --input2 Census/US/P9000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/US/P9000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/US/P9000//boundary.wkt --tolerance 1e-6 --qtag 9000_Census/US_1e-6_1 --debug --local
+2022-03-16 22:37:21,948|13870|application_1639015019875_1075|INFO|scale=1000000.0
+2022-03-16 22:37:22,645|14567|Saved /tmp/edgesCells_9000.wkt in 0.05s [22846 records].
+2022-03-16 22:37:22,646|14568|application_1639015019875_1075|INFO|npartitions=22846
+2022-03-16 22:37:22,646|14568|application_1639015019875_1075|1068|TIME|start|9000_Census/US_1e-6_1
+2022-03-16 22:38:46,667|98589|application_1639015019875_1075|INFO|nEdgesA=36463276
+2022-03-16 22:40:02,659|174581|application_1639015019875_1075|INFO|nEdgesB=37899682
+2022-03-16 22:40:02,660|174582|application_1639015019875_1075|160014|TIME|read|9000_Census/US_1e-6_1
+2022-03-16 22:41:37,407|269329|application_1639015019875_1075|94747|TIME|layer1P|9000_Census/US_1e-6_1
+2022-03-16 22:43:28,176|380098|application_1639015019875_1075|110769|TIME|layer1S|9000_Census/US_1e-6_1
+2022-03-16 22:45:10,767|482689|application_1639015019875_1075|102591|TIME|layer2P|9000_Census/US_1e-6_1
+2022-03-16 22:46:59,638|591560|application_1639015019875_1075|108871|TIME|layer2S|9000_Census/US_1e-6_1
+2022-03-16 22:49:09,378|721300|application_1639015019875_1075|129740|TIME|overlayP|9000_Census/US_1e-6_1
+2022-03-16 22:51:10,333|842255|application_1639015019875_1075|120955|TIME|overlayS|9000_Census/US_1e-6_1
+2022-03-16 22:51:10,333|842255|application_1639015019875_1075|0|TIME|end|9000_Census/US_1e-6_1
+Run 1 ./sdcel2_debug Census/US/P10000 /home/acald013/RIDIR/local_path/Census/US/P10000/ 1e-6 "10000_Census/US_1e-6_1"
+2022-03-16 22:51:28,522|13715|application_1639015019875_1076|13976|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/US/P10000/edgesA --input2 Census/US/P10000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/US/P10000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/US/P10000//boundary.wkt --tolerance 1e-6 --qtag 10000_Census/US_1e-6_1 --debug --local
+2022-03-16 22:51:28,959|14152|application_1639015019875_1076|INFO|scale=1000000.0
+2022-03-16 22:51:29,695|14888|Saved /tmp/edgesCells_10000.wkt in 0.06s [25531 records].
+2022-03-16 22:51:29,696|14889|application_1639015019875_1076|INFO|npartitions=25531
+2022-03-16 22:51:29,696|14889|application_1639015019875_1076|1174|TIME|start|10000_Census/US_1e-6_1
+2022-03-16 22:52:59,362|104555|application_1639015019875_1076|INFO|nEdgesA=36475630
+2022-03-16 22:54:16,803|181996|application_1639015019875_1076|INFO|nEdgesB=37912800
+2022-03-16 22:54:16,804|181997|application_1639015019875_1076|167108|TIME|read|10000_Census/US_1e-6_1
+2022-03-16 22:55:51,530|276723|application_1639015019875_1076|94726|TIME|layer1P|10000_Census/US_1e-6_1
+2022-03-16 22:58:09,894|415087|application_1639015019875_1076|138364|TIME|layer1S|10000_Census/US_1e-6_1
+2022-03-16 22:59:56,355|521548|application_1639015019875_1076|106461|TIME|layer2P|10000_Census/US_1e-6_1
+2022-03-16 23:02:13,725|658918|application_1639015019875_1076|137370|TIME|layer2S|10000_Census/US_1e-6_1
+2022-03-16 23:04:27,787|792980|application_1639015019875_1076|134062|TIME|overlayP|10000_Census/US_1e-6_1
+2022-03-16 23:06:18,892|904085|application_1639015019875_1076|111105|TIME|overlayS|10000_Census/US_1e-6_1
+2022-03-16 23:06:18,892|904085|application_1639015019875_1076|0|TIME|end|10000_Census/US_1e-6_1

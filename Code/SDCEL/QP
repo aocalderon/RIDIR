@@ -1,0 +1,3 @@
+#!/bin/bash
+
+for i in `seq 1000 1000 20000`; do ./QuadPlusPart $i Census/US 1e-6; done
