@@ -1,0 +1,34 @@
+#!/bin/bash
+
+FILENAME=$1
+FACTOR=$2
+
+TOLERANCE=1e-3
+
+echo "hdfs dfs -rm -f -r Census/S/"
+echo "hdfs dfs -mkdir Census/S/"
+
+cat $FILENAME | while read line; do
+    states=(${line//|/ })
+    state="${states[1]}"
+    
+    words=`cat ~/Datasets/Census/${state}/${state}2010.wkt | wc -w`
+    lines=`cat ~/Datasets/Census/${state}/${state}2010.wkt | wc -l`
+    points=`echo $(( ($words / 2 - $lines) ))`
+    partitions=`echo $(( $points / $FACTOR  ))`
+
+    if [ $partitions -ne "0" ]
+    then
+	echo "hdfs dfs -mkdir Census/S/${state}/"
+	#hdfs dfs -mkdir Census/S/${state}/
+	echo "hdfs dfs -put ~/Datasets/Census/${state}/${state}2000.wkt Census/S/${state}/A.wkt"
+	#hdfs dfs -put ~/Datasets/Census/${state}/${state}2000.wkt Census/S/${state}/A.wkt
+	echo "hdfs dfs -put ~/Datasets/Census/${state}/${state}2010.wkt Census/S/${state}/B.wkt"
+	#hdfs dfs -put ~/Datasets/Census/${state}/${state}2010.wkt Census/S/${state}/B.wkt
+
+	echo "./QuadPart -d Census/S/${state} -p ${partitions} -t $TOLERANCE"
+	#./QuadPart -d Census/S/${state} -p ${partitions} -t $TOLERANCE
+	echo "./Perf -d Census/S/${state} -p ${partitions} -t $TOLERANCE -n 1 --debug"
+	./Perf -d Census/S/${state} -p ${partitions} -t $TOLERANCE -n 1 --debug
+    fi
+done

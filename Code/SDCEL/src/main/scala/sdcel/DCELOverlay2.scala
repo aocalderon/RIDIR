@@ -1,28 +1,64 @@
 package edu.ucr.dblab.sdcel
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.{Geometry, Polygon, LineString, Coordinate}
+import com.vividsolutions.jts.geom.{Geometry, Coordinate, Envelope}
+import com.vividsolutions.jts.geom.{Polygon, LineString}
 import com.vividsolutions.jts.io.WKTReader
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.rdd.RDD
+import org.apache.spark.TaskContext
 
 import scala.annotation.tailrec
 
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, Segment, Coords, Coord}
+import edu.ucr.dblab.sdcel.geometries.{Half_edge, Cell, Segment, Coords, Coord}
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getFaces}
+import DCELMerger2.merge
 
 import Utils._
 
-
 object DCELOverlay2 {
+  def overlay(ldcelA: RDD[(Half_edge, String, Envelope, Polygon)], ma: Map[String, EmptyCell],
+              ldcelB: RDD[(Half_edge, String, Envelope, Polygon)], mb: Map[String, EmptyCell])
+    (implicit cells: Map[Int, Cell], geofactory: GeometryFactory, settings: Settings)
+      : RDD[(String, Polygon)] = {
 
-  def mergeSegs(sdcel: RDD[(Segment, String)])
-      (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String, Polygon)] = {
+    val sdcel_prime = ldcelA.zipPartitions(ldcelB,
+      preservesPartitioning=true){ (iterA, iterB) =>
+
+      val pid = TaskContext.getPartitionId
+      val cell = cells(pid)
+
+      val A = getFaces(iterA, cell, ma)
+      val B = getFaces(iterB, cell, mb)
+
+      val hedges = merge(A, B, cells)
+      hedges.toIterator
+    }
+
+    mergeSegments{ collectSegments{ sdcel_prime } }
+  }
+  
+  def mergeSegments(sdcel: RDD[(Segment, String)])
+    (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String, Polygon)] = {
 
     val a = sdcel//.filter{!_._1.isClose}
       .map{ case(s,l) => (l,List(s.getLine)) }
-      .reduceByKey{ case(a, b) => a ++ b }
-      .mapPartitions{ it =>
+      .reduceByKey{ case(a, b) => a ++ b }.persist(settings.persistance)
+
+    if(settings.debug){
+      save(s"/tmp/edgesS.wkt"){
+        a.mapPartitionsWithIndex{ (pid, it) =>
+          it.flatMap{ case(label,segs) =>
+            segs.map{ seg =>
+              s"$seg\t$label\t$pid\n"
+            }
+          }
+        }.collect
+      }
+    }
+
+    val b = a.mapPartitionsWithIndex{ (pid, it) =>
         val reader = new WKTReader(geofactory)
         it.flatMap{ case(l,ss) =>          
           val lines = ss.map{ s =>
@@ -36,7 +72,6 @@ object DCELOverlay2 {
           }
           //lines
           val ps = mergeLines(lines, l)
-          //ps.map{ p => (l,p) }
           ps.map{ p => (l,p) }.groupBy(_._1).map{ case(lab, list) =>
             val polys = list.map(_._2).sortBy(_.getArea)(Ordering[Double].reverse)
             
@@ -65,15 +100,7 @@ object DCELOverlay2 {
           }.flatten
         }
       }
-    a
-  }
-
-  def mergeSegsTest(sdcel: RDD[(Segment, String)])
-      (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String)] = {
-
-    val a = sdcel//.filter{!_._1.isClose}
-      .map{ case(s,l) => (l) }
-    a
+    b
   }
 
   def mergeLines(lines: List[LineString], label:String = "")
@@ -88,11 +115,6 @@ object DCELOverlay2 {
       }
 
       val coords = line.getCoordinates
-
-      //if(label == "A178 B173"){
-      //  println(s"$line\t$flag")
-      //}
-
       val start = coords.head
       val end = coords.last
       val middle = coords.slice(1, coords.size - 1).map(c => Coord(c, true))
@@ -128,12 +150,11 @@ object DCELOverlay2 {
         coords.filter(c => curr.touch(c.first.coord)).head
       } catch {
         case e: java.util.NoSuchElementException => {
-          println("Coords")
-          coords.map{C => geofactory.createLineString(C.coords.map(_.coord)).toText}.foreach(println)
-          println("Current")
-          println(geofactory.createLineString(curr.coords.map(_.coord)).toText)
-          System.exit(1)
-          curr
+          logger.info(s"NoSuchElementException")
+          coords.map{ c =>
+            val d = curr.last.coord.distance(c.first.coord)
+            (c, d)
+          }.toList.sortBy(_._2).map(_._1).head
         }
       }
       val n_coords = coords -- Set(next)
@@ -142,85 +163,43 @@ object DCELOverlay2 {
     }
   }
 
-  def overlay4(sdcel: RDD[(Half_edge, String)]): RDD[(Segment, String)] = {
-    sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      val partitionId = 31
-      val labelId = "A178 B173"
+  def collectSegments(sdcel: RDD[(Half_edge, String)])
+    (implicit geofactory: GeometryFactory, settings: Settings): RDD[(Segment, String)] = {
+
+    if(settings.debug){
+      save("/tmp/edgesZ.wkt"){
+        sdcel.mapPartitionsWithIndex{ (pid, it) =>
+          it.map{ case(hedge, label) =>
+            val wkt = hedge.getPolygon.toText
+            
+            s"$wkt\t$label\n"
+          }
+        }.collect
+      }
+    }
+    
+    val a = sdcel.mapPartitionsWithIndex{ (pid, it) =>
       it.flatMap{ case(hedge, label) =>
 
         if(hedge.isValid){
-          val s = getValidSegments2(hedge, hedge.prev, List(hedge), List.empty[Segment])
+          val s = getValidSegments(hedge, hedge.prev, List(hedge), List.empty[Segment])
           s.map(h => (h, label))
         } else {
           val valid = getNextValidOrStop(hedge.next, hedge, hedge)
           if(valid == hedge){
             List.empty[(Segment, String)]
           } else {
-            val s = getValidSegments2(valid, valid.prev, List(valid), List.empty[Segment])
+            val s = getValidSegments(valid, valid.prev, List(valid), List.empty[Segment])
             s.map(h => (h, label))
           }
         }
       }
     }
-  }
-
-  def overlay4Test(sdcel: RDD[(Half_edge, String)]): RDD[(Segment, String)] = {
-    sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      it.flatMap{ case(hedge, label) =>
-        if(hedge.isValid){
-          val s = getValidSegments2(hedge, hedge.prev, List(hedge), List.empty[Segment])
-          s.map(h => (h, label))
-        } else {
-          val valid = getNextValidOrStop(hedge.next, hedge, hedge)
-          if(valid == hedge){
-            List.empty[(Segment, String)]
-          } else {
-            val s = getValidSegments2(valid, valid.prev, List(valid), List.empty[Segment])
-            s.map(h => (h, label))
-          }
-        }
-      }
-    }
-  }
-
-  def overlay2(sdcel: RDD[(Half_edge, String)]): RDD[(Half_edge, String)] = {
-    sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      it.flatMap{ case(hedge, label) =>
-        val segs = if(hedge.isValid){
-          getValidSegments(hedge, hedge.prev, List(hedge)).map(h => (h, label))
-        } else {
-          val valid = getNextValidOrStop(hedge.next, hedge, hedge)
-          if(valid == hedge){
-            List.empty[(Half_edge, String)]
-          } else {
-            getValidSegments(valid, valid.prev, List(valid)).map(h => (h, label))
-          }
-        }
-        segs
-      }
-    }
-  }
- 
-  def overlay3(it: List[(Half_edge, String)]): List[(Segment, String)] = {
-    it.flatMap{ case(hedge, label) =>
-      if(hedge.isValid){
-        println("Segments")
-        getValidSegments2(hedge, hedge.prev, List(hedge), List.empty[Segment])
-          .map(h => (h, label))
-      } else {
-        val valid = getNextValidOrStop(hedge.next, hedge, hedge)
-        if(valid == hedge){
-          List.empty[(Segment, String)]
-        } else {
-          getValidSegments2(valid, valid.prev, List(valid), List.empty[Segment])
-            .map(h => (h, label))
-        }
-      }
-    }
+    a
   }
 
   @tailrec
-  def getValidSegments2(hcurr: Half_edge, hstop: Half_edge, listH: List[Half_edge],
+  def getValidSegments(hcurr: Half_edge, hstop: Half_edge, listH: List[Half_edge],
     listS: List[Segment], p: Int = -1, l: String = ""): List[Segment] = {
 
     val pid = org.apache.spark.TaskContext.getPartitionId
@@ -235,7 +214,7 @@ object DCELOverlay2 {
     } else {
       if(hcurr.next.isValid){
         val next = hcurr.next
-        getValidSegments2(next, hstop, listH :+ next, listS,p)
+        getValidSegments(next, hstop, listH :+ next, listS,p)
       } else {
         val valid = getNextValidOrStop(hcurr.next, hcurr, hstop)
         hcurr.next = null
@@ -252,30 +231,7 @@ object DCELOverlay2 {
           }
         } else {
           val s = Segment(listH)
-          getValidSegments2(valid, hstop, List(valid), listS :+ s,p)
-        }
-      }
-    }
-  }
-
-  @tailrec
-  def getValidSegments(hcurr: Half_edge, hstop: Half_edge, list: List[Half_edge])
-      : List[Half_edge] = {
-
-    if(hcurr == hstop){
-      hcurr.next = null
-      list
-    } else {
-      if(hcurr.next.isValid){
-        getValidSegments(hcurr.next, hstop, list)
-      } else {
-        val valid = getNextValidOrStop(hcurr.next, hcurr, hstop)
-        hcurr.next = null
-        if(valid == hstop){
-          valid.next = null
-          if(valid.isValid) list :+ valid else list
-        } else {
-          getValidSegments(valid, hstop, list :+ valid)
+          getValidSegments(valid, hstop, List(valid), listS :+ s,p)
         }
       }
     }

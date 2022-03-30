@@ -1,29 +1,22 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{Polygon, LineString, Point}
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.{SparkSession, SaveMode}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.TaskContext
 
+import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.slf4j.{Logger, LoggerFactory}
 import ch.cern.sparkmeasure.TaskMetrics
 
-import edu.ucr.dblab.sdcel.quadtree._
-import edu.ucr.dblab.sdcel.geometries._
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager2._
-
-import PartitionReader._
-import DCELBuilder2.getLDCELs
-import DCELMerger2.{merge2, merge3, merge4}
-import DCELOverlay2._
-
-import Utils._
-import LocalDCEL.createLocalDCELs
-import SingleLabelChecker.checkSingleLabel
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getEmptyCells, runEmptyCells}
+import edu.ucr.dblab.sdcel.PartitionReader.{readQuadtree, readEdges}
+import edu.ucr.dblab.sdcel.DCELOverlay2.overlay
+import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, log, log2, logger}
+import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
+import edu.ucr.dblab.sdcel.SingleLabelChecker.checkSingleLabel
 
 object SDCEL2 {
   def main(args: Array[String]) = {
@@ -35,8 +28,9 @@ object SDCEL2 {
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
     import spark.implicits._
-    val conf = spark.sparkContext.getConf
+    implicit val conf = spark.sparkContext.getConf
     val appId = conf.get("spark.app.id")
+    val qtag = params.qtag()
     implicit val settings = Settings(
       tolerance = params.tolerance(),
       debug = params.debug(),
@@ -52,141 +46,46 @@ object SDCEL2 {
     )
     val command = System.getProperty("sun.java.command")
     log2(s"COMMAND|$command")
-
-    val model = new PrecisionModel(settings.scale)
+    log(s"INFO|tolerance=${settings.tolerance}")
+    implicit val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
 
-    val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
-
-    val qtag = params.qtag()
-    if(params.debug()){
-      log(s"INFO|scale=${settings.scale}")
-      val ftag = qtag.split("_")(0)
-      save{s"/tmp/edgesCells_${ftag}.wkt"}{
-        cells.values.map{ cell =>
-          val wkt = envelope2polygon(cell.mbr.getEnvelopeInternal).toText
-          val id = cell.id
-          val lineage = cell.lineage
-          s"$wkt\t$id\t$lineage\n"
-        }.toList
-      }
-    }
-    log(s"INFO|npartitions=${cells.size}")
+    // Reading the quadtree for partitioning...
+    implicit val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
     log2(s"TIME|start|$qtag")
 
     // Reading data...
-    val edgesRDDA = readEdges(params.input1(), quadtree, "A").cache
-    val nEdgesRDDA = edgesRDDA.count()
-    log(s"INFO|nEdgesA=${nEdgesRDDA}")
-
-    val edgesRDDB = readEdges(params.input2(), quadtree, "B").cache
-    val nEdgesRDDB = edgesRDDB.count()
-    log(s"INFO|nEdgesB=${nEdgesRDDB}")
+    val edgesRDDA = readEdges(params.input1(), quadtree, "A")
+    val emptiesA = getEmptyCells(edgesRDDA, cells, "A")
+    val edgesRDDB = readEdges(params.input2(), quadtree, "B")
+    val emptiesB = getEmptyCells(edgesRDDB, cells, "B")
     log2(s"TIME|read|$qtag")
 
     // Creating local dcel layer A...
-    val ldcelA0 = createLocalDCELs(edgesRDDA, cells).cache
-    ldcelA0.count()
-    log2(s"TIME|layer1P|$qtag")
-
-    /*
-    save("/tmp/edgesLA.wkt"){
-      ldcelA0.flatMap{ case(h,l,e,p) =>
-        h.getNexts.map(n => s"$n\t$l\n")
-      }.collect
-    }
-     */
-
-    /*
-    save("/tmp/edgesFA.wkt"){
-      ldcelA0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
-    }
-     */
-
-    val ldcelA = runEmptyCells(ldcelA0, quadtree, cells).cache
-    ldcelA.count()
-    log2(s"TIME|layer1S|$qtag")
-
-    //save("/tmp/edgesFAC.wkt"){
-    //  ldcelA.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
-    //}
+    val ldcelA0 = createLocalDCELs(edgesRDDA, cells)
+    val (ldcelA, ma) = runEmptyCells(ldcelA0, quadtree, cells, emptiesA, "A")
+    log2(s"TIME|layer1|$qtag")
 
     // Creating local dcel layer B...
-    val ldcelB0 = createLocalDCELs(edgesRDDB, cells).cache
-    ldcelB0.count()
-    log2(s"TIME|layer2P|$qtag")
+    val ldcelB0 = createLocalDCELs(edgesRDDB, cells, "B")
+    val (ldcelB, mb) = runEmptyCells(ldcelB0, quadtree, cells, emptiesB, "B")
+    log2(s"TIME|layer2|$qtag")
 
-    /*
-    save("/tmp/edgesLB.wkt"){
-      ldcelB0.filter(_._4.getNumPoints == 0).map{ case(h,l,e,p) =>
-        s"${h}\t$l\n"
-      }.collect
+    if(params.overlay()){
+      // Overlay local dcels...
+      val sdcel = overlay(ldcelA, ma, ldcelB, mb)
+      sdcel.count
+      log2(s"TIME|overlay|$qtag")
+
+      if(params.debug()){
+        save("/tmp/edgesFO.wkt"){
+          sdcel.map{ case(l,w) =>
+            s"${w.toText}\t$l\t${w.getUserData}\n"
+          }.collect
+        }
+        log2(s"TIME|saveO|$qtag")
+      }
     }
-     */
-
-    /*
-    save("/tmp/edgesFB.wkt"){
-      ldcelB0.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\n" }.collect
-    }
-    */
-
-    val ldcelB = runEmptyCells(ldcelB0, quadtree, cells).cache
-    ldcelB.count()
-    log2(s"TIME|layer2S|$qtag")
-
-    //save("/tmp/edgesFBC.wkt"){
-    //  ldcelB.map{ hedge => s"${hedge._1.getPolygon}\t${hedge._2}\t${hedge._1.data.isHole}\n" }.collect
-    //}
-
-    // Overlay local dcels...
-    
-    val sdcel = ldcelB
-      .zipPartitions(ldcelB, preservesPartitioning=true){ (iterA, iterB) =>
-        val pid = TaskContext.getPartitionId
-        val partitionId = 16
-
-        //val A = iterA.map{_._1.getNexts}.flatten.toList
-        //val B = iterB.map{_._1.getNexts}.flatten.toList
-        val A = iterA.toList
-        val B = iterB.toList
-
-        val hedges = merge4(A, B, cells)
-
-        hedges.toIterator
-      }//.filter(_._1.checkValidity)
-      .cache
-    val nSDcel = sdcel.count()
-    log2(s"TIME|overlayP|$qtag")
-
-    //save("/tmp/edgesFC.wkt"){
-    //  sdcel.map{ case(hedge, label, e) => s"${hedge.getPolygon}\t${label}\n" }.collect
-    //}
-
-    val sdcel2 = overlay4(sdcel.map{case(h,l,e)=> (h,l)}).cache
-    sdcel2.count()
-    log2(s"TIME|overlayS|$qtag")
-
-    /*
-    save("/tmp/edgesFE.wkt"){
-      val ffinal = sdcel2.map{ case(h,l) =>
-
-        s"${h.wkt}\t$l\n"
-      }.collect
-      ffinal
-    }
-     */
-    
-
-    /*
-    save("/tmp/edgesFE.wkt"){
-      val ffinal = mergeSegs(sdcel2).map{ case(l,w) =>
-
-        s"${w.toText}\t$l\t${w.getUserData}\n"
-      }.collect
-      ffinal
-    }
-     */  
-
     /*
     val faces0 = sdcel.mapPartitionsWithIndex{ (pid, it) =>
       val partitionId = 39

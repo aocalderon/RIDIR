@@ -1,0 +1,26 @@
+#!/bin/bash
+
+MASTER=local[10]
+
+DATASET=$1
+TOLERANCE=$2
+LEVEL=$3
+
+EXECUTORS=12
+CORES=9
+DMEMORY=35g
+EMEMORY=20g
+SPARK_JARS=$HOME/Spark/2.4/jars/
+JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
+CLASS="edu.ucr.dblab.sdcel.CellAgg"
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
+
+spark-submit \
+    --files $LOG_FILE \
+    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar \
+    --master $MASTER --deploy-mode client \
+    --num-executors $EXECUTORS --executor-cores $CORES \
+    --executor-memory $EMEMORY --driver-memory $DMEMORY \
+    --class $CLASS $JAR \
+    --input $DATASET --tolerance $TOLERANCE --level $LEVEL

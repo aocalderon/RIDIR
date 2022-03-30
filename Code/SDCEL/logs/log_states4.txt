@@ -1,0 +1,1330 @@
+DATASET    = Census/MainUS
+TOLERANCE  = 1e-6
+ITERATIONS = 1
+PARTITIONS = 5000
+Run 1 ./sdcel2_debug Census/MainUS/P5000 /home/acald013/RIDIR/local_path/Census/MainUS/P5000/ 1e-6 "5000_Census/MainUS_1e-6_1"
+2022-03-21 14:24:00,582|14606|application_1639015019875_1587|14871|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/P5000/edgesA --input2 Census/MainUS/P5000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P5000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P5000//boundary.wkt --tolerance 1e-6 --qtag 5000_Census/MainUS_1e-6_1 --debug --local
+2022-03-21 14:24:00,834|14858|application_1639015019875_1587|INFO|scale=1000000.0
+2022-03-21 14:24:01,276|15300|Saved /tmp/edgesCells_5000.wkt in 0.02s [12343 records].
+2022-03-21 14:24:01,277|15301|application_1639015019875_1587|INFO|npartitions=12343
+2022-03-21 14:24:01,278|15302|application_1639015019875_1587|696|TIME|start|5000_Census/MainUS_1e-6_1
+2022-03-21 14:25:03,264|77288|application_1639015019875_1587|INFO|nEdgesA=35556941
+2022-03-21 14:25:55,288|129312|application_1639015019875_1587|INFO|nEdgesB=36911098
+2022-03-21 14:25:55,288|129312|application_1639015019875_1587|114010|TIME|read|5000_Census/MainUS_1e-6_1
+2022-03-21 14:27:04,713|198737|application_1639015019875_1587|69425|TIME|layer1S|5000_Census/MainUS_1e-6_1
+2022-03-21 14:28:07,874|261898|application_1639015019875_1587|63161|TIME|layer2S|5000_Census/MainUS_1e-6_1
+2022-03-21 14:31:27,711|461735|application_1639015019875_1587|199837|TIME|overlayP|5000_Census/MainUS_1e-6_1
+2022-03-21 14:32:03,043|497067|Saved /tmp/edgesFC.wkt in 15.68s [216187 records].
+2022-03-21 14:34:49,090|663114|Saved /tmp/edgesS.wkt in 9.43s [362880 records].
+2022-03-21 14:35:11,915|685939|application_1639015019875_1587|224204|TIME|overlayS|5000_Census/MainUS_1e-6_1
+2022-03-21 14:35:35,377|709401|Saved /tmp/edgesFE.wkt in 17.07s [125486 records].
+2022-03-21 14:35:35,378|709402|application_1639015019875_1587|23463|TIME|end|5000_Census/MainUS_1e-6_1
+DATASET    = Census/MainUS
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 5000
+Run 1 ./sdcel2_debug Census/MainUS/P5000 /home/acald013/RIDIR/local_path/Census/MainUS/P5000/ 1e-3 "5000_Census/MainUS_1e-3_1"
+2022-03-21 15:33:00,095|13578|application_1639015019875_1604|13820|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/P5000/edgesA --input2 Census/MainUS/P5000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P5000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P5000//boundary.wkt --tolerance 1e-3 --qtag 5000_Census/MainUS_1e-3_1 --debug --local
+2022-03-21 15:33:00,348|13831|application_1639015019875_1604|INFO|scale=1000.0
+2022-03-21 15:33:00,758|14241|Saved /tmp/edgesCells_5000.wkt in 0.02s [12343 records].
+2022-03-21 15:33:00,758|14241|application_1639015019875_1604|INFO|npartitions=12343
+2022-03-21 15:33:00,758|14241|application_1639015019875_1604|663|TIME|start|5000_Census/MainUS_1e-3_1
+2022-03-21 15:34:04,990|78473|application_1639015019875_1604|INFO|nEdgesA=35556941
+2022-03-21 15:35:01,900|135383|application_1639015019875_1604|INFO|nEdgesB=36911098
+2022-03-21 15:35:01,901|135384|application_1639015019875_1604|121143|TIME|read|5000_Census/MainUS_1e-3_1
+2022-03-21 15:36:12,603|206086|application_1639015019875_1604|70702|TIME|layer1S|5000_Census/MainUS_1e-3_1
+2022-03-21 15:37:14,095|267578|application_1639015019875_1604|61492|TIME|layer2S|5000_Census/MainUS_1e-3_1
+2022-03-21 15:40:54,629|488112|application_1639015019875_1604|220534|TIME|overlayS|5000_Census/MainUS_1e-3_1
+2022-03-21 15:41:16,672|510155|Saved /tmp/edgesFE.wkt in 14.75s [125594 records].
+2022-03-21 15:41:16,672|510155|application_1639015019875_1604|22043|TIME|end|5000_Census/MainUS_1e-3_1
+DATASET    = Census/MainUS
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 10000
+Run 1 ./sdcel2_debug Census/MainUS/P10000 /home/acald013/RIDIR/local_path/Census/MainUS/P10000/ 1e-3 "10000_Census/MainUS_1e-3_1"
+2022-03-21 15:43:19,279|13762|application_1639015019875_1605|14011|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/P10000/edgesA --input2 Census/MainUS/P10000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P10000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P10000//boundary.wkt --tolerance 1e-3 --qtag 10000_Census/MainUS_1e-3_1 --debug --local
+2022-03-21 15:43:19,671|14154|application_1639015019875_1605|INFO|scale=1000.0
+2022-03-21 15:43:20,341|14824|Saved /tmp/edgesCells_10000.wkt in 0.04s [24886 records].
+2022-03-21 15:43:20,341|14824|application_1639015019875_1605|INFO|npartitions=24886
+2022-03-21 15:43:20,341|14824|application_1639015019875_1605|1063|TIME|start|10000_Census/MainUS_1e-3_1
+2022-03-21 15:45:04,598|119081|application_1639015019875_1605|INFO|nEdgesA=35621073
+2022-03-21 15:46:41,732|216215|application_1639015019875_1605|INFO|nEdgesB=36978439
+2022-03-21 15:46:41,732|216215|application_1639015019875_1605|201391|TIME|read|10000_Census/MainUS_1e-3_1
+2022-03-21 15:48:44,475|338958|application_1639015019875_1605|122743|TIME|layer1S|10000_Census/MainUS_1e-3_1
+2022-03-21 15:50:53,295|467778|application_1639015019875_1605|128820|TIME|layer2S|10000_Census/MainUS_1e-3_1
+2022-03-21 15:54:55,373|709856|application_1639015019875_1605|242078|TIME|overlayS|10000_Census/MainUS_1e-3_1
+2022-03-21 15:55:24,899|739382|Saved /tmp/edgesFE.wkt in 15.88s [125710 records].
+2022-03-21 15:55:24,900|739383|application_1639015019875_1605|29527|TIME|end|10000_Census/MainUS_1e-3_1
+DATASET    = Census/MainUS
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 1000
+Run 1 ./sdcel2_debug Census/MainUS/P1000 /home/acald013/RIDIR/local_path/Census/MainUS/P1000/ 1e-3 "1000_Census/MainUS_1e-3_1"
+2022-03-21 15:56:19,547|13527|application_1639015019875_1606|13774|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/P1000/edgesA --input2 Census/MainUS/P1000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P1000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P1000//boundary.wkt --tolerance 1e-3 --qtag 1000_Census/MainUS_1e-3_1 --debug --local
+2022-03-21 15:56:19,707|13687|application_1639015019875_1606|INFO|scale=1000.0
+2022-03-21 15:56:19,878|13858|Saved /tmp/edgesCells_1000.wkt in 0.01s [2434 records].
+2022-03-21 15:56:19,878|13858|application_1639015019875_1606|INFO|npartitions=2434
+2022-03-21 15:56:19,879|13859|application_1639015019875_1606|332|TIME|start|1000_Census/MainUS_1e-3_1
+2022-03-21 15:56:50,906|44886|application_1639015019875_1606|INFO|nEdgesA=35474545
+2022-03-21 15:57:13,370|67350|application_1639015019875_1606|INFO|nEdgesB=36824238
+2022-03-21 15:57:13,371|67351|application_1639015019875_1606|53492|TIME|read|1000_Census/MainUS_1e-3_1
+2022-03-21 15:58:39,262|153242|application_1639015019875_1606|85891|TIME|layer1S|1000_Census/MainUS_1e-3_1
+2022-03-21 16:00:30,522|264502|application_1639015019875_1606|111260|TIME|layer2S|1000_Census/MainUS_1e-3_1
+2022-03-21 16:07:25,652|679632|application_1639015019875_1606|415130|TIME|overlayS|1000_Census/MainUS_1e-3_1
+2022-03-21 16:07:43,933|697913|Saved /tmp/edgesFE.wkt in 15.29s [125510 records].
+2022-03-21 16:07:43,934|697914|application_1639015019875_1606|18282|TIME|end|1000_Census/MainUS_1e-3_1
+DATASET    = Census/MainUS
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 5000
+Run 1 ./sdcel2_debug Census/MainUS/P5000 /home/acald013/RIDIR/local_path/Census/MainUS/P5000/ 1e-3 "5000_Census/MainUS_1e-3_1"
+2022-03-21 16:11:02,979|14007|application_1639015019875_1609|14254|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/P5000/edgesA --input2 Census/MainUS/P5000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P5000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P5000//boundary.wkt --tolerance 1e-3 --qtag 5000_Census/MainUS_1e-3_1 --debug --local
+2022-03-21 16:11:03,229|14257|application_1639015019875_1609|INFO|scale=1000.0
+2022-03-21 16:11:03,614|14642|Saved /tmp/edgesCells_5000.wkt in 0.02s [12343 records].
+2022-03-21 16:11:03,615|14643|application_1639015019875_1609|INFO|npartitions=12343
+2022-03-21 16:11:03,616|14644|application_1639015019875_1609|637|TIME|start|5000_Census/MainUS_1e-3_1
+2022-03-21 16:12:06,535|77563|application_1639015019875_1609|INFO|nEdgesA=35556941
+2022-03-21 16:12:58,674|129702|application_1639015019875_1609|INFO|nEdgesB=36911098
+2022-03-21 16:12:58,675|129703|application_1639015019875_1609|115059|TIME|read|5000_Census/MainUS_1e-3_1
+2022-03-21 16:13:57,540|188568|application_1639015019875_1609|58865|TIME|layer1S|5000_Census/MainUS_1e-3_1
+2022-03-21 16:14:56,358|247386|application_1639015019875_1609|58817|TIME|layer2S|5000_Census/MainUS_1e-3_1
+2022-03-21 16:16:31,858|342886|application_1639015019875_1609|95501|TIME|overlayS|5000_Census/MainUS_1e-3_1
+2022-03-21 16:16:53,481|364509|Saved /tmp/edgesFE.wkt in 14.04s [125587 records].
+2022-03-21 16:16:53,482|364510|application_1639015019875_1609|21624|TIME|end|5000_Census/MainUS_1e-3_1
+hdfs dfs -rm -f -r Census/S/
+hdfs dfs -mkdir Census/S/
+hdfs dfs -mkdir Census/S/AL/
+hdfs dfs -put ~/Datasets/Census/AL/AL2000.wkt Census/S/AL/A.wkt
+hdfs dfs -put ~/Datasets/Census/AL/AL2010.wkt Census/S/AL/B.wkt
+./QuadPart -d Census/S/AL -p 511 -t 1e-3
+./Perf -d Census/S/AL -p 511 -t 1e-3 -n 1
+DATASET    = Census/S/AL
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 511
+Run 1 ./sdcel2_debug Census/S/AL/P511 /home/acald013/RIDIR/local_path/Census/S/AL/P511/ 1e-3 "511_Census/S/AL_1e-3_1"
+2022-03-21 16:29:06,009|13600|application_1639015019875_1612|13862|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/AL/P511/edgesA --input2 Census/S/AL/P511/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/AL/P511//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/AL/P511//boundary.wkt --tolerance 1e-3 --qtag 511_Census/S/AL_1e-3_1 --debug --local
+2022-03-21 16:29:06,123|13714|application_1639015019875_1612|INFO|scale=1000.0
+2022-03-21 16:29:06,239|13830|Saved /tmp/edgesCells_511.wkt in 0.00s [1333 records].
+2022-03-21 16:29:06,239|13830|application_1639015019875_1612|INFO|npartitions=1333
+2022-03-21 16:29:06,239|13830|application_1639015019875_1612|230|TIME|start|511_Census/S/AL_1e-3_1
+2022-03-21 16:29:19,616|27207|application_1639015019875_1612|INFO|nEdgesA=994131
+2022-03-21 16:29:23,772|31363|application_1639015019875_1612|INFO|nEdgesB=1053567
+2022-03-21 16:29:23,773|31364|application_1639015019875_1612|17534|TIME|read|511_Census/S/AL_1e-3_1
+2022-03-21 16:29:27,378|34969|application_1639015019875_1612|3605|TIME|layer1S|511_Census/S/AL_1e-3_1
+2022-03-21 16:29:28,857|36448|Saved /tmp/edgesFA.wkt in 0.22s [5947 records].
+2022-03-21 16:29:31,546|39137|application_1639015019875_1612|4168|TIME|layer2S|511_Census/S/AL_1e-3_1
+2022-03-21 16:29:33,350|40941|Saved /tmp/edgesFB.wkt in 0.23s [6189 records].
+2022-03-21 16:29:37,253|44844|application_1639015019875_1612|5707|TIME|overlay|511_Census/S/AL_1e-3_1
+2022-03-21 16:29:38,277|45868|Saved /tmp/edgesFO.wkt in 0.28s [2569 records].
+2022-03-21 16:29:38,277|45868|application_1639015019875_1612|1024|TIME|end|511_Census/S/AL_1e-3_1
+hdfs dfs -mkdir Census/S/AK/
+hdfs dfs -put ~/Datasets/Census/AK/AK2000.wkt Census/S/AK/A.wkt
+hdfs dfs -put ~/Datasets/Census/AK/AK2010.wkt Census/S/AK/B.wkt
+./QuadPart -d Census/S/AK -p 144 -t 1e-3
+./Perf -d Census/S/AK -p 144 -t 1e-3 -n 1
+DATASET    = Census/S/AK
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 144
+Run 1 ./sdcel2_debug Census/S/AK/P144 /home/acald013/RIDIR/local_path/Census/S/AK/P144/ 1e-3 "144_Census/S/AK_1e-3_1"
+2022-03-21 16:29:55,980|13696|application_1639015019875_1613|13947|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/AK/P144/edgesA --input2 Census/S/AK/P144/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/AK/P144//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/AK/P144//boundary.wkt --tolerance 1e-3 --qtag 144_Census/S/AK_1e-3_1 --debug --local
+2022-03-21 16:29:56,067|13783|application_1639015019875_1613|INFO|scale=1000.0
+2022-03-21 16:29:56,145|13861|Saved /tmp/edgesCells_144.wkt in 0.00s [532 records].
+2022-03-21 16:29:56,145|13861|application_1639015019875_1613|INFO|npartitions=532
+2022-03-21 16:29:56,145|13861|application_1639015019875_1613|165|TIME|start|144_Census/S/AK_1e-3_1
+2022-03-21 16:30:07,623|25339|application_1639015019875_1613|INFO|nEdgesA=296525
+2022-03-21 16:30:09,772|27488|application_1639015019875_1613|INFO|nEdgesB=297275
+2022-03-21 16:30:09,773|27489|application_1639015019875_1613|13628|TIME|read|144_Census/S/AK_1e-3_1
+2022-03-21 16:30:11,566|29282|application_1639015019875_1613|1793|TIME|layer1S|144_Census/S/AK_1e-3_1
+2022-03-21 16:30:12,265|29981|Saved /tmp/edgesFA.wkt in 0.07s [1569 records].
+2022-03-21 16:30:13,620|31336|application_1639015019875_1613|2054|TIME|layer2S|144_Census/S/AK_1e-3_1
+2022-03-21 16:30:14,385|32101|Saved /tmp/edgesFB.wkt in 0.11s [1555 records].
+2022-03-21 16:30:16,586|34302|application_1639015019875_1613|2966|TIME|overlay|144_Census/S/AK_1e-3_1
+2022-03-21 16:30:17,125|34841|Saved /tmp/edgesFO.wkt in 0.10s [310 records].
+2022-03-21 16:30:17,125|34841|application_1639015019875_1613|539|TIME|end|144_Census/S/AK_1e-3_1
+hdfs dfs -mkdir Census/S/AZ/
+hdfs dfs -put ~/Datasets/Census/AZ/AZ2000.wkt Census/S/AZ/A.wkt
+hdfs dfs -put ~/Datasets/Census/AZ/AZ2010.wkt Census/S/AZ/B.wkt
+./QuadPart -d Census/S/AZ -p 364 -t 1e-3
+./Perf -d Census/S/AZ -p 364 -t 1e-3 -n 1
+DATASET    = Census/S/AZ
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 364
+Run 1 ./sdcel2_debug Census/S/AZ/P364 /home/acald013/RIDIR/local_path/Census/S/AZ/P364/ 1e-3 "364_Census/S/AZ_1e-3_1"
+2022-03-21 16:30:35,335|13653|application_1639015019875_1614|13936|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/AZ/P364/edgesA --input2 Census/S/AZ/P364/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/AZ/P364//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/AZ/P364//boundary.wkt --tolerance 1e-3 --qtag 364_Census/S/AZ_1e-3_1 --debug --local
+2022-03-21 16:30:35,444|13762|application_1639015019875_1614|INFO|scale=1000.0
+2022-03-21 16:30:35,550|13868|Saved /tmp/edgesCells_364.wkt in 0.00s [1051 records].
+2022-03-21 16:30:35,551|13869|application_1639015019875_1614|INFO|npartitions=1051
+2022-03-21 16:30:35,551|13869|application_1639015019875_1614|216|TIME|start|364_Census/S/AZ_1e-3_1
+2022-03-21 16:30:48,077|26395|application_1639015019875_1614|INFO|nEdgesA=668973
+2022-03-21 16:30:50,950|29268|application_1639015019875_1614|INFO|nEdgesB=748853
+2022-03-21 16:30:50,950|29268|application_1639015019875_1614|15399|TIME|read|364_Census/S/AZ_1e-3_1
+2022-03-21 16:30:53,910|32228|application_1639015019875_1614|2960|TIME|layer1|364_Census/S/AZ_1e-3_1
+2022-03-21 16:30:55,163|33481|Saved /tmp/edgesFA.wkt in 0.14s [4498 records].
+2022-03-21 16:30:57,021|35339|application_1639015019875_1614|3111|TIME|layer2|364_Census/S/AZ_1e-3_1
+2022-03-21 16:30:58,164|36482|Saved /tmp/edgesFB.wkt in 0.20s [5195 records].
+2022-03-21 16:31:01,726|40044|application_1639015019875_1614|4705|TIME|overlay|364_Census/S/AZ_1e-3_1
+2022-03-21 16:31:02,458|40776|Saved /tmp/edgesFO.wkt in 0.16s [1971 records].
+2022-03-21 16:31:02,458|40776|application_1639015019875_1614|732|TIME|end|364_Census/S/AZ_1e-3_1
+hdfs dfs -mkdir Census/S/AR/
+hdfs dfs -put ~/Datasets/Census/AR/AR2000.wkt Census/S/AR/A.wkt
+hdfs dfs -put ~/Datasets/Census/AR/AR2010.wkt Census/S/AR/B.wkt
+./QuadPart -d Census/S/AR -p 429 -t 1e-3
+./Perf -d Census/S/AR -p 429 -t 1e-3 -n 1
+DATASET    = Census/S/AR
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 429
+Run 1 ./sdcel2_debug Census/S/AR/P429 /home/acald013/RIDIR/local_path/Census/S/AR/P429/ 1e-3 "429_Census/S/AR_1e-3_1"
+2022-03-21 16:31:20,762|13954|application_1639015019875_1615|14211|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/AR/P429/edgesA --input2 Census/S/AR/P429/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/AR/P429//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/AR/P429//boundary.wkt --tolerance 1e-3 --qtag 429_Census/S/AR_1e-3_1 --debug --local
+2022-03-21 16:31:20,879|14071|application_1639015019875_1615|INFO|scale=1000.0
+2022-03-21 16:31:20,993|14185|Saved /tmp/edgesCells_429.wkt in 0.00s [1135 records].
+2022-03-21 16:31:20,993|14185|application_1639015019875_1615|INFO|npartitions=1135
+2022-03-21 16:31:20,994|14186|application_1639015019875_1615|233|TIME|start|429_Census/S/AR_1e-3_1
+2022-03-21 16:31:34,053|27245|application_1639015019875_1615|INFO|nEdgesA=859695
+2022-03-21 16:31:37,546|30738|application_1639015019875_1615|INFO|nEdgesB=884111
+2022-03-21 16:31:37,546|30738|application_1639015019875_1615|16552|TIME|read|429_Census/S/AR_1e-3_1
+2022-03-21 16:31:40,364|33556|application_1639015019875_1615|2818|TIME|layer1|429_Census/S/AR_1e-3_1
+2022-03-21 16:31:41,954|35146|Saved /tmp/edgesFA.wkt in 0.37s [4244 records].
+2022-03-21 16:31:44,170|37362|application_1639015019875_1615|3806|TIME|layer2|429_Census/S/AR_1e-3_1
+2022-03-21 16:31:45,292|38484|Saved /tmp/edgesFB.wkt in 0.19s [4375 records].
+2022-03-21 16:31:49,108|42300|application_1639015019875_1615|4938|TIME|overlay|429_Census/S/AR_1e-3_1
+2022-03-21 16:31:50,159|43351|Saved /tmp/edgesFO.wkt in 0.35s [912 records].
+2022-03-21 16:31:50,159|43351|application_1639015019875_1615|1051|TIME|end|429_Census/S/AR_1e-3_1
+hdfs dfs -mkdir Census/S/CA/
+hdfs dfs -put ~/Datasets/Census/CA/CA2000.wkt Census/S/CA/A.wkt
+hdfs dfs -put ~/Datasets/Census/CA/CA2010.wkt Census/S/CA/B.wkt
+./QuadPart -d Census/S/CA -p 1432 -t 1e-3
+./Perf -d Census/S/CA -p 1432 -t 1e-3 -n 1
+DATASET    = Census/S/CA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 1432
+Run 1 ./sdcel2_debug Census/S/CA/P1432 /home/acald013/RIDIR/local_path/Census/S/CA/P1432/ 1e-3 "1432_Census/S/CA_1e-3_1"
+2022-03-21 16:32:10,276|14408|application_1639015019875_1616|14659|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/CA/P1432/edgesA --input2 Census/S/CA/P1432/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/CA/P1432//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/CA/P1432//boundary.wkt --tolerance 1e-3 --qtag 1432_Census/S/CA_1e-3_1 --debug --local
+2022-03-21 16:32:10,430|14562|application_1639015019875_1616|INFO|scale=1000.0
+2022-03-21 16:32:10,645|14777|Saved /tmp/edgesCells_1432.wkt in 0.01s [3649 records].
+2022-03-21 16:32:10,646|14778|application_1639015019875_1616|INFO|npartitions=3649
+2022-03-21 16:32:10,646|14778|application_1639015019875_1616|370|TIME|start|1432_Census/S/CA_1e-3_1
+2022-03-21 16:32:29,401|33533|application_1639015019875_1616|INFO|nEdgesA=2735505
+2022-03-21 16:32:38,432|42564|application_1639015019875_1616|INFO|nEdgesB=2942658
+2022-03-21 16:32:38,432|42564|application_1639015019875_1616|27786|TIME|read|1432_Census/S/CA_1e-3_1
+2022-03-21 16:32:44,946|49078|application_1639015019875_1616|6514|TIME|layer1|1432_Census/S/CA_1e-3_1
+2022-03-21 16:32:48,172|52304|Saved /tmp/edgesFA.wkt in 0.58s [22623 records].
+2022-03-21 16:32:53,170|57302|application_1639015019875_1616|8224|TIME|layer2|1432_Census/S/CA_1e-3_1
+2022-03-21 16:32:56,612|60744|Saved /tmp/edgesFB.wkt in 0.66s [24226 records].
+2022-03-21 16:33:05,191|69323|application_1639015019875_1616|12021|TIME|overlay|1432_Census/S/CA_1e-3_1
+2022-03-21 16:33:07,289|71421|Saved /tmp/edgesFO.wkt in 0.45s [12436 records].
+2022-03-21 16:33:07,289|71421|application_1639015019875_1616|2098|TIME|end|1432_Census/S/CA_1e-3_1
+hdfs dfs -mkdir Census/S/CO/
+hdfs dfs -put ~/Datasets/Census/CO/CO2000.wkt Census/S/CO/A.wkt
+hdfs dfs -put ~/Datasets/Census/CO/CO2010.wkt Census/S/CO/B.wkt
+./QuadPart -d Census/S/CO -p 367 -t 1e-3
+./Perf -d Census/S/CO -p 367 -t 1e-3 -n 1
+DATASET    = Census/S/CO
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 367
+Run 1 ./sdcel2_debug Census/S/CO/P367 /home/acald013/RIDIR/local_path/Census/S/CO/P367/ 1e-3 "367_Census/S/CO_1e-3_1"
+2022-03-21 16:33:25,268|13569|application_1639015019875_1617|13810|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/CO/P367/edgesA --input2 Census/S/CO/P367/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/CO/P367//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/CO/P367//boundary.wkt --tolerance 1e-3 --qtag 367_Census/S/CO_1e-3_1 --debug --local
+2022-03-21 16:33:25,378|13679|application_1639015019875_1617|INFO|scale=1000.0
+2022-03-21 16:33:25,491|13792|Saved /tmp/edgesCells_367.wkt in 0.00s [988 records].
+2022-03-21 16:33:25,491|13792|application_1639015019875_1617|INFO|npartitions=988
+2022-03-21 16:33:25,491|13792|application_1639015019875_1617|223|TIME|start|367_Census/S/CO_1e-3_1
+2022-03-21 16:33:38,533|26834|application_1639015019875_1617|INFO|nEdgesA=718108
+2022-03-21 16:33:41,917|30218|application_1639015019875_1617|INFO|nEdgesB=755838
+2022-03-21 16:33:41,917|30218|application_1639015019875_1617|16426|TIME|read|367_Census/S/CO_1e-3_1
+2022-03-21 16:33:45,409|33710|application_1639015019875_1617|3491|TIME|layer1|367_Census/S/CO_1e-3_1
+2022-03-21 16:33:47,058|35359|Saved /tmp/edgesFA.wkt in 0.18s [4523 records].
+2022-03-21 16:33:49,054|37355|application_1639015019875_1617|3646|TIME|layer2|367_Census/S/CO_1e-3_1
+2022-03-21 16:33:50,233|38534|Saved /tmp/edgesFB.wkt in 0.19s [4895 records].
+2022-03-21 16:33:54,518|42819|application_1639015019875_1617|5464|TIME|overlay|367_Census/S/CO_1e-3_1
+2022-03-21 16:33:55,193|43494|Saved /tmp/edgesFO.wkt in 0.17s [1763 records].
+2022-03-21 16:33:55,193|43494|application_1639015019875_1617|675|TIME|end|367_Census/S/CO_1e-3_1
+hdfs dfs -mkdir Census/S/CT/
+hdfs dfs -put ~/Datasets/Census/CT/CT2000.wkt Census/S/CT/A.wkt
+hdfs dfs -put ~/Datasets/Census/CT/CT2010.wkt Census/S/CT/B.wkt
+./QuadPart -d Census/S/CT -p 127 -t 1e-3
+./Perf -d Census/S/CT -p 127 -t 1e-3 -n 1
+DATASET    = Census/S/CT
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 127
+Run 1 ./sdcel2_debug Census/S/CT/P127 /home/acald013/RIDIR/local_path/Census/S/CT/P127/ 1e-3 "127_Census/S/CT_1e-3_1"
+2022-03-21 16:34:13,156|13773|application_1639015019875_1618|14038|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/CT/P127/edgesA --input2 Census/S/CT/P127/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/CT/P127//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/CT/P127//boundary.wkt --tolerance 1e-3 --qtag 127_Census/S/CT_1e-3_1 --debug --local
+2022-03-21 16:34:13,221|13838|application_1639015019875_1618|INFO|scale=1000.0
+2022-03-21 16:34:13,276|13893|Saved /tmp/edgesCells_127.wkt in 0.00s [328 records].
+2022-03-21 16:34:13,276|13893|application_1639015019875_1618|INFO|npartitions=328
+2022-03-21 16:34:13,276|13893|application_1639015019875_1618|120|TIME|start|127_Census/S/CT_1e-3_1
+2022-03-21 16:34:24,022|24639|application_1639015019875_1618|INFO|nEdgesA=261763
+2022-03-21 16:34:25,970|26587|application_1639015019875_1618|INFO|nEdgesB=263192
+2022-03-21 16:34:25,970|26587|application_1639015019875_1618|12694|TIME|read|127_Census/S/CT_1e-3_1
+2022-03-21 16:34:27,454|28071|application_1639015019875_1618|1484|TIME|layer1|127_Census/S/CT_1e-3_1
+2022-03-21 16:34:27,901|28518|Saved /tmp/edgesFA.wkt in 0.04s [2568 records].
+2022-03-21 16:34:28,637|29254|application_1639015019875_1618|1183|TIME|layer2|127_Census/S/CT_1e-3_1
+2022-03-21 16:34:29,015|29632|Saved /tmp/edgesFB.wkt in 0.06s [2591 records].
+2022-03-21 16:34:30,666|31283|application_1639015019875_1618|2029|TIME|overlay|127_Census/S/CT_1e-3_1
+2022-03-21 16:34:30,958|31575|Saved /tmp/edgesFO.wkt in 0.05s [1188 records].
+2022-03-21 16:34:30,958|31575|application_1639015019875_1618|292|TIME|end|127_Census/S/CT_1e-3_1
+hdfs dfs -mkdir Census/S/DE/
+hdfs dfs -put ~/Datasets/Census/DE/DE2000.wkt Census/S/DE/A.wkt
+hdfs dfs -put ~/Datasets/Census/DE/DE2010.wkt Census/S/DE/B.wkt
+./QuadPart -d Census/S/DE -p 49 -t 1e-3
+./Perf -d Census/S/DE -p 49 -t 1e-3 -n 1
+DATASET    = Census/S/DE
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 49
+Run 1 ./sdcel2_debug Census/S/DE/P49 /home/acald013/RIDIR/local_path/Census/S/DE/P49/ 1e-3 "49_Census/S/DE_1e-3_1"
+2022-03-21 16:34:48,182|13632|application_1639015019875_1619|13871|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/DE/P49/edgesA --input2 Census/S/DE/P49/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/DE/P49//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/DE/P49//boundary.wkt --tolerance 1e-3 --qtag 49_Census/S/DE_1e-3_1 --debug --local
+2022-03-21 16:34:48,239|13689|application_1639015019875_1619|INFO|scale=1000.0
+2022-03-21 16:34:48,275|13725|Saved /tmp/edgesCells_49.wkt in 0.00s [133 records].
+2022-03-21 16:34:48,275|13725|application_1639015019875_1619|INFO|npartitions=133
+2022-03-21 16:34:48,276|13726|application_1639015019875_1619|94|TIME|start|49_Census/S/DE_1e-3_1
+2022-03-21 16:34:57,890|23340|application_1639015019875_1619|INFO|nEdgesA=89835
+2022-03-21 16:34:58,921|24371|application_1639015019875_1619|INFO|nEdgesB=101279
+2022-03-21 16:34:58,921|24371|application_1639015019875_1619|10645|TIME|read|49_Census/S/DE_1e-3_1
+2022-03-21 16:35:00,138|25588|application_1639015019875_1619|1217|TIME|layer1|49_Census/S/DE_1e-3_1
+2022-03-21 16:35:00,476|25926|Saved /tmp/edgesFA.wkt in 0.02s [717 records].
+2022-03-21 16:35:01,297|26747|application_1639015019875_1619|1159|TIME|layer2|49_Census/S/DE_1e-3_1
+2022-03-21 16:35:01,755|27205|Saved /tmp/edgesFB.wkt in 0.03s [785 records].
+2022-03-21 16:35:03,187|28637|application_1639015019875_1619|1890|TIME|overlay|49_Census/S/DE_1e-3_1
+2022-03-21 16:35:03,340|28790|Saved /tmp/edgesFO.wkt in 0.03s [316 records].
+2022-03-21 16:35:03,340|28790|application_1639015019875_1619|153|TIME|end|49_Census/S/DE_1e-3_1
+hdfs dfs -mkdir Census/S/DC/
+hdfs dfs -put ~/Datasets/Census/DC/DC2000.wkt Census/S/DC/A.wkt
+hdfs dfs -put ~/Datasets/Census/DC/DC2010.wkt Census/S/DC/B.wkt
+./QuadPart -d Census/S/DC -p 20 -t 1e-3
+./Perf -d Census/S/DC -p 20 -t 1e-3 -n 1
+DATASET    = Census/S/DC
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 20
+Run 1 ./sdcel2_debug Census/S/DC/P20 /home/acald013/RIDIR/local_path/Census/S/DC/P20/ 1e-3 "20_Census/S/DC_1e-3_1"
+2022-03-21 16:35:20,325|13437|application_1639015019875_1620|13674|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/DC/P20/edgesA --input2 Census/S/DC/P20/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/DC/P20//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/DC/P20//boundary.wkt --tolerance 1e-3 --qtag 20_Census/S/DC_1e-3_1 --debug --local
+2022-03-21 16:35:20,376|13488|application_1639015019875_1620|INFO|scale=1000.0
+2022-03-21 16:35:20,397|13509|Saved /tmp/edgesCells_20.wkt in 0.00s [55 records].
+2022-03-21 16:35:20,397|13509|application_1639015019875_1620|INFO|npartitions=55
+2022-03-21 16:35:20,398|13510|application_1639015019875_1620|73|TIME|start|20_Census/S/DC_1e-3_1
+2022-03-21 16:35:29,488|22600|application_1639015019875_1620|INFO|nEdgesA=41817
+2022-03-21 16:35:30,611|23723|application_1639015019875_1620|INFO|nEdgesB=41633
+2022-03-21 16:35:30,611|23723|application_1639015019875_1620|10213|TIME|read|20_Census/S/DC_1e-3_1
+2022-03-21 16:35:31,976|25088|application_1639015019875_1620|1365|TIME|layer1|20_Census/S/DC_1e-3_1
+2022-03-21 16:35:32,344|25456|Saved /tmp/edgesFA.wkt in 0.01s [472 records].
+2022-03-21 16:35:33,011|26123|application_1639015019875_1620|1035|TIME|layer2|20_Census/S/DC_1e-3_1
+2022-03-21 16:35:33,346|26458|Saved /tmp/edgesFB.wkt in 0.01s [459 records].
+2022-03-21 16:35:34,476|27588|application_1639015019875_1620|1465|TIME|overlay|20_Census/S/DC_1e-3_1
+2022-03-21 16:35:34,563|27675|Saved /tmp/edgesFO.wkt in 0.01s [200 records].
+2022-03-21 16:35:34,564|27676|application_1639015019875_1620|88|TIME|end|20_Census/S/DC_1e-3_1
+hdfs dfs -mkdir Census/S/FL/
+hdfs dfs -put ~/Datasets/Census/FL/FL2000.wkt Census/S/FL/A.wkt
+hdfs dfs -put ~/Datasets/Census/FL/FL2010.wkt Census/S/FL/B.wkt
+./QuadPart -d Census/S/FL -p 598 -t 1e-3
+./Perf -d Census/S/FL -p 598 -t 1e-3 -n 1
+DATASET    = Census/S/FL
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 598
+Run 1 ./sdcel2_debug Census/S/FL/P598 /home/acald013/RIDIR/local_path/Census/S/FL/P598/ 1e-3 "598_Census/S/FL_1e-3_1"
+2022-03-21 16:35:52,618|13650|application_1639015019875_1621|13888|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/FL/P598/edgesA --input2 Census/S/FL/P598/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/FL/P598//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/FL/P598//boundary.wkt --tolerance 1e-3 --qtag 598_Census/S/FL_1e-3_1 --debug --local
+2022-03-21 16:35:52,727|13759|application_1639015019875_1621|INFO|scale=1000.0
+2022-03-21 16:35:52,846|13878|Saved /tmp/edgesCells_598.wkt in 0.00s [1600 records].
+2022-03-21 16:35:52,846|13878|application_1639015019875_1621|INFO|npartitions=1600
+2022-03-21 16:35:52,846|13878|application_1639015019875_1621|228|TIME|start|598_Census/S/FL_1e-3_1
+2022-03-21 16:36:06,805|27837|application_1639015019875_1621|INFO|nEdgesA=1097692
+2022-03-21 16:36:10,859|31891|application_1639015019875_1621|INFO|nEdgesB=1229077
+2022-03-21 16:36:10,860|31892|application_1639015019875_1621|18014|TIME|read|598_Census/S/FL_1e-3_1
+2022-03-21 16:36:15,058|36090|application_1639015019875_1621|4198|TIME|layer1|598_Census/S/FL_1e-3_1
+2022-03-21 16:36:16,721|37753|Saved /tmp/edgesFA.wkt in 0.23s [10234 records].
+2022-03-21 16:36:19,188|40220|application_1639015019875_1621|4130|TIME|layer2|598_Census/S/FL_1e-3_1
+2022-03-21 16:36:21,193|42225|Saved /tmp/edgesFB.wkt in 0.27s [12138 records].
+2022-03-21 16:36:26,189|47221|application_1639015019875_1621|7001|TIME|overlay|598_Census/S/FL_1e-3_1
+2022-03-21 16:36:27,706|48738|Saved /tmp/edgesFO.wkt in 0.40s [6245 records].
+2022-03-21 16:36:27,706|48738|application_1639015019875_1621|1517|TIME|end|598_Census/S/FL_1e-3_1
+hdfs dfs -mkdir Census/S/GA/
+hdfs dfs -put ~/Datasets/Census/GA/GA2000.wkt Census/S/GA/A.wkt
+hdfs dfs -put ~/Datasets/Census/GA/GA2010.wkt Census/S/GA/B.wkt
+./QuadPart -d Census/S/GA -p 653 -t 1e-3
+./Perf -d Census/S/GA -p 653 -t 1e-3 -n 1
+DATASET    = Census/S/GA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 653
+Run 1 ./sdcel2_debug Census/S/GA/P653 /home/acald013/RIDIR/local_path/Census/S/GA/P653/ 1e-3 "653_Census/S/GA_1e-3_1"
+2022-03-21 16:36:45,808|13460|application_1639015019875_1622|13699|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/GA/P653/edgesA --input2 Census/S/GA/P653/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/GA/P653//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/GA/P653//boundary.wkt --tolerance 1e-3 --qtag 653_Census/S/GA_1e-3_1 --debug --local
+2022-03-21 16:36:45,918|13570|application_1639015019875_1622|INFO|scale=1000.0
+2022-03-21 16:36:46,044|13696|Saved /tmp/edgesCells_653.wkt in 0.00s [1663 records].
+2022-03-21 16:36:46,044|13696|application_1639015019875_1622|INFO|npartitions=1663
+2022-03-21 16:36:46,044|13696|application_1639015019875_1622|236|TIME|start|653_Census/S/GA_1e-3_1
+2022-03-21 16:37:00,083|27735|application_1639015019875_1622|INFO|nEdgesA=1259077
+2022-03-21 16:37:04,566|32218|application_1639015019875_1622|INFO|nEdgesB=1344407
+2022-03-21 16:37:04,566|32218|application_1639015019875_1622|18522|TIME|read|653_Census/S/GA_1e-3_1
+2022-03-21 16:37:08,258|35910|application_1639015019875_1622|3692|TIME|layer1|653_Census/S/GA_1e-3_1
+2022-03-21 16:37:09,976|37628|Saved /tmp/edgesFA.wkt in 0.50s [7843 records].
+2022-03-21 16:37:12,568|40220|application_1639015019875_1622|4310|TIME|layer2|653_Census/S/GA_1e-3_1
+2022-03-21 16:37:14,184|41836|Saved /tmp/edgesFB.wkt in 0.33s [8596 records].
+2022-03-21 16:37:19,193|46845|application_1639015019875_1622|6625|TIME|overlay|653_Census/S/GA_1e-3_1
+2022-03-21 16:37:20,723|48375|Saved /tmp/edgesFO.wkt in 0.30s [3424 records].
+2022-03-21 16:37:20,724|48376|application_1639015019875_1622|1531|TIME|end|653_Census/S/GA_1e-3_1
+hdfs dfs -mkdir Census/S/HI/
+hdfs dfs -put ~/Datasets/Census/HI/HI2000.wkt Census/S/HI/A.wkt
+hdfs dfs -put ~/Datasets/Census/HI/HI2010.wkt Census/S/HI/B.wkt
+./QuadPart -d Census/S/HI -p 70 -t 1e-3
+./Perf -d Census/S/HI -p 70 -t 1e-3 -n 1
+DATASET    = Census/S/HI
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 70
+Run 1 ./sdcel2_debug Census/S/HI/P70 /home/acald013/RIDIR/local_path/Census/S/HI/P70/ 1e-3 "70_Census/S/HI_1e-3_1"
+2022-03-21 16:37:38,284|13676|application_1639015019875_1623|13919|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/HI/P70/edgesA --input2 Census/S/HI/P70/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/HI/P70//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/HI/P70//boundary.wkt --tolerance 1e-3 --qtag 70_Census/S/HI_1e-3_1 --debug --local
+2022-03-21 16:37:38,357|13749|application_1639015019875_1623|INFO|scale=1000.0
+2022-03-21 16:37:38,407|13799|Saved /tmp/edgesCells_70.wkt in 0.00s [232 records].
+2022-03-21 16:37:38,407|13799|application_1639015019875_1623|INFO|npartitions=232
+2022-03-21 16:37:38,408|13800|application_1639015019875_1623|124|TIME|start|70_Census/S/HI_1e-3_1
+2022-03-21 16:37:48,746|24138|application_1639015019875_1623|INFO|nEdgesA=126405
+2022-03-21 16:37:50,327|25719|application_1639015019875_1623|INFO|nEdgesB=144457
+2022-03-21 16:37:50,327|25719|application_1639015019875_1623|11919|TIME|read|70_Census/S/HI_1e-3_1
+2022-03-21 16:37:51,399|26791|application_1639015019875_1623|1072|TIME|layer1|70_Census/S/HI_1e-3_1
+2022-03-21 16:37:51,812|27204|Saved /tmp/edgesFA.wkt in 0.03s [1142 records].
+2022-03-21 16:37:52,526|27918|application_1639015019875_1623|1127|TIME|layer2|70_Census/S/HI_1e-3_1
+2022-03-21 16:37:52,893|28285|Saved /tmp/edgesFB.wkt in 0.04s [1304 records].
+2022-03-21 16:37:54,090|29482|application_1639015019875_1623|1564|TIME|overlay|70_Census/S/HI_1e-3_1
+2022-03-21 16:37:54,323|29715|Saved /tmp/edgesFO.wkt in 0.06s [648 records].
+2022-03-21 16:37:54,324|29716|application_1639015019875_1623|234|TIME|end|70_Census/S/HI_1e-3_1
+hdfs dfs -mkdir Census/S/ID/
+hdfs dfs -put ~/Datasets/Census/ID/ID2000.wkt Census/S/ID/A.wkt
+hdfs dfs -put ~/Datasets/Census/ID/ID2010.wkt Census/S/ID/B.wkt
+./QuadPart -d Census/S/ID -p 197 -t 1e-3
+./Perf -d Census/S/ID -p 197 -t 1e-3 -n 1
+DATASET    = Census/S/ID
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 197
+Run 1 ./sdcel2_debug Census/S/ID/P197 /home/acald013/RIDIR/local_path/Census/S/ID/P197/ 1e-3 "197_Census/S/ID_1e-3_1"
+2022-03-21 16:38:11,788|13515|application_1639015019875_1624|13771|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/ID/P197/edgesA --input2 Census/S/ID/P197/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/ID/P197//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/ID/P197//boundary.wkt --tolerance 1e-3 --qtag 197_Census/S/ID_1e-3_1 --debug --local
+2022-03-21 16:38:11,863|13590|application_1639015019875_1624|INFO|scale=1000.0
+2022-03-21 16:38:11,936|13663|Saved /tmp/edgesCells_197.wkt in 0.00s [553 records].
+2022-03-21 16:38:11,936|13663|application_1639015019875_1624|INFO|npartitions=553
+2022-03-21 16:38:11,937|13664|application_1639015019875_1624|149|TIME|start|197_Census/S/ID_1e-3_1
+2022-03-21 16:38:23,143|24870|application_1639015019875_1624|INFO|nEdgesA=411041
+2022-03-21 16:38:25,559|27286|application_1639015019875_1624|INFO|nEdgesB=406301
+2022-03-21 16:38:25,559|27286|application_1639015019875_1624|13622|TIME|read|197_Census/S/ID_1e-3_1
+2022-03-21 16:38:27,638|29365|application_1639015019875_1624|2079|TIME|layer1|197_Census/S/ID_1e-3_1
+2022-03-21 16:38:28,341|30068|Saved /tmp/edgesFA.wkt in 0.08s [1775 records].
+2022-03-21 16:38:29,740|31467|application_1639015019875_1624|2102|TIME|layer2|197_Census/S/ID_1e-3_1
+2022-03-21 16:38:30,517|32244|Saved /tmp/edgesFB.wkt in 0.08s [1803 records].
+2022-03-21 16:38:32,614|34341|application_1639015019875_1624|2874|TIME|overlay|197_Census/S/ID_1e-3_1
+2022-03-21 16:38:33,117|34844|Saved /tmp/edgesFO.wkt in 0.07s [419 records].
+2022-03-21 16:38:33,117|34844|application_1639015019875_1624|503|TIME|end|197_Census/S/ID_1e-3_1
+./sdcel2_debug: line 35: RANCE: command not found
+hdfs dfs -mkdir Census/S/IL/
+hdfs dfs -put ~/Datasets/Census/IL/IL2000.wkt Census/S/IL/A.wkt
+hdfs dfs -put ~/Datasets/Census/IL/IL2010.wkt Census/S/IL/B.wkt
+./QuadPart -d Census/S/IL -p 501 -t 1e-3
+./Perf -d Census/S/IL -p 501 -t 1e-3 -n 1
+DATASET    = Census/S/IL
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 501
+Run 1 ./sdcel2_debug Census/S/IL/P501 /home/acald013/RIDIR/local_path/Census/S/IL/P501/ 1e-3 "501_Census/S/IL_1e-3_1"
+2022-03-21 16:38:50,872|13462|application_1639015019875_1625|13706|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/IL/P501/edgesA --input2 Census/S/IL/P501/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/IL/P501//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/IL/P501//boundary.wkt --tolerance 1e-3 --qtag 501_Census/S/IL_1e-3_1 --debug --local
+2022-03-21 16:38:50,982|13572|application_1639015019875_1625|INFO|scale=1000.0
+2022-03-21 16:38:51,099|13689|Saved /tmp/edgesCells_501.wkt in 0.00s [1282 records].
+2022-03-21 16:38:51,099|13689|application_1639015019875_1625|INFO|npartitions=1282
+2022-03-21 16:38:51,100|13690|application_1639015019875_1625|228|TIME|start|501_Census/S/IL_1e-3_1
+2022-03-21 16:39:04,122|26712|application_1639015019875_1625|INFO|nEdgesA=1005784
+2022-03-21 16:39:07,513|30103|application_1639015019875_1625|INFO|nEdgesB=1031873
+2022-03-21 16:39:07,513|30103|application_1639015019875_1625|16413|TIME|read|501_Census/S/IL_1e-3_1
+2022-03-21 16:39:10,218|32808|application_1639015019875_1625|2705|TIME|layer1|501_Census/S/IL_1e-3_1
+2022-03-21 16:39:11,494|34084|Saved /tmp/edgesFA.wkt in 0.24s [9259 records].
+2022-03-21 16:39:13,531|36121|application_1639015019875_1625|3313|TIME|layer2|501_Census/S/IL_1e-3_1
+2022-03-21 16:39:14,727|37317|Saved /tmp/edgesFB.wkt in 0.25s [9576 records].
+2022-03-21 16:39:18,239|40829|application_1639015019875_1625|4708|TIME|overlay|501_Census/S/IL_1e-3_1
+2022-03-21 16:39:19,049|41639|Saved /tmp/edgesFO.wkt in 0.22s [4081 records].
+2022-03-21 16:39:19,049|41639|application_1639015019875_1625|810|TIME|end|501_Census/S/IL_1e-3_1
+hdfs dfs -mkdir Census/S/IN/
+hdfs dfs -put ~/Datasets/Census/IN/IN2000.wkt Census/S/IN/A.wkt
+hdfs dfs -put ~/Datasets/Census/IN/IN2010.wkt Census/S/IN/B.wkt
+./QuadPart -d Census/S/IN -p 312 -t 1e-3
+./Perf -d Census/S/IN -p 312 -t 1e-3 -n 1
+DATASET    = Census/S/IN
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 312
+Run 1 ./sdcel2_debug Census/S/IN/P312 /home/acald013/RIDIR/local_path/Census/S/IN/P312/ 1e-3 "312_Census/S/IN_1e-3_1"
+2022-03-21 16:39:37,099|13705|application_1639015019875_1626|13945|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/IN/P312/edgesA --input2 Census/S/IN/P312/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/IN/P312//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/IN/P312//boundary.wkt --tolerance 1e-3 --qtag 312_Census/S/IN_1e-3_1 --local
+2022-03-21 16:39:37,189|13795|application_1639015019875_1626|INFO|npartitions=850
+2022-03-21 16:39:37,190|13796|application_1639015019875_1626|91|TIME|start|312_Census/S/IN_1e-3_1
+2022-03-21 16:39:49,355|25961|application_1639015019875_1626|INFO|nEdgesA=623109
+2022-03-21 16:39:52,432|29038|application_1639015019875_1626|INFO|nEdgesB=642651
+2022-03-21 16:39:52,432|29038|application_1639015019875_1626|15242|TIME|read|312_Census/S/IN_1e-3_1
+2022-03-21 16:39:54,379|30985|application_1639015019875_1626|1947|TIME|layer1|312_Census/S/IN_1e-3_1
+2022-03-21 16:39:56,269|32875|application_1639015019875_1626|1890|TIME|layer2|312_Census/S/IN_1e-3_1
+2022-03-21 16:39:59,452|36058|application_1639015019875_1626|3183|TIME|overlay|312_Census/S/IN_1e-3_1
+2022-03-21 16:40:00,225|36831|Saved /tmp/edgesFO.wkt in 0.23s [1944 records].
+2022-03-21 16:40:00,225|36831|application_1639015019875_1626|773|TIME|end|312_Census/S/IN_1e-3_1
+hdfs dfs -mkdir Census/S/IA/
+hdfs dfs -put ~/Datasets/Census/IA/IA2000.wkt Census/S/IA/A.wkt
+hdfs dfs -put ~/Datasets/Census/IA/IA2010.wkt Census/S/IA/B.wkt
+./QuadPart -d Census/S/IA -p 216 -t 1e-3
+./Perf -d Census/S/IA -p 216 -t 1e-3 -n 1
+DATASET    = Census/S/IA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 216
+Run 1 ./sdcel2_debug Census/S/IA/P216 /home/acald013/RIDIR/local_path/Census/S/IA/P216/ 1e-3 "216_Census/S/IA_1e-3_1"
+2022-03-21 16:40:17,942|13824|application_1639015019875_1627|14068|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/IA/P216/edgesA --input2 Census/S/IA/P216/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/IA/P216//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/IA/P216//boundary.wkt --tolerance 1e-3 --qtag 216_Census/S/IA_1e-3_1 --local
+2022-03-21 16:40:18,024|13906|application_1639015019875_1627|INFO|npartitions=574
+2022-03-21 16:40:18,024|13906|application_1639015019875_1627|82|TIME|start|216_Census/S/IA_1e-3_1
+2022-03-21 16:40:29,824|25706|application_1639015019875_1627|INFO|nEdgesA=441171
+2022-03-21 16:40:31,968|27850|application_1639015019875_1627|INFO|nEdgesB=444146
+2022-03-21 16:40:31,968|27850|application_1639015019875_1627|13944|TIME|read|216_Census/S/IA_1e-3_1
+2022-03-21 16:40:34,088|29970|application_1639015019875_1627|2120|TIME|layer1|216_Census/S/IA_1e-3_1
+2022-03-21 16:40:35,254|31136|application_1639015019875_1627|1166|TIME|layer2|216_Census/S/IA_1e-3_1
+2022-03-21 16:40:37,498|33380|application_1639015019875_1627|2244|TIME|overlay|216_Census/S/IA_1e-3_1
+2022-03-21 16:40:37,988|33870|Saved /tmp/edgesFO.wkt in 0.10s [1016 records].
+2022-03-21 16:40:37,988|33870|application_1639015019875_1627|490|TIME|end|216_Census/S/IA_1e-3_1
+hdfs dfs -mkdir Census/S/KS/
+hdfs dfs -put ~/Datasets/Census/KS/KS2000.wkt Census/S/KS/A.wkt
+hdfs dfs -put ~/Datasets/Census/KS/KS2010.wkt Census/S/KS/B.wkt
+./QuadPart -d Census/S/KS -p 159 -t 1e-3
+./Perf -d Census/S/KS -p 159 -t 1e-3 -n 1
+DATASET    = Census/S/KS
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 159
+Run 1 ./sdcel2_debug Census/S/KS/P159 /home/acald013/RIDIR/local_path/Census/S/KS/P159/ 1e-3 "159_Census/S/KS_1e-3_1"
+2022-03-21 16:40:55,237|13507|application_1639015019875_1628|13748|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/KS/P159/edgesA --input2 Census/S/KS/P159/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/KS/P159//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/KS/P159//boundary.wkt --tolerance 1e-3 --qtag 159_Census/S/KS_1e-3_1 --local
+2022-03-21 16:40:55,310|13580|application_1639015019875_1628|INFO|npartitions=430
+2022-03-21 16:40:55,310|13580|application_1639015019875_1628|73|TIME|start|159_Census/S/KS_1e-3_1
+2022-03-21 16:41:06,263|24533|application_1639015019875_1628|INFO|nEdgesA=317886
+2022-03-21 16:41:08,634|26904|application_1639015019875_1628|INFO|nEdgesB=327330
+2022-03-21 16:41:08,634|26904|application_1639015019875_1628|13324|TIME|read|159_Census/S/KS_1e-3_1
+2022-03-21 16:41:10,071|28341|application_1639015019875_1628|1437|TIME|layer1|159_Census/S/KS_1e-3_1
+2022-03-21 16:41:11,005|29275|application_1639015019875_1628|934|TIME|layer2|159_Census/S/KS_1e-3_1
+2022-03-21 16:41:12,878|31148|application_1639015019875_1628|1873|TIME|overlay|159_Census/S/KS_1e-3_1
+2022-03-21 16:41:13,355|31625|Saved /tmp/edgesFO.wkt in 0.07s [1028 records].
+2022-03-21 16:41:13,356|31626|application_1639015019875_1628|478|TIME|end|159_Census/S/KS_1e-3_1
+hdfs dfs -rm -f -r Census/S/
+hdfs dfs -mkdir Census/S/
+hdfs dfs -mkdir Census/S/KY/
+hdfs dfs -put ~/Datasets/Census/KY/KY2000.wkt Census/S/KY/A.wkt
+hdfs dfs -put ~/Datasets/Census/KY/KY2010.wkt Census/S/KY/B.wkt
+./QuadPart -d Census/S/KY -p 573 -t 1e-3
+./Perf -d Census/S/KY -p 573 -t 1e-3 -n 1
+DATASET    = Census/S/KY
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 573
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/KY/P573 /home/acald013/RIDIR/local_path/Census/S/KY/P573/ 1e-3 "573_Census/S/KY_1e-3_1" yarn 
+2022-03-21 17:07:46,372|13857|application_1639015019875_1642|14098|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/KY/P573/edgesA --input2 Census/S/KY/P573/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/KY/P573//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/KY/P573//boundary.wkt --tolerance 1e-3 --qtag 573_Census/S/KY_1e-3_1 --local
+2022-03-21 17:07:46,487|13972|application_1639015019875_1642|INFO|npartitions=1552
+2022-03-21 17:07:46,487|13972|application_1639015019875_1642|116|TIME|start|573_Census/S/KY_1e-3_1
+2022-03-21 17:08:00,151|27636|application_1639015019875_1642|INFO|nEdgesA=1128408
+2022-03-21 17:08:04,083|31568|application_1639015019875_1642|INFO|nEdgesB=1180665
+2022-03-21 17:08:04,084|31569|application_1639015019875_1642|17597|TIME|read|573_Census/S/KY_1e-3_1
+2022-03-21 17:08:07,561|35046|application_1639015019875_1642|3477|TIME|layer1|573_Census/S/KY_1e-3_1
+2022-03-21 17:08:09,946|37431|application_1639015019875_1642|2385|TIME|layer2|573_Census/S/KY_1e-3_1
+2022-03-21 17:08:14,503|41988|application_1639015019875_1642|4557|TIME|overlay|573_Census/S/KY_1e-3_1
+2022-03-21 17:08:14,504|41989|application_1639015019875_1642|1|TIME|end|573_Census/S/KY_1e-3_1
+hdfs dfs -mkdir Census/S/LA/
+hdfs dfs -put ~/Datasets/Census/LA/LA2000.wkt Census/S/LA/A.wkt
+hdfs dfs -put ~/Datasets/Census/LA/LA2010.wkt Census/S/LA/B.wkt
+./QuadPart -d Census/S/LA -p 365 -t 1e-3
+./Perf -d Census/S/LA -p 365 -t 1e-3 -n 1
+DATASET    = Census/S/LA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 365
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/LA/P365 /home/acald013/RIDIR/local_path/Census/S/LA/P365/ 1e-3 "365_Census/S/LA_1e-3_1" yarn 
+2022-03-21 17:08:32,152|13485|application_1639015019875_1643|13728|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/LA/P365/edgesA --input2 Census/S/LA/P365/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/LA/P365//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/LA/P365//boundary.wkt --tolerance 1e-3 --qtag 365_Census/S/LA_1e-3_1 --local
+2022-03-21 17:08:32,247|13580|application_1639015019875_1643|INFO|npartitions=985
+2022-03-21 17:08:32,247|13580|application_1639015019875_1643|95|TIME|start|365_Census/S/LA_1e-3_1
+2022-03-21 17:08:45,217|26550|application_1639015019875_1643|INFO|nEdgesA=754141
+2022-03-21 17:08:49,073|30406|application_1639015019875_1643|INFO|nEdgesB=752373
+2022-03-21 17:08:49,074|30407|application_1639015019875_1643|16827|TIME|read|365_Census/S/LA_1e-3_1
+2022-03-21 17:08:51,902|33235|application_1639015019875_1643|2828|TIME|layer1|365_Census/S/LA_1e-3_1
+2022-03-21 17:08:54,038|35371|application_1639015019875_1643|2136|TIME|layer2|365_Census/S/LA_1e-3_1
+2022-03-21 17:08:58,032|39365|application_1639015019875_1643|3994|TIME|overlay|365_Census/S/LA_1e-3_1
+2022-03-21 17:08:58,032|39365|application_1639015019875_1643|0|TIME|end|365_Census/S/LA_1e-3_1
+hdfs dfs -mkdir Census/S/ME/
+hdfs dfs -put ~/Datasets/Census/ME/ME2000.wkt Census/S/ME/A.wkt
+hdfs dfs -put ~/Datasets/Census/ME/ME2010.wkt Census/S/ME/B.wkt
+./QuadPart -d Census/S/ME -p 146 -t 1e-3
+./Perf -d Census/S/ME -p 146 -t 1e-3 -n 1
+DATASET    = Census/S/ME
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 146
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/ME/P146 /home/acald013/RIDIR/local_path/Census/S/ME/P146/ 1e-3 "146_Census/S/ME_1e-3_1" yarn 
+2022-03-21 17:09:15,765|13841|application_1639015019875_1644|14100|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/ME/P146/edgesA --input2 Census/S/ME/P146/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/ME/P146//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/ME/P146//boundary.wkt --tolerance 1e-3 --qtag 146_Census/S/ME_1e-3_1 --local
+2022-03-21 17:09:15,845|13921|application_1639015019875_1644|INFO|npartitions=421
+2022-03-21 17:09:15,846|13922|application_1639015019875_1644|81|TIME|start|146_Census/S/ME_1e-3_1
+2022-03-21 17:09:27,445|25521|application_1639015019875_1644|INFO|nEdgesA=293724
+2022-03-21 17:09:29,374|27450|application_1639015019875_1644|INFO|nEdgesB=301016
+2022-03-21 17:09:29,375|27451|application_1639015019875_1644|13529|TIME|read|146_Census/S/ME_1e-3_1
+2022-03-21 17:09:31,074|29150|application_1639015019875_1644|1699|TIME|layer1|146_Census/S/ME_1e-3_1
+2022-03-21 17:09:32,112|30188|application_1639015019875_1644|1038|TIME|layer2|146_Census/S/ME_1e-3_1
+2022-03-21 17:09:34,019|32095|application_1639015019875_1644|1907|TIME|overlay|146_Census/S/ME_1e-3_1
+2022-03-21 17:09:34,019|32095|application_1639015019875_1644|0|TIME|end|146_Census/S/ME_1e-3_1
+hdfs dfs -mkdir Census/S/MD/
+hdfs dfs -put ~/Datasets/Census/MD/MD2000.wkt Census/S/MD/A.wkt
+hdfs dfs -put ~/Datasets/Census/MD/MD2010.wkt Census/S/MD/B.wkt
+./QuadPart -d Census/S/MD -p 274 -t 1e-3
+./Perf -d Census/S/MD -p 274 -t 1e-3 -n 1
+DATASET    = Census/S/MD
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 274
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MD/P274 /home/acald013/RIDIR/local_path/Census/S/MD/P274/ 1e-3 "274_Census/S/MD_1e-3_1" yarn 
+2022-03-21 17:09:51,607|13492|application_1639015019875_1645|13730|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MD/P274/edgesA --input2 Census/S/MD/P274/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MD/P274//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MD/P274//boundary.wkt --tolerance 1e-3 --qtag 274_Census/S/MD_1e-3_1 --local
+2022-03-21 17:09:51,696|13581|application_1639015019875_1645|INFO|npartitions=697
+2022-03-21 17:09:51,697|13582|application_1639015019875_1645|90|TIME|start|274_Census/S/MD_1e-3_1
+2022-03-21 17:10:03,911|25796|application_1639015019875_1645|INFO|nEdgesA=540365
+2022-03-21 17:10:06,747|28632|application_1639015019875_1645|INFO|nEdgesB=565684
+2022-03-21 17:10:06,747|28632|application_1639015019875_1645|15050|TIME|read|274_Census/S/MD_1e-3_1
+2022-03-21 17:10:08,817|30702|application_1639015019875_1645|2070|TIME|layer1|274_Census/S/MD_1e-3_1
+2022-03-21 17:10:10,447|32332|application_1639015019875_1645|1630|TIME|layer2|274_Census/S/MD_1e-3_1
+2022-03-21 17:10:13,313|35198|application_1639015019875_1645|2866|TIME|overlay|274_Census/S/MD_1e-3_1
+2022-03-21 17:10:13,313|35198|application_1639015019875_1645|0|TIME|end|274_Census/S/MD_1e-3_1
+hdfs dfs -mkdir Census/S/MA/
+hdfs dfs -put ~/Datasets/Census/MA/MA2000.wkt Census/S/MA/A.wkt
+hdfs dfs -put ~/Datasets/Census/MA/MA2010.wkt Census/S/MA/B.wkt
+./QuadPart -d Census/S/MA -p 188 -t 1e-3
+./Perf -d Census/S/MA -p 188 -t 1e-3 -n 1
+DATASET    = Census/S/MA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 188
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MA/P188 /home/acald013/RIDIR/local_path/Census/S/MA/P188/ 1e-3 "188_Census/S/MA_1e-3_1" yarn 
+2022-03-21 17:10:31,221|13799|application_1639015019875_1646|14044|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MA/P188/edgesA --input2 Census/S/MA/P188/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MA/P188//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MA/P188//boundary.wkt --tolerance 1e-3 --qtag 188_Census/S/MA_1e-3_1 --local
+2022-03-21 17:10:31,290|13868|application_1639015019875_1646|INFO|npartitions=478
+2022-03-21 17:10:31,290|13868|application_1639015019875_1646|69|TIME|start|188_Census/S/MA_1e-3_1
+2022-03-21 17:10:42,525|25103|application_1639015019875_1646|INFO|nEdgesA=356042
+2022-03-21 17:10:44,815|27393|application_1639015019875_1646|INFO|nEdgesB=387951
+2022-03-21 17:10:44,815|27393|application_1639015019875_1646|13525|TIME|read|188_Census/S/MA_1e-3_1
+2022-03-21 17:10:46,490|29068|application_1639015019875_1646|1675|TIME|layer1|188_Census/S/MA_1e-3_1
+2022-03-21 17:10:47,547|30125|application_1639015019875_1646|1057|TIME|layer2|188_Census/S/MA_1e-3_1
+2022-03-21 17:10:49,818|32396|application_1639015019875_1646|2271|TIME|overlay|188_Census/S/MA_1e-3_1
+2022-03-21 17:10:49,819|32397|application_1639015019875_1646|1|TIME|end|188_Census/S/MA_1e-3_1
+hdfs dfs -mkdir Census/S/MI/
+hdfs dfs -put ~/Datasets/Census/MI/MI2000.wkt Census/S/MI/A.wkt
+hdfs dfs -put ~/Datasets/Census/MI/MI2010.wkt Census/S/MI/B.wkt
+./QuadPart -d Census/S/MI -p 262 -t 1e-3
+./Perf -d Census/S/MI -p 262 -t 1e-3 -n 1
+DATASET    = Census/S/MI
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 262
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MI/P262 /home/acald013/RIDIR/local_path/Census/S/MI/P262/ 1e-3 "262_Census/S/MI_1e-3_1" yarn 
+2022-03-21 17:11:07,293|13524|application_1639015019875_1647|13771|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MI/P262/edgesA --input2 Census/S/MI/P262/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MI/P262//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MI/P262//boundary.wkt --tolerance 1e-3 --qtag 262_Census/S/MI_1e-3_1 --local
+2022-03-21 17:11:07,378|13609|application_1639015019875_1647|INFO|npartitions=676
+2022-03-21 17:11:07,379|13610|application_1639015019875_1647|86|TIME|start|262_Census/S/MI_1e-3_1
+2022-03-21 17:11:19,242|25473|application_1639015019875_1647|INFO|nEdgesA=607355
+2022-03-21 17:11:22,575|28806|application_1639015019875_1647|INFO|nEdgesB=538722
+2022-03-21 17:11:22,575|28806|application_1639015019875_1647|15196|TIME|read|262_Census/S/MI_1e-3_1
+2022-03-21 17:11:25,210|31441|application_1639015019875_1647|2635|TIME|layer1|262_Census/S/MI_1e-3_1
+2022-03-21 17:11:26,510|32741|application_1639015019875_1647|1300|TIME|layer2|262_Census/S/MI_1e-3_1
+2022-03-21 17:11:28,946|35177|application_1639015019875_1647|2436|TIME|overlay|262_Census/S/MI_1e-3_1
+2022-03-21 17:11:28,946|35177|application_1639015019875_1647|0|TIME|end|262_Census/S/MI_1e-3_1
+hdfs dfs -mkdir Census/S/MN/
+hdfs dfs -put ~/Datasets/Census/MN/MN2000.wkt Census/S/MN/A.wkt
+hdfs dfs -put ~/Datasets/Census/MN/MN2010.wkt Census/S/MN/B.wkt
+./QuadPart -d Census/S/MN -p 353 -t 1e-3
+./Perf -d Census/S/MN -p 353 -t 1e-3 -n 1
+DATASET    = Census/S/MN
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 353
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MN/P353 /home/acald013/RIDIR/local_path/Census/S/MN/P353/ 1e-3 "353_Census/S/MN_1e-3_1" yarn 
+2022-03-21 17:11:47,169|14051|application_1639015019875_1648|14303|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MN/P353/edgesA --input2 Census/S/MN/P353/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MN/P353//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MN/P353//boundary.wkt --tolerance 1e-3 --qtag 353_Census/S/MN_1e-3_1 --local
+2022-03-21 17:11:47,277|14159|application_1639015019875_1648|INFO|npartitions=943
+2022-03-21 17:11:47,278|14160|application_1639015019875_1648|109|TIME|start|353_Census/S/MN_1e-3_1
+2022-03-21 17:12:00,992|27874|application_1639015019875_1648|INFO|nEdgesA=707424
+2022-03-21 17:12:04,610|31492|application_1639015019875_1648|INFO|nEdgesB=726090
+2022-03-21 17:12:04,610|31492|application_1639015019875_1648|17332|TIME|read|353_Census/S/MN_1e-3_1
+2022-03-21 17:12:07,159|34041|application_1639015019875_1648|2549|TIME|layer1|353_Census/S/MN_1e-3_1
+2022-03-21 17:12:08,775|35657|application_1639015019875_1648|1616|TIME|layer2|353_Census/S/MN_1e-3_1
+2022-03-21 17:12:12,477|39359|application_1639015019875_1648|3702|TIME|overlay|353_Census/S/MN_1e-3_1
+2022-03-21 17:12:12,477|39359|application_1639015019875_1648|0|TIME|end|353_Census/S/MN_1e-3_1
+hdfs dfs -mkdir Census/S/MS/
+hdfs dfs -put ~/Datasets/Census/MS/MS2000.wkt Census/S/MS/A.wkt
+hdfs dfs -put ~/Datasets/Census/MS/MS2010.wkt Census/S/MS/B.wkt
+./QuadPart -d Census/S/MS -p 394 -t 1e-3
+./Perf -d Census/S/MS -p 394 -t 1e-3 -n 1
+DATASET    = Census/S/MS
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 394
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MS/P394 /home/acald013/RIDIR/local_path/Census/S/MS/P394/ 1e-3 "394_Census/S/MS_1e-3_1" yarn 
+2022-03-21 17:12:30,771|13982|application_1639015019875_1649|14232|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MS/P394/edgesA --input2 Census/S/MS/P394/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MS/P394//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MS/P394//boundary.wkt --tolerance 1e-3 --qtag 394_Census/S/MS_1e-3_1 --local
+2022-03-21 17:12:30,871|14082|application_1639015019875_1649|INFO|npartitions=1126
+2022-03-21 17:12:30,872|14083|application_1639015019875_1649|101|TIME|start|394_Census/S/MS_1e-3_1
+2022-03-21 17:12:43,740|26951|application_1639015019875_1649|INFO|nEdgesA=777899
+2022-03-21 17:12:46,800|30011|application_1639015019875_1649|INFO|nEdgesB=812259
+2022-03-21 17:12:46,800|30011|application_1639015019875_1649|15928|TIME|read|394_Census/S/MS_1e-3_1
+2022-03-21 17:12:49,518|32729|application_1639015019875_1649|2718|TIME|layer1|394_Census/S/MS_1e-3_1
+2022-03-21 17:12:51,429|34640|application_1639015019875_1649|1911|TIME|layer2|394_Census/S/MS_1e-3_1
+2022-03-21 17:12:55,046|38257|application_1639015019875_1649|3617|TIME|overlay|394_Census/S/MS_1e-3_1
+2022-03-21 17:12:55,046|38257|application_1639015019875_1649|0|TIME|end|394_Census/S/MS_1e-3_1
+hdfs dfs -mkdir Census/S/MO/
+hdfs dfs -put ~/Datasets/Census/MO/MO2000.wkt Census/S/MO/A.wkt
+hdfs dfs -put ~/Datasets/Census/MO/MO2010.wkt Census/S/MO/B.wkt
+./QuadPart -d Census/S/MO -p 485 -t 1e-3
+./Perf -d Census/S/MO -p 485 -t 1e-3 -n 1
+DATASET    = Census/S/MO
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 485
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MO/P485 /home/acald013/RIDIR/local_path/Census/S/MO/P485/ 1e-3 "485_Census/S/MO_1e-3_1" yarn 
+2022-03-21 17:13:12,859|13551|application_1639015019875_1650|13788|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MO/P485/edgesA --input2 Census/S/MO/P485/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MO/P485//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MO/P485//boundary.wkt --tolerance 1e-3 --qtag 485_Census/S/MO_1e-3_1 --local
+2022-03-21 17:13:12,994|13686|application_1639015019875_1650|INFO|npartitions=1270
+2022-03-21 17:13:12,994|13686|application_1639015019875_1650|135|TIME|start|485_Census/S/MO_1e-3_1
+2022-03-21 17:13:26,237|26929|application_1639015019875_1650|INFO|nEdgesA=967864
+2022-03-21 17:13:29,806|30498|application_1639015019875_1650|INFO|nEdgesB=998479
+2022-03-21 17:13:29,806|30498|application_1639015019875_1650|16812|TIME|read|485_Census/S/MO_1e-3_1
+2022-03-21 17:13:32,756|33448|application_1639015019875_1650|2950|TIME|layer1|485_Census/S/MO_1e-3_1
+2022-03-21 17:13:35,207|35899|application_1639015019875_1650|2451|TIME|layer2|485_Census/S/MO_1e-3_1
+2022-03-21 17:13:39,089|39781|application_1639015019875_1650|3882|TIME|overlay|485_Census/S/MO_1e-3_1
+2022-03-21 17:13:39,089|39781|application_1639015019875_1650|0|TIME|end|485_Census/S/MO_1e-3_1
+hdfs dfs -mkdir Census/S/MT/
+hdfs dfs -put ~/Datasets/Census/MT/MT2000.wkt Census/S/MT/A.wkt
+hdfs dfs -put ~/Datasets/Census/MT/MT2010.wkt Census/S/MT/B.wkt
+./QuadPart -d Census/S/MT -p 303 -t 1e-3
+./Perf -d Census/S/MT -p 303 -t 1e-3 -n 1
+DATASET    = Census/S/MT
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 303
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MT/P303 /home/acald013/RIDIR/local_path/Census/S/MT/P303/ 1e-3 "303_Census/S/MT_1e-3_1" yarn 
+2022-03-21 17:13:57,009|13752|application_1639015019875_1651|14007|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MT/P303/edgesA --input2 Census/S/MT/P303/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MT/P303//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MT/P303//boundary.wkt --tolerance 1e-3 --qtag 303_Census/S/MT_1e-3_1 --local
+2022-03-21 17:13:57,110|13853|application_1639015019875_1651|INFO|npartitions=907
+2022-03-21 17:13:57,110|13853|application_1639015019875_1651|102|TIME|start|303_Census/S/MT_1e-3_1
+2022-03-21 17:14:09,902|26645|application_1639015019875_1651|INFO|nEdgesA=660492
+2022-03-21 17:14:12,743|29486|application_1639015019875_1651|INFO|nEdgesB=624860
+2022-03-21 17:14:12,743|29486|application_1639015019875_1651|15633|TIME|read|303_Census/S/MT_1e-3_1
+2022-03-21 17:14:15,697|32440|application_1639015019875_1651|2954|TIME|layer1|303_Census/S/MT_1e-3_1
+2022-03-21 17:14:17,410|34153|application_1639015019875_1651|1713|TIME|layer2|303_Census/S/MT_1e-3_1
+2022-03-21 17:14:21,382|38125|application_1639015019875_1651|3972|TIME|overlay|303_Census/S/MT_1e-3_1
+2022-03-21 17:14:21,382|38125|application_1639015019875_1651|0|TIME|end|303_Census/S/MT_1e-3_1
+hdfs dfs -mkdir Census/S/NE/
+hdfs dfs -put ~/Datasets/Census/NE/NE2000.wkt Census/S/NE/A.wkt
+hdfs dfs -put ~/Datasets/Census/NE/NE2010.wkt Census/S/NE/B.wkt
+./QuadPart -d Census/S/NE -p 123 -t 1e-3
+./Perf -d Census/S/NE -p 123 -t 1e-3 -n 1
+DATASET    = Census/S/NE
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 123
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/NE/P123 /home/acald013/RIDIR/local_path/Census/S/NE/P123/ 1e-3 "123_Census/S/NE_1e-3_1" yarn 
+2022-03-21 17:14:39,305|14100|application_1639015019875_1652|14340|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/NE/P123/edgesA --input2 Census/S/NE/P123/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/NE/P123//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/NE/P123//boundary.wkt --tolerance 1e-3 --qtag 123_Census/S/NE_1e-3_1 --local
+2022-03-21 17:14:39,371|14166|application_1639015019875_1652|INFO|npartitions=316
+2022-03-21 17:14:39,371|14166|application_1639015019875_1652|66|TIME|start|123_Census/S/NE_1e-3_1
+2022-03-21 17:14:50,576|25371|application_1639015019875_1652|INFO|nEdgesA=257608
+2022-03-21 17:14:52,273|27068|application_1639015019875_1652|INFO|nEdgesB=253489
+2022-03-21 17:14:52,273|27068|application_1639015019875_1652|12902|TIME|read|123_Census/S/NE_1e-3_1
+2022-03-21 17:14:53,832|28627|application_1639015019875_1652|1559|TIME|layer1|123_Census/S/NE_1e-3_1
+2022-03-21 17:14:54,764|29559|application_1639015019875_1652|932|TIME|layer2|123_Census/S/NE_1e-3_1
+2022-03-21 17:14:56,424|31219|application_1639015019875_1652|1660|TIME|overlay|123_Census/S/NE_1e-3_1
+2022-03-21 17:14:56,424|31219|application_1639015019875_1652|0|TIME|end|123_Census/S/NE_1e-3_1
+hdfs dfs -mkdir Census/S/NV/
+hdfs dfs -put ~/Datasets/Census/NV/NV2000.wkt Census/S/NV/A.wkt
+hdfs dfs -put ~/Datasets/Census/NV/NV2010.wkt Census/S/NV/B.wkt
+./QuadPart -d Census/S/NV -p 148 -t 1e-3
+./Perf -d Census/S/NV -p 148 -t 1e-3 -n 1
+DATASET    = Census/S/NV
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 148
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/NV/P148 /home/acald013/RIDIR/local_path/Census/S/NV/P148/ 1e-3 "148_Census/S/NV_1e-3_1" yarn 
+2022-03-21 17:15:13,932|13653|application_1639015019875_1653|13900|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/NV/P148/edgesA --input2 Census/S/NV/P148/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/NV/P148//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/NV/P148//boundary.wkt --tolerance 1e-3 --qtag 148_Census/S/NV_1e-3_1 --local
+2022-03-21 17:15:14,007|13728|application_1639015019875_1653|INFO|npartitions=472
+2022-03-21 17:15:14,008|13729|application_1639015019875_1653|76|TIME|start|148_Census/S/NV_1e-3_1
+2022-03-21 17:15:25,303|25024|application_1639015019875_1653|INFO|nEdgesA=279508
+2022-03-21 17:15:27,294|27015|application_1639015019875_1653|INFO|nEdgesB=304191
+2022-03-21 17:15:27,294|27015|application_1639015019875_1653|13286|TIME|read|148_Census/S/NV_1e-3_1
+2022-03-21 17:15:29,115|28836|application_1639015019875_1653|1821|TIME|layer1|148_Census/S/NV_1e-3_1
+2022-03-21 17:15:30,179|29900|application_1639015019875_1653|1064|TIME|layer2|148_Census/S/NV_1e-3_1
+2022-03-21 17:15:32,494|32215|application_1639015019875_1653|2315|TIME|overlay|148_Census/S/NV_1e-3_1
+2022-03-21 17:15:32,495|32216|application_1639015019875_1653|1|TIME|end|148_Census/S/NV_1e-3_1
+hdfs dfs -mkdir Census/S/NH/
+hdfs dfs -put ~/Datasets/Census/NH/NH2000.wkt Census/S/NH/A.wkt
+hdfs dfs -put ~/Datasets/Census/NH/NH2010.wkt Census/S/NH/B.wkt
+./QuadPart -d Census/S/NH -p 41 -t 1e-3
+./Perf -d Census/S/NH -p 41 -t 1e-3 -n 1
+DATASET    = Census/S/NH
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 41
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/NH/P41 /home/acald013/RIDIR/local_path/Census/S/NH/P41/ 1e-3 "41_Census/S/NH_1e-3_1" yarn 
+2022-03-21 17:15:50,734|14363|application_1639015019875_1654|14608|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/NH/P41/edgesA --input2 Census/S/NH/P41/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/NH/P41//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/NH/P41//boundary.wkt --tolerance 1e-3 --qtag 41_Census/S/NH_1e-3_1 --local
+2022-03-21 17:15:50,791|14420|application_1639015019875_1654|INFO|npartitions=115
+2022-03-21 17:15:50,791|14420|application_1639015019875_1654|57|TIME|start|41_Census/S/NH_1e-3_1
+2022-03-21 17:16:00,515|24144|application_1639015019875_1654|INFO|nEdgesA=79097
+2022-03-21 17:16:01,604|25233|application_1639015019875_1654|INFO|nEdgesB=84479
+2022-03-21 17:16:01,604|25233|application_1639015019875_1654|10813|TIME|read|41_Census/S/NH_1e-3_1
+2022-03-21 17:16:02,764|26393|application_1639015019875_1654|1160|TIME|layer1|41_Census/S/NH_1e-3_1
+2022-03-21 17:16:03,648|27277|application_1639015019875_1654|884|TIME|layer2|41_Census/S/NH_1e-3_1
+2022-03-21 17:16:05,247|28876|application_1639015019875_1654|1599|TIME|overlay|41_Census/S/NH_1e-3_1
+2022-03-21 17:16:05,248|28877|application_1639015019875_1654|0|TIME|end|41_Census/S/NH_1e-3_1
+hdfs dfs -mkdir Census/S/NJ/
+hdfs dfs -put ~/Datasets/Census/NJ/NJ2000.wkt Census/S/NJ/A.wkt
+hdfs dfs -put ~/Datasets/Census/NJ/NJ2010.wkt Census/S/NJ/B.wkt
+./QuadPart -d Census/S/NJ -p 228 -t 1e-3
+./Perf -d Census/S/NJ -p 228 -t 1e-3 -n 1
+DATASET    = Census/S/NJ
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 228
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/NJ/P228 /home/acald013/RIDIR/local_path/Census/S/NJ/P228/ 1e-3 "228_Census/S/NJ_1e-3_1" yarn 
+2022-03-21 17:16:22,647|13453|application_1639015019875_1655|13698|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/NJ/P228/edgesA --input2 Census/S/NJ/P228/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/NJ/P228//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/NJ/P228//boundary.wkt --tolerance 1e-3 --qtag 228_Census/S/NJ_1e-3_1 --local
+2022-03-21 17:16:22,743|13549|application_1639015019875_1655|INFO|npartitions=553
+2022-03-21 17:16:22,743|13549|application_1639015019875_1655|96|TIME|start|228_Census/S/NJ_1e-3_1
+2022-03-21 17:16:34,565|25371|application_1639015019875_1655|INFO|nEdgesA=477769
+2022-03-21 17:16:36,592|27398|application_1639015019875_1655|INFO|nEdgesB=470425
+2022-03-21 17:16:36,592|27398|application_1639015019875_1655|13849|TIME|read|228_Census/S/NJ_1e-3_1
+2022-03-21 17:16:38,359|29165|application_1639015019875_1655|1767|TIME|layer1|228_Census/S/NJ_1e-3_1
+2022-03-21 17:16:39,539|30345|application_1639015019875_1655|1180|TIME|layer2|228_Census/S/NJ_1e-3_1
+2022-03-21 17:16:41,876|32682|application_1639015019875_1655|2337|TIME|overlay|228_Census/S/NJ_1e-3_1
+2022-03-21 17:16:41,876|32682|application_1639015019875_1655|0|TIME|end|228_Census/S/NJ_1e-3_1
+hdfs dfs -mkdir Census/S/NM/
+hdfs dfs -put ~/Datasets/Census/NM/NM2000.wkt Census/S/NM/A.wkt
+hdfs dfs -put ~/Datasets/Census/NM/NM2010.wkt Census/S/NM/B.wkt
+./QuadPart -d Census/S/NM -p 206 -t 1e-3
+./Perf -d Census/S/NM -p 206 -t 1e-3 -n 1
+DATASET    = Census/S/NM
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 206
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/NM/P206 /home/acald013/RIDIR/local_path/Census/S/NM/P206/ 1e-3 "206_Census/S/NM_1e-3_1" yarn 
+2022-03-21 17:16:59,538|13726|application_1639015019875_1656|13965|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/NM/P206/edgesA --input2 Census/S/NM/P206/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/NM/P206//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/NM/P206//boundary.wkt --tolerance 1e-3 --qtag 206_Census/S/NM_1e-3_1 --local
+2022-03-21 17:16:59,618|13806|application_1639015019875_1656|INFO|npartitions=598
+2022-03-21 17:16:59,618|13806|application_1639015019875_1656|80|TIME|start|206_Census/S/NM_1e-3_1
+2022-03-21 17:17:11,578|25766|application_1639015019875_1656|INFO|nEdgesA=415370
+2022-03-21 17:17:13,905|28093|application_1639015019875_1656|INFO|nEdgesB=424093
+2022-03-21 17:17:13,905|28093|application_1639015019875_1656|14287|TIME|read|206_Census/S/NM_1e-3_1
+2022-03-21 17:17:16,159|30347|application_1639015019875_1656|2254|TIME|layer1|206_Census/S/NM_1e-3_1
+2022-03-21 17:17:17,614|31802|application_1639015019875_1656|1455|TIME|layer2|206_Census/S/NM_1e-3_1
+2022-03-21 17:17:20,326|34514|application_1639015019875_1656|2712|TIME|overlay|206_Census/S/NM_1e-3_1
+2022-03-21 17:17:20,327|34515|application_1639015019875_1656|1|TIME|end|206_Census/S/NM_1e-3_1
+hdfs dfs -mkdir Census/S/NY/
+hdfs dfs -put ~/Datasets/Census/NY/NY2000.wkt Census/S/NY/A.wkt
+hdfs dfs -put ~/Datasets/Census/NY/NY2010.wkt Census/S/NY/B.wkt
+./QuadPart -d Census/S/NY -p 365 -t 1e-3
+./Perf -d Census/S/NY -p 365 -t 1e-3 -n 1
+DATASET    = Census/S/NY
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 365
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/NY/P365 /home/acald013/RIDIR/local_path/Census/S/NY/P365/ 1e-3 "365_Census/S/NY_1e-3_1" yarn 
+2022-03-21 17:17:38,081|13580|application_1639015019875_1657|13823|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/NY/P365/edgesA --input2 Census/S/NY/P365/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/NY/P365//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/NY/P365//boundary.wkt --tolerance 1e-3 --qtag 365_Census/S/NY_1e-3_1 --local
+2022-03-21 17:17:38,186|13685|application_1639015019875_1657|INFO|npartitions=997
+2022-03-21 17:17:38,186|13685|application_1639015019875_1657|105|TIME|start|365_Census/S/NY_1e-3_1
+2022-03-21 17:17:51,346|26845|application_1639015019875_1657|INFO|nEdgesA=756336
+2022-03-21 17:17:55,041|30540|application_1639015019875_1657|INFO|nEdgesB=749117
+2022-03-21 17:17:55,041|30540|application_1639015019875_1657|16855|TIME|read|365_Census/S/NY_1e-3_1
+2022-03-21 17:17:57,763|33262|application_1639015019875_1657|2722|TIME|layer1|365_Census/S/NY_1e-3_1
+2022-03-21 17:17:59,682|35181|application_1639015019875_1657|1919|TIME|layer2|365_Census/S/NY_1e-3_1
+2022-03-21 17:18:03,312|38811|application_1639015019875_1657|3630|TIME|overlay|365_Census/S/NY_1e-3_1
+2022-03-21 17:18:03,312|38811|application_1639015019875_1657|0|TIME|end|365_Census/S/NY_1e-3_1
+hdfs dfs -mkdir Census/S/NC/
+hdfs dfs -put ~/Datasets/Census/NC/NC2000.wkt Census/S/NC/A.wkt
+hdfs dfs -put ~/Datasets/Census/NC/NC2010.wkt Census/S/NC/B.wkt
+./QuadPart -d Census/S/NC -p 764 -t 1e-3
+./Perf -d Census/S/NC -p 764 -t 1e-3 -n 1
+DATASET    = Census/S/NC
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 764
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/NC/P764 /home/acald013/RIDIR/local_path/Census/S/NC/P764/ 1e-3 "764_Census/S/NC_1e-3_1" yarn 
+2022-03-21 17:18:21,547|13485|application_1639015019875_1658|13728|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/NC/P764/edgesA --input2 Census/S/NC/P764/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/NC/P764//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/NC/P764//boundary.wkt --tolerance 1e-3 --qtag 764_Census/S/NC_1e-3_1 --local
+2022-03-21 17:18:21,683|13621|application_1639015019875_1658|INFO|npartitions=1987
+2022-03-21 17:18:21,684|13622|application_1639015019875_1658|137|TIME|start|764_Census/S/NC_1e-3_1
+2022-03-21 17:18:36,992|28930|application_1639015019875_1658|INFO|nEdgesA=1367933
+2022-03-21 17:18:42,230|34168|application_1639015019875_1658|INFO|nEdgesB=1573367
+2022-03-21 17:18:42,230|34168|application_1639015019875_1658|20546|TIME|read|764_Census/S/NC_1e-3_1
+2022-03-21 17:18:46,301|38239|application_1639015019875_1658|4071|TIME|layer1|764_Census/S/NC_1e-3_1
+2022-03-21 17:18:49,444|41382|application_1639015019875_1658|3143|TIME|layer2|764_Census/S/NC_1e-3_1
+2022-03-21 17:18:54,634|46572|application_1639015019875_1658|5190|TIME|overlay|764_Census/S/NC_1e-3_1
+2022-03-21 17:18:54,634|46572|application_1639015019875_1658|0|TIME|end|764_Census/S/NC_1e-3_1
+hdfs dfs -mkdir Census/S/ND/
+hdfs dfs -put ~/Datasets/Census/ND/ND2000.wkt Census/S/ND/A.wkt
+hdfs dfs -put ~/Datasets/Census/ND/ND2010.wkt Census/S/ND/B.wkt
+./QuadPart -d Census/S/ND -p 90 -t 1e-3
+./Perf -d Census/S/ND -p 90 -t 1e-3 -n 1
+DATASET    = Census/S/ND
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 90
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/ND/P90 /home/acald013/RIDIR/local_path/Census/S/ND/P90/ 1e-3 "90_Census/S/ND_1e-3_1" yarn 
+2022-03-21 17:19:27,530|28969|application_1639015019875_1659|29223|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/ND/P90/edgesA --input2 Census/S/ND/P90/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/ND/P90//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/ND/P90//boundary.wkt --tolerance 1e-3 --qtag 90_Census/S/ND_1e-3_1 --local
+2022-03-21 17:19:27,593|29032|application_1639015019875_1659|INFO|npartitions=262
+2022-03-21 17:19:27,594|29033|application_1639015019875_1659|64|TIME|start|90_Census/S/ND_1e-3_1
+2022-03-21 17:19:38,063|39502|application_1639015019875_1659|INFO|nEdgesA=201897
+2022-03-21 17:19:39,410|40849|application_1639015019875_1659|INFO|nEdgesB=186089
+2022-03-21 17:19:39,410|40849|application_1639015019875_1659|11816|TIME|read|90_Census/S/ND_1e-3_1
+2022-03-21 17:19:41,129|42568|application_1639015019875_1659|1719|TIME|layer1|90_Census/S/ND_1e-3_1
+2022-03-21 17:19:42,262|43701|application_1639015019875_1659|1133|TIME|layer2|90_Census/S/ND_1e-3_1
+2022-03-21 17:19:44,029|45468|application_1639015019875_1659|1767|TIME|overlay|90_Census/S/ND_1e-3_1
+2022-03-21 17:19:44,029|45468|application_1639015019875_1659|0|TIME|end|90_Census/S/ND_1e-3_1
+hdfs dfs -mkdir Census/S/OH/
+hdfs dfs -put ~/Datasets/Census/OH/OH2000.wkt Census/S/OH/A.wkt
+hdfs dfs -put ~/Datasets/Census/OH/OH2010.wkt Census/S/OH/B.wkt
+./QuadPart -d Census/S/OH -p 439 -t 1e-3
+./Perf -d Census/S/OH -p 439 -t 1e-3 -n 1
+DATASET    = Census/S/OH
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 439
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/OH/P439 /home/acald013/RIDIR/local_path/Census/S/OH/P439/ 1e-3 "439_Census/S/OH_1e-3_1" yarn 
+2022-03-21 17:20:01,857|13395|application_1639015019875_1660|13632|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/OH/P439/edgesA --input2 Census/S/OH/P439/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/OH/P439//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/OH/P439//boundary.wkt --tolerance 1e-3 --qtag 439_Census/S/OH_1e-3_1 --local
+2022-03-21 17:20:01,963|13501|application_1639015019875_1660|INFO|npartitions=1138
+2022-03-21 17:20:01,963|13501|application_1639015019875_1660|106|TIME|start|439_Census/S/OH_1e-3_1
+2022-03-21 17:20:14,932|26470|application_1639015019875_1660|INFO|nEdgesA=906482
+2022-03-21 17:20:18,766|30304|application_1639015019875_1660|INFO|nEdgesB=902531
+2022-03-21 17:20:18,766|30304|application_1639015019875_1660|16803|TIME|read|439_Census/S/OH_1e-3_1
+2022-03-21 17:20:22,074|33612|application_1639015019875_1660|3308|TIME|layer1|439_Census/S/OH_1e-3_1
+2022-03-21 17:20:24,707|36245|application_1639015019875_1660|2633|TIME|layer2|439_Census/S/OH_1e-3_1
+2022-03-21 17:20:28,588|40126|application_1639015019875_1660|3881|TIME|overlay|439_Census/S/OH_1e-3_1
+2022-03-21 17:20:28,589|40127|application_1639015019875_1660|1|TIME|end|439_Census/S/OH_1e-3_1
+hdfs dfs -mkdir Census/S/OK/
+hdfs dfs -put ~/Datasets/Census/OK/OK2000.wkt Census/S/OK/A.wkt
+hdfs dfs -put ~/Datasets/Census/OK/OK2010.wkt Census/S/OK/B.wkt
+./QuadPart -d Census/S/OK -p 345 -t 1e-3
+./Perf -d Census/S/OK -p 345 -t 1e-3 -n 1
+DATASET    = Census/S/OK
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 345
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/OK/P345 /home/acald013/RIDIR/local_path/Census/S/OK/P345/ 1e-3 "345_Census/S/OK_1e-3_1" yarn 
+2022-03-21 17:20:46,162|13366|application_1639015019875_1661|13607|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/OK/P345/edgesA --input2 Census/S/OK/P345/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/OK/P345//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/OK/P345//boundary.wkt --tolerance 1e-3 --qtag 345_Census/S/OK_1e-3_1 --local
+2022-03-21 17:20:46,258|13462|application_1639015019875_1661|INFO|npartitions=907
+2022-03-21 17:20:46,259|13463|application_1639015019875_1661|96|TIME|start|345_Census/S/OK_1e-3_1
+2022-03-21 17:20:59,085|26289|application_1639015019875_1661|INFO|nEdgesA=692222
+2022-03-21 17:21:02,005|29209|application_1639015019875_1661|INFO|nEdgesB=710898
+2022-03-21 17:21:02,005|29209|application_1639015019875_1661|15747|TIME|read|345_Census/S/OK_1e-3_1
+2022-03-21 17:21:04,578|31782|application_1639015019875_1661|2573|TIME|layer1|345_Census/S/OK_1e-3_1
+2022-03-21 17:21:06,406|33610|application_1639015019875_1661|1828|TIME|layer2|345_Census/S/OK_1e-3_1
+2022-03-21 17:21:09,982|37186|application_1639015019875_1661|3576|TIME|overlay|345_Census/S/OK_1e-3_1
+2022-03-21 17:21:09,982|37186|application_1639015019875_1661|0|TIME|end|345_Census/S/OK_1e-3_1
+hdfs dfs -mkdir Census/S/OR/
+hdfs dfs -put ~/Datasets/Census/OR/OR2000.wkt Census/S/OR/A.wkt
+hdfs dfs -put ~/Datasets/Census/OR/OR2010.wkt Census/S/OR/B.wkt
+./QuadPart -d Census/S/OR -p 464 -t 1e-3
+./Perf -d Census/S/OR -p 464 -t 1e-3 -n 1
+DATASET    = Census/S/OR
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 464
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/OR/P464 /home/acald013/RIDIR/local_path/Census/S/OR/P464/ 1e-3 "464_Census/S/OR_1e-3_1" yarn 
+2022-03-21 17:21:28,165|13885|application_1639015019875_1662|14133|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/OR/P464/edgesA --input2 Census/S/OR/P464/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/OR/P464//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/OR/P464//boundary.wkt --tolerance 1e-3 --qtag 464_Census/S/OR_1e-3_1 --local
+2022-03-21 17:21:28,275|13995|application_1639015019875_1662|INFO|npartitions=1285
+2022-03-21 17:21:28,275|13995|application_1639015019875_1662|110|TIME|start|464_Census/S/OR_1e-3_1
+2022-03-21 17:21:41,401|27121|application_1639015019875_1662|INFO|nEdgesA=929006
+2022-03-21 17:21:44,813|30533|application_1639015019875_1662|INFO|nEdgesB=954536
+2022-03-21 17:21:44,813|30533|application_1639015019875_1662|16538|TIME|read|464_Census/S/OR_1e-3_1
+2022-03-21 17:21:48,004|33724|application_1639015019875_1662|3191|TIME|layer1|464_Census/S/OR_1e-3_1
+2022-03-21 17:21:50,667|36387|application_1639015019875_1662|2663|TIME|layer2|464_Census/S/OR_1e-3_1
+2022-03-21 17:21:54,835|40555|application_1639015019875_1662|4168|TIME|overlay|464_Census/S/OR_1e-3_1
+2022-03-21 17:21:54,835|40555|application_1639015019875_1662|0|TIME|end|464_Census/S/OR_1e-3_1
+hdfs dfs -mkdir Census/S/PA/
+hdfs dfs -put ~/Datasets/Census/PA/PA2000.wkt Census/S/PA/A.wkt
+hdfs dfs -put ~/Datasets/Census/PA/PA2010.wkt Census/S/PA/B.wkt
+./QuadPart -d Census/S/PA -p 585 -t 1e-3
+./Perf -d Census/S/PA -p 585 -t 1e-3 -n 1
+DATASET    = Census/S/PA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 585
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/PA/P585 /home/acald013/RIDIR/local_path/Census/S/PA/P585/ 1e-3 "585_Census/S/PA_1e-3_1" yarn 
+2022-03-21 17:22:13,978|13750|application_1639015019875_1663|13993|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/PA/P585/edgesA --input2 Census/S/PA/P585/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/PA/P585//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/PA/P585//boundary.wkt --tolerance 1e-3 --qtag 585_Census/S/PA_1e-3_1 --local
+2022-03-21 17:22:14,082|13854|application_1639015019875_1663|INFO|npartitions=1513
+2022-03-21 17:22:14,083|13855|application_1639015019875_1663|105|TIME|start|585_Census/S/PA_1e-3_1
+2022-03-21 17:22:28,226|27998|application_1639015019875_1663|INFO|nEdgesA=1221797
+2022-03-21 17:22:32,245|32017|application_1639015019875_1663|INFO|nEdgesB=1205634
+2022-03-21 17:22:32,245|32017|application_1639015019875_1663|18162|TIME|read|585_Census/S/PA_1e-3_1
+2022-03-21 17:22:35,501|35273|application_1639015019875_1663|3256|TIME|layer1|585_Census/S/PA_1e-3_1
+2022-03-21 17:22:38,093|37865|application_1639015019875_1663|2592|TIME|layer2|585_Census/S/PA_1e-3_1
+2022-03-21 17:22:42,292|42064|application_1639015019875_1663|4199|TIME|overlay|585_Census/S/PA_1e-3_1
+2022-03-21 17:22:42,292|42064|application_1639015019875_1663|0|TIME|end|585_Census/S/PA_1e-3_1
+hdfs dfs -mkdir Census/S/RI/
+hdfs dfs -put ~/Datasets/Census/RI/RI2000.wkt Census/S/RI/A.wkt
+hdfs dfs -put ~/Datasets/Census/RI/RI2010.wkt Census/S/RI/B.wkt
+./QuadPart -d Census/S/RI -p 39 -t 1e-3
+./Perf -d Census/S/RI -p 39 -t 1e-3 -n 1
+DATASET    = Census/S/RI
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 39
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/RI/P39 /home/acald013/RIDIR/local_path/Census/S/RI/P39/ 1e-3 "39_Census/S/RI_1e-3_1" yarn 
+2022-03-21 17:22:59,817|13692|application_1639015019875_1664|13947|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/RI/P39/edgesA --input2 Census/S/RI/P39/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/RI/P39//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/RI/P39//boundary.wkt --tolerance 1e-3 --qtag 39_Census/S/RI_1e-3_1 --local
+2022-03-21 17:22:59,880|13755|application_1639015019875_1664|INFO|npartitions=103
+2022-03-21 17:22:59,881|13756|application_1639015019875_1664|64|TIME|start|39_Census/S/RI_1e-3_1
+2022-03-21 17:23:09,505|23380|application_1639015019875_1664|INFO|nEdgesA=84871
+2022-03-21 17:23:10,825|24700|application_1639015019875_1664|INFO|nEdgesB=81491
+2022-03-21 17:23:10,826|24701|application_1639015019875_1664|10945|TIME|read|39_Census/S/RI_1e-3_1
+2022-03-21 17:23:11,963|25838|application_1639015019875_1664|1137|TIME|layer1|39_Census/S/RI_1e-3_1
+2022-03-21 17:23:12,593|26468|application_1639015019875_1664|630|TIME|layer2|39_Census/S/RI_1e-3_1
+2022-03-21 17:23:13,734|27609|application_1639015019875_1664|1141|TIME|overlay|39_Census/S/RI_1e-3_1
+2022-03-21 17:23:13,734|27609|application_1639015019875_1664|0|TIME|end|39_Census/S/RI_1e-3_1
+hdfs dfs -mkdir Census/S/SC/
+hdfs dfs -put ~/Datasets/Census/SC/SC2000.wkt Census/S/SC/A.wkt
+hdfs dfs -put ~/Datasets/Census/SC/SC2010.wkt Census/S/SC/B.wkt
+./QuadPart -d Census/S/SC -p 421 -t 1e-3
+./Perf -d Census/S/SC -p 421 -t 1e-3 -n 1
+DATASET    = Census/S/SC
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 421
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/SC/P421 /home/acald013/RIDIR/local_path/Census/S/SC/P421/ 1e-3 "421_Census/S/SC_1e-3_1" yarn 
+2022-03-21 17:23:31,984|13950|application_1639015019875_1665|14188|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/SC/P421/edgesA --input2 Census/S/SC/P421/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/SC/P421//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/SC/P421//boundary.wkt --tolerance 1e-3 --qtag 421_Census/S/SC_1e-3_1 --local
+2022-03-21 17:23:32,085|14051|application_1639015019875_1665|INFO|npartitions=1063
+2022-03-21 17:23:32,085|14051|application_1639015019875_1665|101|TIME|start|421_Census/S/SC_1e-3_1
+2022-03-21 17:23:44,932|26898|application_1639015019875_1665|INFO|nEdgesA=784762
+2022-03-21 17:23:48,087|30053|application_1639015019875_1665|INFO|nEdgesB=868105
+2022-03-21 17:23:48,087|30053|application_1639015019875_1665|16002|TIME|read|421_Census/S/SC_1e-3_1
+2022-03-21 17:23:50,876|32842|application_1639015019875_1665|2789|TIME|layer1|421_Census/S/SC_1e-3_1
+2022-03-21 17:23:52,482|34448|application_1639015019875_1665|1606|TIME|layer2|421_Census/S/SC_1e-3_1
+2022-03-21 17:23:55,970|37936|application_1639015019875_1665|3488|TIME|overlay|421_Census/S/SC_1e-3_1
+2022-03-21 17:23:55,971|37937|application_1639015019875_1665|1|TIME|end|421_Census/S/SC_1e-3_1
+hdfs dfs -mkdir Census/S/SD/
+hdfs dfs -put ~/Datasets/Census/SD/SD2000.wkt Census/S/SD/A.wkt
+hdfs dfs -put ~/Datasets/Census/SD/SD2010.wkt Census/S/SD/B.wkt
+./QuadPart -d Census/S/SD -p 164 -t 1e-3
+./Perf -d Census/S/SD -p 164 -t 1e-3 -n 1
+DATASET    = Census/S/SD
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 164
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/SD/P164 /home/acald013/RIDIR/local_path/Census/S/SD/P164/ 1e-3 "164_Census/S/SD_1e-3_1" yarn 
+2022-03-21 17:24:13,667|13784|application_1639015019875_1666|14021|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/SD/P164/edgesA --input2 Census/S/SD/P164/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/SD/P164//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/SD/P164//boundary.wkt --tolerance 1e-3 --qtag 164_Census/S/SD_1e-3_1 --local
+2022-03-21 17:24:13,752|13869|application_1639015019875_1666|INFO|npartitions=499
+2022-03-21 17:24:13,753|13870|application_1639015019875_1666|87|TIME|start|164_Census/S/SD_1e-3_1
+2022-03-21 17:24:25,183|25300|application_1639015019875_1666|INFO|nEdgesA=374206
+2022-03-21 17:24:27,276|27393|application_1639015019875_1666|INFO|nEdgesB=338269
+2022-03-21 17:24:27,276|27393|application_1639015019875_1666|13523|TIME|read|164_Census/S/SD_1e-3_1
+2022-03-21 17:24:29,294|29411|application_1639015019875_1666|2018|TIME|layer1|164_Census/S/SD_1e-3_1
+2022-03-21 17:24:30,788|30905|application_1639015019875_1666|1494|TIME|layer2|164_Census/S/SD_1e-3_1
+2022-03-21 17:24:33,312|33429|application_1639015019875_1666|2524|TIME|overlay|164_Census/S/SD_1e-3_1
+2022-03-21 17:24:33,312|33429|application_1639015019875_1666|0|TIME|end|164_Census/S/SD_1e-3_1
+hdfs dfs -mkdir Census/S/TN/
+hdfs dfs -put ~/Datasets/Census/TN/TN2000.wkt Census/S/TN/A.wkt
+hdfs dfs -put ~/Datasets/Census/TN/TN2010.wkt Census/S/TN/B.wkt
+./QuadPart -d Census/S/TN -p 693 -t 1e-3
+./Perf -d Census/S/TN -p 693 -t 1e-3 -n 1
+DATASET    = Census/S/TN
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 693
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/TN/P693 /home/acald013/RIDIR/local_path/Census/S/TN/P693/ 1e-3 "693_Census/S/TN_1e-3_1" yarn 
+2022-03-21 17:24:52,196|14168|application_1639015019875_1667|14437|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/TN/P693/edgesA --input2 Census/S/TN/P693/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/TN/P693//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/TN/P693//boundary.wkt --tolerance 1e-3 --qtag 693_Census/S/TN_1e-3_1 --local
+2022-03-21 17:24:52,312|14284|application_1639015019875_1667|INFO|npartitions=1777
+2022-03-21 17:24:52,312|14284|application_1639015019875_1667|116|TIME|start|693_Census/S/TN_1e-3_1
+2022-03-21 17:25:06,874|28846|application_1639015019875_1667|INFO|nEdgesA=1327280
+2022-03-21 17:25:11,784|33756|application_1639015019875_1667|INFO|nEdgesB=1427991
+2022-03-21 17:25:11,785|33757|application_1639015019875_1667|19473|TIME|read|693_Census/S/TN_1e-3_1
+2022-03-21 17:25:15,706|37678|application_1639015019875_1667|3921|TIME|layer1|693_Census/S/TN_1e-3_1
+2022-03-21 17:25:18,414|40386|application_1639015019875_1667|2708|TIME|layer2|693_Census/S/TN_1e-3_1
+2022-03-21 17:25:22,949|44921|application_1639015019875_1667|4535|TIME|overlay|693_Census/S/TN_1e-3_1
+2022-03-21 17:25:22,950|44922|application_1639015019875_1667|1|TIME|end|693_Census/S/TN_1e-3_1
+hdfs dfs -mkdir Census/S/TX/
+hdfs dfs -put ~/Datasets/Census/TX/TX2000.wkt Census/S/TX/A.wkt
+hdfs dfs -put ~/Datasets/Census/TX/TX2010.wkt Census/S/TX/B.wkt
+./QuadPart -d Census/S/TX -p 1417 -t 1e-3
+./Perf -d Census/S/TX -p 1417 -t 1e-3 -n 1
+DATASET    = Census/S/TX
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 1417
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/TX/P1417 /home/acald013/RIDIR/local_path/Census/S/TX/P1417/ 1e-3 "1417_Census/S/TX_1e-3_1" yarn 
+2022-03-21 17:25:42,186|13590|application_1639015019875_1668|13829|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/TX/P1417/edgesA --input2 Census/S/TX/P1417/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/TX/P1417//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/TX/P1417//boundary.wkt --tolerance 1e-3 --qtag 1417_Census/S/TX_1e-3_1 --local
+2022-03-21 17:25:42,332|13736|application_1639015019875_1668|INFO|npartitions=3871
+2022-03-21 17:25:42,333|13737|application_1639015019875_1668|147|TIME|start|1417_Census/S/TX_1e-3_1
+2022-03-21 17:26:01,684|33088|application_1639015019875_1668|INFO|nEdgesA=2869512
+2022-03-21 17:26:10,647|42051|application_1639015019875_1668|INFO|nEdgesB=2914228
+2022-03-21 17:26:10,647|42051|application_1639015019875_1668|28314|TIME|read|1417_Census/S/TX_1e-3_1
+2022-03-21 17:26:18,251|49655|application_1639015019875_1668|7604|TIME|layer1|1417_Census/S/TX_1e-3_1
+2022-03-21 17:26:25,345|56749|application_1639015019875_1668|7094|TIME|layer2|1417_Census/S/TX_1e-3_1
+2022-03-21 17:26:35,850|67254|application_1639015019875_1668|10505|TIME|overlay|1417_Census/S/TX_1e-3_1
+2022-03-21 17:26:35,851|67255|application_1639015019875_1668|1|TIME|end|1417_Census/S/TX_1e-3_1
+hdfs dfs -mkdir Census/S/UT/
+hdfs dfs -put ~/Datasets/Census/UT/UT2000.wkt Census/S/UT/A.wkt
+hdfs dfs -put ~/Datasets/Census/UT/UT2010.wkt Census/S/UT/B.wkt
+./QuadPart -d Census/S/UT -p 237 -t 1e-3
+./Perf -d Census/S/UT -p 237 -t 1e-3 -n 1
+DATASET    = Census/S/UT
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 237
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/UT/P237 /home/acald013/RIDIR/local_path/Census/S/UT/P237/ 1e-3 "237_Census/S/UT_1e-3_1" yarn 
+2022-03-21 17:26:54,582|14363|application_1639015019875_1669|14610|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/UT/P237/edgesA --input2 Census/S/UT/P237/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/UT/P237//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/UT/P237//boundary.wkt --tolerance 1e-3 --qtag 237_Census/S/UT_1e-3_1 --local
+2022-03-21 17:26:54,664|14445|application_1639015019875_1669|INFO|npartitions=679
+2022-03-21 17:26:54,664|14445|application_1639015019875_1669|82|TIME|start|237_Census/S/UT_1e-3_1
+2022-03-21 17:27:06,267|26048|application_1639015019875_1669|INFO|nEdgesA=483923
+2022-03-21 17:27:08,275|28056|application_1639015019875_1669|INFO|nEdgesB=488004
+2022-03-21 17:27:08,275|28056|application_1639015019875_1669|13611|TIME|read|237_Census/S/UT_1e-3_1
+2022-03-21 17:27:11,136|30917|application_1639015019875_1669|2861|TIME|layer1|237_Census/S/UT_1e-3_1
+2022-03-21 17:27:12,771|32552|application_1639015019875_1669|1634|TIME|layer2|237_Census/S/UT_1e-3_1
+2022-03-21 17:27:16,111|35892|application_1639015019875_1669|3341|TIME|overlay|237_Census/S/UT_1e-3_1
+2022-03-21 17:27:16,111|35892|application_1639015019875_1669|0|TIME|end|237_Census/S/UT_1e-3_1
+hdfs dfs -mkdir Census/S/VT/
+hdfs dfs -put ~/Datasets/Census/VT/VT2000.wkt Census/S/VT/A.wkt
+hdfs dfs -put ~/Datasets/Census/VT/VT2010.wkt Census/S/VT/B.wkt
+./QuadPart -d Census/S/VT -p 32 -t 1e-3
+./Perf -d Census/S/VT -p 32 -t 1e-3 -n 1
+DATASET    = Census/S/VT
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 32
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/VT/P32 /home/acald013/RIDIR/local_path/Census/S/VT/P32/ 1e-3 "32_Census/S/VT_1e-3_1" yarn 
+2022-03-21 17:27:33,828|13904|application_1639015019875_1670|14229|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/VT/P32/edgesA --input2 Census/S/VT/P32/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/VT/P32//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/VT/P32//boundary.wkt --tolerance 1e-3 --qtag 32_Census/S/VT_1e-3_1 --local
+2022-03-21 17:27:33,880|13956|application_1639015019875_1670|INFO|npartitions=85
+2022-03-21 17:27:33,881|13957|application_1639015019875_1670|53|TIME|start|32_Census/S/VT_1e-3_1
+2022-03-21 17:27:43,368|23444|application_1639015019875_1670|INFO|nEdgesA=65996
+2022-03-21 17:27:44,726|24802|application_1639015019875_1670|INFO|nEdgesB=66771
+2022-03-21 17:27:44,726|24802|application_1639015019875_1670|10845|TIME|read|32_Census/S/VT_1e-3_1
+2022-03-21 17:27:45,928|26004|application_1639015019875_1670|1202|TIME|layer1|32_Census/S/VT_1e-3_1
+2022-03-21 17:27:46,556|26632|application_1639015019875_1670|628|TIME|layer2|32_Census/S/VT_1e-3_1
+2022-03-21 17:27:47,882|27958|application_1639015019875_1670|1326|TIME|overlay|32_Census/S/VT_1e-3_1
+2022-03-21 17:27:47,882|27958|application_1639015019875_1670|0|TIME|end|32_Census/S/VT_1e-3_1
+hdfs dfs -mkdir Census/S/VA/
+hdfs dfs -put ~/Datasets/Census/VA/VA2000.wkt Census/S/VA/A.wkt
+hdfs dfs -put ~/Datasets/Census/VA/VA2010.wkt Census/S/VA/B.wkt
+./QuadPart -d Census/S/VA -p 655 -t 1e-3
+./Perf -d Census/S/VA -p 655 -t 1e-3 -n 1
+DATASET    = Census/S/VA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 655
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/VA/P655 /home/acald013/RIDIR/local_path/Census/S/VA/P655/ 1e-3 "655_Census/S/VA_1e-3_1" yarn 
+2022-03-21 17:28:05,873|13484|application_1639015019875_1671|13721|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/VA/P655/edgesA --input2 Census/S/VA/P655/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/VA/P655//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/VA/P655//boundary.wkt --tolerance 1e-3 --qtag 655_Census/S/VA_1e-3_1 --local
+2022-03-21 17:28:05,997|13608|application_1639015019875_1671|INFO|npartitions=1690
+2022-03-21 17:28:05,998|13609|application_1639015019875_1671|125|TIME|start|655_Census/S/VA_1e-3_1
+2022-03-21 17:28:20,583|28194|application_1639015019875_1671|INFO|nEdgesA=1258554
+2022-03-21 17:28:24,837|32448|application_1639015019875_1671|INFO|nEdgesB=1347781
+2022-03-21 17:28:24,839|32450|application_1639015019875_1671|18841|TIME|read|655_Census/S/VA_1e-3_1
+2022-03-21 17:28:28,628|36239|application_1639015019875_1671|3789|TIME|layer1|655_Census/S/VA_1e-3_1
+2022-03-21 17:28:31,355|38966|application_1639015019875_1671|2727|TIME|layer2|655_Census/S/VA_1e-3_1
+2022-03-21 17:28:36,505|44116|application_1639015019875_1671|5150|TIME|overlay|655_Census/S/VA_1e-3_1
+2022-03-21 17:28:36,505|44116|application_1639015019875_1671|0|TIME|end|655_Census/S/VA_1e-3_1
+hdfs dfs -mkdir Census/S/WA/
+hdfs dfs -put ~/Datasets/Census/WA/WA2000.wkt Census/S/WA/A.wkt
+hdfs dfs -put ~/Datasets/Census/WA/WA2010.wkt Census/S/WA/B.wkt
+./QuadPart -d Census/S/WA -p 429 -t 1e-3
+./Perf -d Census/S/WA -p 429 -t 1e-3 -n 1
+DATASET    = Census/S/WA
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 429
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/WA/P429 /home/acald013/RIDIR/local_path/Census/S/WA/P429/ 1e-3 "429_Census/S/WA_1e-3_1" yarn 
+2022-03-21 17:28:54,489|13639|application_1639015019875_1672|13884|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/WA/P429/edgesA --input2 Census/S/WA/P429/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/WA/P429//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/WA/P429//boundary.wkt --tolerance 1e-3 --qtag 429_Census/S/WA_1e-3_1 --local
+2022-03-21 17:28:54,593|13743|application_1639015019875_1672|INFO|npartitions=1135
+2022-03-21 17:28:54,593|13743|application_1639015019875_1672|104|TIME|start|429_Census/S/WA_1e-3_1
+2022-03-21 17:29:07,661|26811|application_1639015019875_1672|INFO|nEdgesA=820157
+2022-03-21 17:29:10,930|30080|application_1639015019875_1672|INFO|nEdgesB=883123
+2022-03-21 17:29:10,930|30080|application_1639015019875_1672|16337|TIME|read|429_Census/S/WA_1e-3_1
+2022-03-21 17:29:13,777|32927|application_1639015019875_1672|2847|TIME|layer1|429_Census/S/WA_1e-3_1
+2022-03-21 17:29:15,593|34743|application_1639015019875_1672|1816|TIME|layer2|429_Census/S/WA_1e-3_1
+2022-03-21 17:29:18,756|37906|application_1639015019875_1672|3163|TIME|overlay|429_Census/S/WA_1e-3_1
+2022-03-21 17:29:18,756|37906|application_1639015019875_1672|0|TIME|end|429_Census/S/WA_1e-3_1
+hdfs dfs -mkdir Census/S/WV/
+hdfs dfs -put ~/Datasets/Census/WV/WV2000.wkt Census/S/WV/A.wkt
+hdfs dfs -put ~/Datasets/Census/WV/WV2010.wkt Census/S/WV/B.wkt
+./QuadPart -d Census/S/WV -p 365 -t 1e-3
+./Perf -d Census/S/WV -p 365 -t 1e-3 -n 1
+DATASET    = Census/S/WV
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 365
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/WV/P365 /home/acald013/RIDIR/local_path/Census/S/WV/P365/ 1e-3 "365_Census/S/WV_1e-3_1" yarn 
+2022-03-21 17:29:36,786|13759|application_1639015019875_1673|13998|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/WV/P365/edgesA --input2 Census/S/WV/P365/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/WV/P365//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/WV/P365//boundary.wkt --tolerance 1e-3 --qtag 365_Census/S/WV_1e-3_1 --local
+2022-03-21 17:29:36,879|13852|application_1639015019875_1673|INFO|npartitions=949
+2022-03-21 17:29:36,879|13852|application_1639015019875_1673|93|TIME|start|365_Census/S/WV_1e-3_1
+2022-03-21 17:29:49,569|26542|application_1639015019875_1673|INFO|nEdgesA=729575
+2022-03-21 17:29:52,912|29885|application_1639015019875_1673|INFO|nEdgesB=752375
+2022-03-21 17:29:52,912|29885|application_1639015019875_1673|16033|TIME|read|365_Census/S/WV_1e-3_1
+2022-03-21 17:29:55,596|32569|application_1639015019875_1673|2684|TIME|layer1|365_Census/S/WV_1e-3_1
+2022-03-21 17:29:57,778|34751|application_1639015019875_1673|2182|TIME|layer2|365_Census/S/WV_1e-3_1
+2022-03-21 17:30:01,649|38622|application_1639015019875_1673|3871|TIME|overlay|365_Census/S/WV_1e-3_1
+2022-03-21 17:30:01,650|38623|application_1639015019875_1673|1|TIME|end|365_Census/S/WV_1e-3_1
+hdfs dfs -mkdir Census/S/WI/
+hdfs dfs -put ~/Datasets/Census/WI/WI2000.wkt Census/S/WI/A.wkt
+hdfs dfs -put ~/Datasets/Census/WI/WI2010.wkt Census/S/WI/B.wkt
+./QuadPart -d Census/S/WI -p 362 -t 1e-3
+./Perf -d Census/S/WI -p 362 -t 1e-3 -n 1
+DATASET    = Census/S/WI
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 362
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/WI/P362 /home/acald013/RIDIR/local_path/Census/S/WI/P362/ 1e-3 "362_Census/S/WI_1e-3_1" yarn 
+2022-03-21 17:30:19,516|13681|application_1639015019875_1674|13926|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/WI/P362/edgesA --input2 Census/S/WI/P362/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/WI/P362//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/WI/P362//boundary.wkt --tolerance 1e-3 --qtag 362_Census/S/WI_1e-3_1 --local
+2022-03-21 17:30:19,654|13819|application_1639015019875_1674|INFO|npartitions=970
+2022-03-21 17:30:19,654|13819|application_1639015019875_1674|138|TIME|start|362_Census/S/WI_1e-3_1
+2022-03-21 17:30:32,984|27149|application_1639015019875_1674|INFO|nEdgesA=773292
+2022-03-21 17:30:37,051|31216|application_1639015019875_1674|INFO|nEdgesB=745762
+2022-03-21 17:30:37,052|31217|application_1639015019875_1674|17398|TIME|read|362_Census/S/WI_1e-3_1
+2022-03-21 17:30:39,709|33874|application_1639015019875_1674|2657|TIME|layer1|362_Census/S/WI_1e-3_1
+2022-03-21 17:30:41,484|35649|application_1639015019875_1674|1775|TIME|layer2|362_Census/S/WI_1e-3_1
+2022-03-21 17:30:45,317|39482|application_1639015019875_1674|3833|TIME|overlay|362_Census/S/WI_1e-3_1
+2022-03-21 17:30:45,317|39482|application_1639015019875_1674|0|TIME|end|362_Census/S/WI_1e-3_1
+hdfs dfs -mkdir Census/S/WY/
+hdfs dfs -put ~/Datasets/Census/WY/WY2000.wkt Census/S/WY/A.wkt
+hdfs dfs -put ~/Datasets/Census/WY/WY2010.wkt Census/S/WY/B.wkt
+./QuadPart -d Census/S/WY -p 109 -t 1e-3
+./Perf -d Census/S/WY -p 109 -t 1e-3 -n 1
+DATASET    = Census/S/WY
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 109
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/WY/P109 /home/acald013/RIDIR/local_path/Census/S/WY/P109/ 1e-3 "109_Census/S/WY_1e-3_1" yarn 
+2022-03-21 17:31:03,144|13860|application_1639015019875_1675|14095|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/WY/P109/edgesA --input2 Census/S/WY/P109/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/WY/P109//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/WY/P109//boundary.wkt --tolerance 1e-3 --qtag 109_Census/S/WY_1e-3_1 --local
+2022-03-21 17:31:03,209|13925|application_1639015019875_1675|INFO|npartitions=343
+2022-03-21 17:31:03,210|13926|application_1639015019875_1675|66|TIME|start|109_Census/S/WY_1e-3_1
+2022-03-21 17:31:13,704|24420|application_1639015019875_1675|INFO|nEdgesA=225166
+2022-03-21 17:31:15,382|26098|application_1639015019875_1675|INFO|nEdgesB=225574
+2022-03-21 17:31:15,383|26099|application_1639015019875_1675|12173|TIME|read|109_Census/S/WY_1e-3_1
+2022-03-21 17:31:17,112|27828|application_1639015019875_1675|1729|TIME|layer1|109_Census/S/WY_1e-3_1
+2022-03-21 17:31:18,102|28818|application_1639015019875_1675|990|TIME|layer2|109_Census/S/WY_1e-3_1
+2022-03-21 17:31:20,306|31022|application_1639015019875_1675|2204|TIME|overlay|109_Census/S/WY_1e-3_1
+2022-03-21 17:31:20,306|31022|application_1639015019875_1675|0|TIME|end|109_Census/S/WY_1e-3_1
+hdfs dfs -mkdir Census/S/AS/
+hdfs dfs -put ~/Datasets/Census/AS/AS2000.wkt Census/S/AS/A.wkt
+hdfs dfs -put ~/Datasets/Census/AS/AS2010.wkt Census/S/AS/B.wkt
+./QuadPart -d Census/S/AS -p 1 -t 1e-3
+./Perf -d Census/S/AS -p 1 -t 1e-3 -n 1
+DATASET    = Census/S/AS
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 1
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/AS/P1 /home/acald013/RIDIR/local_path/Census/S/AS/P1/ 1e-3 "1_Census/S/AS_1e-3_1" yarn 
+2022-03-21 17:31:37,522|13315|application_1639015019875_1676|13558|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/AS/P1/edgesA --input2 Census/S/AS/P1/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/AS/P1//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/AS/P1//boundary.wkt --tolerance 1e-3 --qtag 1_Census/S/AS_1e-3_1 --local
+2022-03-21 17:31:37,568|13361|application_1639015019875_1676|INFO|npartitions=1
+2022-03-21 17:31:37,569|13362|application_1639015019875_1676|47|TIME|start|1_Census/S/AS_1e-3_1
+2022-03-21 17:31:46,170|21963|application_1639015019875_1676|INFO|nEdgesA=4884
+2022-03-21 17:31:51,117|26910|application_1639015019875_1676|INFO|nEdgesB=3306
+2022-03-21 17:31:51,117|26910|application_1639015019875_1676|13548|TIME|read|1_Census/S/AS_1e-3_1
+2022-03-21 17:31:51,979|27772|application_1639015019875_1676|862|TIME|layer1|1_Census/S/AS_1e-3_1
+2022-03-21 17:31:52,719|28512|application_1639015019875_1676|740|TIME|layer2|1_Census/S/AS_1e-3_1
+2022-03-21 17:31:54,054|29847|application_1639015019875_1676|1335|TIME|overlay|1_Census/S/AS_1e-3_1
+2022-03-21 17:31:54,055|29848|application_1639015019875_1676|1|TIME|end|1_Census/S/AS_1e-3_1
+hdfs dfs -mkdir Census/S/GU/
+hdfs dfs -put ~/Datasets/Census/GU/GU2000.wkt Census/S/GU/A.wkt
+hdfs dfs -put ~/Datasets/Census/GU/GU2010.wkt Census/S/GU/B.wkt
+./QuadPart -d Census/S/GU -p 26 -t 1e-3
+./Perf -d Census/S/GU -p 26 -t 1e-3 -n 1
+DATASET    = Census/S/GU
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 26
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/GU/P26 /home/acald013/RIDIR/local_path/Census/S/GU/P26/ 1e-3 "26_Census/S/GU_1e-3_1" yarn 
+2022-03-21 17:32:12,045|13855|application_1639015019875_1677|14119|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/GU/P26/edgesA --input2 Census/S/GU/P26/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/GU/P26//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/GU/P26//boundary.wkt --tolerance 1e-3 --qtag 26_Census/S/GU_1e-3_1 --local
+2022-03-21 17:32:12,100|13910|application_1639015019875_1677|INFO|npartitions=76
+2022-03-21 17:32:12,100|13910|application_1639015019875_1677|55|TIME|start|26_Census/S/GU_1e-3_1
+2022-03-21 17:32:21,340|23150|application_1639015019875_1677|INFO|nEdgesA=16826
+2022-03-21 17:32:22,584|24394|application_1639015019875_1677|INFO|nEdgesB=53878
+2022-03-21 17:32:22,584|24394|application_1639015019875_1677|10484|TIME|read|26_Census/S/GU_1e-3_1
+2022-03-21 17:32:23,221|25031|application_1639015019875_1677|637|TIME|layer1|26_Census/S/GU_1e-3_1
+2022-03-21 17:32:24,057|25867|application_1639015019875_1677|836|TIME|layer2|26_Census/S/GU_1e-3_1
+2022-03-21 17:32:25,013|26823|application_1639015019875_1677|956|TIME|overlay|26_Census/S/GU_1e-3_1
+2022-03-21 17:32:25,014|26824|application_1639015019875_1677|1|TIME|end|26_Census/S/GU_1e-3_1
+hdfs dfs -mkdir Census/S/MP/
+hdfs dfs -put ~/Datasets/Census/MP/MP2000.wkt Census/S/MP/A.wkt
+hdfs dfs -put ~/Datasets/Census/MP/MP2010.wkt Census/S/MP/B.wkt
+./QuadPart -d Census/S/MP -p 18 -t 1e-3
+./Perf -d Census/S/MP -p 18 -t 1e-3 -n 1
+DATASET    = Census/S/MP
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 18
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/MP/P18 /home/acald013/RIDIR/local_path/Census/S/MP/P18/ 1e-3 "18_Census/S/MP_1e-3_1" yarn 
+2022-03-21 17:32:42,622|13700|application_1639015019875_1678|13941|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/MP/P18/edgesA --input2 Census/S/MP/P18/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/MP/P18//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/MP/P18//boundary.wkt --tolerance 1e-3 --qtag 18_Census/S/MP_1e-3_1 --local
+2022-03-21 17:32:42,677|13755|application_1639015019875_1678|INFO|npartitions=67
+2022-03-21 17:32:42,678|13756|application_1639015019875_1678|56|TIME|start|18_Census/S/MP_1e-3_1
+2022-03-21 17:32:51,670|22748|application_1639015019875_1678|INFO|nEdgesA=8362
+2022-03-21 17:32:52,883|23961|application_1639015019875_1678|INFO|nEdgesB=37108
+2022-03-21 17:32:52,883|23961|application_1639015019875_1678|10205|TIME|read|18_Census/S/MP_1e-3_1
+2022-03-21 17:32:53,777|24855|application_1639015019875_1678|894|TIME|layer1|18_Census/S/MP_1e-3_1
+2022-03-21 17:32:54,574|25652|application_1639015019875_1678|797|TIME|layer2|18_Census/S/MP_1e-3_1
+2022-03-21 17:32:55,399|26477|application_1639015019875_1678|825|TIME|overlay|18_Census/S/MP_1e-3_1
+2022-03-21 17:32:55,400|26478|application_1639015019875_1678|1|TIME|end|18_Census/S/MP_1e-3_1
+hdfs dfs -mkdir Census/S/PR/
+hdfs dfs -put ~/Datasets/Census/PR/PR2000.wkt Census/S/PR/A.wkt
+hdfs dfs -put ~/Datasets/Census/PR/PR2010.wkt Census/S/PR/B.wkt
+./QuadPart -d Census/S/PR -p 169 -t 1e-3
+./Perf -d Census/S/PR -p 169 -t 1e-3 -n 1
+DATASET    = Census/S/PR
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 169
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/PR/P169 /home/acald013/RIDIR/local_path/Census/S/PR/P169/ 1e-3 "169_Census/S/PR_1e-3_1" yarn 
+2022-03-21 17:33:12,804|13610|application_1639015019875_1679|13853|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/PR/P169/edgesA --input2 Census/S/PR/P169/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/PR/P169//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/PR/P169//boundary.wkt --tolerance 1e-3 --qtag 169_Census/S/PR_1e-3_1 --local
+2022-03-21 17:33:12,871|13677|application_1639015019875_1679|INFO|npartitions=427
+2022-03-21 17:33:12,872|13678|application_1639015019875_1679|68|TIME|start|169_Census/S/PR_1e-3_1
+2022-03-21 17:33:24,353|25159|application_1639015019875_1679|INFO|nEdgesA=334657
+2022-03-21 17:33:26,482|27288|application_1639015019875_1679|INFO|nEdgesB=348645
+2022-03-21 17:33:26,482|27288|application_1639015019875_1679|13610|TIME|read|169_Census/S/PR_1e-3_1
+2022-03-21 17:33:28,252|29058|application_1639015019875_1679|1770|TIME|layer1|169_Census/S/PR_1e-3_1
+2022-03-21 17:33:29,326|30132|application_1639015019875_1679|1074|TIME|layer2|169_Census/S/PR_1e-3_1
+2022-03-21 17:33:31,360|32166|application_1639015019875_1679|2034|TIME|overlay|169_Census/S/PR_1e-3_1
+2022-03-21 17:33:31,360|32166|application_1639015019875_1679|0|TIME|end|169_Census/S/PR_1e-3_1
+hdfs dfs -mkdir Census/S/VI/
+hdfs dfs -put ~/Datasets/Census/VI/VI2000.wkt Census/S/VI/A.wkt
+hdfs dfs -put ~/Datasets/Census/VI/VI2010.wkt Census/S/VI/B.wkt
+./QuadPart -d Census/S/VI -p 19 -t 1e-3
+./Perf -d Census/S/VI -p 19 -t 1e-3 -n 1
+DATASET    = Census/S/VI
+TOLERANCE  = 1e-3
+ITERATIONS = 1
+PARTITIONS = 19
+MASTER     = yarn
+Run 1 ./sdcel2_debug Census/S/VI/P19 /home/acald013/RIDIR/local_path/Census/S/VI/P19/ 1e-3 "19_Census/S/VI_1e-3_1" yarn 
+2022-03-21 17:33:49,551|14386|application_1639015019875_1680|14643|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=35g --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/S/VI/P19/edgesA --input2 Census/S/VI/P19/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/S/VI/P19//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/S/VI/P19//boundary.wkt --tolerance 1e-3 --qtag 19_Census/S/VI_1e-3_1 --local
+2022-03-21 17:33:49,609|14444|application_1639015019875_1680|INFO|npartitions=58
+2022-03-21 17:33:49,609|14444|application_1639015019875_1680|59|TIME|start|19_Census/S/VI_1e-3_1
+2022-03-21 17:33:58,809|23644|application_1639015019875_1680|INFO|nEdgesA=58638
+2022-03-21 17:33:59,853|24688|application_1639015019875_1680|INFO|nEdgesB=40172
+2022-03-21 17:33:59,854|24689|application_1639015019875_1680|10245|TIME|read|19_Census/S/VI_1e-3_1
+2022-03-21 17:34:01,431|26266|application_1639015019875_1680|1577|TIME|layer1|19_Census/S/VI_1e-3_1
+2022-03-21 17:34:02,080|26915|application_1639015019875_1680|649|TIME|layer2|19_Census/S/VI_1e-3_1
+2022-03-21 17:34:03,278|28113|application_1639015019875_1680|1198|TIME|overlay|19_Census/S/VI_1e-3_1
+2022-03-21 17:34:03,278|28113|application_1639015019875_1680|0|TIME|end|19_Census/S/VI_1e-3_1

@@ -1,7 +1,8 @@
 #!/bin/bash
 
-NPARTITIONS=$1
+MASTER=yarn
 
+NPARTITIONS=$1
 HDFS_PATH=$2
 INPUT1=$HDFS_PATH/A.wkt
 INPUT2=$HDFS_PATH/B.wkt
@@ -35,7 +36,6 @@ SPARK_JARS=$HOME/Spark/2.4/jars/
 JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
 CLASS="edu.ucr.dblab.sdcel.QuadtreeGenerator"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
-MASTER=yarn
 
 spark-submit \
     --master $MASTER \

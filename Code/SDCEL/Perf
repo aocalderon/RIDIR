@@ -1,16 +1,96 @@
 #!/bin/bash
 
-PS=(1000 2000 3000 4000 5000 6000 7000 8000 10000 11000 12000 13000 14000 15000 16000 17000 18000 19000 20000)
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-d|--dataset)
+	    DATASET="$2"
+	    shift
+	    shift
+	    ;;
+	-t|--tolerance)
+	    TOLERANCE="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-f|--first)
+	    FIRST="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-i|--increment)
+	    INCREMENT="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-l|--last)
+	    LAST="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-n|--iterations)
+	    N="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-p|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-m|--master)
+	    MASTER="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	--debug)
+	    DEBUG="--debug"
+	    shift # past argument
+	    ;;
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+echo "DATASET    = ${DATASET}"
+echo "TOLERANCE  = ${TOLERANCE}"
+
+if [ -z ${PARTITIONS+x} ] # if PARTITIONS does not exist...
+then 
+    PS=(`seq $FIRST $INCREMENT $LAST`)
+    echo "FIRST      = ${FIRST}"
+    echo "INCREMENT  = ${INCREMENT}"
+    echo "LAST       = ${LAST}"    
+else 
+    PS=(`seq $PARTITIONS 1 $PARTITIONS`)    
+    echo "PARTITIONS = ${PARTITIONS}"
+fi
+
+if [ -v N ];     then echo "ITERATIONS = ${N}"; else N=1; fi
+if [ -v DEBUG ]; then echo "DEBUG      = YES";  else DEBUG=""; fi
+if [ -v MASTER ]
+then
+    echo "MASTER     = ${MASTER}"
+else
+    MASTER="yarn"
+    echo "MASTER     = yarn"
+fi
+
 #PS=(5000)
-HDFS_PATH=$1
-TOLERANCE=$2
-N=$3
 
 for n in $(seq 1 $N)
 do
     for P in "${PS[@]}"
     do
-	echo "Run $n ./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE \"${P}_${HDFS_PATH}_${TOLERANCE}_${n}\""
-	./sdcel2_debug $HDFS_PATH/P$P /home/acald013/RIDIR/local_path/$HDFS_PATH/P$P/ $TOLERANCE "${P}_${HDFS_PATH}_${TOLERANCE}_${n}"
+	echo "Run $n ./sdcel2_debug $DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ $TOLERANCE \"${P}_${DATASET}_${TOLERANCE}_${n}\" ${MASTER} ${DEBUG}"
+	./sdcel2_debug $DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ $TOLERANCE "${P}_${DATASET}_${TOLERANCE}_${n}" $MASTER $DEBUG
     done
 done

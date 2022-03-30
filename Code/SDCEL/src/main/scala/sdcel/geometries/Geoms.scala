@@ -17,6 +17,8 @@ case class LEdge(coords: Array[Coordinate], l: LineString) extends Edge(coords)
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
   label: String = "A", crossingInfo: String = "None", nedges: Int = -1) {
 
+  def isCrossingBorder: Boolean = crossingInfo != "None"
+
   private var cellBorder = false
   def setCellBorder(cb: Boolean) = { cellBorder = cb }
   def getCellBorder(): Boolean = { cellBorder }
@@ -166,16 +168,16 @@ case class Half_edge(edge: LineString) {
       if(coords.size >= 4){
         geofactory.createPolygon(coords)
       } else {
-        println("Error creating polygon face. Less than 4 vertices...")
-        println(this)
+        logger.info("Error creating polygon face. Less than 4 vertices...")
+        logger.info(this.toString)
         emptyPolygon
       }
     } catch {
       case e: java.lang.IllegalArgumentException => {
-        println("Error creating polygon face...")
+        logger.info("Error creating polygon face...")
         //println(e.getMessage)
         //println(coords.mkString(" "))
-        println(this)
+        logger.info(this.toString)
         emptyPolygon
       }
     }
@@ -209,7 +211,7 @@ case class Half_edge(edge: LineString) {
       minx:Double,miny:Double,maxx:Double,maxy:Double,tags:Set[String])
         : (List[Half_edge], Envelope, String) = {
       val next = hedges.last.next
-      if( next == null || next == hedges.head){
+      if( next == null || next == hedges.head || hedges.exists(_ == next)){
         val mbr = new Envelope(minx,maxx,miny,maxy)
         hedges.head.mbr = mbr
         val ftag = if(tags.exists(_.split(" ").size > 1)){
@@ -249,7 +251,7 @@ case class Half_edge(edge: LineString) {
       (implicit geofactory: GeometryFactory): (List[Half_edge], Envelope, Polygon) = {
 
       val next = hedges.last.next
-      if( next == null || next == hedges.head){
+      if( next == null || next == hedges.head || hedges.exists(_ == next)){
         val mbr = new Envelope(minx,maxx,miny,maxy)
         hedges.head.mbr = mbr
         val ring = coords :+ hedges.head.v1
@@ -257,7 +259,7 @@ case class Half_edge(edge: LineString) {
           geofactory.createPolygon(ring)
         else{
           logger.info(s"${hedges.head.toString}")
-          hedges.foreach(println)
+          logger.info(hedges.mkString("\n"))
           geofactory.createPolygon(Array.empty[Coordinate])
         }
         hedges.head.poly = poly
@@ -293,7 +295,7 @@ case class Half_edge(edge: LineString) {
     def getNextsTailrec(hedges: List[Half_edge], i: Int): List[Half_edge] = {
 
       val next = hedges.last.next
-      if( next == null || next == hedges.head){
+      if( next == null || next == hedges.head || hedges.exists(_ == next)){
         hedges
       } else if(i >= MAX_RECURSION){
         List.empty[Half_edge]
@@ -550,9 +552,13 @@ case class Segment(hedges: List[Half_edge]) {
 }
 
 case class Cell(id: Int, lineage: String, mbr: LinearRing){
+  var lids: List[String] = List.empty[String]
+  var hasCrossingEdges: Boolean = true
   val boundary = mbr.getEnvelopeInternal
 
-  def wkt(implicit geofactory: GeometryFactory) = s"${toPolygon.toText}\t${lineage}\t${id}"
+  def getLids: List[String] = if(lids.isEmpty) List(lineage) else lids
+
+  def wkt(implicit geofactory: GeometryFactory) = s"${toPolygon.toText}\tL${lineage}\t${id}"
 
   def toPolygon(implicit geofactory: GeometryFactory): Polygon = {
     geofactory.createPolygon(mbr)

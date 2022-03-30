@@ -1,0 +1,74 @@
+#!/bin/bash
+
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-d|--dataset)
+	    DATASET="$2"
+	    shift
+	    shift
+	    ;;
+	-n|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-p|--partition)
+	    PARTITION="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-t|--tolerance)
+	    TOLERANCE="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-m|--master)
+	    MASTER="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	--debug)
+	    DEBUG="--debug"
+	    shift # past argument
+	    ;;
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+echo "DATASET    = ${DATASET}"
+echo "PARTITIONS = ${PARTITIONS}"
+echo "PARTITION  = ${PARTITION}"
+echo "TOLERANCE  = ${TOLERANCE}"
+
+if [ -v DEBUG ];  then echo "DEBUG      = YES";  else DEBUG=""; fi
+if [ -v MASTER ]; then echo "MASTER     = ${MASTER}"; else MASTER="local"; echo "MASTER     = local"; fi
+
+PARTPAD=$(printf "%05d" $PARTITION)
+PART_PRIME=$(hdfs dfs -ls ${DATASET}/P${PARTITIONS}/edgesA/part-${PARTPAD}*)
+PART=`echo $PART_PRIME | cut -d' ' -f8`
+QTAG="${DATASET}_${PARTITIONS}_${PARTITION}_${TOLERANCE}"
+
+SPARK_JARS=$HOME/Spark/2.4/jars/
+JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
+CLASS="edu.ucr.dblab.sdcel.SDCEL2_byPartition"
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
+
+spark-submit \
+    --files $LOG_FILE \
+    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
+    --master $MASTER --deploy-mode client \
+    --class $CLASS $JAR \
+    --input1 $PART \
+    --quadtree $HOME/RIDIR/local_path/${DATASET}/P${PARTITIONS}/quadtree.wkt \
+    --boundary $HOME/RIDIR/local_path/${DATASET}/P${PARTITIONS}/boundary.wkt \
+    --partition $PARTITION \
+    --tolerance $TOLERANCE --qtag $QTAG $DEBUG

@@ -1,0 +1,540 @@
+./QuadPlusPart 1000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P1000 ...
+2022-03-17 18:35:48,271|13424|application_1639015019875_1152|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P1000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P1000/boundary.wkt --partitions 1000 --tolerance 1e-6
+2022-03-17 18:35:48,271|13424|application_1639015019875_1152|INFO|scale=1000000.0
+2022-03-17 18:35:48,280|13433|application_1639015019875_1152|TIME|Start
+2022-03-17 18:36:06,668|31821|application_1639015019875_1152|INFO|edgesA=35417146
+2022-03-17 18:36:18,464|43617|application_1639015019875_1152|INFO|edgesB=36764043
+2022-03-17 18:36:23,123|48276|application_1639015019875_1152|TIME|Read
+2022-03-17 18:36:23,124|48277|Partition by number (1000)
+2022-03-17 18:36:23,131|48284|Fraction: 0.010050632780618051
+2022-03-17 18:36:31,182|56335|application_1639015019875_1152|INFO|partitions=2434
+2022-03-17 18:36:31,182|56335|application_1639015019875_1152|TIME|Partition
+2022-03-17 18:36:31,189|56342|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P1000/boundary.wkt in 0.00s [1 records].
+2022-03-17 18:36:31,343|56496|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P1000/quadtree.wkt in 0.01s [2434 records].
+2022-03-17 18:36:31,512|56665|application_1639015019875_1152|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P1000/edgesA/
+rm -f -r Census/MainUS/P1000/edgesB/
+2022-03-17 18:36:48,413|13637|application_1639015019875_1153|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P1000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P1000/boundary.wkt --apath Census/MainUS/P1000/edgesA --bpath Census/MainUS/P1000/edgesB --tolerance 1e-6 --save
+2022-03-17 18:36:48,414|13638|application_1639015019875_1153|INFO|scale=1000000.0
+2022-03-17 18:36:48,427|13651|application_1639015019875_1153|TIME|Start
+2022-03-17 18:37:06,073|31297|application_1639015019875_1153|INFO|edgesA=35417146
+2022-03-17 18:37:21,711|46935|application_1639015019875_1153|INFO|edgesB=36764043
+2022-03-17 18:37:21,722|46946|application_1639015019875_1153|TIME|Read
+2022-03-17 18:38:01,512|86736|application_1639015019875_1153|TIME|Saving
+./QuadPlusPart 2000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P2000 ...
+2022-03-17 18:38:23,933|16026|application_1639015019875_1154|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P2000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P2000/boundary.wkt --partitions 2000 --tolerance 1e-6
+2022-03-17 18:38:23,934|16027|application_1639015019875_1154|INFO|scale=1000000.0
+2022-03-17 18:38:23,942|16035|application_1639015019875_1154|TIME|Start
+2022-03-17 18:38:41,320|33413|application_1639015019875_1154|INFO|edgesA=35417146
+2022-03-17 18:38:51,374|43467|application_1639015019875_1154|INFO|edgesB=36764043
+2022-03-17 18:38:59,723|51816|application_1639015019875_1154|TIME|Read
+2022-03-17 18:38:59,724|51817|Partition by number (2000)
+2022-03-17 18:38:59,728|51821|Fraction: 0.010050632780618051
+2022-03-17 18:39:02,868|54961|application_1639015019875_1154|INFO|partitions=4936
+2022-03-17 18:39:02,868|54961|application_1639015019875_1154|TIME|Partition
+2022-03-17 18:39:02,874|54967|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P2000/boundary.wkt in 0.00s [1 records].
+2022-03-17 18:39:03,110|55203|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P2000/quadtree.wkt in 0.01s [4936 records].
+2022-03-17 18:39:03,280|55373|application_1639015019875_1154|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P2000/edgesA/
+rm -f -r Census/MainUS/P2000/edgesB/
+2022-03-17 18:39:20,788|14324|application_1639015019875_1155|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P2000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P2000/boundary.wkt --apath Census/MainUS/P2000/edgesA --bpath Census/MainUS/P2000/edgesB --tolerance 1e-6 --save
+2022-03-17 18:39:20,789|14325|application_1639015019875_1155|INFO|scale=1000000.0
+2022-03-17 18:39:20,803|14339|application_1639015019875_1155|TIME|Start
+2022-03-17 18:39:38,513|32049|application_1639015019875_1155|INFO|edgesA=35417146
+2022-03-17 18:39:51,496|45032|application_1639015019875_1155|INFO|edgesB=36764043
+2022-03-17 18:39:51,506|45042|application_1639015019875_1155|TIME|Read
+2022-03-17 18:40:45,019|98555|application_1639015019875_1155|TIME|Saving
+./QuadPlusPart 3000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P3000 ...
+2022-03-17 18:41:05,654|14042|application_1639015019875_1156|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P3000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P3000/boundary.wkt --partitions 3000 --tolerance 1e-6
+2022-03-17 18:41:05,655|14043|application_1639015019875_1156|INFO|scale=1000000.0
+2022-03-17 18:41:05,663|14051|application_1639015019875_1156|TIME|Start
+2022-03-17 18:41:22,970|31358|application_1639015019875_1156|INFO|edgesA=35417146
+2022-03-17 18:41:34,048|42436|application_1639015019875_1156|INFO|edgesB=36764043
+2022-03-17 18:41:39,100|47488|application_1639015019875_1156|TIME|Read
+2022-03-17 18:41:39,101|47489|Partition by number (3000)
+2022-03-17 18:41:39,105|47493|Fraction: 0.010050632780618051
+2022-03-17 18:41:42,148|50536|application_1639015019875_1156|INFO|partitions=7291
+2022-03-17 18:41:42,148|50536|application_1639015019875_1156|TIME|Partition
+2022-03-17 18:41:42,153|50541|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P3000/boundary.wkt in 0.00s [1 records].
+2022-03-17 18:41:42,428|50816|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P3000/quadtree.wkt in 0.01s [7291 records].
+2022-03-17 18:41:42,578|50966|application_1639015019875_1156|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P3000/edgesA/
+rm -f -r Census/MainUS/P3000/edgesB/
+2022-03-17 18:41:59,384|13589|application_1639015019875_1157|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P3000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P3000/boundary.wkt --apath Census/MainUS/P3000/edgesA --bpath Census/MainUS/P3000/edgesB --tolerance 1e-6 --save
+2022-03-17 18:41:59,384|13589|application_1639015019875_1157|INFO|scale=1000000.0
+2022-03-17 18:41:59,397|13602|application_1639015019875_1157|TIME|Start
+2022-03-17 18:42:18,067|32272|application_1639015019875_1157|INFO|edgesA=35417146
+2022-03-17 18:42:30,421|44626|application_1639015019875_1157|INFO|edgesB=36764043
+2022-03-17 18:42:30,431|44636|application_1639015019875_1157|TIME|Read
+2022-03-17 18:43:45,352|119557|application_1639015019875_1157|TIME|Saving
+./QuadPlusPart 4000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P4000 ...
+2022-03-17 18:44:05,848|13847|application_1639015019875_1158|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P4000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P4000/boundary.wkt --partitions 4000 --tolerance 1e-6
+2022-03-17 18:44:05,848|13847|application_1639015019875_1158|INFO|scale=1000000.0
+2022-03-17 18:44:05,858|13857|application_1639015019875_1158|TIME|Start
+2022-03-17 18:44:23,745|31744|application_1639015019875_1158|INFO|edgesA=35417146
+2022-03-17 18:44:35,050|43049|application_1639015019875_1158|INFO|edgesB=36764043
+2022-03-17 18:44:40,241|48240|application_1639015019875_1158|TIME|Read
+2022-03-17 18:44:40,241|48240|Partition by number (4000)
+2022-03-17 18:44:40,246|48245|Fraction: 0.010050632780618051
+2022-03-17 18:44:45,063|53062|application_1639015019875_1158|INFO|partitions=9859
+2022-03-17 18:44:45,063|53062|application_1639015019875_1158|TIME|Partition
+2022-03-17 18:44:45,069|53068|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P4000/boundary.wkt in 0.00s [1 records].
+2022-03-17 18:44:45,397|53396|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P4000/quadtree.wkt in 0.02s [9859 records].
+2022-03-17 18:44:45,555|53554|application_1639015019875_1158|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P4000/edgesA/
+rm -f -r Census/MainUS/P4000/edgesB/
+2022-03-17 18:45:02,230|13477|application_1639015019875_1159|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P4000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P4000/boundary.wkt --apath Census/MainUS/P4000/edgesA --bpath Census/MainUS/P4000/edgesB --tolerance 1e-6 --save
+2022-03-17 18:45:02,231|13478|application_1639015019875_1159|INFO|scale=1000000.0
+2022-03-17 18:45:02,243|13490|application_1639015019875_1159|TIME|Start
+2022-03-17 18:45:20,978|32225|application_1639015019875_1159|INFO|edgesA=35417146
+2022-03-17 18:45:31,982|43229|application_1639015019875_1159|INFO|edgesB=36764043
+2022-03-17 18:45:31,993|43240|application_1639015019875_1159|TIME|Read
+2022-03-17 18:47:02,701|133948|application_1639015019875_1159|TIME|Saving
+./QuadPlusPart 5000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P5000 ...
+2022-03-17 18:47:23,153|13813|application_1639015019875_1160|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P5000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P5000/boundary.wkt --partitions 5000 --tolerance 1e-6
+2022-03-17 18:47:23,154|13814|application_1639015019875_1160|INFO|scale=1000000.0
+2022-03-17 18:47:23,165|13825|application_1639015019875_1160|TIME|Start
+2022-03-17 18:47:40,838|31498|application_1639015019875_1160|INFO|edgesA=35417146
+2022-03-17 18:47:52,565|43225|application_1639015019875_1160|INFO|edgesB=36764043
+2022-03-17 18:47:57,540|48200|application_1639015019875_1160|TIME|Read
+2022-03-17 18:47:57,541|48201|Partition by number (5000)
+2022-03-17 18:47:57,544|48204|Fraction: 0.010050632780618051
+2022-03-17 18:48:00,748|51408|application_1639015019875_1160|INFO|partitions=12343
+2022-03-17 18:48:00,748|51408|application_1639015019875_1160|TIME|Partition
+2022-03-17 18:48:00,754|51414|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P5000/boundary.wkt in 0.00s [1 records].
+2022-03-17 18:48:01,111|51771|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P5000/quadtree.wkt in 0.02s [12343 records].
+2022-03-17 18:48:01,283|51943|application_1639015019875_1160|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P5000/edgesA/
+rm -f -r Census/MainUS/P5000/edgesB/
+2022-03-17 18:48:18,071|13564|application_1639015019875_1161|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P5000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P5000/boundary.wkt --apath Census/MainUS/P5000/edgesA --bpath Census/MainUS/P5000/edgesB --tolerance 1e-6 --save
+2022-03-17 18:48:18,071|13564|application_1639015019875_1161|INFO|scale=1000000.0
+2022-03-17 18:48:18,084|13577|application_1639015019875_1161|TIME|Start
+2022-03-17 18:48:37,224|32717|application_1639015019875_1161|INFO|edgesA=35417146
+2022-03-17 18:48:49,634|45127|application_1639015019875_1161|INFO|edgesB=36764043
+2022-03-17 18:48:49,653|45146|application_1639015019875_1161|TIME|Read
+2022-03-17 18:50:38,274|153767|application_1639015019875_1161|TIME|Saving
+./QuadPlusPart 6000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P6000 ...
+2022-03-17 18:51:00,081|13790|application_1639015019875_1162|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P6000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P6000/boundary.wkt --partitions 6000 --tolerance 1e-6
+2022-03-17 18:51:00,081|13790|application_1639015019875_1162|INFO|scale=1000000.0
+2022-03-17 18:51:00,090|13799|application_1639015019875_1162|TIME|Start
+2022-03-17 18:51:18,706|32415|application_1639015019875_1162|INFO|edgesA=35417146
+2022-03-17 18:51:32,720|46429|application_1639015019875_1162|INFO|edgesB=36764043
+2022-03-17 18:51:37,282|50991|application_1639015019875_1162|TIME|Read
+2022-03-17 18:51:37,283|50992|Partition by number (6000)
+2022-03-17 18:51:37,290|50999|Fraction: 0.010050632780618051
+2022-03-17 18:51:40,513|54222|application_1639015019875_1162|INFO|partitions=14968
+2022-03-17 18:51:40,513|54222|application_1639015019875_1162|TIME|Partition
+2022-03-17 18:51:40,520|54229|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P6000/boundary.wkt in 0.00s [1 records].
+2022-03-17 18:51:40,950|54659|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P6000/quadtree.wkt in 0.03s [14968 records].
+2022-03-17 18:51:41,122|54831|application_1639015019875_1162|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P6000/edgesA/
+rm -f -r Census/MainUS/P6000/edgesB/
+2022-03-17 18:51:57,934|13592|application_1639015019875_1163|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P6000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P6000/boundary.wkt --apath Census/MainUS/P6000/edgesA --bpath Census/MainUS/P6000/edgesB --tolerance 1e-6 --save
+2022-03-17 18:51:57,935|13593|application_1639015019875_1163|INFO|scale=1000000.0
+2022-03-17 18:51:57,948|13606|application_1639015019875_1163|TIME|Start
+2022-03-17 18:52:16,690|32348|application_1639015019875_1163|INFO|edgesA=35417146
+2022-03-17 18:52:36,039|51697|application_1639015019875_1163|INFO|edgesB=36764043
+2022-03-17 18:52:36,053|51711|application_1639015019875_1163|TIME|Read
+2022-03-17 18:54:48,536|184194|application_1639015019875_1163|TIME|Saving
+./QuadPlusPart 7000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P7000 ...
+2022-03-17 18:55:09,044|13786|application_1639015019875_1164|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P7000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P7000/boundary.wkt --partitions 7000 --tolerance 1e-6
+2022-03-17 18:55:09,044|13786|application_1639015019875_1164|INFO|scale=1000000.0
+2022-03-17 18:55:09,053|13795|application_1639015019875_1164|TIME|Start
+2022-03-17 18:55:27,102|31844|application_1639015019875_1164|INFO|edgesA=35417146
+2022-03-17 18:55:37,972|42714|application_1639015019875_1164|INFO|edgesB=36764043
+2022-03-17 18:55:42,324|47066|application_1639015019875_1164|TIME|Read
+2022-03-17 18:55:42,325|47067|Partition by number (7000)
+2022-03-17 18:55:42,329|47071|Fraction: 0.010050632780618051
+2022-03-17 18:55:45,292|50034|application_1639015019875_1164|INFO|partitions=17404
+2022-03-17 18:55:45,292|50034|application_1639015019875_1164|TIME|Partition
+2022-03-17 18:55:45,298|50040|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P7000/boundary.wkt in 0.00s [1 records].
+2022-03-17 18:55:45,741|50483|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P7000/quadtree.wkt in 0.03s [17404 records].
+2022-03-17 18:55:45,895|50637|application_1639015019875_1164|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P7000/edgesA/
+rm -f -r Census/MainUS/P7000/edgesB/
+2022-03-17 18:56:02,666|13556|application_1639015019875_1165|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P7000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P7000/boundary.wkt --apath Census/MainUS/P7000/edgesA --bpath Census/MainUS/P7000/edgesB --tolerance 1e-6 --save
+2022-03-17 18:56:02,666|13556|application_1639015019875_1165|INFO|scale=1000000.0
+2022-03-17 18:56:02,679|13569|application_1639015019875_1165|TIME|Start
+2022-03-17 18:56:22,451|33341|application_1639015019875_1165|INFO|edgesA=35417146
+2022-03-17 18:56:32,079|42969|application_1639015019875_1165|INFO|edgesB=36764043
+2022-03-17 18:56:32,092|42982|application_1639015019875_1165|TIME|Read
+2022-03-17 18:59:08,373|199263|application_1639015019875_1165|TIME|Saving
+./QuadPlusPart 8000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P8000 ...
+2022-03-17 18:59:28,909|13731|application_1639015019875_1166|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P8000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P8000/boundary.wkt --partitions 8000 --tolerance 1e-6
+2022-03-17 18:59:28,909|13731|application_1639015019875_1166|INFO|scale=1000000.0
+2022-03-17 18:59:28,918|13740|application_1639015019875_1166|TIME|Start
+2022-03-17 18:59:46,306|31128|application_1639015019875_1166|INFO|edgesA=35417146
+2022-03-17 18:59:59,306|44128|application_1639015019875_1166|INFO|edgesB=36764043
+2022-03-17 19:00:08,249|53071|application_1639015019875_1166|TIME|Read
+2022-03-17 19:00:08,250|53072|Partition by number (8000)
+2022-03-17 19:00:08,257|53079|Fraction: 0.010050632780618051
+2022-03-17 19:00:11,449|56271|application_1639015019875_1166|INFO|partitions=19786
+2022-03-17 19:00:11,450|56272|application_1639015019875_1166|TIME|Partition
+2022-03-17 19:00:11,458|56280|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P8000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:00:12,079|56901|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P8000/quadtree.wkt in 0.03s [19786 records].
+2022-03-17 19:00:12,244|57066|application_1639015019875_1166|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P8000/edgesA/
+rm -f -r Census/MainUS/P8000/edgesB/
+2022-03-17 19:00:29,537|14066|application_1639015019875_1167|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P8000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P8000/boundary.wkt --apath Census/MainUS/P8000/edgesA --bpath Census/MainUS/P8000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:00:29,537|14066|application_1639015019875_1167|INFO|scale=1000000.0
+2022-03-17 19:00:29,550|14079|application_1639015019875_1167|TIME|Start
+2022-03-17 19:00:46,500|31029|application_1639015019875_1167|INFO|edgesA=35417146
+2022-03-17 19:00:55,561|40090|application_1639015019875_1167|INFO|edgesB=36764043
+2022-03-17 19:00:55,573|40102|application_1639015019875_1167|TIME|Read
+2022-03-17 19:03:59,300|223829|application_1639015019875_1167|TIME|Saving
+./QuadPlusPart 9000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P9000 ...
+2022-03-17 19:04:20,200|13945|application_1639015019875_1168|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P9000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P9000/boundary.wkt --partitions 9000 --tolerance 1e-6
+2022-03-17 19:04:20,201|13946|application_1639015019875_1168|INFO|scale=1000000.0
+2022-03-17 19:04:20,214|13959|application_1639015019875_1168|TIME|Start
+2022-03-17 19:04:37,175|30920|application_1639015019875_1168|INFO|edgesA=35417146
+2022-03-17 19:04:49,686|43431|application_1639015019875_1168|INFO|edgesB=36764043
+2022-03-17 19:04:51,289|45034|application_1639015019875_1168|TIME|Read
+2022-03-17 19:04:51,290|45035|Partition by number (9000)
+2022-03-17 19:04:51,295|45040|Fraction: 0.010050632780618051
+2022-03-17 19:04:54,548|48293|application_1639015019875_1168|INFO|partitions=22267
+2022-03-17 19:04:54,548|48293|application_1639015019875_1168|TIME|Partition
+2022-03-17 19:04:54,555|48300|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P9000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:04:55,050|48795|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P9000/quadtree.wkt in 0.03s [22267 records].
+2022-03-17 19:04:55,208|48953|application_1639015019875_1168|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P9000/edgesA/
+rm -f -r Census/MainUS/P9000/edgesB/
+2022-03-17 19:05:11,931|13537|application_1639015019875_1169|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P9000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P9000/boundary.wkt --apath Census/MainUS/P9000/edgesA --bpath Census/MainUS/P9000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:05:11,932|13538|application_1639015019875_1169|INFO|scale=1000000.0
+2022-03-17 19:05:11,945|13551|application_1639015019875_1169|TIME|Start
+2022-03-17 19:05:32,542|34148|application_1639015019875_1169|INFO|edgesA=35417146
+2022-03-17 19:05:45,238|46844|application_1639015019875_1169|INFO|edgesB=36764043
+2022-03-17 19:05:45,248|46854|application_1639015019875_1169|TIME|Read
+2022-03-17 19:09:03,671|245277|application_1639015019875_1169|TIME|Saving
+./QuadPlusPart 10000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P10000 ...
+2022-03-17 19:09:24,115|13850|application_1639015019875_1170|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P10000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P10000/boundary.wkt --partitions 10000 --tolerance 1e-6
+2022-03-17 19:09:24,116|13851|application_1639015019875_1170|INFO|scale=1000000.0
+2022-03-17 19:09:24,125|13860|application_1639015019875_1170|TIME|Start
+2022-03-17 19:09:43,203|32938|application_1639015019875_1170|INFO|edgesA=35417146
+2022-03-17 19:09:54,029|43764|application_1639015019875_1170|INFO|edgesB=36764043
+2022-03-17 19:09:55,265|45000|application_1639015019875_1170|TIME|Read
+2022-03-17 19:09:55,265|45000|Partition by number (10000)
+2022-03-17 19:09:55,269|45004|Fraction: 0.010050632780618051
+2022-03-17 19:09:58,341|48076|application_1639015019875_1170|INFO|partitions=24886
+2022-03-17 19:09:58,341|48076|application_1639015019875_1170|TIME|Partition
+2022-03-17 19:09:58,347|48082|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P10000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:09:59,121|48856|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P10000/quadtree.wkt in 0.06s [24886 records].
+2022-03-17 19:09:59,287|49022|application_1639015019875_1170|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P10000/edgesA/
+rm -f -r Census/MainUS/P10000/edgesB/
+2022-03-17 19:10:15,968|13405|application_1639015019875_1171|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P10000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P10000/boundary.wkt --apath Census/MainUS/P10000/edgesA --bpath Census/MainUS/P10000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:10:15,968|13405|application_1639015019875_1171|INFO|scale=1000000.0
+2022-03-17 19:10:15,982|13419|application_1639015019875_1171|TIME|Start
+2022-03-17 19:10:35,657|33094|application_1639015019875_1171|INFO|edgesA=35417146
+2022-03-17 19:10:48,018|45455|application_1639015019875_1171|INFO|edgesB=36764043
+2022-03-17 19:10:48,028|45465|application_1639015019875_1171|TIME|Read
+2022-03-17 19:14:30,208|267645|application_1639015019875_1171|TIME|Saving
+./QuadPlusPart 11000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P11000 ...
+2022-03-17 19:14:51,525|14414|application_1639015019875_1172|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P11000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P11000/boundary.wkt --partitions 11000 --tolerance 1e-6
+2022-03-17 19:14:51,525|14414|application_1639015019875_1172|INFO|scale=1000000.0
+2022-03-17 19:14:51,534|14423|application_1639015019875_1172|TIME|Start
+2022-03-17 19:15:11,645|34534|application_1639015019875_1172|INFO|edgesA=35417146
+2022-03-17 19:15:24,156|47045|application_1639015019875_1172|INFO|edgesB=36764043
+2022-03-17 19:15:28,911|51800|application_1639015019875_1172|TIME|Read
+2022-03-17 19:15:28,911|51800|Partition by number (11000)
+2022-03-17 19:15:28,915|51804|Fraction: 0.010050632780618051
+2022-03-17 19:15:32,416|55305|application_1639015019875_1172|INFO|partitions=27841
+2022-03-17 19:15:32,416|55305|application_1639015019875_1172|TIME|Partition
+2022-03-17 19:15:32,422|55311|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P11000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:15:33,041|55930|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P11000/quadtree.wkt in 0.05s [27841 records].
+2022-03-17 19:15:33,197|56086|application_1639015019875_1172|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P11000/edgesA/
+rm -f -r Census/MainUS/P11000/edgesB/
+2022-03-17 19:15:50,041|13637|application_1639015019875_1173|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P11000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P11000/boundary.wkt --apath Census/MainUS/P11000/edgesA --bpath Census/MainUS/P11000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:15:50,041|13637|application_1639015019875_1173|INFO|scale=1000000.0
+2022-03-17 19:15:50,055|13651|application_1639015019875_1173|TIME|Start
+2022-03-17 19:16:07,943|31539|application_1639015019875_1173|INFO|edgesA=35417146
+2022-03-17 19:16:20,513|44109|application_1639015019875_1173|INFO|edgesB=36764043
+2022-03-17 19:16:20,525|44121|application_1639015019875_1173|TIME|Read
+2022-03-17 19:20:38,531|302127|application_1639015019875_1173|TIME|Saving
+./QuadPlusPart 12000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P12000 ...
+2022-03-17 19:20:58,804|13438|application_1639015019875_1174|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P12000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P12000/boundary.wkt --partitions 12000 --tolerance 1e-6
+2022-03-17 19:20:58,805|13439|application_1639015019875_1174|INFO|scale=1000000.0
+2022-03-17 19:20:58,813|13447|application_1639015019875_1174|TIME|Start
+2022-03-17 19:21:16,700|31334|application_1639015019875_1174|INFO|edgesA=35417146
+2022-03-17 19:21:28,757|43391|application_1639015019875_1174|INFO|edgesB=36764043
+2022-03-17 19:21:35,098|49732|application_1639015019875_1174|TIME|Read
+2022-03-17 19:21:35,099|49733|Partition by number (12000)
+2022-03-17 19:21:35,105|49739|Fraction: 0.010050632780618051
+2022-03-17 19:21:39,000|53634|application_1639015019875_1174|INFO|partitions=30187
+2022-03-17 19:21:39,000|53634|application_1639015019875_1174|TIME|Partition
+2022-03-17 19:21:39,006|53640|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P12000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:21:39,623|54257|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P12000/quadtree.wkt in 0.05s [30187 records].
+2022-03-17 19:21:39,783|54417|application_1639015019875_1174|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P12000/edgesA/
+rm -f -r Census/MainUS/P12000/edgesB/
+2022-03-17 19:21:57,024|14094|application_1639015019875_1175|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P12000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P12000/boundary.wkt --apath Census/MainUS/P12000/edgesA --bpath Census/MainUS/P12000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:21:57,024|14094|application_1639015019875_1175|INFO|scale=1000000.0
+2022-03-17 19:21:57,038|14108|application_1639015019875_1175|TIME|Start
+2022-03-17 19:22:15,318|32388|application_1639015019875_1175|INFO|edgesA=35417146
+2022-03-17 19:22:27,186|44256|application_1639015019875_1175|INFO|edgesB=36764043
+2022-03-17 19:22:27,197|44267|application_1639015019875_1175|TIME|Read
+2022-03-17 19:27:05,061|322131|application_1639015019875_1175|TIME|Saving
+./QuadPlusPart 13000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P13000 ...
+2022-03-17 19:27:25,110|13654|application_1639015019875_1176|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P13000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P13000/boundary.wkt --partitions 13000 --tolerance 1e-6
+2022-03-17 19:27:25,110|13654|application_1639015019875_1176|INFO|scale=1000000.0
+2022-03-17 19:27:25,120|13664|application_1639015019875_1176|TIME|Start
+2022-03-17 19:27:42,688|31232|application_1639015019875_1176|INFO|edgesA=35417146
+2022-03-17 19:27:55,237|43781|application_1639015019875_1176|INFO|edgesB=36764043
+2022-03-17 19:27:55,792|44336|application_1639015019875_1176|TIME|Read
+2022-03-17 19:27:55,793|44337|Partition by number (13000)
+2022-03-17 19:27:55,797|44341|Fraction: 0.010050632780618051
+2022-03-17 19:28:02,619|51163|application_1639015019875_1176|INFO|partitions=33127
+2022-03-17 19:28:02,619|51163|application_1639015019875_1176|TIME|Partition
+2022-03-17 19:28:02,628|51172|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P13000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:28:03,307|51851|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P13000/quadtree.wkt in 0.05s [33127 records].
+2022-03-17 19:28:03,472|52016|application_1639015019875_1176|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P13000/edgesA/
+rm -f -r Census/MainUS/P13000/edgesB/
+2022-03-17 19:28:20,577|13868|application_1639015019875_1177|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P13000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P13000/boundary.wkt --apath Census/MainUS/P13000/edgesA --bpath Census/MainUS/P13000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:28:20,577|13868|application_1639015019875_1177|INFO|scale=1000000.0
+2022-03-17 19:28:20,590|13881|application_1639015019875_1177|TIME|Start
+2022-03-17 19:28:38,148|31439|application_1639015019875_1177|INFO|edgesA=35417146
+2022-03-17 19:28:48,953|42244|application_1639015019875_1177|INFO|edgesB=36764043
+2022-03-17 19:28:48,968|42259|application_1639015019875_1177|TIME|Read
+2022-03-17 19:34:08,850|362141|application_1639015019875_1177|TIME|Saving
+./QuadPlusPart 14000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P14000 ...
+2022-03-17 19:34:29,892|14445|application_1639015019875_1178|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P14000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P14000/boundary.wkt --partitions 14000 --tolerance 1e-6
+2022-03-17 19:34:29,893|14446|application_1639015019875_1178|INFO|scale=1000000.0
+2022-03-17 19:34:29,905|14458|application_1639015019875_1178|TIME|Start
+2022-03-17 19:34:47,608|32161|application_1639015019875_1178|INFO|edgesA=35417146
+2022-03-17 19:35:00,888|45441|application_1639015019875_1178|INFO|edgesB=36764043
+2022-03-17 19:35:06,087|50640|application_1639015019875_1178|TIME|Read
+2022-03-17 19:35:06,088|50641|Partition by number (14000)
+2022-03-17 19:35:06,095|50648|Fraction: 0.010050632780618051
+2022-03-17 19:35:09,498|54051|application_1639015019875_1178|INFO|partitions=35827
+2022-03-17 19:35:09,499|54052|application_1639015019875_1178|TIME|Partition
+2022-03-17 19:35:09,505|54058|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P14000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:35:10,219|54772|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P14000/quadtree.wkt in 0.05s [35827 records].
+2022-03-17 19:35:10,369|54922|application_1639015019875_1178|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P14000/edgesA/
+rm -f -r Census/MainUS/P14000/edgesB/
+2022-03-17 19:35:27,134|13579|application_1639015019875_1179|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P14000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P14000/boundary.wkt --apath Census/MainUS/P14000/edgesA --bpath Census/MainUS/P14000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:35:27,134|13579|application_1639015019875_1179|INFO|scale=1000000.0
+2022-03-17 19:35:27,147|13592|application_1639015019875_1179|TIME|Start
+2022-03-17 19:35:45,220|31665|application_1639015019875_1179|INFO|edgesA=35417146
+2022-03-17 19:35:58,069|44514|application_1639015019875_1179|INFO|edgesB=36764043
+2022-03-17 19:35:58,084|44529|application_1639015019875_1179|TIME|Read
+2022-03-17 19:41:47,703|394148|application_1639015019875_1179|TIME|Saving
+./QuadPlusPart 15000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P15000 ...
+2022-03-17 19:42:07,867|13495|application_1639015019875_1180|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P15000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P15000/boundary.wkt --partitions 15000 --tolerance 1e-6
+2022-03-17 19:42:07,868|13496|application_1639015019875_1180|INFO|scale=1000000.0
+2022-03-17 19:42:07,877|13505|application_1639015019875_1180|TIME|Start
+2022-03-17 19:42:27,719|33347|application_1639015019875_1180|INFO|edgesA=35417146
+2022-03-17 19:42:37,803|43431|application_1639015019875_1180|INFO|edgesB=36764043
+2022-03-17 19:42:38,556|44184|application_1639015019875_1180|TIME|Read
+2022-03-17 19:42:38,557|44185|Partition by number (15000)
+2022-03-17 19:42:38,561|44189|Fraction: 0.010050632780618051
+2022-03-17 19:42:43,169|48797|application_1639015019875_1180|INFO|partitions=38365
+2022-03-17 19:42:43,170|48798|application_1639015019875_1180|TIME|Partition
+2022-03-17 19:42:43,178|48806|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P15000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:42:44,123|49751|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P15000/quadtree.wkt in 0.11s [38365 records].
+2022-03-17 19:42:44,303|49931|application_1639015019875_1180|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P15000/edgesA/
+rm -f -r Census/MainUS/P15000/edgesB/
+2022-03-17 19:43:01,102|13570|application_1639015019875_1181|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P15000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P15000/boundary.wkt --apath Census/MainUS/P15000/edgesA --bpath Census/MainUS/P15000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:43:01,103|13571|application_1639015019875_1181|INFO|scale=1000000.0
+2022-03-17 19:43:01,118|13586|application_1639015019875_1181|TIME|Start
+2022-03-17 19:43:17,919|30387|application_1639015019875_1181|INFO|edgesA=35417146
+2022-03-17 19:43:30,066|42534|application_1639015019875_1181|INFO|edgesB=36764043
+2022-03-17 19:43:30,078|42546|application_1639015019875_1181|TIME|Read
+2022-03-17 19:49:50,610|423078|application_1639015019875_1181|TIME|Saving
+./QuadPlusPart 16000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P16000 ...
+2022-03-17 19:50:10,971|13626|application_1639015019875_1182|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P16000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P16000/boundary.wkt --partitions 16000 --tolerance 1e-6
+2022-03-17 19:50:10,971|13626|application_1639015019875_1182|INFO|scale=1000000.0
+2022-03-17 19:50:10,980|13635|application_1639015019875_1182|TIME|Start
+2022-03-17 19:50:31,466|34121|application_1639015019875_1182|INFO|edgesA=35417146
+2022-03-17 19:50:44,701|47356|application_1639015019875_1182|INFO|edgesB=36764043
+2022-03-17 19:50:45,790|48445|application_1639015019875_1182|TIME|Read
+2022-03-17 19:50:45,791|48446|Partition by number (16000)
+2022-03-17 19:50:45,795|48450|Fraction: 0.010050632780618051
+2022-03-17 19:50:53,750|56405|application_1639015019875_1182|INFO|partitions=40990
+2022-03-17 19:50:53,751|56406|application_1639015019875_1182|TIME|Partition
+2022-03-17 19:50:53,757|56412|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P16000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:50:54,509|57164|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P16000/quadtree.wkt in 0.06s [40990 records].
+2022-03-17 19:50:54,663|57318|application_1639015019875_1182|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P16000/edgesA/
+rm -f -r Census/MainUS/P16000/edgesB/
+2022-03-17 19:51:11,528|13611|application_1639015019875_1183|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P16000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P16000/boundary.wkt --apath Census/MainUS/P16000/edgesA --bpath Census/MainUS/P16000/edgesB --tolerance 1e-6 --save
+2022-03-17 19:51:11,528|13611|application_1639015019875_1183|INFO|scale=1000000.0
+2022-03-17 19:51:11,541|13624|application_1639015019875_1183|TIME|Start
+2022-03-17 19:51:29,539|31622|application_1639015019875_1183|INFO|edgesA=35417146
+2022-03-17 19:51:41,286|43369|application_1639015019875_1183|INFO|edgesB=36764043
+2022-03-17 19:51:41,298|43381|application_1639015019875_1183|TIME|Read
+2022-03-17 19:58:56,417|478500|application_1639015019875_1183|TIME|Saving
+./QuadPlusPart 17000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P17000 ...
+2022-03-17 19:59:16,781|13974|application_1639015019875_1184|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P17000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P17000/boundary.wkt --partitions 17000 --tolerance 1e-6
+2022-03-17 19:59:16,781|13974|application_1639015019875_1184|INFO|scale=1000000.0
+2022-03-17 19:59:16,791|13984|application_1639015019875_1184|TIME|Start
+2022-03-17 19:59:34,881|32074|application_1639015019875_1184|INFO|edgesA=35417146
+2022-03-17 19:59:47,151|44344|application_1639015019875_1184|INFO|edgesB=36764043
+2022-03-17 19:59:48,762|45955|application_1639015019875_1184|TIME|Read
+2022-03-17 19:59:48,763|45956|Partition by number (17000)
+2022-03-17 19:59:48,768|45961|Fraction: 0.010050632780618051
+2022-03-17 19:59:52,153|49346|application_1639015019875_1184|INFO|partitions=44272
+2022-03-17 19:59:52,154|49347|application_1639015019875_1184|TIME|Partition
+2022-03-17 19:59:52,160|49353|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P17000/boundary.wkt in 0.00s [1 records].
+2022-03-17 19:59:52,952|50145|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P17000/quadtree.wkt in 0.06s [44272 records].
+2022-03-17 19:59:53,119|50312|application_1639015019875_1184|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P17000/edgesA/
+rm -f -r Census/MainUS/P17000/edgesB/
+2022-03-17 20:00:17,948|21477|application_1639015019875_1185|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P17000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P17000/boundary.wkt --apath Census/MainUS/P17000/edgesA --bpath Census/MainUS/P17000/edgesB --tolerance 1e-6 --save
+2022-03-17 20:00:17,949|21478|application_1639015019875_1185|INFO|scale=1000000.0
+2022-03-17 20:00:17,962|21491|application_1639015019875_1185|TIME|Start
+2022-03-17 20:00:36,125|39654|application_1639015019875_1185|INFO|edgesA=35417146
+2022-03-17 20:00:48,405|51934|application_1639015019875_1185|INFO|edgesB=36764043
+2022-03-17 20:00:48,419|51948|application_1639015019875_1185|TIME|Read
+2022-03-17 20:08:45,999|529528|application_1639015019875_1185|TIME|Saving
+./QuadPlusPart 18000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P18000 ...
+2022-03-17 20:09:06,483|13621|application_1639015019875_1186|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P18000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P18000/boundary.wkt --partitions 18000 --tolerance 1e-6
+2022-03-17 20:09:06,484|13622|application_1639015019875_1186|INFO|scale=1000000.0
+2022-03-17 20:09:06,493|13631|application_1639015019875_1186|TIME|Start
+2022-03-17 20:09:25,625|32763|application_1639015019875_1186|INFO|edgesA=35417146
+2022-03-17 20:09:36,002|43140|application_1639015019875_1186|INFO|edgesB=36764043
+2022-03-17 20:09:36,796|43934|application_1639015019875_1186|TIME|Read
+2022-03-17 20:09:36,796|43934|Partition by number (18000)
+2022-03-17 20:09:36,800|43938|Fraction: 0.010050632780618051
+2022-03-17 20:09:40,510|47648|application_1639015019875_1186|INFO|partitions=46606
+2022-03-17 20:09:40,511|47649|application_1639015019875_1186|TIME|Partition
+2022-03-17 20:09:40,516|47654|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P18000/boundary.wkt in 0.00s [1 records].
+2022-03-17 20:09:41,438|48576|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P18000/quadtree.wkt in 0.09s [46606 records].
+2022-03-17 20:09:41,623|48761|application_1639015019875_1186|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P18000/edgesA/
+rm -f -r Census/MainUS/P18000/edgesB/
+2022-03-17 20:10:01,748|15658|application_1639015019875_1187|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P18000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P18000/boundary.wkt --apath Census/MainUS/P18000/edgesA --bpath Census/MainUS/P18000/edgesB --tolerance 1e-6 --save
+2022-03-17 20:10:01,748|15658|application_1639015019875_1187|INFO|scale=1000000.0
+2022-03-17 20:10:01,764|15674|application_1639015019875_1187|TIME|Start
+2022-03-17 20:10:22,707|36617|application_1639015019875_1187|INFO|edgesA=35417146
+2022-03-17 20:10:34,079|47989|application_1639015019875_1187|INFO|edgesB=36764043
+2022-03-17 20:10:34,098|48008|application_1639015019875_1187|TIME|Read
+2022-03-17 20:19:05,128|559038|application_1639015019875_1187|TIME|Saving
+./QuadPlusPart 19000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P19000 ...
+2022-03-17 20:19:25,725|13902|application_1639015019875_1188|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P19000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P19000/boundary.wkt --partitions 19000 --tolerance 1e-6
+2022-03-17 20:19:25,726|13903|application_1639015019875_1188|INFO|scale=1000000.0
+2022-03-17 20:19:25,735|13912|application_1639015019875_1188|TIME|Start
+2022-03-17 20:19:43,356|31533|application_1639015019875_1188|INFO|edgesA=35417146
+2022-03-17 20:19:54,132|42309|application_1639015019875_1188|INFO|edgesB=36764043
+2022-03-17 20:19:55,871|44048|application_1639015019875_1188|TIME|Read
+2022-03-17 20:19:55,871|44048|Partition by number (19000)
+2022-03-17 20:19:55,876|44053|Fraction: 0.010050632780618051
+2022-03-17 20:20:02,391|50568|application_1639015019875_1188|INFO|partitions=49372
+2022-03-17 20:20:02,391|50568|application_1639015019875_1188|TIME|Partition
+2022-03-17 20:20:02,397|50574|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P19000/boundary.wkt in 0.00s [1 records].
+2022-03-17 20:20:03,253|51430|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P19000/quadtree.wkt in 0.07s [49372 records].
+2022-03-17 20:20:03,410|51587|application_1639015019875_1188|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P19000/edgesA/
+rm -f -r Census/MainUS/P19000/edgesB/
+2022-03-17 20:20:20,625|13970|application_1639015019875_1189|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P19000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P19000/boundary.wkt --apath Census/MainUS/P19000/edgesA --bpath Census/MainUS/P19000/edgesB --tolerance 1e-6 --save
+2022-03-17 20:20:20,625|13970|application_1639015019875_1189|INFO|scale=1000000.0
+2022-03-17 20:20:20,638|13983|application_1639015019875_1189|TIME|Start
+2022-03-17 20:20:37,198|30543|application_1639015019875_1189|INFO|edgesA=35417146
+2022-03-17 20:20:48,782|42127|application_1639015019875_1189|INFO|edgesB=36764043
+2022-03-17 20:20:48,795|42140|application_1639015019875_1189|TIME|Read
+2022-03-17 20:30:35,068|628413|application_1639015019875_1189|TIME|Saving
+./QuadPlusPart 20000 Census/MainUS 1e-6
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/Census/MainUS/P20000 ...
+2022-03-17 20:30:55,630|14026|application_1639015019875_1190|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --qpath /home/acald013/RIDIR/local_path/Census/MainUS/P20000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/Census/MainUS/P20000/boundary.wkt --partitions 20000 --tolerance 1e-6
+2022-03-17 20:30:55,631|14027|application_1639015019875_1190|INFO|scale=1000000.0
+2022-03-17 20:30:55,640|14036|application_1639015019875_1190|TIME|Start
+2022-03-17 20:31:15,600|33996|application_1639015019875_1190|INFO|edgesA=35417146
+2022-03-17 20:31:28,549|46945|application_1639015019875_1190|INFO|edgesB=36764043
+2022-03-17 20:31:29,614|48010|application_1639015019875_1190|TIME|Read
+2022-03-17 20:31:29,614|48010|Partition by number (20000)
+2022-03-17 20:31:29,618|48014|Fraction: 0.010050632780618051
+2022-03-17 20:31:32,998|51394|application_1639015019875_1190|INFO|partitions=52252
+2022-03-17 20:31:32,999|51395|application_1639015019875_1190|TIME|Partition
+2022-03-17 20:31:33,008|51404|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P20000/boundary.wkt in 0.00s [1 records].
+2022-03-17 20:31:33,909|52305|Saved /home/acald013/RIDIR/local_path/Census/MainUS/P20000/quadtree.wkt in 0.08s [52252 records].
+2022-03-17 20:31:34,069|52465|application_1639015019875_1190|TIME|Close
+Partitioning edges...
+rm -f -r Census/MainUS/P20000/edgesA/
+rm -f -r Census/MainUS/P20000/edgesB/
+2022-03-17 20:31:51,154|13804|application_1639015019875_1191|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P20000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P20000/boundary.wkt --apath Census/MainUS/P20000/edgesA --bpath Census/MainUS/P20000/edgesB --tolerance 1e-6 --save
+2022-03-17 20:31:51,155|13805|application_1639015019875_1191|INFO|scale=1000000.0
+2022-03-17 20:31:51,167|13817|application_1639015019875_1191|TIME|Start
+2022-03-17 20:32:09,152|31802|application_1639015019875_1191|INFO|edgesA=35417146
+2022-03-17 20:32:20,688|43338|application_1639015019875_1191|INFO|edgesB=36764043
+2022-03-17 20:32:20,698|43348|application_1639015019875_1191|TIME|Read
+2022-03-17 20:42:17,324|639974|application_1639015019875_1191|TIME|Saving

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-d|--dataset)
+	    DATASET="$2"
+	    shift
+	    shift
+	    ;;
+	-n|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-p|--partition)
+	    PARTITION="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+echo "DATASET    = ${DATASET}"
+echo "PARTITIONS = ${PARTITIONS}"
+echo "PARTITION  = ${PARTITION}"
+
+PARTPAD=$(printf "%05d" $PARTITION)
+PARTA=$(hdfs dfs -ls ${DATASET}/P${PARTITIONS}/edgesA/part-${PARTPAD}*)
+echo $PARTA
+PARTB=$(hdfs dfs -ls ${DATASET}/P${PARTITIONS}/edgesB/part-${PARTPAD}*)
+echo $PARTB
+
+hdfs dfs -get -f `echo $PARTA | cut -d' ' -f8` /tmp/edgesXA${PARTITION}.wkt
+hdfs dfs -get -f `echo $PARTB | cut -d' ' -f8` /tmp/edgesXB${PARTITION}.wkt

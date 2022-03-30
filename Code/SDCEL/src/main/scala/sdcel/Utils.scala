@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate, Polygon, Poi
 import org.apache.spark.sql.{SparkSession, Dataset, Row, functions}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
+import org.apache.spark.SparkEnv
 
 import ch.cern.sparkmeasure.TaskMetrics
 
@@ -40,6 +41,13 @@ object Utils {
     
     logger.info(s"${settings.appId}|$duration|$msg")
     prev.t = now
+  }
+
+  def getPartitionLocation(pid: Long)(implicit settings: Settings): String = {
+    val eid  = SparkEnv.get.executorId
+    val host = java.net.InetAddress.getLocalHost().getHostName()
+    logger.info(s"Partition $pid at executor $eid in $host...")
+    s"${settings.appId}|${host}:${eid}"
   }
 
   def save(filename: String)(content: Seq[String]): Unit = {

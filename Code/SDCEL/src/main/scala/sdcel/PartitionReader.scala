@@ -49,11 +49,21 @@ object PartitionReader {
       (id -> cell)
     }.toMap
 
+    if(settings.debug){
+      log(s"INFO|npartitions=${cells.size}")
+      save{s"/tmp/edgesQ.wkt"}{
+        cells.values.map{ cell =>
+          val wkt = cell.wkt
+          s"$wkt\n"
+        }.toList
+      }
+    }    
+
     (quadtree, cells)
   }
 
   def readEdges[T](input: String, quadtree: StandardQuadTree[T], label: String)
-    (implicit geofactory: GeometryFactory, spark: SparkSession):
+    (implicit geofactory: GeometryFactory, spark: SparkSession, settings: Settings):
       RDD[LineString] = {
     
     // Reading data...
@@ -78,8 +88,45 @@ object PartitionReader {
           edge.setUserData(data)
           (partitionId, edge)
         }.toIterator
-      }.partitionBy(new SimplePartitioner(partitions))
+      }
+      //.persist(settings.persistance)
+      .partitionBy(new SimplePartitioner(partitions))
       .map(_._2)
+      .persist(settings.persistance)
+
+    edgesRDD
+  }
+
+  def readEdges_byPartition[T](input: String, label: String)
+    (implicit geofactory: GeometryFactory, spark: SparkSession, settings: Settings):
+      RDD[LineString] = {
+    
+    // Reading data...
+    val partitions = 1
+    val edgesRDD = spark.read.textFile(input).rdd
+      .mapPartitionsWithIndex{ case(index, lines) =>
+        val reader = new WKTReader(geofactory)
+        lines.map{ line =>
+          val arr = line.split("\t")
+          val wkt = arr(0)
+          val partitionId = arr(1).toInt
+          val polygonId = arr(2).toInt
+          val ringId = arr(3).toInt
+          val edgeId = arr(4).toInt
+          val isHole = arr(5).toBoolean
+          val nedges = try { arr(6).toInt }
+          catch { case e: java.lang.ArrayIndexOutOfBoundsException => -1 }
+          val cross  = try { arr(7) }
+          catch { case e: java.lang.ArrayIndexOutOfBoundsException => "" } 
+          val edge = reader.read(wkt).asInstanceOf[LineString]
+          val data = EdgeData(polygonId, ringId, edgeId, isHole, label, cross, nedges)
+          edge.setUserData(data)
+          (0, edge)
+        }.toIterator
+      }
+      .partitionBy(new SimplePartitioner(partitions))
+      .map(_._2)
+      .persist(settings.persistance)
 
     edgesRDD
   }

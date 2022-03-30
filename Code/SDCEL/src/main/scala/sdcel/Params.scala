@@ -12,6 +12,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val bycapacity:  ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val readid:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
+  val partition:   ScallopOption[Int]     = opt[Int]     (default = Some(0))
 
   val fraction:    ScallopOption[Double]  = opt[Double]  (default = Some(0.01))
   val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
@@ -21,7 +22,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val notmerge:    ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-  val overlay:     ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val overlay:     ScallopOption[Boolean] = opt[Boolean] (default = Some(true))
   val output:      ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
   val persistance: ScallopOption[Int]     = opt[Int]     (default = Some(1))
 

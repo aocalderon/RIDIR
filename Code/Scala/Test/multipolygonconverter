@@ -1,0 +1,53 @@
+#!/bin/bash
+
+EXECUTORS=12
+CORES=9
+DMEMORY=24g
+EMEMORY=30g
+SPARK_JARS=$HOME/Spark/2.4/jars/
+CLASS_JAR=$HOME/RIDIR/Code/Scala/Test/target/scala-2.11/tester_2.11-0.1.jar
+CLASS_NAME="MultiPolygonConverter"
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
+
+THE_MASTER="yarn"
+THE_INPUT="hdfs:///user/acald013/tmp/level2.csv"
+THE_OUTPUT="hdfs:///user/acald013/gadm/level2"
+THE_PARTITIONS=1080
+THE_TOLERANCE="1e-8"
+
+while getopts "i:o:p:s:t:l" OPTION; do
+    case $OPTION in
+    i)
+        THE_INPUT=$OPTARG
+        ;;
+    o)
+        THE_OUTPUT=$OPTARG
+        ;;
+    p)
+        THE_PARTITIONS=$OPTARG
+        ;;
+    t)
+        THE_TOLERANCE=$OPTARG
+        ;;
+    l)
+	THE_MASTER="local[*]"
+	;;
+    *)
+        echo "Incorrect options provided"
+        exit 1
+        ;;
+    esac
+done
+
+spark-submit \
+    --files $LOG_FILE \
+    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+    --conf spark.driver.maxResultSize=4G \
+    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar \
+    --master $THE_MASTER --deploy-mode client \
+    --num-executors $EXECUTORS --executor-cores $CORES \
+    --executor-memory $EMEMORY --driver-memory $DMEMORY \
+    --class $CLASS_NAME $CLASS_JAR \
+    --input $THE_INPUT --output $THE_OUTPUT \
+    --partitions $THE_PARTITIONS --tolerance $THE_TOLERANCE
+
