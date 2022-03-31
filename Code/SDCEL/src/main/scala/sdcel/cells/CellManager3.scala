@@ -1,20 +1,17 @@
 package edu.ucr.dblab.sdcel.cells
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate, Point,
-  LineString, Polygon}
+import com.vividsolutions.jts.geom.{Geometry, Envelope, Coordinate}
+import com.vividsolutions.jts.geom.{Point, LineString, Polygon}
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.rdd.RDD
-import org.apache.spark.serializer.KryoSerializer
-
-import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 
 import scala.collection.immutable.HashMap
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
-import org.slf4j.{Logger, LoggerFactory}
+//import org.slf4j.{Logger, LoggerFactory}
 
 import edu.ucr.dblab.sdcel.PartitionReader._
 import edu.ucr.dblab.sdcel.Utils.{Settings, save, getPartitionLocation, logger, log, log2}
@@ -24,9 +21,10 @@ import edu.ucr.dblab.sdcel.Params
 
 object EmptyCellManager2 {
 
-  def getEmptyCells(data: RDD[LineString], cells: Map[Int, Cell], letter: String = "A")
+  def getEmptyCells(data: RDD[LineString], letter: String = "A")
     (implicit settings: Settings, geofactory: GeometryFactory,
-      logger: Logger): Array[(Int, Boolean)] = {
+      cells: Map[Int, Cell]): Array[(Int, Boolean)] = {
+
     val empties_prime = data.mapPartitionsWithIndex{ (pid, it) =>
       val cell = cells(pid)
       val cenvelope = cell.boundary
@@ -57,7 +55,6 @@ object EmptyCellManager2 {
     empties
   }
 
-
   case class EmptyCell(point: Point, pid: Cell, empty:Cell,
     polyId: Int = -1, label: String = "*"){
 
@@ -80,10 +77,9 @@ object EmptyCellManager2 {
   case class ECellInfo(lid2: String, empty: EmptyCell)
 
   def runEmptyCells[T](sdcel: RDD[(Half_edge, String, Envelope, Polygon)],
-    quadtree: StandardQuadTree[T], cells: Map[Int, Cell], empties: Array[(Int, Boolean)],
-    letter: String = "A")
+    empties: Array[(Int, Boolean)], letter: String = "A")
     (implicit geofactory: GeometryFactory, settings: Settings, spark: SparkSession,
-      params: Params, logger: Logger)
+      quadtree: StandardQuadTree[T], cells: Map[Int, Cell])
       : (RDD[(Half_edge, String, Envelope, Polygon)], Map[String, EmptyCell]) = {
 
     val (ne, e) = empties.map{ case(id, emp) => (cells(id), emp) }
@@ -109,7 +105,7 @@ object EmptyCellManager2 {
         id.toInt -> Cell(id, lineage, ring)
       }.toMap
 
-      if(params.debug()){
+      if(settings.debug){
         save(s"/tmp/edgesP${letter}.wkt"){
           cells_prime.values.map{ cell =>
             val wkt = cell.wkt
@@ -120,7 +116,7 @@ object EmptyCellManager2 {
 
       val r_prime = solve(quadtree_prime, cells_prime, non_empties, empties3.values.toList)
 
-      if(params.debug()){
+      if(settings.debug){
         save(s"/tmp/edgesR${letter}.wkt"){
           r_prime.map{ r =>
             val wkt   = r.point
@@ -146,7 +142,7 @@ object EmptyCellManager2 {
         a.lid1 -> b.empty
       }).toMap
 
-      if(params.debug()){
+      if(settings.debug){
         save(s"/tmp/edgesM${letter}.wkt"){
           cells_map.map{ case(k, v) =>
             val wkt   = v.point.toText
@@ -190,25 +186,18 @@ object EmptyCellManager2 {
     
   def updatePolygonIds(sdcel: RDD[(Half_edge, String, Envelope, Polygon)],
     r: List[EmptyCell], cells: Map[Int, Cell])
-    (implicit settings: Settings, geofactory: GeometryFactory, logger: Logger)
+    (implicit settings: Settings, geofactory: GeometryFactory)
       : List[EmptyCell] = {
 
     
     val lids = r.map(r => r.pid.lineage).toSet
     sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      val ploc = getPartitionLocation(pid)
-      logger.info(s"update|start|$pid|$ploc")
-
       val lid = cells(pid).lineage
-      logger.info(s"update|lineage|$pid|$ploc")
       val result = if(lids.contains(lid)){
-        logger.info(s"update|start|$pid|$ploc")
         
         val points  = r.filter(_.pid.lineage == lid)
-        logger.info(s"update|filter|$pid|$ploc")
 
         val faces = it.map{ f => (f._2, f._3, f._4, f._1) }
-        logger.info(s"update|faces|$pid|$ploc")
 
         val faces_prime = for {
           point <- points
@@ -216,7 +205,6 @@ object EmptyCellManager2 {
         } yield {
           face
         }
-        logger.info(s"update|join1|$pid|$ploc")
 
         val list = for{
           point  <- points
@@ -234,21 +222,18 @@ object EmptyCellManager2 {
           }
           point.copy(polyId = polyId, label = label)
         }
-        logger.info(s"update|join2|$pid|$ploc")
 
         list.toIterator
       } else {
-        logger.info(s"update|empty|$pid|$ploc")
         List.empty[EmptyCell].toIterator
       }
-      logger.info(s"update|end|$pid|$ploc")
       result
     }.collect.toList
   }
 
   def solve[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
     non_empties: List[Cell], empties: List[Cell])
-    (implicit geofactory: GeometryFactory, settings: Settings, logger: Logger)
+    (implicit geofactory: GeometryFactory, settings: Settings)
       : List[EmptyCell] = {
 
     val s = solveRec(quadtree, cells, empties, non_empties, List.empty[(Point,Cell,Cell)])
@@ -260,7 +245,7 @@ object EmptyCellManager2 {
   @tailrec
   private def solveRec[T](quadtree: StandardQuadTree[T], cells: Map[Int, Cell],
     empties: List[Cell], non_empties: List[Cell], result: List[(Point, Cell, Cell)])
-    (implicit geofactory: GeometryFactory, settings: Settings, logger: Logger)
+    (implicit geofactory: GeometryFactory, settings: Settings)
       : List[(Point, Cell, Cell)] = {
 
     // iterate recursively over the set of empty cells...
@@ -279,7 +264,7 @@ object EmptyCellManager2 {
 
   // helper function to call closest function
   private def getClosestPath[T](Q: StandardQuadTree[T], NE: List[Cell], c: Cell)
-    (implicit geofactory: GeometryFactory, settings: Settings, logger: Logger):
+    (implicit geofactory: GeometryFactory, settings: Settings):
       (Cell, Point, List[Cell]) = {
 
     // just create a fake point and empty list to start the recursion...
@@ -295,7 +280,7 @@ object EmptyCellManager2 {
   // which is the closest to them...
   private def closest[T](Q: StandardQuadTree[T], NE: List[Cell], c: Cell,
     path: List[Cell], point: Point)
-    (implicit geofactory: GeometryFactory, settings: Settings, logger: Logger):
+    (implicit geofactory: GeometryFactory, settings: Settings):
       (Cell, List[Cell], Point) = {
 
     // get cells in the corner and reference point...
@@ -323,7 +308,7 @@ object EmptyCellManager2 {
   // The internal corner is that one which point to the interior
   // of the cell parent...
   private def getCellsAtCorner[T](quadtree: StandardQuadTree[T], c: Cell)
-    (implicit geofactory: GeometryFactory, settings: Settings, logger: Logger)
+    (implicit geofactory: GeometryFactory, settings: Settings)
       : (List[Cell], Point) = {
 
     // take the quadrant of the cell...
@@ -456,124 +441,5 @@ object EmptyCellManager2 {
 
     (quadtree_prime, empties_prime)
   }  
-
-  // for testing purposes...
-  def main(args: Array[String]) = {
-    implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
-    implicit val geofactory = new GeometryFactory(new PrecisionModel(1000.0))
-    implicit val settings = Settings(tolerance = 0.001, debug = false)
-    implicit val spark = SparkSession.builder()
-      .config("spark.serializer",classOf[KryoSerializer].getName)
-      .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
-      .getOrCreate()
-    import spark.implicits._
-
-    val qpath = args(0)
-    val bpath = args(1)
-    val (quadtree, cells) = readQuadtree[Int](qpath, bpath)
-
-    /*
-    // Testing quadtree creation...
-    save("/tmp/edgesQ.wkt"){
-      cells.values.map{ cell =>
-        cell.wkt + "\n"
-      }.toList
-    }
-
-    // Testing getCellsAtCorner function...
-    save("/tmp/edgesC.wkt"){
-      quadtree.getLeafZones.asScala.map{ leaf =>
-        val id = leaf.partitionId
-        val cell = Cell(id, leaf.lineage, envelope2ring(leaf.getEnvelope))
-        val (around, point) = getCellsAtCorner(quadtree, cell)
-
-        val wkt = point.toText
-        val ids = around.map(_.id).mkString(" ")
-
-        s"$wkt\t$id: $ids\n"
-      }
-    }
-
-    // Testing quadtree extract function...
-    val lineageId = "10"
-    save(s"/tmp/edgesL.wkt"){
-      Quadtree.extract(quadtree, lineageId).getLeafZones.asScala.map{ leaf =>
-        val id = leaf.partitionId
-        val lineage = leaf.lineage
-        val wkt = envelope2polygon(leaf.getEnvelope).toText
-        s"$wkt\t$id\t$lineage\n"
-      }
-    }
-     */
-
-    // Testing getClosestPath function...
-    val non_empties = List(5, 17, 32, 48)
-    val empties = (0 to 51).toSet.diff(non_empties.toSet).toList
-    val ne = non_empties.map(ne => cells(ne))
-    val e  = empties.map(e => cells(e))
-
-    val result = solve(quadtree, cells, ne, e)
-    save("/tmp/edgesP.wkt"){
-      result.map{ ecell =>
-        val wkt = ecell.empty.wkt
-        s"$wkt\t${ecell.empty.id}\t${ecell.pid.id}\t${ecell.pid.lineage}\n"
-      }.toList
-    }
- 
-    /*
-    // Testing clean quadtree...
-    import scala.io.Source
-    val epath  = "/home/acald013/RIDIR/local_path/CA/P3000/empties.txt"
-    val nepath = "/home/acald013/RIDIR/local_path/CA/P3000/nonempties.txt"
-    val empties2  = Source.fromFile(epath).getLines.map(_.toInt).toList
-    val nempties2 = Source.fromFile(nepath).getLines.map(_.toInt).toList
-    val qpath2 = "/home/acald013/RIDIR/local_path/CA/P3000/quadtree.wkt"
-    val bpath2 = "/home/acald013/RIDIR/local_path/CA/P3000/boundary.wkt"
-
-    val (quadtree_test, cells_test) = readQuadtree[Int](qpath2, bpath2)
-
-    val empties_prime = cells_test.filter{ case(id, cell) => empties2.contains(id) }
-      .values.map(cell => (cell.lineage, cell)).toList
-    val emptiesHash = HashMap(empties_prime.map( i => i._1 -> i._2): _* )
-    val nempties_prime = cells_test.filter{ case(id, cell) => nempties2.contains(id) }
-      .values.map(cell => (cell.lineage, cell)).toList
-    val nemptiesHash = HashMap(nempties_prime.map( i => i._1 -> i._2): _* )
-
-    val (new_quadtree, empties3) = cleanQuadtree(quadtree_test, emptiesHash, nemptiesHash)
-
-    save("/tmp/edgesNQ.wkt"){
-      new_quadtree.getLeafZones.asScala.map{ leaf =>
-        val wkt = envelope2polygon(leaf.getEnvelope).toText
-        val id = leaf.partitionId
-        val lineage = leaf.lineage
-
-        s"$wkt\t$id\t$lineage\n"
-      }
-    }
-
-    save("/tmp/edgesEM.wkt"){
-      empties3.values.toList.map{ cell =>
-        val wkt = cell.wkt
-        val id = cell.id
-        val lineage = cell.lineage
-
-        s"$wkt\t$id\t$lineage\n"
-      }
-    }
-
-    save("/tmp/empties3.txt"){
-      empties3.values.toList.map{ cell =>
-        val id = cell.id
-
-        s"$id\n"
-      }
-    }
-
-    println(empties2.size)
-    println(empties3.size)
-     */
-
-    spark.close()
-  }
 }
 

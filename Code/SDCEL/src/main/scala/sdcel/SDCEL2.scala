@@ -1,6 +1,5 @@
 package edu.ucr.dblab.sdcel
 
-
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.{SparkSession, SaveMode}
 import org.apache.spark.storage.StorageLevel
@@ -16,12 +15,11 @@ import edu.ucr.dblab.sdcel.PartitionReader.{readQuadtree, readEdges}
 import edu.ucr.dblab.sdcel.DCELOverlay2.overlay
 import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, log, log2, logger}
 import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
-import edu.ucr.dblab.sdcel.SingleLabelChecker.checkSingleLabel
 
 object SDCEL2 {
   def main(args: Array[String]) = {
-    implicit val now = Tick(System.currentTimeMillis)
     // Starting session...
+    implicit val now = Tick(System.currentTimeMillis)
     implicit val params = new Params(args)
     implicit val spark = SparkSession.builder()
       .config("spark.serializer",classOf[KryoSerializer].getName)
@@ -56,19 +54,23 @@ object SDCEL2 {
 
     // Reading data...
     val edgesRDDA = readEdges(params.input1(), quadtree, "A")
-    val emptiesA = getEmptyCells(edgesRDDA, cells, "A")
+    val emptiesA = getEmptyCells(edgesRDDA, "A")
     val edgesRDDB = readEdges(params.input2(), quadtree, "B")
-    val emptiesB = getEmptyCells(edgesRDDB, cells, "B")
+    val emptiesB = getEmptyCells(edgesRDDB, "B")
     log2(s"TIME|read|$qtag")
 
     // Creating local dcel layer A...
-    val ldcelA0 = createLocalDCELs(edgesRDDA, cells)
-    val (ldcelA, ma) = runEmptyCells(ldcelA0, quadtree, cells, emptiesA, "A")
+    val ldcelA0 = createLocalDCELs(edgesRDDA, "A")
+    val (ldcelA, ma) = runEmptyCells(ldcelA0, emptiesA, "A")
     log2(s"TIME|layer1|$qtag")
 
+    if(settings.debug){
+      Utils.saveSDCEL("tmp/ldcelA", ldcelA, ma)
+    }
+
     // Creating local dcel layer B...
-    val ldcelB0 = createLocalDCELs(edgesRDDB, cells, "B")
-    val (ldcelB, mb) = runEmptyCells(ldcelB0, quadtree, cells, emptiesB, "B")
+    val ldcelB0 = createLocalDCELs(edgesRDDB, "B")
+    val (ldcelB, mb) = runEmptyCells(ldcelB0, emptiesB, "B")
     log2(s"TIME|layer2|$qtag")
 
     if(params.overlay()){
@@ -86,22 +88,11 @@ object SDCEL2 {
         log2(s"TIME|saveO|$qtag")
       }
     }
+
     /*
     val faces0 = sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      val partitionId = 39
       val hedges = it.toList
       val faces = hedges.map{hedge => Face(hedge._1, hedge._2)}
-      if(pid == partitionId){
-        println("Test!!!")
-        faces.groupBy(_.label)
-          .mapValues{ f =>
-            val polys = f.sortBy(_.outerArea).reverse
-            val outer = polys.head
-            outer.inners = polys.tail.toVector
-            val wkt = outer.getGeometry.toText
-            wkt
-          }//.foreach{println}
-      }
       faces.groupBy(_.label)
         .mapValues{ f =>
           val polys = f.sortBy(_.outerArea).reverse
@@ -109,11 +100,7 @@ object SDCEL2 {
           outer.inners = polys.tail.toVector
           outer
         }.map(_._2).toIterator
-      //it
     }.cache
-    //save("/tmp/edgesFaces.wkt"){
-    //  faces0.map{f => s"${f.getGeometry.toText}\t${f.label}\n"}.collect
-    //}
 
     // Running overlay operations...
     val faces1 = faces0.flatMap{ face =>
@@ -130,16 +117,7 @@ object SDCEL2 {
         }
       }
       polys
-      //flatMap(p => FaceViz(p, label))
-      //FaceViz(poly, label)
     }
-
-    /*
-    val faces = sdcel_prime.map{ case(hedge, tag) =>
-      val boundary = hedge.getPolygon
-      FaceViz(boundary, tag)
-    }
-     */
 
     val output_path = params.output()
     overlapOp(faces1, intersection, s"${output_path}/edgesInt")

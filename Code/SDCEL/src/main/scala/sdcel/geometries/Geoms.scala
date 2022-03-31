@@ -33,10 +33,11 @@ case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
 
   override def toString: String =
     s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo"
+
+  def getParams: String = s"$label\t$polygonId\t$ringId\t$edgeId\t$isHole"
 }
 
-case class Half_edge(edge: LineString) {
-  private val geofactory = edge.getFactory
+case class Half_edge(edge: LineString, id: Long = 0L) {
   val coords = edge.getCoordinates
   val v1 = coords(0)
   val v2 = coords(1)
@@ -44,8 +45,7 @@ case class Half_edge(edge: LineString) {
     edge.getUserData.asInstanceOf[EdgeData]
   else
     EdgeData(-1,-1,-1,false)
-  //val orig = Vertex(v1)
-  //val dest = Vertex(v2)
+  val params = data.getParams
 
   var (orig, dest) = data.getInvalidVertex match {
     case 0 => (Vertex(v1), Vertex(v2))
@@ -115,7 +115,7 @@ case class Half_edge(edge: LineString) {
 
   def getTag: String = tags.sortBy(_.label).mkString(" ")
 
-  def split(p: Coordinate): List[Half_edge] = {
+  def split(p: Coordinate)(implicit geofactory: GeometryFactory): List[Half_edge] = {
     if(p == v1 || p == v2 || !edge.getEnvelopeInternal.intersects(p)){
       List(this) // if intersection is on the extremes or outside (there is not split at all), it returns the same...
     } else {
@@ -380,8 +380,7 @@ case class Half_edge(edge: LineString) {
   }
 
   val emptyPolygon: Polygon = {
-    val p0 = new Coordinate(0,0)
-    geofactory.createPolygon(Array(p0, p0, p0, p0))
+    this.edge.getFactory.createPolygon(Array.empty[Coordinate])
   }
 }
 

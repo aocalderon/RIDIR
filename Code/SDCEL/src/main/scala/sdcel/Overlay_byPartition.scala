@@ -80,7 +80,7 @@ object Overlay_byPartition {
     log2(s"TIME|read|$qtag")
 
     // Creating local dcel layer A...
-    val ldcelA = createLocalDCELs(edgesRDDA, cells)
+    val ldcelA = createLocalDCELs(edgesRDDA, "A")
     if(params.debug()){
       save(s"/tmp/edgesFA${partition}.wkt"){
         ldcelA.mapPartitionsWithIndex{ (pid, it) =>
@@ -94,7 +94,7 @@ object Overlay_byPartition {
     log2(s"TIME|layer1|$qtag")
 
     // Creating local dcel layer A...
-    val ldcelB = createLocalDCELs(edgesRDDB, cells)
+    val ldcelB = createLocalDCELs(edgesRDDB, "B")
     if(params.debug()){
       save(s"/tmp/edgesFB${partition}.wkt"){
         ldcelB.mapPartitionsWithIndex{ (pid, it) =>

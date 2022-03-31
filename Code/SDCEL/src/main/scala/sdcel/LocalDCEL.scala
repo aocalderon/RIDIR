@@ -25,33 +25,42 @@ import DCELMerger2.{setTwins, groupByNext, groupByNextMBR, groupByNextMBRPoly}
 import Utils._
 
 object LocalDCEL {
-  def createLocalDCELs(edgesRDD: RDD[LineString], cells: Map[Int, Cell],
-    letter: String = "A")
-    (implicit geofactory: GeometryFactory, settings: Settings, logger: Logger)
+  def createLocalDCELs(edgesRDD: RDD[LineString], letter: String = "A")
+    (implicit cells: Map[Int, Cell], geofactory: GeometryFactory, settings: Settings)
       : RDD[(Half_edge, String, Envelope, Polygon)] = {
 
     val r = edgesRDD.mapPartitionsWithIndex{ (pid, it) =>
+      val cell = cells(pid)
 
       val (containedIt, crossingIt) = classifyEdges(it)
       val crossing = getCrossing(crossingIt.toList).filter(_.getLength > 0)
-
       val S = getIntersectionsOnBorder(crossing, "S")
       val W = getIntersectionsOnBorder(crossing, "W")
       val N = getIntersectionsOnBorder(crossing, "N")
       val E = getIntersectionsOnBorder(crossing, "E")
-      val cell = cells(pid)
       val bordersS = splitBorder(cell.getSouthBorder, S)
       val bordersE = splitBorder(cell.getEastBorder, E)
       val bordersN = splitBorder(cell.getNorthBorder, N)
       val bordersW = splitBorder(cell.getWestBorder, W)
-      val borders = (bordersS ++ bordersE ++ bordersN ++ bordersW).map{Half_edge}
+
+      val borders_prime = (bordersS ++ bordersE ++ bordersN ++ bordersW).map(b => (b,"b"))
+      val inners_prime  = (containedIt ++ crossing).toList.map(i => (i,"i"))
+
+      val (bs, is) = (borders_prime ++ inners_prime).zipWithIndex
+        .map{ case(h, id) =>
+          val edge = h._1
+          val hedge = Half_edge(edge, id)
+          (hedge, h._2)
+        }.partition( _._2 == "b")
+
+      val borders = bs.map(_._1)
       setTwins(borders)
       setNextAndPrevBorders(borders)
 
-      val inner = (containedIt ++ crossing).map{Half_edge}.toList
-      setTwins(inner)
+      val inners = is.map(_._1)
+      setTwins(inners)
 
-      val inner_segments = sortInnerHedges(inner)
+      val inner_segments = sortInnerHedges(inners)
       setNextAndPrev(inner_segments)
       val (inner_closed, inner_open) = inner_segments.partition(_.isClose)
       // closing pointer in polygons fully contained...
@@ -60,9 +69,9 @@ object LocalDCEL {
         seg.first.prev = seg.last
       }
 
-      merge(inner.filter(_.data.crossingInfo != "None").filter(_.twin != null),  borders)
+      merge(inners.filter(_.data.crossingInfo != "None").filter(_.twin != null),  borders)
       
-      val hedges = groupByNextMBRPoly((inner).toSet,
+      val hedges = groupByNextMBRPoly((inners).toSet,
         List.empty[(Half_edge, String, Envelope, Polygon)])
 
       hedges.filter(_._2.split(" ").size == 1).toIterator

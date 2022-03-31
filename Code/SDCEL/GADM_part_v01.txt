@@ -1,0 +1,275 @@
+DATASET    = gadm/l3vsl2
+TOLERANCE  = 1e-3
+FIRST      = 1000
+INCREMENT  = 1000
+LAST       = 10000
+./QuadPlusPart 1000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P1000 ...
+2022-03-30 08:26:55,191|13566|application_1639015019875_2135|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P1000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P1000/boundary.wkt --partitions 1000 --tolerance 1e-3
+2022-03-30 08:26:55,192|13567|application_1639015019875_2135|INFO|scale=1000.0
+2022-03-30 08:26:55,201|13576|application_1639015019875_2135|TIME|Start
+2022-03-30 08:27:17,140|35515|application_1639015019875_2135|INFO|edgesA=68779746
+2022-03-30 08:27:40,104|58479|application_1639015019875_2135|INFO|edgesB=64598411
+2022-03-30 08:27:45,571|63946|application_1639015019875_2135|TIME|Read
+2022-03-30 08:27:45,571|63946|Partition by number (1000)
+2022-03-30 08:27:45,577|63952|Fraction: 0.01003722781272588
+2022-03-30 08:27:51,813|70188|application_1639015019875_2135|INFO|partitions=2818
+2022-03-30 08:27:51,813|70188|application_1639015019875_2135|TIME|Partition
+2022-03-30 08:27:51,819|70194|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P1000/boundary.wkt in 0.00s [1 records].
+2022-03-30 08:27:52,033|70408|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P1000/quadtree.wkt in 0.01s [2818 records].
+2022-03-30 08:27:52,208|70583|application_1639015019875_2135|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P1000/edgesA/
+rm -f -r gadm/l3vsl2/P1000/edgesB/
+2022-03-30 08:28:09,130|13708|application_1639015019875_2136|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P1000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P1000/boundary.wkt --apath gadm/l3vsl2/P1000/edgesA --bpath gadm/l3vsl2/P1000/edgesB --tolerance 1e-3 --save
+2022-03-30 08:28:09,131|13709|application_1639015019875_2136|INFO|scale=1000.0
+2022-03-30 08:28:09,143|13721|application_1639015019875_2136|TIME|Start
+2022-03-30 08:28:30,684|35262|application_1639015019875_2136|INFO|edgesA=68779746
+2022-03-30 08:28:59,148|63726|application_1639015019875_2136|INFO|edgesB=64598411
+2022-03-30 08:28:59,160|63738|application_1639015019875_2136|TIME|Read
+2022-03-30 08:30:17,546|142124|application_1639015019875_2136|TIME|Saving
+./QuadPlusPart 2000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P2000 ...
+2022-03-30 08:30:38,489|14355|application_1639015019875_2137|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P2000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P2000/boundary.wkt --partitions 2000 --tolerance 1e-3
+2022-03-30 08:30:38,489|14355|application_1639015019875_2137|INFO|scale=1000.0
+2022-03-30 08:30:38,498|14364|application_1639015019875_2137|TIME|Start
+2022-03-30 08:31:00,501|36367|application_1639015019875_2137|INFO|edgesA=68779746
+2022-03-30 08:31:26,708|62574|application_1639015019875_2137|INFO|edgesB=64598411
+2022-03-30 08:31:44,163|80029|application_1639015019875_2137|TIME|Read
+2022-03-30 08:31:44,164|80030|Partition by number (2000)
+2022-03-30 08:31:44,168|80034|Fraction: 0.01003722781272588
+2022-03-30 08:31:48,478|84344|application_1639015019875_2137|INFO|partitions=5596
+2022-03-30 08:31:48,479|84345|application_1639015019875_2137|TIME|Partition
+2022-03-30 08:31:48,486|84352|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P2000/boundary.wkt in 0.00s [1 records].
+2022-03-30 08:31:48,744|84610|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P2000/quadtree.wkt in 0.01s [5596 records].
+2022-03-30 08:31:48,980|84846|application_1639015019875_2137|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P2000/edgesA/
+rm -f -r gadm/l3vsl2/P2000/edgesB/
+2022-03-30 08:32:07,073|13760|application_1639015019875_2138|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P2000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P2000/boundary.wkt --apath gadm/l3vsl2/P2000/edgesA --bpath gadm/l3vsl2/P2000/edgesB --tolerance 1e-3 --save
+2022-03-30 08:32:07,074|13761|application_1639015019875_2138|INFO|scale=1000.0
+2022-03-30 08:32:07,087|13774|application_1639015019875_2138|TIME|Start
+2022-03-30 08:32:33,295|39982|application_1639015019875_2138|INFO|edgesA=68779746
+2022-03-30 08:32:57,731|64418|application_1639015019875_2138|INFO|edgesB=64598411
+2022-03-30 08:32:57,742|64429|application_1639015019875_2138|TIME|Read
+2022-03-30 08:34:27,743|154430|application_1639015019875_2138|TIME|Saving
+./QuadPlusPart 3000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P3000 ...
+2022-03-30 08:34:51,478|14460|application_1639015019875_2139|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P3000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P3000/boundary.wkt --partitions 3000 --tolerance 1e-3
+2022-03-30 08:34:51,478|14460|application_1639015019875_2139|INFO|scale=1000.0
+2022-03-30 08:34:51,487|14469|application_1639015019875_2139|TIME|Start
+2022-03-30 08:35:14,784|37766|application_1639015019875_2139|INFO|edgesA=68779746
+2022-03-30 08:35:41,916|64898|application_1639015019875_2139|INFO|edgesB=64598411
+2022-03-30 08:35:47,271|70253|application_1639015019875_2139|TIME|Read
+2022-03-30 08:35:47,272|70254|Partition by number (3000)
+2022-03-30 08:35:47,276|70258|Fraction: 0.01003722781272588
+2022-03-30 08:35:51,612|74594|application_1639015019875_2139|INFO|partitions=8248
+2022-03-30 08:35:51,613|74595|application_1639015019875_2139|TIME|Partition
+2022-03-30 08:35:51,621|74603|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P3000/boundary.wkt in 0.00s [1 records].
+2022-03-30 08:35:51,959|74941|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P3000/quadtree.wkt in 0.02s [8248 records].
+2022-03-30 08:35:52,208|75190|application_1639015019875_2139|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P3000/edgesA/
+rm -f -r gadm/l3vsl2/P3000/edgesB/
+2022-03-30 08:36:08,999|13529|application_1639015019875_2140|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P3000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P3000/boundary.wkt --apath gadm/l3vsl2/P3000/edgesA --bpath gadm/l3vsl2/P3000/edgesB --tolerance 1e-3 --save
+2022-03-30 08:36:08,999|13529|application_1639015019875_2140|INFO|scale=1000.0
+2022-03-30 08:36:09,012|13542|application_1639015019875_2140|TIME|Start
+2022-03-30 08:36:31,140|35670|application_1639015019875_2140|INFO|edgesA=68779746
+2022-03-30 08:36:50,040|54570|application_1639015019875_2140|INFO|edgesB=64598411
+2022-03-30 08:36:50,053|54583|application_1639015019875_2140|TIME|Read
+2022-03-30 08:38:34,262|158792|application_1639015019875_2140|TIME|Saving
+./QuadPlusPart 4000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P4000 ...
+2022-03-30 08:38:54,524|13585|application_1639015019875_2141|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P4000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P4000/boundary.wkt --partitions 4000 --tolerance 1e-3
+2022-03-30 08:38:54,524|13585|application_1639015019875_2141|INFO|scale=1000.0
+2022-03-30 08:38:54,533|13594|application_1639015019875_2141|TIME|Start
+2022-03-30 08:39:18,664|37725|application_1639015019875_2141|INFO|edgesA=68779746
+2022-03-30 08:39:48,128|67189|application_1639015019875_2141|INFO|edgesB=64598411
+2022-03-30 08:39:55,266|74327|application_1639015019875_2141|TIME|Read
+2022-03-30 08:39:55,266|74327|Partition by number (4000)
+2022-03-30 08:39:55,272|74333|Fraction: 0.01003722781272588
+2022-03-30 08:39:59,486|78547|application_1639015019875_2141|INFO|partitions=10861
+2022-03-30 08:39:59,486|78547|application_1639015019875_2141|TIME|Partition
+2022-03-30 08:39:59,492|78553|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P4000/boundary.wkt in 0.00s [1 records].
+2022-03-30 08:39:59,887|78948|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P4000/quadtree.wkt in 0.02s [10861 records].
+2022-03-30 08:40:00,213|79274|application_1639015019875_2141|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P4000/edgesA/
+rm -f -r gadm/l3vsl2/P4000/edgesB/
+2022-03-30 08:40:16,825|13308|application_1639015019875_2142|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P4000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P4000/boundary.wkt --apath gadm/l3vsl2/P4000/edgesA --bpath gadm/l3vsl2/P4000/edgesB --tolerance 1e-3 --save
+2022-03-30 08:40:16,826|13309|application_1639015019875_2142|INFO|scale=1000.0
+2022-03-30 08:40:16,838|13321|application_1639015019875_2142|TIME|Start
+2022-03-30 08:40:38,368|34851|application_1639015019875_2142|INFO|edgesA=68779746
+2022-03-30 08:41:06,071|62554|application_1639015019875_2142|INFO|edgesB=64598411
+2022-03-30 08:41:06,083|62566|application_1639015019875_2142|TIME|Read
+2022-03-30 08:43:03,218|179701|application_1639015019875_2142|TIME|Saving
+./QuadPlusPart 5000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P5000 ...
+2022-03-30 08:43:24,263|14475|application_1639015019875_2143|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P5000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P5000/boundary.wkt --partitions 5000 --tolerance 1e-3
+2022-03-30 08:43:24,263|14475|application_1639015019875_2143|INFO|scale=1000.0
+2022-03-30 08:43:24,272|14484|application_1639015019875_2143|TIME|Start
+2022-03-30 08:43:45,780|35992|application_1639015019875_2143|INFO|edgesA=68779746
+2022-03-30 08:44:11,675|61887|application_1639015019875_2143|INFO|edgesB=64598411
+2022-03-30 08:44:40,797|91009|application_1639015019875_2143|TIME|Read
+2022-03-30 08:44:40,797|91009|Partition by number (5000)
+2022-03-30 08:44:40,808|91020|Fraction: 0.01003722781272588
+2022-03-30 08:44:44,568|94780|application_1639015019875_2143|INFO|partitions=13609
+2022-03-30 08:44:44,568|94780|application_1639015019875_2143|TIME|Partition
+2022-03-30 08:44:44,574|94786|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P5000/boundary.wkt in 0.00s [1 records].
+2022-03-30 08:44:45,105|95317|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P5000/quadtree.wkt in 0.03s [13609 records].
+2022-03-30 08:44:45,342|95554|application_1639015019875_2143|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P5000/edgesA/
+rm -f -r gadm/l3vsl2/P5000/edgesB/
+2022-03-30 08:45:02,545|13971|application_1639015019875_2144|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P5000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P5000/boundary.wkt --apath gadm/l3vsl2/P5000/edgesA --bpath gadm/l3vsl2/P5000/edgesB --tolerance 1e-3 --save
+2022-03-30 08:45:02,545|13971|application_1639015019875_2144|INFO|scale=1000.0
+2022-03-30 08:45:02,558|13984|application_1639015019875_2144|TIME|Start
+2022-03-30 08:45:24,628|36054|application_1639015019875_2144|INFO|edgesA=68779746
+2022-03-30 08:45:47,758|59184|application_1639015019875_2144|INFO|edgesB=64598411
+2022-03-30 08:45:47,769|59195|application_1639015019875_2144|TIME|Read
+2022-03-30 08:48:02,290|193716|application_1639015019875_2144|TIME|Saving
+./QuadPlusPart 6000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P6000 ...
+2022-03-30 08:48:24,174|14864|application_1639015019875_2145|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P6000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P6000/boundary.wkt --partitions 6000 --tolerance 1e-3
+2022-03-30 08:48:24,174|14864|application_1639015019875_2145|INFO|scale=1000.0
+2022-03-30 08:48:24,184|14874|application_1639015019875_2145|TIME|Start
+2022-03-30 08:48:46,686|37376|application_1639015019875_2145|INFO|edgesA=68779746
+2022-03-30 08:49:19,608|70298|application_1639015019875_2145|INFO|edgesB=64598411
+2022-03-30 08:49:26,806|77496|application_1639015019875_2145|TIME|Read
+2022-03-30 08:49:26,807|77497|Partition by number (6000)
+2022-03-30 08:49:26,813|77503|Fraction: 0.01003722781272588
+2022-03-30 08:49:31,822|82512|application_1639015019875_2145|INFO|partitions=16402
+2022-03-30 08:49:31,822|82512|application_1639015019875_2145|TIME|Partition
+2022-03-30 08:49:31,833|82523|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P6000/boundary.wkt in 0.00s [1 records].
+2022-03-30 08:49:32,678|83368|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P6000/quadtree.wkt in 0.02s [16402 records].
+2022-03-30 08:49:32,911|83601|application_1639015019875_2145|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P6000/edgesA/
+rm -f -r gadm/l3vsl2/P6000/edgesB/
+2022-03-30 08:49:49,932|13747|application_1639015019875_2146|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P6000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P6000/boundary.wkt --apath gadm/l3vsl2/P6000/edgesA --bpath gadm/l3vsl2/P6000/edgesB --tolerance 1e-3 --save
+2022-03-30 08:49:49,932|13747|application_1639015019875_2146|INFO|scale=1000.0
+2022-03-30 08:49:49,945|13760|application_1639015019875_2146|TIME|Start
+2022-03-30 08:50:13,766|37581|application_1639015019875_2146|INFO|edgesA=68779746
+2022-03-30 08:50:38,522|62337|application_1639015019875_2146|INFO|edgesB=64598411
+2022-03-30 08:50:38,532|62347|application_1639015019875_2146|TIME|Read
+2022-03-30 08:53:19,765|223580|application_1639015019875_2146|TIME|Saving
+./QuadPlusPart 7000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P7000 ...
+2022-03-30 08:53:42,432|14122|application_1639015019875_2147|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P7000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P7000/boundary.wkt --partitions 7000 --tolerance 1e-3
+2022-03-30 08:53:42,432|14122|application_1639015019875_2147|INFO|scale=1000.0
+2022-03-30 08:53:42,441|14131|application_1639015019875_2147|TIME|Start
+2022-03-30 08:54:03,831|35521|application_1639015019875_2147|INFO|edgesA=68779746
+2022-03-30 08:54:23,851|55541|application_1639015019875_2147|INFO|edgesB=64598411
+2022-03-30 08:54:36,123|67813|application_1639015019875_2147|TIME|Read
+2022-03-30 08:54:36,123|67813|Partition by number (7000)
+2022-03-30 08:54:36,128|67818|Fraction: 0.01003722781272588
+2022-03-30 08:54:40,515|72205|application_1639015019875_2147|INFO|partitions=19207
+2022-03-30 08:54:40,515|72205|application_1639015019875_2147|TIME|Partition
+2022-03-30 08:54:40,522|72212|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P7000/boundary.wkt in 0.00s [1 records].
+2022-03-30 08:54:41,183|72873|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P7000/quadtree.wkt in 0.13s [19207 records].
+2022-03-30 08:54:41,354|73044|application_1639015019875_2147|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P7000/edgesA/
+rm -f -r gadm/l3vsl2/P7000/edgesB/
+2022-03-30 08:54:58,419|13774|application_1639015019875_2148|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P7000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P7000/boundary.wkt --apath gadm/l3vsl2/P7000/edgesA --bpath gadm/l3vsl2/P7000/edgesB --tolerance 1e-3 --save
+2022-03-30 08:54:58,419|13774|application_1639015019875_2148|INFO|scale=1000.0
+2022-03-30 08:54:58,432|13787|application_1639015019875_2148|TIME|Start
+2022-03-30 08:55:21,451|36806|application_1639015019875_2148|INFO|edgesA=68779746
+2022-03-30 08:55:45,681|61036|application_1639015019875_2148|INFO|edgesB=64598411
+2022-03-30 08:55:45,692|61047|application_1639015019875_2148|TIME|Read
+2022-03-30 08:58:46,543|241898|application_1639015019875_2148|TIME|Saving
+./QuadPlusPart 8000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P8000 ...
+2022-03-30 08:59:06,694|13544|application_1639015019875_2149|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P8000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P8000/boundary.wkt --partitions 8000 --tolerance 1e-3
+2022-03-30 08:59:06,694|13544|application_1639015019875_2149|INFO|scale=1000.0
+2022-03-30 08:59:06,703|13553|application_1639015019875_2149|TIME|Start
+2022-03-30 08:59:30,425|37275|application_1639015019875_2149|INFO|edgesA=68779746
+2022-03-30 09:00:00,300|67150|application_1639015019875_2149|INFO|edgesB=64598411
+2022-03-30 09:00:08,385|75235|application_1639015019875_2149|TIME|Read
+2022-03-30 09:00:08,385|75235|Partition by number (8000)
+2022-03-30 09:00:08,393|75243|Fraction: 0.01003722781272588
+2022-03-30 09:00:13,574|80424|application_1639015019875_2149|INFO|partitions=21970
+2022-03-30 09:00:13,574|80424|application_1639015019875_2149|TIME|Partition
+2022-03-30 09:00:13,582|80432|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P8000/boundary.wkt in 0.00s [1 records].
+2022-03-30 09:00:14,129|80979|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P8000/quadtree.wkt in 0.03s [21970 records].
+2022-03-30 09:00:14,303|81153|application_1639015019875_2149|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P8000/edgesA/
+rm -f -r gadm/l3vsl2/P8000/edgesB/
+2022-03-30 09:00:31,416|13843|application_1639015019875_2150|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P8000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P8000/boundary.wkt --apath gadm/l3vsl2/P8000/edgesA --bpath gadm/l3vsl2/P8000/edgesB --tolerance 1e-3 --save
+2022-03-30 09:00:31,417|13844|application_1639015019875_2150|INFO|scale=1000.0
+2022-03-30 09:00:31,430|13857|application_1639015019875_2150|TIME|Start
+2022-03-30 09:00:53,871|36298|application_1639015019875_2150|INFO|edgesA=68779746
+2022-03-30 09:01:16,783|59210|application_1639015019875_2150|INFO|edgesB=64598411
+2022-03-30 09:01:16,794|59221|application_1639015019875_2150|TIME|Read
+2022-03-30 09:05:03,338|285765|application_1639015019875_2150|TIME|Saving
+./QuadPlusPart 9000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P9000 ...
+2022-03-30 09:05:23,898|13955|application_1639015019875_2151|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P9000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P9000/boundary.wkt --partitions 9000 --tolerance 1e-3
+2022-03-30 09:05:23,899|13956|application_1639015019875_2151|INFO|scale=1000.0
+2022-03-30 09:05:23,909|13966|application_1639015019875_2151|TIME|Start
+2022-03-30 09:05:44,176|34233|application_1639015019875_2151|INFO|edgesA=68779746
+2022-03-30 09:06:12,699|62756|application_1639015019875_2151|INFO|edgesB=64598411
+2022-03-30 09:06:20,448|70505|application_1639015019875_2151|TIME|Read
+2022-03-30 09:06:20,448|70505|Partition by number (9000)
+2022-03-30 09:06:20,453|70510|Fraction: 0.01003722781272588
+2022-03-30 09:06:26,035|76092|application_1639015019875_2151|INFO|partitions=24733
+2022-03-30 09:06:26,036|76093|application_1639015019875_2151|TIME|Partition
+2022-03-30 09:06:26,046|76103|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P9000/boundary.wkt in 0.00s [1 records].
+2022-03-30 09:06:26,912|76969|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P9000/quadtree.wkt in 0.08s [24733 records].
+2022-03-30 09:06:27,076|77133|application_1639015019875_2151|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P9000/edgesA/
+rm -f -r gadm/l3vsl2/P9000/edgesB/
+2022-03-30 09:06:44,059|13707|application_1639015019875_2152|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P9000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P9000/boundary.wkt --apath gadm/l3vsl2/P9000/edgesA --bpath gadm/l3vsl2/P9000/edgesB --tolerance 1e-3 --save
+2022-03-30 09:06:44,060|13708|application_1639015019875_2152|INFO|scale=1000.0
+2022-03-30 09:06:44,072|13720|application_1639015019875_2152|TIME|Start
+2022-03-30 09:07:07,695|37343|application_1639015019875_2152|INFO|edgesA=68779746
+2022-03-30 09:07:26,416|56064|application_1639015019875_2152|INFO|edgesB=64598411
+2022-03-30 09:07:26,430|56078|application_1639015019875_2152|TIME|Read
+2022-03-30 09:11:27,557|297205|application_1639015019875_2152|TIME|Saving
+./QuadPlusPart 10000 gadm/l3vsl2 1e-3
+Making folders...
+Creating quadtree...
+Checking /home/acald013/RIDIR/local_path/gadm/l3vsl2/P10000 ...
+2022-03-30 09:11:48,569|13983|application_1639015019875_2153|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.QuadtreeGenerator --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --qpath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P10000/quadtree.wkt --epath /home/acald013/RIDIR/local_path/gadm/l3vsl2/P10000/boundary.wkt --partitions 10000 --tolerance 1e-3
+2022-03-30 09:11:48,569|13983|application_1639015019875_2153|INFO|scale=1000.0
+2022-03-30 09:11:48,578|13992|application_1639015019875_2153|TIME|Start
+2022-03-30 09:12:09,964|35378|application_1639015019875_2153|INFO|edgesA=68779746
+2022-03-30 09:12:34,298|59712|application_1639015019875_2153|INFO|edgesB=64598411
+2022-03-30 09:12:49,893|75307|application_1639015019875_2153|TIME|Read
+2022-03-30 09:12:49,893|75307|Partition by number (10000)
+2022-03-30 09:12:49,899|75313|Fraction: 0.01003722781272588
+2022-03-30 09:12:54,357|79771|application_1639015019875_2153|INFO|partitions=27322
+2022-03-30 09:12:54,358|79772|application_1639015019875_2153|TIME|Partition
+2022-03-30 09:12:54,363|79777|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P10000/boundary.wkt in 0.00s [1 records].
+2022-03-30 09:12:55,121|80535|Saved /home/acald013/RIDIR/local_path/gadm/l3vsl2/P10000/quadtree.wkt in 0.03s [27322 records].
+2022-03-30 09:12:55,280|80694|application_1639015019875_2153|TIME|Close
+Partitioning edges...
+rm -f -r gadm/l3vsl2/P10000/edgesA/
+rm -f -r gadm/l3vsl2/P10000/edgesB/
+2022-03-30 09:13:12,206|13663|application_1639015019875_2154|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.driver.memory=12g --conf spark.driver.maxResultSize=2G --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.DCELPartitionerByQuadtree --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --num-executors 12 --executor-cores 9 --executor-memory 30g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 gadm/l3vsl2/A.wkt --input2 gadm/l3vsl2/B.wkt --quadtree /home/acald013/RIDIR/local_path/gadm/l3vsl2/P10000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/gadm/l3vsl2/P10000/boundary.wkt --apath gadm/l3vsl2/P10000/edgesA --bpath gadm/l3vsl2/P10000/edgesB --tolerance 1e-3 --save
+2022-03-30 09:13:12,207|13664|application_1639015019875_2154|INFO|scale=1000.0
+2022-03-30 09:13:12,219|13676|application_1639015019875_2154|TIME|Start
+2022-03-30 09:13:34,279|35736|application_1639015019875_2154|INFO|edgesA=68779746
+2022-03-30 09:13:57,336|58793|application_1639015019875_2154|INFO|edgesB=64598411
+2022-03-30 09:13:57,348|58805|application_1639015019875_2154|TIME|Read
+2022-03-30 09:18:13,349|314806|application_1639015019875_2154|TIME|Saving

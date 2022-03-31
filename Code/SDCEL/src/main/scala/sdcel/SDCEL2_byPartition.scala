@@ -58,7 +58,7 @@ object SDCEL2_byPartition {
     // Reading the quadtree for partitioning...
     val (quadtree, cells_prime) = readQuadtree[Int](params.quadtree(), params.boundary())
     val partition = params.partition()
-    val cells = Map(0 -> Cell(0, "0", cells_prime(partition).mbr))
+    implicit val cells = Map(0 -> Cell(0, "0", cells_prime(partition).mbr))
     log(s"INFO|npartitions=${cells_prime.size}")
     log(s"INFO|partition=${partition}")
 
@@ -88,7 +88,7 @@ object SDCEL2_byPartition {
     }
 
     // Creating local dcel layer A...
-    val ldcelA0 = createLocalDCELs(edgesRDDA, cells)
+    val ldcelA0 = createLocalDCELs(edgesRDDA)
     log2(s"TIME|layer1|$qtag")
 
     if(params.debug()){
