@@ -112,7 +112,7 @@ object LocalDCEL {
         val ins = getLineSegments(hedges.tail, List(hedges.head),
           List.empty[List[Half_edge]])
 
-        val segs = ins.map{Segment}
+        val segs = ins.map{ hs => Segment(hs) }
         if(segs.head.startId == 0){
           // If the first edge Id of the polygon is here, we have to check the continuity...
           val start = segs.head

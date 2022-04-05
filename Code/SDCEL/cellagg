@@ -1,10 +1,55 @@
 #!/bin/bash
 
-MASTER=local[10]
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-d|--dataset)
+	    DATASET="$2"
+	    shift
+	    shift
+	    ;;
+	-t|--tolerance)
+	    TOLERANCE="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-l|--level)
+	    LEVEL="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-m|--master)
+	    MASTER="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	--debug)
+	    DEBUG="--debug"
+	    shift # past argument
+	    ;;
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-DATASET=$1
-TOLERANCE=$2
-LEVEL=$3
+echo "DATASET    = ${DATASET}"
+echo "TOLERANCE  = ${TOLERANCE}"
+echo "LEVEL      = ${LEVEL}"
+if [ -v DEBUG ]; then echo "DEBUG      = YES";  else DEBUG=""; fi
+if [ -v MASTER ]
+then
+    echo "MASTER     = ${MASTER}"
+else
+    MASTER="yarn"
+    echo "MASTER     = yarn"
+fi
 
 EXECUTORS=12
 CORES=9

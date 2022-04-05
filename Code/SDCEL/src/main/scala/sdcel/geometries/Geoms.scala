@@ -4,6 +4,7 @@ import scala.annotation.tailrec
 import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry, Envelope}
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
 import com.vividsolutions.jts.geomgraph.Edge
+import com.vividsolutions.jts.io.WKTReader
 
 import edu.ucr.dblab.sdcel.Utils.logger
 
@@ -35,6 +36,47 @@ case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
     s"${label}$polygonId\t$ringId\t${edgeId}/${nedges}\t$isHole\t$crossingInfo"
 
   def getParams: String = s"$label\t$polygonId\t$ringId\t$edgeId\t$isHole"
+
+  def save: String = s"${polygonId}_${ringId}_${edgeId}_${isHole}_${label}"
+}
+
+object Half_edge {
+  def save(hedge: Half_edge): String = {
+    val  id  = hedge.id
+    val wkt  = hedge.edge.toText
+    val data = hedge.data.save
+    val prev = hedge.prev.id
+    val next = hedge.next.id
+    val twin = hedge.twin.id
+
+    s"$wkt\t$id\t$prev\t$next\t$twin\t$data"
+  }
+
+  def load(hedge: String)(implicit geofactory: GeometryFactory): Half_edge = {
+    val arr = hedge.split("\t")
+    val wkt = arr(0)
+    val id  = arr(1).toLong
+    val prev = arr(2).toLong
+    val twin = try{ arr(4).toLong } catch { case e: Throwable => -1L }
+    val next = arr(6).toLong
+
+    val data_arr = arr(6).split("_")
+    val pid = data_arr(0).toInt
+    val rid = data_arr(1).toInt
+    val eid = data_arr(2).toInt
+    val hol = data_arr(3).toBoolean
+    val lab = data_arr(4)
+    val data = EdgeData(pid, rid, eid, hol, lab)
+
+    val reader = new WKTReader(geofactory)
+    val edge = reader.read(wkt).asInstanceOf[LineString]
+    edge.setUserData(data)
+
+    val h = Half_edge(edge, id)
+    h.pointers = List(prev, twin, next)
+    h
+  }
+
 }
 
 case class Half_edge(edge: LineString, id: Long = 0L) {
@@ -66,6 +108,7 @@ case class Half_edge(edge: LineString, id: Long = 0L) {
   var tag: String = null
   var source: Coordinate = v1
   var target: Coordinate = v2
+  var pointers: List[Long] = List(-1L, -1L, -1L)
   var MAX_RECURSION: Int = Int.MaxValue
 
   override def toString = s"${edge.toText}\t$data\t${tag}"
@@ -403,16 +446,15 @@ case class Coords(coords: Array[Coord]){
 
   override def toString: String = coords.toList.toString
 
-  def getCoords: Array[Coordinate] = {
-    /*
-    if(first == last){
-      coords.map(_.coord)
-    } else {
-      val c = coords.filter(_.valid).map(_.coord)
-      c :+ c.head
-    }
-     */
+  def getHedges(implicit geofactory: GeometryFactory): List[Half_edge] = {
+    val coordinates = coords.map(_.coord)
+    val pairs = coordinates.zip(coordinates.tail)
+    pairs.map{ case(v1, v2) =>
+      Half_edge(geofactory.createLineString(Array(v1, v2)))
+    }.toList
+  }
 
+  def getCoords: Array[Coordinate] = {
     val C = coords.filter(_.valid).map(_.coord)
     if(C.isEmpty){
       coords.map(_.coord)
@@ -456,6 +498,39 @@ case class Coords(coords: Array[Coord]){
   }
 }
 
+object Segment {
+  def save(segment: Segment)(implicit geofactory: GeometryFactory): String = {
+    val coords = segment.hedges.map{_.v1} :+ segment.hedges.last.v2
+    val wkt = geofactory.createLineString(coords.toArray).toText
+    val hole = segment.isHole
+    val flag = segment.extremeToRemove
+    val fid = segment.first.id
+    val lid = segment.last.id
+
+    s"$wkt\t$hole\t$flag\t$fid\t$lid"
+  }
+
+  def load(string: String)(implicit geofactory: GeometryFactory): Segment = {
+    val arr = string.split("\t")
+    val wkt = arr(0)
+    val hole = arr(1).toInt
+    val extr = arr(2)
+    val fid = try{ arr(3).toLong } catch { case e: Throwable => -1L}
+    val lid = try{ arr(4).toLong } catch { case e: Throwable => -1L}
+
+    val reader = new WKTReader(geofactory)
+    val coords = reader.read(wkt).asInstanceOf[LineString].getCoordinates
+    val hedges = coords.zip(coords.tail).map{ case(v1, v2) =>
+      val edge = geofactory.createLineString(Array(v1, v2))
+      Half_edge(edge)
+    }.toList
+
+    val segment = Segment(hedges)
+    segment.extremeToRemove = extr
+    segment
+  }
+}
+
 case class Segment(hedges: List[Half_edge]) {
   val first = hedges.head
   val last = hedges.last
@@ -463,6 +538,7 @@ case class Segment(hedges: List[Half_edge]) {
   val ringId = first.data.ringId
   val startId = first.data.edgeId
   val endId = last.data.edgeId
+  var extremeToRemove = "N"
 
   override def toString = s"${polygonId}:\n${hedges.map(_.edge)}"
 
@@ -472,13 +548,19 @@ case class Segment(hedges: List[Half_edge]) {
     s"${s.toText}\t${first.data}"
   }
 
+  def toLine(implicit geofactory: GeometryFactory): String = {
+      val coords = hedges.map{_.v1} :+ hedges.last.v2
+      val s = geofactory.createLineString(coords.toArray)
+      s"${s.toText}\t${isHole}\t${extremeToRemove}"
+  }
+
   def getLine(implicit geofactory: GeometryFactory): String = {
     if(isClose){
       val coords = hedges.map{_.v1} :+ hedges.last.v2
       val s = geofactory.createLineString(coords.toArray)
       s"${s.toText}\t${isHole}\tN"      
     } else {
-      val extremeToRemove = 
+      extremeToRemove = 
         if(first.orig.valid && last.dest.valid){
           "N"
         } else if(!first.orig.valid && last.dest.valid){

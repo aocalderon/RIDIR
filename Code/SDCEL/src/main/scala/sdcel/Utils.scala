@@ -28,7 +28,8 @@ object Utils {
     local: Boolean = false,
     seed: Long = 42L,
     appId: String = "0",
-    persistance: StorageLevel = StorageLevel.MEMORY_ONLY_2
+    persistance: StorageLevel = StorageLevel.MEMORY_ONLY_2,
+    ooption: Int = 0
   ){
     val scale = 1 / tolerance
   }

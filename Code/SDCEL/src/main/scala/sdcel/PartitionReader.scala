@@ -60,9 +60,9 @@ object PartitionReader {
     (quadtree, cells)
   }
 
-  def readEdges[T](input: String, quadtree: StandardQuadTree[T], label: String)
-    (implicit geofactory: GeometryFactory, spark: SparkSession, settings: Settings):
-      RDD[LineString] = {
+  def readEdges[T](input: String, label: String)
+    (implicit geofactory: GeometryFactory, spark: SparkSession, settings: Settings,
+      quadtree: StandardQuadTree[T]): RDD[LineString] = {
     
     // Reading data...
     val partitions = quadtree.getLeafZones.size

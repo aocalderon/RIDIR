@@ -7,9 +7,10 @@ QTAG=$4
 QTAG=${QTAG:-"Tag"}
 MASTER=$5
 MASTER=${MASTER:-"yarn"}
-DEBUG=$6
+OOPTION=$6
+DEBUG=$7
 DEBUG=${DEBUG:-""}
-WAIT=$7
+WAIT=$8
 WAIT=${WAIT:-"3s"}
 
 EXECUTORS=12
@@ -34,4 +35,4 @@ spark-submit \
     --input2 $HDFS_PATH/edgesB \
     --quadtree $LOCAL_PATH/quadtree.wkt \
     --boundary $LOCAL_PATH/boundary.wkt \
-    --tolerance $TOLERANCE --qtag $QTAG $DEBUG --local
+    --tolerance $TOLERANCE --qtag $QTAG --ooption $OOPTION $DEBUG 

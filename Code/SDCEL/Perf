@@ -1,7 +1,6 @@
 #!/bin/bash
 
 POSITIONAL_ARGS=()
-
 while [[ $# -gt 0 ]]; do
     case $1 in
 	-d|--dataset)
@@ -44,6 +43,11 @@ while [[ $# -gt 0 ]]; do
 	    shift # past argument
 	    shift # past value
 	    ;;	
+	-o|--ooption)
+	    OOPTION="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
 	--debug)
 	    DEBUG="--debug"
 	    shift # past argument
@@ -74,8 +78,9 @@ else
     echo "PARTITIONS = ${PARTITIONS}"
 fi
 
-if [ -v N ];     then echo "ITERATIONS = ${N}"; else N=1; fi
-if [ -v DEBUG ]; then echo "DEBUG      = YES";  else DEBUG=""; fi
+if [ -v N ];      then echo "ITERATIONS = ${N}"; else N=1; fi
+if [ -v DEBUG ];  then echo "DEBUG      = YES";  else DEBUG=""; fi
+if [ -v OOPTION ]; then echo "OOPTION    = ${OOPTION}"; else OOPTION=0; fi
 if [ -v MASTER ]
 then
     echo "MASTER     = ${MASTER}"
@@ -91,6 +96,6 @@ do
     for P in "${PS[@]}"
     do
 	echo "Run $n ./sdcel2_debug $DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ $TOLERANCE \"${P}_${DATASET}_${TOLERANCE}_${n}\" ${MASTER} ${DEBUG}"
-	./sdcel2_debug $DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ $TOLERANCE "${P}_${DATASET}_${TOLERANCE}_${n}" $MASTER $DEBUG
+	./sdcel2_debug $DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ $TOLERANCE "${P}_${DATASET}_${TOLERANCE}_${n}" $MASTER $OOPTION $DEBUG
     done
 done

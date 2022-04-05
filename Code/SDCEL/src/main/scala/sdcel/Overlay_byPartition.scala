@@ -16,14 +16,11 @@ import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2._
 
-import PartitionReader._
-import DCELBuilder2.getLDCELs
-import DCELMerger2.merge
-import DCELOverlay2.overlay
-
-import Utils._
-import LocalDCEL.createLocalDCELs
-import SingleLabelChecker.checkSingleLabel
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getEmptyCells, runEmptyCells}
+import edu.ucr.dblab.sdcel.PartitionReader.{readQuadtree, readEdges_byPartition}
+import edu.ucr.dblab.sdcel.DCELOverlay2.{overlay, overlayByLevel, overlayMaster}
+import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, log, log2, logger}
+import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
 
 object Overlay_byPartition {
   def main(args: Array[String]) = {
@@ -42,18 +39,20 @@ object Overlay_byPartition {
       tolerance = params.tolerance(),
       debug = params.debug(),
       local = params.local(),
+      ooption = params.ooption(),
+      appId = appId,
       persistance = params.persistance() match {
         case 0 => StorageLevel.NONE
         case 1 => StorageLevel.MEMORY_ONLY
         case 2 => StorageLevel.MEMORY_ONLY_SER
         case 3 => StorageLevel.MEMORY_ONLY_2
         case 4 => StorageLevel.MEMORY_ONLY_SER_2
-      },
-      appId = appId
+      }
     )
     val command = System.getProperty("sun.java.command")
     log2(s"COMMAND|$command")
     log(s"INFO|tolerance=${settings.tolerance}")
+    log(s"INFO|overlay_option=${settings.ooption}")
     implicit val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
 
@@ -103,24 +102,38 @@ object Overlay_byPartition {
           }.toIterator
         }.collect
       }
-      log2(s"TIME|saveL1|$qtag")
+      log2(s"TIME|saveL2|$qtag")
     }
     log2(s"TIME|layer2|$qtag")
 
     val m = Map.empty[String, EmptyCell]
 
-    val sdcel = overlay(ldcelA, m, ldcelB, m)
-    sdcel.count
-    log2(s"TIME|overlay|$qtag")
+    settings.ooption match {
+      case 0 => {
+        val sdcel = overlay(ldcelA, m, ldcelB, m)
+        sdcel.count
+        log2(s"TIME|overlay|$qtag")
 
-    if(params.debug()){
-      save("/tmp/edgesFO.wkt"){
-        sdcel.map{ case(l,w) =>
-          s"${w.toText}\t$l\t${w.getUserData}\n"
-        }.collect
+        if(params.debug()){
+          save(s"/tmp/edgesFO${partition}.wkt"){
+            sdcel.map{ case(l,w) =>
+              s"${w.toText}\t$l\t${w.getUserData}\n"
+            }.collect
+          }
+          log2(s"TIME|saveO|$qtag")
+        }
       }
-      log2(s"TIME|saveO|$qtag")
+      case 1 => {
+        logger.info(s"Running overlayMaster...")
+        overlayMaster(ldcelA, m, ldcelB, m)
+        log2(s"TIME|overlayMaster|$qtag")
+      }
+      case 2 => {
+        overlayByLevel(ldcelA, m, ldcelB, m)
+        log2(s"TIME|overlayByLevel|$qtag")
+      }
     }
+
     spark.close
   }
 }
