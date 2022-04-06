@@ -34,6 +34,7 @@ object SDCEL2 {
       debug = params.debug(),
       local = params.local(),
       ooption = params.ooption(),
+      level = params.level(),
       appId = appId,
       persistance = params.persistance() match {
         case 0 => StorageLevel.NONE
@@ -47,6 +48,7 @@ object SDCEL2 {
     log2(s"COMMAND|$command")
     log(s"INFO|tolerance=${settings.tolerance}")
     log(s"INFO|overlay_option=${settings.ooption}")
+    log(s"INFO|overlay_level=${settings.level}")
     implicit val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
 

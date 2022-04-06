@@ -24,6 +24,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val notmerge:    ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val overlay:     ScallopOption[Boolean] = opt[Boolean] (default = Some(true))
   val ooption:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
+  val level:       ScallopOption[Int]     = opt[Int]     (default = Some(4))
   val output:      ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
   val persistance: ScallopOption[Int]     = opt[Int]     (default = Some(1))
 

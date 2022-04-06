@@ -102,7 +102,7 @@ object DCELOverlay2 {
     }
 
     val segs1 = collectSegments{ sdcel_prime}
-    val (segs2, m) = aggregateSegments( segs1, 5)
+    val (segs2, m) = aggregateSegments( segs1, settings.level)
 
     val S = segs2.mapPartitions{ it =>
       mergeSegmentsByLevel(it.toArray).toIterator
