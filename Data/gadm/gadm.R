@@ -1,7 +1,11 @@
 library(tidyverse)
 setwd("~/RIDIR/Data/gadm/")
 
-data0 = enframe(read_lines("GADM_v01.txt"), value="line")
+data0a = enframe(read_lines("GADM_v01.txt"), value="line")
+data0b = enframe(read_lines("GADM_v02.txt"), value="line")
+
+data0 = bind_rows(data0a, data0b)
+
 data1 = data0 %>%
   filter(str_detect(line, 'TIME')) 
 
@@ -13,11 +17,12 @@ data2 = data1 %>%
   filter(stage == "layer1" | stage == "layer2" | stage == "overlay") %>%
   select(time, stage, partitions, appId) %>%
   mutate(time = as.numeric(time) / 1000.0) %>%
-  mutate(partitions = fct_relevel(partitions, "1000", "2000", "3000", "4000", "5000", "6000", "7000", "8000", "9000", "10000", "11000", "12000", "13000", "14000", "15000")) %>%
+  mutate(partitions = fct_relevel(partitions, "2000", "4000", "6000", "8000", "10000", "12000", "14000", "16000", "18000", "20000")) %>%
   add_column(size = "gadm")
 
 data3 = data2 %>%
-  group_by(partitions, stage, size) %>% summarise(time = mean(time)) 
+  group_by(partitions, stage, size) %>% summarise(time = mean(time)) %>%
+  filter(partitions != 1000 & partitions != 3000 & partitions != 5000 & partitions != 7000 & partitions != 9000)
 
 write_tsv(data3, "gadm.tsv")
 
