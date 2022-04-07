@@ -10,7 +10,7 @@ import com.vividsolutions.jts.io.WKTReader
 import org.rogach.scallop.ScallopConf
 import org.slf4j.{Logger, LoggerFactory}
 import scala.util.Random
-import edu.ucr.dblab.Utils.save
+//import edu.ucr.dblab.Utils.save
 
 object Tester {
   implicit val logger = LoggerFactory.getLogger("myLogger")
