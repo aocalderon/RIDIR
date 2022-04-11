@@ -16,11 +16,7 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/tasks.readonly']
 
-
 def main():
-    """Shows basic usage of the Tasks API.
-    Prints the title and ID of the first 10 task lists.
-    """
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -47,7 +43,7 @@ def main():
         items = results.get('items', [])
 
         if not items:
-            print('No task lists found.')
+            print('No tasklists found.')
             return
 
         for item in items:
