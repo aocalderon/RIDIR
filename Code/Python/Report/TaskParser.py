@@ -52,6 +52,7 @@ def main():
 
         for item in items:
             tasklistTitle = item['title']
+            filehandle = open('{0}.tex'.format(tasklistTitle), 'w')
             tasklistId = item['id']
             results = service.tasks().list(tasklist=tasklistId,
                                            showHidden=True,
@@ -73,10 +74,11 @@ def main():
                 dates.append(date)
             for (date, tasks) in zip(dates, tasks):
                 line = ", ".join([task[2] for task in tasks])
-                
-                print("{0} & 4 & {1}. \\\\[10pt] \hline".format(date, line))
+                latex = "{0} & 4 & {1}. \\\\[10pt] \hline".format(date, line)
+                filehandle.write("{0}\n".format(latex))
+                print(latex)
             print("\n")
-            
+            filehandle.close()            
                 
     except HttpError as err:
         print(err)
