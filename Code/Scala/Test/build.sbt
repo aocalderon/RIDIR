@@ -18,7 +18,7 @@ libraryDependencies += "org.datasyslab" % "JTSplus" % "0.1.4"
 libraryDependencies += "org.slf4j" % "slf4j-jdk14" % "1.7.25"
 libraryDependencies += "org.rogach" % "scallop_2.11" % "2.1.3"
 
-libraryDependencies += "edu.ucr.dblab" % "utils_2.11" % "0.1"
+//libraryDependencies += "edu.ucr.dblab" % "utils_2.11" % "0.1"
 
 mainClass in (Compile, run) := Some("edu.ucr.dblab.Tester")
 mainClass in (Compile, packageBin) := Some("edu.ucr.dblab.Tester")
