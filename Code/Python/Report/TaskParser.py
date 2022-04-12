@@ -38,7 +38,6 @@ def main():
         service = build('tasks', 'v1', credentials=creds)
 
         # Call the Tasks API
-        optionalArgs = {'maxResults=100', 'showHidden=true', 'showDeleted=true'}
         results = service.tasklists().list(maxResults=100).execute()
         items = results.get('items', [])
 
@@ -52,7 +51,8 @@ def main():
             tasklistId = item['id']
             results = service.tasks().list(tasklist=tasklistId,
                                            showHidden=True,
-                                           showCompleted=True).execute()
+                                           showCompleted=True,
+                                           maxResults=100).execute()
             items = results.get('items', [])
             tasks_prime = []
             for item in items:
