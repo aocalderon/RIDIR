@@ -74,9 +74,9 @@ def main():
                 filehandle.write("{0}\n".format(latex))
                 print(latex)
             print("\n")
-            filehandle.close()            
+            filehandle.close()
                 
-    except HttpError as err:
+    Except HttpError as err:
         print(err)
 
 
