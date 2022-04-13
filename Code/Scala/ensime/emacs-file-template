@@ -1,0 +1,147 @@
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+
+(defun sbt-shell ()
+  "Create or visit a `sbt-shell' buffer."
+  (interactive)
+  (if (not (get-buffer "*sbt-shell*"))
+      (progn
+        (split-window-sensibly (selected-window))
+        (other-window 1)
+        (eshell)
+	(rename-buffer "*sbt-shell*"))
+    (switch-to-buffer-other-window "*sbt-shell*"))
+  (insert (concat "cd "
+		  (substring default-directory 0 (string-match-p "/src" default-directory))
+		  "; sbt;" ))
+  (execute-kbd-macro "\C-m")
+  (other-window -1)
+)
+
+(defun sbt-package ()
+  "Execute sbt package."
+  (interactive)
+  (save-buffer)
+  (switch-to-buffer-other-window "*sbt-shell*")
+  (insert "package")
+  (execute-kbd-macro "\C-m")
+  (other-window -1)
+)
+
+(defun sbt-test ()
+  "Execute sbt test."
+  (interactive)
+  (save-buffer)
+  (switch-to-buffer-other-window "*sbt-shell*")
+  (insert "test")
+  (execute-kbd-macro "\C-m")
+  (other-window -1)
+)
+
+(defun sbt-run ()
+  "Execute sbt runMain."
+  (interactive)
+  (save-buffer)
+  (set 'object_name (substring (buffer-name) 0 (string-match-p "\\." (buffer-name))))
+  (switch-to-buffer-other-window "*sbt-shell*")
+  (insert (concat "runMain " object_name))
+  (execute-kbd-macro "\C-m")
+  (other-window -1)
+)
+
+(defun spark-shell ()
+  "Creates or visit a `spark-shell` buffer."
+  (interactive)
+  (if (not (get-buffer "*spark-shell*"))
+      (progn
+        (split-window-sensibly (selected-window))
+        (other-window 1)
+        (eshell)
+	(rename-buffer "*spark-shell*"))
+    (switch-to-buffer-other-window "*spark-shell*"))
+  (insert "spark-shell --master local[10]")
+  (execute-kbd-macro "\C-m")
+  (other-window -1)
+)
+
+(defun spark-eval-cell ()
+  (interactive)
+  (save-excursion
+    (widen)
+    (setq cellprefix "//**")
+    (setq spos (search-backward cellprefix))
+    (goto-char ( + spos (length cellprefix)))
+    (setq epos (search-forward cellprefix))
+    (setq code (buffer-substring-no-properties spos epos))
+    (switch-to-buffer-other-window "*spark-shell*")
+    (insert (substring code (length cellprefix) (- (length code) (length cellprefix))))  
+    ;;( insert (string-join (butlast (cdr (split-string code "\n"))) "\n") )
+    (execute-kbd-macro "\C-m")
+    (other-window -1)
+  )
+)
+
+(global-set-key (kbd "<f3>") 'compile)
+(global-set-key (kbd "<f5>") 'shell)
+(global-set-key (kbd "<f6>") 'other-window)
+(global-set-key (kbd "<f7>") 'sbt-shell)
+(global-set-key (kbd "<f8>") 'sbt-test)
+(global-set-key (kbd "<f9>") 'sbt-package)
+(global-set-key (kbd "C-z") 'undo)
+(global-set-key (kbd "C-x p") 'spark-eval-cell)
+
+;; Enable scala-mode for highlighting, indentation and motion commands
+(use-package scala-mode
+  :interpreter
+    ("scala" . scala-mode))
+
+;; Enable sbt mode for executing sbt commands
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false"))
+   )
+
+(use-package ensime
+  :ensure t
+  :pin melpa)
+(setq ensime-startup-notification nil)
+(defun mark-whole-buffer ()
+  "Put point at beginning and mark at end of buffer.
+If narrowing is in effect, only uses the accessible part of the buffer.
+You probably should not use this function in Lisp programs;
+it is usually a mistake for a Lisp function to use any subroutine
+that uses or sets the mark."
+  (declare (interactive-only t))
+  (interactive)
+  (push-mark)
+  (push-mark (point-max) nil t)
+  ;; This is really `point-min' in most cases, but if we're in the
+  ;; minibuffer, this is at the end of the prompt.
+  (goto-char (minibuffer-prompt-end)))
+
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(tango-dark))
+ '(package-selected-packages
+   '(company-jedi jedi yasnippet use-package sbt-mode flycheck company auto-complete)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

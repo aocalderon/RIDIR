@@ -1,7 +1,7 @@
 name := "Testers"
 organization := "edu.ucr.dblab"
 version := "0.1"
-scalaVersion := "2.12.8"
+scalaVersion in ThisBuild := "2.12.8"
 
 val SparkVersion = "3.2.0"
 
