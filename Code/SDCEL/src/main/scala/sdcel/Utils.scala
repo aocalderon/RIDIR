@@ -2,9 +2,10 @@ package edu.ucr.dblab.sdcel
 
 import com.vividsolutions.jts.geom.{ GeometryFactory, PrecisionModel }
 import com.vividsolutions.jts.geom.{ Geometry, Envelope, Coordinate }
-import com.vividsolutions.jts.geom.{ Polygon, Point }
+import com.vividsolutions.jts.geom.{ Polygon, LineString, Point }
+import com.vividsolutions.jts.io.WKTReader
 
-import org.apache.spark.sql.{ SparkSession, Dataset, Row, functions }
+import org.apache.spark.sql.{ SparkSession, Dataset, Row, functions, SaveMode }
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{ TaskContext, SparkEnv }
@@ -12,8 +13,9 @@ import org.apache.spark.{ TaskContext, SparkEnv }
 import ch.cern.sparkmeasure.TaskMetrics
 import org.slf4j.{ Logger, LoggerFactory }
 
-import edu.ucr.dblab.sdcel.geometries.{ Half_edge, Cell }
+import edu.ucr.dblab.sdcel.geometries.{ Half_edge, Cell, EdgeData }
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{ getFaces, EmptyCell }
+import DCELMerger2.{groupByNextMBRPoly}
 
 object Utils {
   //** Implicits
@@ -30,7 +32,7 @@ object Utils {
     appId: String = "0",
     persistance: StorageLevel = StorageLevel.MEMORY_ONLY_2,
     ooption: Int = 0,
-    level: Int = 4
+    olevel: Int = 4
   ){
     val scale = 1 / tolerance
   }
@@ -56,69 +58,81 @@ object Utils {
   }
 
   def saveSDCEL(output: String, 
-    sdcel: RDD[(Half_edge, String, Envelope, Polygon)],
-    m: Map[String, EmptyCell])
-    (implicit geofactory: GeometryFactory, cells: Map[Int, Cell], settings: Settings) = {
+    sdcel: RDD[(Half_edge, String, Envelope, Polygon)], m: Map[String, EmptyCell])
+    (implicit geofactory: GeometryFactory, cells: Map[Int, Cell], settings: Settings,
+      spark: SparkSession) = {
 
-    case class Face(h: Half_edge, l: String, e: Envelope, p: Polygon){
+    import spark.implicits._
+    case class Face(h: Half_edge, l: String, e: Envelope, p: Polygon, pid: Int){
       val id = h.id
-
-      override def toString: String = s"$id\t$l\t$e\t$p"
-
-      def toRecord(pid: Long = -1L): String = s"$p\t$id\t$l\t$pid"
-    }
-    case class Data(pid: Int, hedges: List[Half_edge],
-      faces: List[Face] = List.empty[Face]){
-
-      override def toString: String = {
-        "Partition:\n" +
-        s"$pid\n" +
-        s"Half Edges:\n" +
-        hedges.map{ h => 
-          val par  = h.params
-          val wkt  = h.wkt
-          val id   = h.id
-          val prev = h.prev.id
-          val next = h.next.id
-          val twin = if( h.twin != null) h.twin.id else null
-
-          s"$wkt\t$id\t$par\t$prev\t$next\t$twin"
-        }.mkString("\n") +
-        "\n" +
-        s"Faces:\n" +
-        faces.mkString("\n") +
-        "\n" 
-      }
-
-      def getHalf_edges: List[String] = {
-        hedges.map{ h => 
-          val par  = h.params
-          val wkt  = h.wkt
-          val id   = h.id
-          val prev = h.prev.id
-          val next = h.next.id
-          val twin = if( h.twin != null) h.twin.id else null
-
-          s"$wkt\t$pid\t$id\t$par\t$prev\t$next\t$twin"
-        }
-      }
+      override def toString: String = s"$p\t$pid\t$id\t$l"
     }
 
     sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      val faces = getFaces(it, cells(pid), m).map{ case(h,l,e,p) => Face(h,l,e,p) }
+      val faces = getFaces(it, cells(pid), m).map{ case(h,l,e,p) => Face(h,l,e,p,pid) }
       val hedges = faces.flatMap{_.h.getNexts}
 
-      Data(pid, hedges).getHalf_edges.toIterator
-    }.saveAsTextFile(output + "/hedges")
+      hedges.map{ h => Half_edge.save(h, pid) }.toIterator
+    }.toDS.write.mode(SaveMode.Overwrite).text(output + "/hedges")
     log(s"INFO|SDCEL half edges saved at ${output}/hedges")
 
     sdcel.mapPartitionsWithIndex{ (pid, it) =>
       val faces = getFaces(it, cells(pid), m)
-        .map{ case(h,l,e,p) => Face(h,l,e,p).toRecord(pid) }
+        .map{ case(h,l,e,p) => Face(h,l,e,p,pid).toString }
 
       faces.toIterator
-    }.saveAsTextFile(output + "/faces")
+    }.toDS.write.mode(SaveMode.Overwrite).text(output + "/faces")
+
     log(s"INFO|SDCEL faces saved at ${output}/faces")
+  }
+
+  def loadSDCEL(input: String, letter: String = "A")
+    (implicit spark: SparkSession, geofactory: GeometryFactory, cells: Map[Int, Cell],
+      settings: Settings): RDD[(Half_edge, String, Envelope, Polygon)] = {
+
+    val input_base = input.split("/edges")(0)
+    val partitions = cells.size
+    val sdcel = spark.read.textFile(s"${input_base}/ldcel${letter}/hedges").rdd
+      .mapPartitionsWithIndex{ case(pid, lines) =>
+        val reader = new WKTReader(geofactory)
+        lines.map{ line =>
+          val hedge = Half_edge.load(line)
+          (hedge.partitionId, hedge)
+        }.toIterator
+      }
+      .partitionBy(new SimplePartitioner(partitions))
+      .mapPartitionsWithIndex{ (pid, it) =>
+        val hs = it.toList
+        val hedgesMap = hs.map{ case(pid, edge) =>  edge.id -> edge }.toMap
+        val hedges = hs.map{ case(pid, edge) =>
+          val pointers = edge.pointers
+          edge.prev = try{ hedgesMap(pointers(0)) } catch {
+            case e: java.util.NoSuchElementException => {
+              logger.info(s"NULL at prev. $pid ${edge.wkt} ${edge.pointers.mkString(" ")}")
+              null
+            }
+          }
+          edge.twin = try{ hedgesMap(pointers(1)) } catch {
+            case e: java.util.NoSuchElementException => {
+              logger.info(s"NULL at twin. $pid ${edge.wkt} ${edge.pointers.mkString(" ")}")
+              edge.reverse
+            }
+          }
+          edge.next = try{ hedgesMap(pointers(2)) } catch {
+            case e: java.util.NoSuchElementException => {
+              logger.info(s"NULL at next. $pid ${edge.wkt} ${edge.pointers.mkString(" ")}")
+              null
+            }
+          }
+
+          edge
+        }
+
+        groupByNextMBRPoly((hedges).toSet, List.empty[(Half_edge, String, Envelope, Polygon)])
+          .filter(_._2.split(" ").size == 1).toIterator
+      }.persist(settings.persistance)
+
+    sdcel
   }
 
   def save(filename: String)(content: Seq[String]): Unit = {

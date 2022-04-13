@@ -110,21 +110,10 @@ object Overlay_byPartition {
 
     settings.ooption match {
       case 0 => {
-        val sdcel = overlay(ldcelA, m, ldcelB, m)
-        sdcel.count
+        overlay(ldcelA, m, ldcelB, m)
         log2(s"TIME|overlay|$qtag")
-
-        if(params.debug()){
-          save(s"/tmp/edgesFO${partition}.wkt"){
-            sdcel.map{ case(l,w) =>
-              s"${w.toText}\t$l\t${w.getUserData}\n"
-            }.collect
-          }
-          log2(s"TIME|saveO|$qtag")
-        }
       }
       case 1 => {
-        logger.info(s"Running overlayMaster...")
         overlayMaster(ldcelA, m, ldcelB, m)
         log2(s"TIME|overlayMaster|$qtag")
       }

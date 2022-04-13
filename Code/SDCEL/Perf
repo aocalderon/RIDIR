@@ -57,6 +57,10 @@ while [[ $# -gt 0 ]]; do
 	    DEBUG="--debug"
 	    shift # past argument
 	    ;;
+	--loadsdcel)
+	    LOADSDCEL="--loadsdcel"
+	    shift # past argument
+	    ;;
 	-*|--*)
 	    echo "Unknown option $1"
 	    exit 1
@@ -83,10 +87,12 @@ else
     echo "PARTITIONS = ${PARTITIONS}"
 fi
 
-if [ -v N ];       then echo "ITERATIONS = ${N}";       else N=1;       fi
-if [ -v DEBUG ];   then echo "DEBUG      = YES";        else DEBUG="";  fi
-if [ -v OOPTION ]; then echo "OOPTION    = ${OOPTION}"; else OOPTION=0; fi
-if [ -v OLEVEL ];  then echo "OLEVEL     = ${OLEVEL}";  else OLEVEL=4;  fi
+if [ -v N ];         then echo "ITERATIONS = ${N}";       else N=1;          fi
+if [ -v DEBUG ];     then echo "DEBUG      = YES";        else DEBUG="";     fi
+if [ -v LOADSDCEL ]; then echo "LOADSDCEL  = YES";        else LOADSDCEL=""; fi
+if [ -v OOPTION ];   then echo "OOPTION    = ${OOPTION}"; else OOPTION=0;    fi
+if [ -v OLEVEL ];    then echo "OLEVEL     = ${OLEVEL}";  else OLEVEL=4;     fi
+
 if [ -v MASTER ]
 then
     echo "MASTER     = ${MASTER}"
@@ -95,13 +101,17 @@ else
     echo "MASTER     = yarn"
 fi
 
-#PS=(5000)
-
 for n in $(seq 1 $N)
 do
     for P in "${PS[@]}"
     do
-	echo "Run $n ./sdcel2_debug $DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ $TOLERANCE \"${P}_${DATASET}_${TOLERANCE}_${n}\" ${MASTER} ${DEBUG}"
-	./sdcel2_debug $DATASET/P$P /home/acald013/RIDIR/local_path/$DATASET/P$P/ $TOLERANCE "${P}_${DATASET}_${TOLERANCE}_${n}" $MASTER $OOPTION $OLEVEL $DEBUG
+	echo "RUN        = $n"
+	./sdcel2_debug \
+	    --hdfspath $DATASET/P$P \
+	    --localpath /home/acald013/RIDIR/local_path/$DATASET/P$P/ \
+	    --tolerance $TOLERANCE \
+	    --tag "${P}_${DATASET}_${TOLERANCE}_${OOPTION}_${OLEVEL}_${n}" \
+	    --master $MASTER \
+	    --ooption $OOPTION --olevel $OLEVEL $DEBUG $LOADSDCEL
     done
 done
