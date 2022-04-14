@@ -33,6 +33,11 @@ while [[ $# -gt 0 ]]; do
 	    shift # past argument
 	    shift # past value
 	    ;;	
+	-e|--olevel)
+	    OLEVEL="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
 	--debug)
 	    DEBUG="--debug"
 	    shift # past argument
@@ -53,9 +58,17 @@ echo "PARTITIONS = ${PARTITIONS}"
 echo "PARTITION  = ${PARTITION}"
 echo "TOLERANCE  = ${TOLERANCE}"
 
-if [ -v DEBUG ];    then echo "DEBUG      = YES";  else DEBUG=""; fi
-if [ -v OOPTION ];  then echo "OOPTION    = ${OOPTION}";  else OOPTION=0; fi
-if [ -v MASTER ];   then echo "MASTER     = ${MASTER}"; else MASTER="local"; echo "MASTER     = local"; fi
+if [ -v DEBUG ];    then echo "DEBUG      = YES";        else DEBUG="";  fi
+if [ -v OOPTION ];  then echo "OOPTION    = ${OOPTION}"; else OOPTION=0; fi
+if [ -v OLEVEL ];   then echo "OLEVEL     = ${OLEVEL}";  else OLEVEL=4;  fi
+
+if [ -v MASTER ];
+then
+    echo "MASTER     = ${MASTER}";
+else
+    MASTER="local";
+    echo "MASTER     = local";
+fi
 
 PARTPAD=$(printf "%05d" $PARTITION)
 PARTA_PRIME=$(hdfs dfs -ls ${DATASET}/P${PARTITIONS}/edgesA/part-${PARTPAD}*)
@@ -80,4 +93,4 @@ spark-submit \
     --quadtree $HOME/RIDIR/local_path/${DATASET}/P${PARTITIONS}/quadtree.wkt \
     --boundary $HOME/RIDIR/local_path/${DATASET}/P${PARTITIONS}/boundary.wkt \
     --partition $PARTITION \
-    --tolerance $TOLERANCE --qtag $QTAG --ooption $OOPTION $DEBUG
+    --tolerance $TOLERANCE --qtag $QTAG --ooption $OOPTION --olevel $OLEVEL $DEBUG

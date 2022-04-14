@@ -68,7 +68,7 @@ object DCELOverlay2 {
       spark: SparkSession): List[(String, Polygon)] = {
 
     val sdcel_prime = zipMerge(ldcelA, ma, ldcelB, mb)
-    val segments_prime = collectSegments{ sdcel_prime }.persist(settings.persistance)
+    val segments_prime = collectSegments{ sdcel_prime }//.persist(settings.persistance)
 
     val segments = segments_prime
       .map{ case(seg, lab) =>
@@ -78,13 +78,49 @@ object DCELOverlay2 {
       .map{ case(seg, lab, pid) =>
         (Segment.load(seg), lab)
       }
+
+    if(settings.debug){
+      save("/tmp/edgesS1.wkt"){
+        segments.map{ case(segment, label) =>
+          s"${segment.wkt}\t$label\n"
+        }
+      }
+    }
     
     val faces = mergeSegmentsByLevel(segments)
       .map{ case(label, coords) =>
-        label -> coords.filter(_.getCoords.size >= 4).map{c =>
-          geofactory.createPolygon(c.getCoords)
-        }.head
-      }
+        val polygons = coords.filter(_.getCoords.size >= 4).map{c =>
+          (label, geofactory.createPolygon(c.getCoords))
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////
+        polygons.groupBy(_._1).flatMap{ case(lab, list) =>
+          val polys = list.map(_._2).sortBy(_.getArea)(Ordering[Double].reverse)
+          
+          val outer0 = polys.head.getExteriorRing.getCoordinates
+          val outer = outer0
+          val shell = geofactory.createLinearRing(outer)
+          val O = geofactory.createPolygon(shell)
+
+          val inners = polys.tail.map{ poly =>
+            val inner0 = poly.getExteriorRing.getCoordinates
+            val inner = inner0
+            geofactory.createLinearRing(inner)
+          }.toArray
+
+          val (holes, noholes) = inners.partition{ i =>
+            i.getInteriorPoint.coveredBy(O)
+          }
+
+          val p = geofactory.createPolygon(shell, holes)
+          val p2 = noholes.map{ nh =>
+            geofactory.createPolygon(nh)
+          }
+          val ps = p +: p2
+
+          ps.map{ p => (lab, p) }
+        }.toList
+        //////////////////////////////////////////////////////////////////////////////////////////
+      }.flatten
 
     if(settings.debug){
       save("/tmp/edgesO.wkt"){
@@ -116,11 +152,40 @@ object DCELOverlay2 {
       coords.map{ C => (Segment(C.getHedges), label)}
     }.flatten
 
-    val faces = mergeSegmentsByLevel(segments).map{ case(label, coords) =>
-      label -> coords.filter(_.getCoords.size >= 4).map{c =>
-        geofactory.createPolygon(c.getCoords)
-      }.head
-    }
+    val faces = mergeSegmentsByLevel(segments)
+      .map{ case(label, coords) =>
+        val polygons = coords.filter(_.getCoords.size >= 4).map{c =>
+          (label, geofactory.createPolygon(c.getCoords))
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////
+        polygons.groupBy(_._1).flatMap{ case(lab, list) =>
+          val polys = list.map(_._2).sortBy(_.getArea)(Ordering[Double].reverse)
+          
+          val outer0 = polys.head.getExteriorRing.getCoordinates
+          val outer = outer0
+          val shell = geofactory.createLinearRing(outer)
+          val O = geofactory.createPolygon(shell)
+
+          val inners = polys.tail.map{ poly =>
+            val inner0 = poly.getExteriorRing.getCoordinates
+            val inner = inner0
+            geofactory.createLinearRing(inner)
+          }.toArray
+
+          val (holes, noholes) = inners.partition{ i =>
+            i.getInteriorPoint.coveredBy(O)
+          }
+
+          val p = geofactory.createPolygon(shell, holes)
+          val p2 = noholes.map{ nh =>
+            geofactory.createPolygon(nh)
+          }
+          val ps = p +: p2
+
+          ps.map{ p => (lab, p) }
+        }.toList
+        //////////////////////////////////////////////////////////////////////////////////////////
+      }.flatten
 
     if(settings.debug){
       save("/tmp/edgesO.wkt"){
@@ -213,29 +278,12 @@ object DCELOverlay2 {
   def mergeSegments(sdcel: RDD[(Segment, String)])
     (implicit geofactory: GeometryFactory, settings: Settings): RDD[(String, Polygon)] = {
 
-    val a = sdcel//.filter{!_._1.isClose}
+    val segmentsRepartitionByLabel = sdcel//.filter{!_._1.isClose}
       .map{ case(s,l) => (l,List(s.getLine)) }
-      .reduceByKey{ case(a, b) => a ++ b }.persist(settings.persistance)
+      .reduceByKey{ case(a, b) => a ++ b }
+      .persist(settings.persistance) // Persistance due to repartition...
 
-    if(settings.debug){
-      save(s"/tmp/edgesS.wkt"){
-        a.mapPartitionsWithIndex{ (pid, it) =>
-          it.flatMap{ case(label,segs_prime) =>
-            segs_prime.map{ s =>
-              val arr = s.split("\t")
-              val wkt    = arr(0)
-              val hole   = arr(1) // is part of a hole?
-              val valid  = arr(2) // has to be removed later?
-              val border = try{ arr(3).toBoolean }
-              catch { case _: Throwable => false } // is a border?
-              s"$wkt\t$label\t$hole\t$valid\t$border\t$pid\n"
-            }
-          }
-        }.collect
-      }
-    }
-
-    val b = a.mapPartitionsWithIndex{ (pid, it) =>
+    val faces = segmentsRepartitionByLabel.mapPartitionsWithIndex{ (pid, it) =>
         val reader = new WKTReader(geofactory)
         it.flatMap{ case(label, segs_prime) =>          
           val segs = segs_prime.map{ s =>
@@ -243,10 +291,8 @@ object DCELOverlay2 {
             val wkt    = arr(0)
             val hole   = arr(1) // is part of a hole?
             val valid  = arr(2) // has to be removed later?
-            val border = try{ arr(3).toBoolean }
-            catch { case _: Throwable => false } // is a border?
             val seg = reader.read(wkt).asInstanceOf[LineString]
-            seg.setUserData(s"$hole\t$valid\t$border") // ishole, flag, isborder
+            seg.setUserData(s"$hole\t$valid") // ishole, flag
             seg
           }
           val polygons = mergeLocalSegments(segs, label)
@@ -277,8 +323,9 @@ object DCELOverlay2 {
             ps.map{ p => (lab, p)}
           }.flatten
         }
-      }
-    b
+    }
+
+    faces
   }
 
   def mergeLocalSegments(segments: List[LineString], label:String = "")
@@ -395,9 +442,10 @@ object DCELOverlay2 {
           }
         }
       }
-    }.persist(settings.persistance)
+    }
 
     if(settings.debug){
+      S.persist(settings.persistance) // Persistance is required during debugging...
       save("/tmp/edgesS.wkt"){
         S.mapPartitionsWithIndex{ (pid, it) =>
           it.map{ case(segment, label) =>

@@ -81,7 +81,7 @@ object Overlay_byPartition {
     // Creating local dcel layer A...
     val ldcelA = createLocalDCELs(edgesRDDA, "A")
     if(params.debug()){
-      save(s"/tmp/edgesFA${partition}.wkt"){
+      save(s"/tmp/edgesA${partition}.wkt"){
         ldcelA.mapPartitionsWithIndex{ (pid, it) =>
           it.map{ hedge =>
             s"${hedge._4.toText}\t${hedge._2}\t${pid}\n"
@@ -95,7 +95,7 @@ object Overlay_byPartition {
     // Creating local dcel layer A...
     val ldcelB = createLocalDCELs(edgesRDDB, "B")
     if(params.debug()){
-      save(s"/tmp/edgesFB${partition}.wkt"){
+      save(s"/tmp/edgesB${partition}.wkt"){
         ldcelB.mapPartitionsWithIndex{ (pid, it) =>
           it.map{ hedge =>
             s"${hedge._4.toText}\t${hedge._2}\t${pid}\n"

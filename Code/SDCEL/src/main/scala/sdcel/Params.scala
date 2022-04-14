@@ -21,6 +21,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val loadsdcel:   ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val savesdcel:   ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val notmerge:    ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val overlay:     ScallopOption[Boolean] = opt[Boolean] (default = Some(true))
   val ooption:     ScallopOption[Int]     = opt[Int]     (default = Some(0))

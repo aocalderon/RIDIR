@@ -94,13 +94,17 @@ object SDCEL2 {
       val ldcelA = createLocalDCELs(edgesRDDA, "A")
       val ma = runEmptyCells(ldcelA, emptiesA, "A")
       log2(s"TIME|layer1|$qtag")
-      saveSDCEL(s"${params.input1().split("edgesA")(0)}/ldcelA", ldcelA, ma)
+      if(params.savesdcel()){
+        saveSDCEL(s"${params.input1().split("edgesA")(0)}/ldcelA", ldcelA, ma)
+      }
 
       // Creating local dcel layer B...
       val ldcelB = createLocalDCELs(edgesRDDB, "B")
       val mb = runEmptyCells(ldcelB, emptiesB, "B")
       log2(s"TIME|layer2|$qtag")
-      saveSDCEL(s"${params.input2().split("edgesB")(0)}/ldcelB", ldcelB, mb)
+      if(params.savesdcel()){
+        saveSDCEL(s"${params.input2().split("edgesB")(0)}/ldcelB", ldcelB, mb)
+      }
 
       (ldcelA, ma, ldcelB, mb)
     }

@@ -1,0 +1,41 @@
+DATASET    = Census/MainUS
+TOLERANCE  = 1e-3
+PARTITIONS = 5000
+ITERATIONS = 1
+OOPTION    = 1
+OLEVEL     = 5
+MASTER     = yarn
+RUN        = 1
+HDFS_PATH  = Census/MainUS/P5000
+LOCAL_PATH = /home/acald013/RIDIR/local_path/Census/MainUS/P5000/
+TAG        = 5000_Census/MainUS_1e-3_1_5_1
+2022-04-12 17:18:19,537|13740|application_1648870353198_0405|13996|COMMAND|org.apache.spark.deploy.SparkSubmit --master yarn --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.SDCEL2 --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/spark-measure_2.11-0.16.jar --num-executors 12 --executor-cores 9 --executor-memory 20g /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --input1 Census/MainUS/P5000/edgesA --input2 Census/MainUS/P5000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/MainUS/P5000//quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/MainUS/P5000//boundary.wkt --tolerance 1e-3 --qtag 5000_Census/MainUS_1e-3_1_5_1 --ooption 1 --olevel 5
+2022-04-12 17:18:19,538|13741|application_1648870353198_0405|INFO|tolerance=0.001
+2022-04-12 17:18:19,538|13741|application_1648870353198_0405|INFO|overlay_option=1
+2022-04-12 17:18:19,538|13741|application_1648870353198_0405|INFO|overlay_level=5
+2022-04-12 17:18:19,913|14116|application_1648870353198_0405|376|TIME|start|5000_Census/MainUS_1e-3_1_5_1
+2022-04-12 17:20:30,650|144853|application_1648870353198_0405|130737|TIME|read|5000_Census/MainUS_1e-3_1_5_1
+2022-04-12 17:21:04,185|178388|application_1648870353198_0405|33535|TIME|layer1|5000_Census/MainUS_1e-3_1_5_1
+2022-04-12 17:22:16,340|250543|application_1648870353198_0405|INFO|SDCEL half edges saved at Census/MainUS/P5000//ldcelA/hedges
+2022-04-12 17:23:18,882|313085|application_1648870353198_0405|INFO|SDCEL faces saved at Census/MainUS/P5000//ldcelA/faces
+2022-04-12 17:23:49,619|343822|application_1648870353198_0405|165434|TIME|layer2|5000_Census/MainUS_1e-3_1_5_1
+2022-04-12 17:24:57,853|412056|application_1648870353198_0405|INFO|SDCEL half edges saved at Census/MainUS/P5000//ldcelB/hedges
+2022-04-12 17:26:01,971|476174|application_1648870353198_0405|INFO|SDCEL faces saved at Census/MainUS/P5000//ldcelB/faces
+Exception in thread "Yarn application state monitor" java.lang.OutOfMemoryError: Java heap space
+	at java.io.BufferedReader.<init>(BufferedReader.java:105)
+	at java.io.BufferedReader.<init>(BufferedReader.java:116)
+	at java.io.LineNumberReader.<init>(LineNumberReader.java:72)
+	at org.apache.log4j.DefaultThrowableRenderer.render(DefaultThrowableRenderer.java:64)
+	at org.apache.log4j.spi.ThrowableInformation.getThrowableStrRep(ThrowableInformation.java:87)
+	at org.apache.log4j.spi.LoggingEvent.getThrowableStrRep(LoggingEvent.java:413)
+	at org.apache.log4j.WriterAppender.subAppend(WriterAppender.java:313)
+	at org.apache.log4j.DailyRollingFileAppender.subAppend(DailyRollingFileAppender.java:369)
+	at org.apache.log4j.WriterAppender.append(WriterAppender.java:162)
+	at org.apache.log4j.AppenderSkeleton.doAppend(AppenderSkeleton.java:251)
+	at org.apache.log4j.helpers.AppenderAttachableImpl.appendLoopOnAppenders(AppenderAttachableImpl.java:66)
+	at org.apache.log4j.Category.callAppenders(Category.java:206)
+	at org.apache.log4j.Category.forcedLog(Category.java:391)
+	at org.apache.log4j.Category.log(Category.java:856)
+
+Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "Yarn application state monitor"
+Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
