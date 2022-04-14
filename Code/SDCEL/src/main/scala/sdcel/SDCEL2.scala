@@ -13,7 +13,7 @@ import ch.cern.sparkmeasure.TaskMetrics
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getEmptyCells, runEmptyCells}
 import edu.ucr.dblab.sdcel.PartitionReader.{readQuadtree, readEdges}
 import edu.ucr.dblab.sdcel.DCELOverlay2.{overlay, overlayByLevel, overlayMaster}
-import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, log, log2, logger}
+import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, saveSDCEL, loadSDCEL, log, log2, logger}
 import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
 
 object SDCEL2 {
@@ -34,7 +34,7 @@ object SDCEL2 {
       debug = params.debug(),
       local = params.local(),
       ooption = params.ooption(),
-      level = params.level(),
+      olevel = params.olevel(),
       appId = appId,
       persistance = params.persistance() match {
         case 0 => StorageLevel.NONE
@@ -48,7 +48,7 @@ object SDCEL2 {
     log2(s"COMMAND|$command")
     log(s"INFO|tolerance=${settings.tolerance}")
     log(s"INFO|overlay_option=${settings.ooption}")
-    log(s"INFO|overlay_level=${settings.level}")
+    log(s"INFO|overlay_level=${settings.olevel}")
     implicit val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
 
@@ -57,43 +57,63 @@ object SDCEL2 {
     log2(s"TIME|start|$qtag")
 
     // Reading data...
-    val edgesRDDA = readEdges(params.input1(), "A")
-    val emptiesA = getEmptyCells(edgesRDDA, "A")
-    val edgesRDDB = readEdges(params.input2(), "B")
-    val emptiesB = getEmptyCells(edgesRDDB, "B")
-    log2(s"TIME|read|$qtag")
+    val (ldcelA, ma, ldcelB, mb) = if(params.loadsdcel()){
+      val ldcelA = loadSDCEL(params.input1(), "A")
+      if(settings.debug){
+        save("/tmp/edgesA.wkt"){
+          ldcelA.mapPartitionsWithIndex{ (pid, it) =>
+            it.map{ case(h,l,e,p) =>
+              val wkt = p.toText
+              s"$wkt\t$l\t$pid\n"
+            }
+          }.collect
+        }
+      }
+      val ldcelB = loadSDCEL(params.input2(), "B")
+      if(settings.debug){
+        save("/tmp/edgesB.wkt"){
+          ldcelB.mapPartitionsWithIndex{ (pid, it) =>
+            it.map{ case(h,l,e,p) =>
+              val wkt = p.toText
+              s"$wkt\t$l\t$pid\n"
+            }
+          }.collect
+        }
+      }
+      val m = Map.empty[String, EmptyCell]
+      
+      (ldcelA, m, ldcelB, m)
+    } else {
+      val edgesRDDA = readEdges(params.input1(), "A")
+      val emptiesA = getEmptyCells(edgesRDDA, "A")
+      val edgesRDDB = readEdges(params.input2(), "B")
+      val emptiesB = getEmptyCells(edgesRDDB, "B")
+      log2(s"TIME|read|$qtag")
 
-    // Creating local dcel layer A...
-    val ldcelA0 = createLocalDCELs(edgesRDDA, "A")
-    val (ldcelA, ma) = runEmptyCells(ldcelA0, emptiesA, "A")
-    log2(s"TIME|layer1|$qtag")
+      // Creating local dcel layer A...
+      val ldcelA = createLocalDCELs(edgesRDDA, "A")
+      val ma = runEmptyCells(ldcelA, emptiesA, "A")
+      log2(s"TIME|layer1|$qtag")
+      saveSDCEL(s"${params.input1().split("edgesA")(0)}/ldcelA", ldcelA, ma)
 
-    // Utils.saveSDCEL("tmp/ldcelA", ldcelA, ma)
+      // Creating local dcel layer B...
+      val ldcelB = createLocalDCELs(edgesRDDB, "B")
+      val mb = runEmptyCells(ldcelB, emptiesB, "B")
+      log2(s"TIME|layer2|$qtag")
+      saveSDCEL(s"${params.input2().split("edgesB")(0)}/ldcelB", ldcelB, mb)
 
-    // Creating local dcel layer B...
-    val ldcelB0 = createLocalDCELs(edgesRDDB, "B")
-    val (ldcelB, mb) = runEmptyCells(ldcelB0, emptiesB, "B")
-    log2(s"TIME|layer2|$qtag")
+      (ldcelA, ma, ldcelB, mb)
+    }
 
     if(params.overlay()){
       // Overlay local dcels...
       settings.ooption match {
         case 0 => {
-          val sdcel = overlay(ldcelA, ma, ldcelB, mb)
-          sdcel.count
+          overlay(ldcelA, ma, ldcelB, mb)
           log2(s"TIME|overlay|$qtag")
-
-          if(params.debug()){
-            save("/tmp/edgesFO.wkt"){
-              sdcel.map{ case(l,w) =>
-                s"${w.toText}\t$l\t${w.getUserData}\n"
-              }.collect
-            }
-            log2(s"TIME|saveO|$qtag")
-          }
         }
         case 1 => {
-          val sdcel = overlayMaster(ldcelA, ma, ldcelB, mb)
+          overlayMaster(ldcelA, ma, ldcelB, mb)
           log2(s"TIME|overlayMaster|$qtag")
         }
         case 2 => {

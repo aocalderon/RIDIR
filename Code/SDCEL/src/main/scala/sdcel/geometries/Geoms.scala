@@ -37,49 +37,53 @@ case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
 
   def getParams: String = s"$label\t$polygonId\t$ringId\t$edgeId\t$isHole"
 
-  def save: String = s"${polygonId}_${ringId}_${edgeId}_${isHole}_${label}"
+  def save: String = s"${polygonId}_${ringId}_${edgeId}_${isHole}_${label}_${cellBorder}"
 }
 
 object Half_edge {
-  def save(hedge: Half_edge): String = {
+  def save(hedge: Half_edge, pid: Int): String = {
     val  id  = hedge.id
     val wkt  = hedge.edge.toText
     val data = hedge.data.save
-    val prev = hedge.prev.id
-    val next = hedge.next.id
-    val twin = hedge.twin.id
+    val prev = try{ hedge.prev.id } catch { case e: Throwable => -1L}
+    val twin = try{ hedge.twin.id } catch { case e: Throwable => -1L}
+    val next = try{ hedge.next.id } catch { case e: Throwable => -1L}
 
-    s"$wkt\t$id\t$prev\t$next\t$twin\t$data"
+    s"$wkt\t$pid\t$id\t$prev\t$twin\t$next\t$data"
   }
 
-  def load(hedge: String)(implicit geofactory: GeometryFactory): Half_edge = {
-    val arr = hedge.split("\t")
-    val wkt = arr(0)
-    val id  = arr(1).toLong
-    val prev = arr(2).toLong
-    val twin = try{ arr(4).toLong } catch { case e: Throwable => -1L }
-    val next = arr(6).toLong
+  def load(line: String)(implicit geofactory: GeometryFactory): Half_edge = {
+    val arr  = line.split("\t")
+    val wkt  = arr(0)
+    val pid  = arr(1).toInt
+    val curr_id = arr(2).toLong
+    val prev_id = try{ arr(3).toLong } catch { case e: Throwable => -1L }
+    val twin_id = try{ arr(4).toLong } catch { case e: Throwable => -1L }
+    val next_id = try{ arr(5).toLong } catch { case e: Throwable => -1L }
 
     val data_arr = arr(6).split("_")
-    val pid = data_arr(0).toInt
-    val rid = data_arr(1).toInt
-    val eid = data_arr(2).toInt
-    val hol = data_arr(3).toBoolean
-    val lab = data_arr(4)
-    val data = EdgeData(pid, rid, eid, hol, lab)
+    val polyId = data_arr(0).toInt
+    val ringId = data_arr(1).toInt
+    val edgeId = data_arr(2).toInt
+    val hole   = data_arr(3).toBoolean
+    val label  = data_arr(4)
+    val cellb  = data_arr(5).toBoolean
+    val data   = EdgeData(polyId, ringId, edgeId, hole, label)
+    data.setCellBorder(cellb)
 
     val reader = new WKTReader(geofactory)
     val edge = reader.read(wkt).asInstanceOf[LineString]
     edge.setUserData(data)
 
-    val h = Half_edge(edge, id)
-    h.pointers = List(prev, twin, next)
+    val h = Half_edge(edge)
+    h.id = curr_id
+    h.pointers = List(prev_id, twin_id, next_id)
+    h.partitionId = pid
     h
   }
-
 }
 
-case class Half_edge(edge: LineString, id: Long = 0L) {
+case class Half_edge(edge: LineString) {
   val coords = edge.getCoordinates
   val v1 = coords(0)
   val v2 = coords(1)
@@ -97,6 +101,7 @@ case class Half_edge(edge: LineString, id: Long = 0L) {
   }
 
   val wkt = edge.toText()
+  var id: Long = 0L
   var original_coords: Array[Coordinate] = Array.empty[Coordinate]
   var tags: List[Tag] = List.empty[Tag]
   var twin: Half_edge = null
@@ -109,6 +114,7 @@ case class Half_edge(edge: LineString, id: Long = 0L) {
   var source: Coordinate = v1
   var target: Coordinate = v2
   var pointers: List[Long] = List(-1L, -1L, -1L)
+  var partitionId: Int = -1
   var MAX_RECURSION: Int = Int.MaxValue
 
   override def toString = s"${edge.toText}\t$data\t${tag}"
@@ -341,7 +347,7 @@ case class Half_edge(edge: LineString, id: Long = 0L) {
       if( next == null || next == hedges.head || hedges.exists(_ == next)){
         hedges
       } else if(i >= MAX_RECURSION){
-        List.empty[Half_edge]
+        hedges :+ hedges.head
       }else {
         getNextsTailrec(hedges :+ next, i + 1)
       }
@@ -522,7 +528,8 @@ object Segment {
     val coords = reader.read(wkt).asInstanceOf[LineString].getCoordinates
     val hedges = coords.zip(coords.tail).map{ case(v1, v2) =>
       val edge = geofactory.createLineString(Array(v1, v2))
-      Half_edge(edge)
+      val hedge = Half_edge(edge)
+      hedge
     }.toList
 
     val segment = Segment(hedges)
@@ -545,7 +552,7 @@ case class Segment(hedges: List[Half_edge]) {
   def wkt(implicit geofactory: GeometryFactory): String = {
     val coords = hedges.map{_.v1} :+ hedges.last.v2
     val s = geofactory.createLineString(coords.toArray)
-    s"${s.toText}\t${first.data}"
+    s"${s.toText}\t${first.data}\t${extremeToRemove}"
   }
 
   def toLine(implicit geofactory: GeometryFactory): String = {
@@ -577,6 +584,7 @@ case class Segment(hedges: List[Half_edge]) {
     }
   }
 
+  /*
   def line(implicit geofactory: GeometryFactory): String = {
     if(isClose){
       val coords = hedges.map{_.v1} :+ hedges.last.v2
@@ -620,12 +628,11 @@ case class Segment(hedges: List[Half_edge]) {
       s"${s.toText}\t${isHole}\t${extremeToRemove}"
     }
   }
+   */
 
   def isHole: Int = if(hedges.exists(!_.data.isHole)) 0 else 1
 
-  def isClose: Boolean = {
-    last.v2 == first.v1
-  }
+  def isClose: Boolean = last.v2 == first.v1
 
   def getExtremes: List[Half_edge] = if(hedges.size == 1) List(first) else List(first, last)
 
@@ -717,35 +724,28 @@ case class Cell(id: Int, lineage: String, mbr: LinearRing){
     val sw = new Coordinate(boundary.getMaxX, boundary.getMinY)
     val nw = new Coordinate(boundary.getMaxX, boundary.getMaxY)
     val ne = new Coordinate(boundary.getMinX, boundary.getMaxY)
+
     val e1 = geofactory.createLineString(Array(se, sw))
     val e2 = geofactory.createLineString(Array(sw, nw))
     val e3 = geofactory.createLineString(Array(nw, ne))
     val e4 = geofactory.createLineString(Array(ne, se))
-    val ed1 = EdgeData(polyId, -1, 1, false, label)
-    ed1.setCellBorder(true)
-    val ed2 = EdgeData(polyId, -1, 2, false, label)
-    ed2.setCellBorder(true)
-    val ed3 = EdgeData(polyId, -1, 3, false, label)
-    ed3.setCellBorder(true)
-    val ed4 = EdgeData(polyId, -1, 4, false, label)
-    ed4.setCellBorder(true)
-    e1.setUserData(ed1)
-    e2.setUserData(ed2)
-    e3.setUserData(ed3)
-    e4.setUserData(ed4)
+
+    val ed1 = EdgeData(polyId, -1, 1, false, label); ed1.setCellBorder(true); e1.setUserData(ed1)
+    val ed2 = EdgeData(polyId, -1, 2, false, label); ed2.setCellBorder(true); e2.setUserData(ed2)
+    val ed3 = EdgeData(polyId, -1, 3, false, label); ed3.setCellBorder(true); e3.setUserData(ed3)
+    val ed4 = EdgeData(polyId, -1, 4, false, label); ed4.setCellBorder(true); e4.setUserData(ed4)
+
     val tag = s"$label$polyId"
-    val h1 = Half_edge(e1)
-    h1.tag = tag
-    val h2 = Half_edge(e2)
-    h2.tag = tag
-    val h3 = Half_edge(e3)
-    h3.tag = tag
-    val h4 = Half_edge(e4)
-    h4.tag = tag
+    val h1 = Half_edge(e1); h1.tag = tag; h1.id  = 0;
+    val h2 = Half_edge(e2); h2.tag = tag; h2.id  = 1; 
+    val h3 = Half_edge(e3); h3.tag = tag; h3.id  = 2; 
+    val h4 = Half_edge(e4); h4.tag = tag; h4.id  = 3; 
+
     h1.next = h2; h1.prev = h4
     h2.next = h3; h2.prev = h1
     h3.next = h4; h3.prev = h2
     h4.next = h1; h4.prev = h3
+
     h1
   }
 }

@@ -20,12 +20,12 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
 
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-  val save:        ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
+  val loadsdcel:   ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val notmerge:    ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val overlay:     ScallopOption[Boolean] = opt[Boolean] (default = Some(true))
   val ooption:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
-  val level:       ScallopOption[Int]     = opt[Int]     (default = Some(4))
-  val output:      ScallopOption[String]  = opt[String]  (default = Some("/tmp"))
+  val olevel:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
+  val output:      ScallopOption[String]  = opt[String]  (default = Some("tmp/"))
   val persistance: ScallopOption[Int]     = opt[Int]     (default = Some(1))
 
   val apath:  ScallopOption[String] = opt[String] (default = Some("edgesA.wkt"))

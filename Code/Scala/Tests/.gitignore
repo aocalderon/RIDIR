@@ -1,0 +1,5 @@
+target/*
+project/*
+metastore_db/*
+.ensime
+.ensime_cache/*

@@ -1,18 +1,72 @@
 #!/bin/bash
 
-HDFS_PATH=$1
-LOCAL_PATH=$2
-TOLERANCE=$3
-QTAG=$4
-QTAG=${QTAG:-"Tag"}
-MASTER=$5
-MASTER=${MASTER:-"yarn"}
-OOPTION=$6
-OLEVEL=$7
-DEBUG=$8
-DEBUG=${DEBUG:-""}
-WAIT=$9
-WAIT=${WAIT:-"3s"}
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-h|--hdfspath)
+	    HDFS_PATH="$2"
+	    shift
+	    shift
+	    ;;
+	-l|--localpath)
+	    LOCAL_PATH="$2"
+	    shift
+	    shift
+	    ;;
+	-t|--tolerance)
+	    TOLERANCE="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-a|--tag)
+	    TAG="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-w|--wait)
+	    WAIT="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-m|--master)
+	    MASTER="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-o|--ooption)
+	    OOPTION="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-e|--olevel)
+	    OLEVEL="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	--debug)
+	    DEBUG="--debug"
+	    shift # past argument
+	    ;;
+	--loadsdcel)
+	    LOADSDCEL="--loadsdcel"
+	    shift # past argument
+	    ;;
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+echo "HDFS_PATH  = $HDFS_PATH"
+echo "LOCAL_PATH = $LOCAL_PATH"
+if [ -v TAG ];       then echo "TAG        = $TAG";       else TAG='date';   fi
+if [ -v WAIT ];      then echo "WAIT       = $WAIT";      else WAIT="3s";    fi
 
 EXECUTORS=12
 CORES=9
@@ -27,13 +81,15 @@ spark-submit \
     --files $LOG_FILE \
     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
     --conf spark.driver.maxResultSize=4G \
+    --conf spark.kryoserializer.buffer.max=256m \
     --conf spark.locality.wait=$WAIT \
     --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
     --master $MASTER --deploy-mode client \
-    --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
+    --num-executors $EXECUTORS --executor-cores $CORES \
+    --executor-memory $EMEMORY --driver-memory $DMEMORY \
     --class $CLASS $JAR \
     --input1 $HDFS_PATH/edgesA \
     --input2 $HDFS_PATH/edgesB \
     --quadtree $LOCAL_PATH/quadtree.wkt \
     --boundary $LOCAL_PATH/boundary.wkt \
-    --tolerance $TOLERANCE --qtag $QTAG --ooption $OOPTION --level $OLEVEL $DEBUG 
+    --tolerance $TOLERANCE --qtag $TAG --ooption $OOPTION --olevel $OLEVEL $DEBUG $LOADSDCEL

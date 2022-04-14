@@ -29,23 +29,23 @@ object DCELMerger2 {
     val ha = extractHedges(hlepA)
     val hb = extractHedges(hlepB)
     val (aList, bList) = intersects(ha, hb)
-    val hedges_prime = (aList ++ bList)
+    val hedges0 = (aList ++ bList)
 
     // Remove duplicates...
-    val hedges = removeDuplicates(hedges_prime)
+    val hedges1 = removeDuplicates(hedges0)
 
     // Setting new twins...
-    val hedges2 = setTwins(hedges)
+    val hedges2 = setTwins(hedges1)
 
     // Running sequential...
     sequential(hedges2)
 
     // Getting unique half-edge and label to represent the face...
-    val h = groupByNextMBR(hedges.toSet, List.empty[(Half_edge, String, Envelope)])
+    val hedges3 = groupByNextMBR(hedges1.toSet, List.empty[(Half_edge, String, Envelope)])
 
     val Artree = getRTree(hlepA)
     val Brtree = getRTree(hlepB)
-    val (singles, multiples) = h.partition{ case(h,l,e) =>
+    val (singles, multiples) = hedges3.partition{ case(h,l,e) =>
       l.split(" ").size == 1
     }
     val (singlesA, singlesB) = singles.partition{ case(h,l,e) =>
@@ -54,9 +54,9 @@ object DCELMerger2 {
     val newSinglesA = updateLabel(singlesA, Brtree)
     val newSinglesB = updateLabel(singlesB, Artree)
 
-    val new_h = newSinglesA ++ newSinglesB ++ multiples.map{ case(h,l,e) => (h,l)}
-
-    new_h
+    val hedges4 = newSinglesA ++ newSinglesB ++ multiples.map{ case(h,l,e) => (h,l)}
+    
+    hedges4
   }
 
   def updateLabel(singles: List[(Half_edge, String, Envelope)], rtree: STRtree)

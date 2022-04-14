@@ -43,21 +43,12 @@ object LocalDCEL {
       val bordersN = splitBorder(cell.getNorthBorder, N)
       val bordersW = splitBorder(cell.getWestBorder, W)
 
-      val borders_prime = (bordersS ++ bordersE ++ bordersN ++ bordersW).map(b => (b,"b"))
-      val inners_prime  = (containedIt ++ crossing).toList.map(i => (i,"i"))
+      val borders = (bordersS ++ bordersE ++ bordersN ++ bordersW).map{ b => Half_edge(b) }
+      val inners  = (containedIt ++ crossing).toList.map{ i => Half_edge(i) }
 
-      val (bs, is) = (borders_prime ++ inners_prime).zipWithIndex
-        .map{ case(h, id) =>
-          val edge = h._1
-          val hedge = Half_edge(edge, id)
-          (hedge, h._2)
-        }.partition( _._2 == "b")
-
-      val borders = bs.map(_._1)
       setTwins(borders)
       setNextAndPrevBorders(borders)
 
-      val inners = is.map(_._1)
       setTwins(inners)
 
       val inner_segments = sortInnerHedges(inners)
@@ -67,6 +58,12 @@ object LocalDCEL {
       inner_closed.map{ seg =>
         seg.last.next = seg.first
         seg.first.prev = seg.last
+      }
+
+      (inners ++ borders).zipWithIndex
+      .map{ case(hedge, id) =>
+        hedge.id = id
+        hedge
       }
 
       merge(inners.filter(_.data.crossingInfo != "None").filter(_.twin != null),  borders)
@@ -85,7 +82,8 @@ object LocalDCEL {
     val vertices = borders0.map(_.v2)
     val borders =  borders0 ++ borders0.filter(_.twin.isNewTwin).map(_.twin)
 
-    val hedges = (borders ++ crossing).filter(h => vertices.contains(h.v2))
+    val hedges_prime = (borders ++ crossing)
+    val hedges = hedges_prime.filter(h => vertices.contains(h.v2))
     val incidents = hedges.groupBy(_.v2).values.toList
 
     // At each vertex, get their incident half-edges...

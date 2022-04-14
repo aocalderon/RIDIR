@@ -29,3 +29,12 @@ partitions	stage	size	time
 20000	layer1	gadm	399.7086
 20000	layer2	gadm	554.171
 20000	overlay	gadm	483.067
+22000	layer1	gadm	520.30675
+22000	layer2	gadm	756.67525
+22000	overlay	gadm	503.6105
+24000	layer1	gadm	652.4045
+24000	layer2	gadm	960.1320000000001
+24000	overlay	gadm	634.37925
+26000	layer1	gadm	750.325
+26000	layer2	gadm	1107.7215
+26000	overlay	gadm	705.21475

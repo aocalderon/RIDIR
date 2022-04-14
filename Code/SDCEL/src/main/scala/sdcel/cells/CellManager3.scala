@@ -79,14 +79,13 @@ object EmptyCellManager2 {
   def runEmptyCells[T](sdcel: RDD[(Half_edge, String, Envelope, Polygon)],
     empties: Array[(Int, Boolean)], letter: String = "A")
     (implicit geofactory: GeometryFactory, settings: Settings, spark: SparkSession,
-      quadtree: StandardQuadTree[T], cells: Map[Int, Cell])
-      : (RDD[(Half_edge, String, Envelope, Polygon)], Map[String, EmptyCell]) = {
+      quadtree: StandardQuadTree[T], cells: Map[Int, Cell]): Map[String, EmptyCell] = {
 
     val (ne, e) = empties.map{ case(id, emp) => (cells(id), emp) }
       .partition{ case(cell, non_empty) => non_empty }
 
     if(e.isEmpty){
-      (sdcel, Map.empty[String, EmptyCell])
+      Map.empty[String, EmptyCell]
     } else {
       val non_empties = ne.map(_._1).toList
       val empties = e.map(_._1).toList
@@ -162,7 +161,7 @@ object EmptyCellManager2 {
         }
       }
 
-      (sdcel, cells_map)
+      cells_map
     }
   }
 
@@ -184,6 +183,14 @@ object EmptyCellManager2 {
     }
   }
     
+  def getFullSetHedges(it: Iterator[(Half_edge, String, Envelope, Polygon)])
+      : List[(Half_edge, String, Envelope, Polygon)] = {
+
+    it.flatMap{ case(hedge,l,e,p) =>
+      hedge.getNexts.map{h => (h,l,e,p)}
+    }.toList
+  }
+
   def updatePolygonIds(sdcel: RDD[(Half_edge, String, Envelope, Polygon)],
     r: List[EmptyCell], cells: Map[Int, Cell])
     (implicit settings: Settings, geofactory: GeometryFactory)

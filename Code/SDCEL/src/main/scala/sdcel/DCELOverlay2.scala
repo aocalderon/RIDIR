@@ -12,17 +12,17 @@ import org.apache.spark.TaskContext
 import scala.annotation.tailrec
 
 import edu.ucr.dblab.sdcel.geometries.{ Half_edge, Cell, Segment, Coords, Coord }
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{ EmptyCell, getFaces }
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{ EmptyCell, getFaces, getFullSetHedges }
 import edu.ucr.dblab.sdcel.DCELMerger2.merge
 import edu.ucr.dblab.sdcel.Utils.{ Settings, logger, save }
 import edu.ucr.dblab.sdcel.CellAgg.{ aggregateSegments, aggregateHedges }
 
 object DCELOverlay2 {
-  def overlay(
+  def zipMerge(
     ldcelA: RDD[(Half_edge, String, Envelope, Polygon)], ma: Map[String, EmptyCell],
     ldcelB: RDD[(Half_edge, String, Envelope, Polygon)], mb: Map[String, EmptyCell])
     (implicit cells: Map[Int, Cell], geofactory: GeometryFactory, settings: Settings)
-      : RDD[(String, Polygon)] = {
+      : RDD[(Half_edge, String)]  = {
 
     val sdcel_prime = ldcelA.zipPartitions(ldcelB,
       preservesPartitioning=true){ (iterA, iterB) =>
@@ -37,90 +37,100 @@ object DCELOverlay2 {
       hedges.toIterator
     }
 
-    mergeSegments{ collectSegments{ sdcel_prime } }
+    sdcel_prime
+  }
+
+  def overlay(
+    ldcelA: RDD[(Half_edge, String, Envelope, Polygon)], ma: Map[String, EmptyCell],
+    ldcelB: RDD[(Half_edge, String, Envelope, Polygon)], mb: Map[String, EmptyCell])
+    (implicit cells: Map[Int, Cell], geofactory: GeometryFactory, settings: Settings,
+      spark: SparkSession): RDD[(String, Polygon)] = {
+
+    val sdcel_prime = zipMerge(ldcelA, ma, ldcelB, mb)
+    val segments    = collectSegments(sdcel_prime)
+    val sdcel       = mergeSegments(segments)
+
+    if(settings.debug){
+      save("/tmp/edgesO.wkt"){
+        sdcel.map{ case(l,w) =>
+          s"${w.toText}\t$l\t${w.getUserData}\n"
+        }.collect
+      }
+    }
+    sdcel.count
+    sdcel    
   }
 
   def overlayMaster(
     ldcelA: RDD[(Half_edge, String, Envelope, Polygon)], ma: Map[String, EmptyCell],
     ldcelB: RDD[(Half_edge, String, Envelope, Polygon)], mb: Map[String, EmptyCell])
     (implicit cells: Map[Int, Cell], geofactory: GeometryFactory, settings: Settings,
-      spark: SparkSession): List[(Polygon, String)] = {
+      spark: SparkSession): List[(String, Polygon)] = {
 
-    val sdcel_prime = ldcelA.zipPartitions(ldcelB,
-      preservesPartitioning=true){ (iterA, iterB) =>
+    val sdcel_prime = zipMerge(ldcelA, ma, ldcelB, mb)
+    val segments_prime = collectSegments{ sdcel_prime }.persist(settings.persistance)
 
-      val pid = TaskContext.getPartitionId
-      val cell = cells(pid)
-
-      val A = getFaces(iterA, cell, ma)
-      val B = getFaces(iterB, cell, mb)
-
-      val hedges = merge(A, B, cells)
-      hedges.toIterator
-    }
-    
-    val segments = collectSegments{ sdcel_prime }
-      .map{ case(seg, lab) => (Segment.save(seg), lab) }
-      .collect
-      .map{ case(seg, lab) => (Segment.load(seg), lab) }
+    val segments = segments_prime
+      .map{ case(seg, lab) =>
+        val pid = TaskContext.getPartitionId
+        (Segment.save(seg), lab, pid)
+      }.collect
+      .map{ case(seg, lab, pid) =>
+        (Segment.load(seg), lab)
+      }
     
     val faces = mergeSegmentsByLevel(segments)
       .map{ case(label, coords) =>
-        label -> coords.filter(_.getCoords.size >= 3).map{c =>
+        label -> coords.filter(_.getCoords.size >= 4).map{c =>
           geofactory.createPolygon(c.getCoords)
         }.head
       }
 
     if(settings.debug){
-      save("/tmp/edgesP.wkt"){
+      save("/tmp/edgesO.wkt"){
         faces.map{ case(label, face) =>
           s"${face.toText}\t$label\n"
         }.toList
       }
     }
 
-    faces.toList.map(_.swap)
+    faces.toList
   }
 
   def overlayByLevel(
     ldcelA: RDD[(Half_edge, String, Envelope, Polygon)], ma: Map[String, EmptyCell],
     ldcelB: RDD[(Half_edge, String, Envelope, Polygon)], mb: Map[String, EmptyCell])
     (implicit cells: Map[Int, Cell], geofactory: GeometryFactory, settings: Settings,
-      spark: SparkSession): Unit = {
+      spark: SparkSession): List[(String, Polygon)] = {
 
-    val sdcel_prime = ldcelA.zipPartitions(ldcelB,
-      preservesPartitioning=true){ (iterA, iterB) =>
+    val sdcel_prime = zipMerge(ldcelA, ma, ldcelB, mb)
 
-      val pid = TaskContext.getPartitionId
-      val cell = cells(pid)
+    val segments_prime = collectSegments{ sdcel_prime}
+    val (segmentsPerLevel, m) = aggregateSegments( segments_prime, settings.olevel)
 
-      val A = getFaces(iterA, cell, ma)
-      val B = getFaces(iterB, cell, mb)
-
-      val hedges = merge(A, B, cells)
-      hedges.toIterator
-    }
-
-    val segs1 = collectSegments{ sdcel_prime}
-    val (segs2, m) = aggregateSegments( segs1, settings.level)
-
-    val S = segs2.mapPartitions{ it =>
+    val segmentsAtRoot = segmentsPerLevel.mapPartitions{ it =>
       mergeSegmentsByLevel(it.toArray).toIterator
     }.collect
-    val segs3 = S.map{ case(label, coords)  =>
+
+    val segments = segmentsAtRoot.map{ case(label, coords)  =>
       coords.map{ C => (Segment(C.getHedges), label)}
     }.flatten
-    val r2 = mergeSegmentsByLevel(segs3).map{ case(label, coords) =>
-      label -> coords.filter(_.getCoords.size >= 3).map{c =>
+
+    val faces = mergeSegmentsByLevel(segments).map{ case(label, coords) =>
+      label -> coords.filter(_.getCoords.size >= 4).map{c =>
         geofactory.createPolygon(c.getCoords)
       }.head
     }
-    save("/tmp/edgesP.wkt"){
-      r2.map{ case(label, polygon) =>
-        s"${polygon.toText}\t$label\n"
-      }.toList
+
+    if(settings.debug){
+      save("/tmp/edgesO.wkt"){
+        faces.map{ case(label, polygon) =>
+          s"${polygon.toText}\t$label\n"
+        }.toList
+      }
     }
-    
+
+    faces.toList
   }
 
   /*  Merge by cells  */
@@ -130,7 +140,7 @@ object DCELOverlay2 {
 
     if(settings.debug){
       val pid = TaskContext.getPartitionId
-      logger.info(s"mergeSegments|$pid|${segments.size}")
+      logger.info(s"mergeSegmentsByLevel|$pid|${segments.size}")
     }
     val reader = new WKTReader(geofactory)
 
@@ -210,9 +220,15 @@ object DCELOverlay2 {
     if(settings.debug){
       save(s"/tmp/edgesS.wkt"){
         a.mapPartitionsWithIndex{ (pid, it) =>
-          it.flatMap{ case(label,segs) =>
-            segs.map{ seg =>
-              s"$seg\t$label\t$pid\n"
+          it.flatMap{ case(label,segs_prime) =>
+            segs_prime.map{ s =>
+              val arr = s.split("\t")
+              val wkt    = arr(0)
+              val hole   = arr(1) // is part of a hole?
+              val valid  = arr(2) // has to be removed later?
+              val border = try{ arr(3).toBoolean }
+              catch { case _: Throwable => false } // is a border?
+              s"$wkt\t$label\t$hole\t$valid\t$border\t$pid\n"
             }
           }
         }.collect
@@ -224,11 +240,13 @@ object DCELOverlay2 {
         it.flatMap{ case(label, segs_prime) =>          
           val segs = segs_prime.map{ s =>
             val arr = s.split("\t")
-            val s1 = arr(0)
-            val s2 = arr(1) // is part of a hole?
-            val s3 = arr(2) // I need to remove a coordinate later...
-            val seg = reader.read(s1).asInstanceOf[LineString]
-            seg.setUserData(s"$s2\t$s3") // ishole, flag
+            val wkt    = arr(0)
+            val hole   = arr(1) // is part of a hole?
+            val valid  = arr(2) // has to be removed later?
+            val border = try{ arr(3).toBoolean }
+            catch { case _: Throwable => false } // is a border?
+            val seg = reader.read(wkt).asInstanceOf[LineString]
+            seg.setUserData(s"$hole\t$valid\t$border") // ishole, flag, isborder
             seg
           }
           val polygons = mergeLocalSegments(segs, label)
@@ -350,47 +368,53 @@ object DCELOverlay2 {
     (implicit geofactory: GeometryFactory, settings: Settings): RDD[(Segment, String)] = {
 
     if(settings.debug){
+      sdcel.persist(settings.persistance)
       save("/tmp/edgesZ.wkt"){
         sdcel.mapPartitionsWithIndex{ (pid, it) =>
           it.map{ case(hedge, label) =>
             val wkt = hedge.getPolygon.toText
-            
-            s"$wkt\t$label\n"
+            val n = label.split(" ").size
+            s"$wkt\t$label\t$n\n"
           }
         }.collect
       }
     }
     
-    val a = sdcel.mapPartitionsWithIndex{ (pid, it) =>
+    val S = sdcel.mapPartitionsWithIndex{ (pid, it) =>
       it.flatMap{ case(hedge, label) =>
-
         if(hedge.isValid){
-          val s = getValidSegments(hedge, hedge.prev, List(hedge), List.empty[Segment])
-          s.map(h => (h, label))
+          val segments = getValidSegments(hedge, hedge.prev, List(hedge), List.empty[Segment])
+          segments.map{ segment => segment.hedges.foreach(_.tag = label); (segment, label) }
         } else {
           val valid = getNextValidOrStop(hedge.next, hedge, hedge)
           if(valid == hedge){
             List.empty[(Segment, String)]
           } else {
-            val s = getValidSegments(valid, valid.prev, List(valid), List.empty[Segment])
-            s.map(h => (h, label))
+            val segments = getValidSegments(valid, valid.prev, List(valid), List.empty[Segment])
+            segments.map{ segment => segment.hedges.foreach(_.tag = label); (segment, label) }
           }
         }
       }
+    }.persist(settings.persistance)
+
+    if(settings.debug){
+      save("/tmp/edgesS.wkt"){
+        S.mapPartitionsWithIndex{ (pid, it) =>
+          it.map{ case(segment, label) =>
+            s"${segment.wkt}\t$label\t$pid\n"
+          }
+        }.collect
+      }
     }
-    a
+
+    S
   }
 
   @tailrec
   def getValidSegments(hcurr: Half_edge, hstop: Half_edge, listH: List[Half_edge],
     listS: List[Segment], p: Int = -1, l: String = ""): List[Segment] = {
 
-    val pid = org.apache.spark.TaskContext.getPartitionId
-    if(pid == p && l.contains(hcurr.label)){
-      println(hcurr)
-    }
-
-    if(hcurr == hstop){
+    if(hcurr == hstop || hstop == null){
       hcurr.next = null
       val s = Segment(listH)
       listS :+ s

@@ -64,11 +64,9 @@ object DCELPartitionerByQuadtree {
     val edgesB = edgesRDDB.spatialPartitionedRDD.rdd
 
     // Saving to HDFS adding info about edges crossing border cells...
-    if(params.save()){
-      saveToHDFSWithCrossingInfo(edgesA, cells, params.apath())
-      saveToHDFSWithCrossingInfo(edgesB, cells, params.bpath())
-      log("TIME|Saving")
-    }
+    saveToHDFSWithCrossingInfo(edgesA, cells, params.apath())
+    saveToHDFSWithCrossingInfo(edgesB, cells, params.bpath())
+    log("TIME|Saving")
 
     if(settings.debug){
       save("/tmp/edgesA.wkt"){
