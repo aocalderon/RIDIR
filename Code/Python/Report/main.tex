@@ -2,22 +2,29 @@
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{tikz}
-\pagestyle{empty}
-\usepackage[top=1cm, left=0.5cm, right=0.5cm,paperwidth=612pt,paperheight=792pt]{geometry}
+\usepackage[top=1cm, left=0.5cm, right=0.5cm,bottom=1cm,paperwidth=612pt,paperheight=792pt]{geometry}
+\usepackage[absolute,overlay]{textpos}
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
 
 \newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}m{#1}}
 \newcolumntype{N}{@{}m{0pt}@{}}
 
+\pagestyle{empty}
+
 \begin{document}
-\vspace{1cm}
+
+\vspace{0.5cm}
 \begin{center}
 UCR Time \& Attendance Reporting System
 \end{center}
 
-{\includegraphics[width=450pt,height=40pt]{latexImage_27cdb919c08fde06af0ea4f32e9b0b4a.png}}
-{\includegraphics[width=95pt,  height=40pt]{latexImage_4bdc976671d95a1b7e024dfbd0cca2f2.png}}
-\put(-86,40){\includegraphics[width=86pt,height=30pt]{latexImage_7fbf2b7b584b6a1336a02995be0fda2e.png}}
+\begin{textblock}{20}(175,5)
+    \includegraphics[width=75pt,height=30pt]{latexImage_7fbf2b7b584b6a1336a02995be0fda2e.png}
+\end{textblock}
+
+\noindent \includegraphics[width=475pt,height=40pt]{latexImage_27cdb919c08fde06af0ea4f32e9b0b4a.png}\includegraphics[width=105pt,  height=40pt]{latexImage_4bdc976671d95a1b7e024dfbd0cca2f2.png}
 
 \begin{center}
     April 03, 2022 - April 16, 2022 Timesheet
@@ -30,14 +37,14 @@ UCR Time \& Attendance Reporting System
     \begin{tabular}{  | C{4cm} | C{2cm} | C{4cm} | C{4cm} | C{2cm} | }
             \hline
             & & \small D01003 - Computer & & \\
-            Andres Calderon & GSR & \small Science \& & Vassilis Tsotras & 20 \\
+            Andres Calderon & GSR & \small Science \& & Vassilis Tsotras & 40 \\
             & & \small Engineering & & \\
             \hline
         \end{tabular}
     } 
 \end{center}
 
-\vspace{1cm}
+\vspace{0.5cm}
 {
     \fontsize{6}{1}\usefont{T1}{cmr}{b}{n}\selectfont
     \begin{tabularx}{0.8\textwidth}{  X  X  X  X  X  X  }
@@ -50,13 +57,10 @@ UCR Time \& Attendance Reporting System
 \begin{table}[htbp]
 \begin{tabular}{ | C{2cm} | C{1cm} |  L{13.5cm} | N}
 \hline
-Day of Month & Total Hours & & \\[10pt] \hline
-Position & & \\[10pt] \hline
-
+Day of Month & Total Hours & & \\ \hline
+Position & & \\ \hline
 \include{Work.tex}
-  
-Total: & 20 & \\[10pt] \hline
-
+Total: & 40 & \\ \hline
 \end{tabular}
 \label{tab:table}
 \end{table}
