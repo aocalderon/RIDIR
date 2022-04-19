@@ -1,5 +1,5 @@
 library(tidyverse)
-setwd("~/RIDIR/Data/StateOverlayTester/")
+setwd("~/RIDIR/Data/OverlayTester/")
 
 data0 = enframe(read_lines("Overlay_Tester_v01.txt"), value="line")
 data1 = data0 %>% filter(str_detect(line, 'TIME')) 
@@ -15,6 +15,7 @@ data2 = data1 %>%
   select(time, stage, tag, overlay_option, overlay_level, appId) %>%
   mutate(time = as.numeric(time) / 1000.0) 
 
+tag_labels = c("CA","TX","NC","TN","GA","VA","PA")
 method_labels = c("By Label", 
                   "At Master/Root", 
                   "At Level [4]", 
@@ -35,6 +36,8 @@ data3 = data2 %>%
                             }
   )) %>%
   mutate(method = fct_relevel(method, method_labels)) %>%
+  mutate(tag = as.factor(tag)) %>%
+  mutate(tag = fct_relevel(tag, tag_labels)) %>%
   select(method, time, tag, overlay_option, overlay_level, stage)
 
 write_tsv(data3, "States.tsv") 
@@ -42,9 +45,9 @@ write_tsv(data3, "States.tsv")
 p = ggplot(data3, aes(x = method, y = time)) + 
   geom_col(width = 0.7, position="dodge") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x="Method for overlay", y="Time [s]", 
+  labs(x="Method of overlay", y="Time [s]", 
        title=paste0("Diverse State Census Tracts datasets performance for SDCEL computation")) + 
-  facet_wrap(~tag) 
+  facet_wrap(~tag, ncol = 4) 
 plot(p)
 
 ggsave(paste0("States.pdf"), width = 8, height = 5)

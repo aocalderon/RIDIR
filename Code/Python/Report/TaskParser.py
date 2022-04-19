@@ -4,7 +4,8 @@ from __future__ import print_function
 
 import os.path
 
-from datetime import datetime
+from datetime import datetime, timedelta
+from datetime import date as dt
 
 from itertools import groupby
 from operator import itemgetter
@@ -46,7 +47,13 @@ def main():
 			tasklistTitle = item['title']
 			filehandle = open('{0}.tex'.format(tasklistTitle), 'w')
 			tasklistId = item['id']
-			results = service.tasks().list(tasklist=tasklistId, showHidden=True, showCompleted=True, maxResults=100).execute()
+			now = dt.today() + timedelta(1)
+			ago = now - timedelta(15)
+			dueMin = "{0}T00:00:00.00Z".format(ago)
+			dueMax = "{0}T00:00:00.00Z".format(now)
+			print("Today's date: ", dueMax)
+			print("2 weeks ago : ", dueMin)
+			results = service.tasks().list(tasklist=tasklistId, showHidden=True, showCompleted=True, maxResults=100, dueMin=dueMin, dueMax=dueMax).execute()
 			items = results.get('items', [])
 			tasks_prime = []
 			for item in items:
@@ -63,7 +70,7 @@ def main():
 				dates.append(date)
 			for (date, tasks) in zip(dates, tasks):
 				line = ", ".join([task[2] for task in tasks])
-				latex = "{0} & 4 & {1}. \\\\[10pt] \hline".format(date, line)
+				latex = "{0} & 4 & {1}. \\\\ \hline".format(date, line)
 				filehandle.write("{0}\n".format(latex))
 				print(latex)
 			print("\n")
