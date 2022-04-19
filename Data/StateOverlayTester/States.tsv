@@ -1,0 +1,44 @@
+method	time	tag	overlay_option	overlay_level	stage
+By Label	9.779399999999999	CA	0	4	overlay
+By Label	6.1544	NC	0	4	overlay
+By Label	5.6106	TN	0	4	overlay
+By Label	10.5114	TX	0	4	overlay
+At Master/Root	66.652	CA	1	4	overlayMaster
+At Master/Root	32.3632	NC	1	4	overlayMaster
+At Master/Root	29.3622	TN	1	4	overlayMaster
+At Master/Root	70.0506	TX	1	4	overlayMaster
+At Level [10]	117.811	CA	2	10	overlayByLevel
+At Level [10]	61.0668	NC	2	10	overlayByLevel
+At Level [10]	53.2192	TN	2	10	overlayByLevel
+At Level [10]	123.095	TX	2	10	overlayByLevel
+At Level [11]	117.9742	CA	2	11	overlayByLevel
+At Level [11]	60.0886	NC	2	11	overlayByLevel
+At Level [11]	50.8312	TN	2	11	overlayByLevel
+At Level [11]	117.1032	TX	2	11	overlayByLevel
+At Level [12]	115.747	CA	2	12	overlayByLevel
+At Level [12]	61.5808	NC	2	12	overlayByLevel
+At Level [12]	123.033	TX	2	12	overlayByLevel
+At Level [4]	62.2924	CA	2	4	overlayByLevel
+At Level [4]	32.214	NC	2	4	overlayByLevel
+At Level [4]	29.2722	TN	2	4	overlayByLevel
+At Level [4]	64.9382	TX	2	4	overlayByLevel
+At Level [5]	63.575	CA	2	5	overlayByLevel
+At Level [5]	33.525	NC	2	5	overlayByLevel
+At Level [5]	28.7594	TN	2	5	overlayByLevel
+At Level [5]	65.922	TX	2	5	overlayByLevel
+At Level [6]	63.8388	CA	2	6	overlayByLevel
+At Level [6]	35.086	NC	2	6	overlayByLevel
+At Level [6]	30.9574	TN	2	6	overlayByLevel
+At Level [6]	66.3324	TX	2	6	overlayByLevel
+At Level [7]	71.0736	CA	2	7	overlayByLevel
+At Level [7]	48.6184	NC	2	7	overlayByLevel
+At Level [7]	44.5074	TN	2	7	overlayByLevel
+At Level [7]	79.844	TX	2	7	overlayByLevel
+At Level [8]	90.1488	CA	2	8	overlayByLevel
+At Level [8]	58.8194	NC	2	8	overlayByLevel
+At Level [8]	52.6172	TN	2	8	overlayByLevel
+At Level [8]	106.0022	TX	2	8	overlayByLevel
+At Level [9]	113.1722	CA	2	9	overlayByLevel
+At Level [9]	60.375	NC	2	9	overlayByLevel
+At Level [9]	52.0582	TN	2	9	overlayByLevel
+At Level [9]	121.1284	TX	2	9	overlayByLevel
