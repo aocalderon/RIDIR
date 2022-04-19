@@ -506,14 +506,11 @@ case class Coords(coords: Array[Coord]){
 
 object Segment {
   def save(segment: Segment)(implicit geofactory: GeometryFactory): String = {
-    val coords = segment.hedges.map{_.v1} :+ segment.hedges.last.v2
-    val wkt = geofactory.createLineString(coords.toArray).toText
-    val hole = segment.isHole
-    val flag = segment.extremeToRemove
+    val line = segment.getLine // wkt isHole extremeToRemove
     val fid = segment.first.id
     val lid = segment.last.id
 
-    s"$wkt\t$hole\t$flag\t$fid\t$lid"
+    s"$line\t$fid\t$lid"
   }
 
   def load(string: String)(implicit geofactory: GeometryFactory): Segment = {

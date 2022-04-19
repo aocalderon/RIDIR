@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DATASET="OR"
-PARTITIONS=464
+DATASET="TX"
+PARTITIONS=1417
 
 ./Perf -d Census/S/$DATASET -t 1e-3 -p $PARTITIONS -m yarn -o 0 -n 5
 

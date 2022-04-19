@@ -1,7 +1,32 @@
 #!/bin/bash
 
-DATASET="OR"
-PARTITIONS=464
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-d|--dataset)
+	    DATASET="$2"
+	    shift
+	    shift
+	    ;;
+	-p|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+echo "DATASET    = $DATASET"
+echo "PARTITIONS = $PARTITIONS"
 
 ./Perf -d Census/S/$DATASET -t 1e-3 -p $PARTITIONS -m yarn -o 0 -n 5
 
