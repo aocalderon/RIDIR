@@ -1,0 +1,36 @@
+#!/bin/bash
+
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-d|--dataset)
+	    DATASET="$2"
+	    shift
+	    shift
+	    ;;
+	-n|--iterations)
+	    ITERATIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-p|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+./Perf -d $DATASET -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 12 -o 0
+./Perf -d $DATASET -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 9 -o 0
+./Perf -d $DATASET -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 6 -o 0
+./Perf -d $DATASET -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 3 -o 0

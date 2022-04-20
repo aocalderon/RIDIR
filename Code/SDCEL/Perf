@@ -43,6 +43,11 @@ while [[ $# -gt 0 ]]; do
 	    shift # past argument
 	    shift # past value
 	    ;;	
+	-x|--executors)
+	    EXECUTORS=$2
+	    shift # past argument
+	    shift # past value
+	    ;;	
 	-o|--ooption)
 	    OOPTION="$2"
 	    shift # past argument
@@ -101,12 +106,13 @@ else
     echo "PARTITIONS = ${PARTITIONS}"
 fi
 
-if [ -v N ];         then echo "ITERATIONS = ${N}";       else N=1;          fi
+if [ -v N ];         then echo "ITERATIONS = $N";         else N=1;          fi
 if [ -v DEBUG ];     then echo "DEBUG      = YES";        else DEBUG="";     fi
 if [ -v LOADSDCEL ]; then echo "LOADSDCEL  = YES";        else LOADSDCEL=""; fi
 if [ -v SAVESDCEL ]; then echo "SAVESDCEL  = YES";        else SAVESDCEL=""; fi
-if [ -v OOPTION ];   then echo "OOPTION    = ${OOPTION}"; else OOPTION=0;    fi
-if [ -v OLEVEL ];    then echo "OLEVEL     = ${OLEVEL}";  else OLEVEL=4;     fi
+if [ -v OOPTION ];   then echo "OOPTION    = $OOPTION";   else OOPTION=0;    fi
+if [ -v OLEVEL ];    then echo "OLEVEL     = $OLEVEL";    else OLEVEL=4;     fi
+if [ -v EXECUTORS ]; then echo "EXECUTORS  = $EXECUTORS"; else EXECUTORS=12; fi
 if [ -v WAIT ];      then echo "WAIT       = $WAIT";      else WAIT="3s";    fi
 
 if [ -v MASTER ]
@@ -117,7 +123,6 @@ else
     echo "MASTER     = yarn"
 fi
 
-EXECUTORS=12
 CORES=9
 DMEMORY=35g
 EMEMORY=20g
@@ -137,7 +142,7 @@ do
     for P in "${PS[@]}"
     do
 	echo "RUN        = $n"
-	TAG="${DATASET}_${TOLERANCE}_${OOPTION}_${OLEVEL}_${P}_${n}";
+	TAG="${DATASET}_${TOLERANCE}_${OOPTION}_${OLEVEL}_${P}_${EXECUTORS}_${n}";
 	PARAMS=(
 	    --files $LOG_FILE \
 	    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
