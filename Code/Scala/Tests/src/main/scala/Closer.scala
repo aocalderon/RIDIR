@@ -79,7 +79,10 @@ FROM
     val limit = if(params.k() > 0){ s"LIMIT ${params.k()}" } else { "" }
     val result = spark.sql(s"""
 SELECT
-  wkt, geom, dist, edges, sum(edges) OVER (ORDER BY dist) AS cumulative_edges
+  wkt, geom, dist, edges, 
+  sum(edges) OVER ( ORDER BY 
+                          dist 
+                    ROWS BETWEEN unbounded preceding AND CURRENT ROW ) AS cumulative_edges
 FROM
   distances $limit
 """).cache()
