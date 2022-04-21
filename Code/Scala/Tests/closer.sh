@@ -68,5 +68,5 @@ PARAMS=(
 	    --class $CLASS_NAME $CLASS_JAR \
 	    --input $INPUT --output $OUTPUT --partitions $PARTITIONS --x $X --y $Y --k $K
 )
-echo "spark-submit ${PARAMS[@]}"
-spark-submit ${PARAMS[@]}
+echo "${HOME}/Spark/3.2/bin/spark-submit ${PARAMS[@]}"
+${HOME}/Spark/3.2/bin/spark-submit ${PARAMS[@]}
