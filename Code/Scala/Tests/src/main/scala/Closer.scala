@@ -52,6 +52,7 @@ object Closer {
         }
       }.toDF("centroid", "geoid", "edges", "wkt").cache()
     logger.info(s"Number of partitions: ${centroidsRaw.rdd.getNumPartitions}")
+    logger.info(s"Number of records   : ${centroidsRaw.count}")
     centroidsRaw.createOrReplaceTempView("centroidsRaw")
 
     logger.info("Computing the centroids...")
@@ -60,7 +61,7 @@ SELECT
   ST_GeomFromWKT(centroid) AS geom, geoid, edges, wkt
 FROM
   centroidsRaw
-""").cache()
+""")
     centroids.createOrReplaceTempView("centroids")
     logger.info(s"Number of partitions: ${centroids.rdd.getNumPartitions}")
 
@@ -71,7 +72,7 @@ SELECT
   ST_Distance(geom, ST_Point(${params.x()},${params.y()})) AS dist, wkt
 FROM 
   centroids
-""").cache()
+""")
     distances.createOrReplaceTempView("distances")
     logger.info(s"Number of partitions: ${distances.rdd.getNumPartitions}")
 
@@ -87,9 +88,10 @@ FROM
   distances $limit
 """).cache()
     logger.info(s"Number of partitions: ${result.rdd.getNumPartitions}")
+    logger.info(s"Number of records   : ${result.count}")
 
     logger.info("Saving the results...")
-    if(false){
+    if(params.local()){
       val f = new PrintWriter(params.output())
       val wkt = result.collect.map{ row =>
         val wkt = row.getString(0)
@@ -121,12 +123,13 @@ FROM
 }
 
 class CloserConf(args: Array[String]) extends ScallopConf(args) {
-  val input:      ScallopOption[String] = opt[String] (required = true)
-  val output:     ScallopOption[String] = opt[String] (required = true)
-  val x:          ScallopOption[Double] = opt[Double] (default  = Some(10.0))
-  val y:          ScallopOption[Double] = opt[Double] (default  = Some(10.0))
-  val k:          ScallopOption[Int]    = opt[Int]    (default  = Some(100))
-  val partitions: ScallopOption[Int]    = opt[Int]    (default  = Some(128))
-  val precision:  ScallopOption[Double] = opt[Double] (default  = Some(1000.0))
+  val input:      ScallopOption[String]  = opt[String]  (required = true)
+  val output:     ScallopOption[String]  = opt[String]  (required = true)
+  val x:          ScallopOption[Double]  = opt[Double]  (default  = Some(10.0))
+  val y:          ScallopOption[Double]  = opt[Double]  (default  = Some(10.0))
+  val k:          ScallopOption[Int]     = opt[Int]     (default  = Some(100))
+  val partitions: ScallopOption[Int]     = opt[Int]     (default  = Some(128))
+  val precision:  ScallopOption[Double]  = opt[Double]  (default  = Some(1000.0))
+  val local:      ScallopOption[Boolean] = opt[Boolean] (default  = Some(false))
   verify()
 }

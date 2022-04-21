@@ -13,6 +13,11 @@ while [[ $# -gt 0 ]]; do
 	    shift # past argument
 	    shift # past value
 	    ;;
+	-p|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
 	-x)
 	    X="$2"
 	    shift # past argument
@@ -40,8 +45,10 @@ while [[ $# -gt 0 ]]; do
 done
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-echo "INPUT    = $INPUT"
-echo "OUTPUT   = $OUTPUT"
+
+echo "INPUT      = $INPUT"
+echo "OUTPUT     = $OUTPUT"
+if [ -v PARTITIONS ]; then echo "PARTITIONS = $PARTITIONS"; else PARTITIONS=12; fi
 
 PACKAGES=org.apache.sedona:sedona-core-3.0_2.12:1.0.1-incubating
 PACKAGES=$PACKAGES,org.apache.sedona:sedona-sql-3.0_2.12:1.0.1-incubating
@@ -59,7 +66,7 @@ PARAMS=(
 	    --conf spark.executor.memory=5g \
 	    --packages $PACKAGES \
 	    --class $CLASS_NAME $CLASS_JAR \
-	    --input $INPUT --output $OUTPUT --x $X --y $Y --k $K
+	    --input $INPUT --output $OUTPUT --partitions $PARTITIONS --x $X --y $Y --k $K
 )
 echo "spark-submit ${PARAMS[@]}"
 spark-submit ${PARAMS[@]}
