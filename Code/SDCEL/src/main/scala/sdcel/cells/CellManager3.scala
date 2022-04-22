@@ -11,8 +11,6 @@ import scala.collection.immutable.HashMap
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
-//import org.slf4j.{Logger, LoggerFactory}
-
 import edu.ucr.dblab.sdcel.PartitionReader._
 import edu.ucr.dblab.sdcel.Utils.{Settings, save, getPartitionLocation, logger, log, log2}
 import edu.ucr.dblab.sdcel.quadtree.{StandardQuadTree, QuadRectangle, Quadtree}
@@ -21,11 +19,11 @@ import edu.ucr.dblab.sdcel.Params
 
 object EmptyCellManager2 {
 
-  def getEmptyCells(data: RDD[LineString], letter: String = "A")
+  def getNonEmptyCells(data: RDD[LineString], letter: String = "A")
     (implicit settings: Settings, geofactory: GeometryFactory,
       cells: Map[Int, Cell]): Array[(Int, Boolean)] = {
 
-    val empties_prime = data.mapPartitionsWithIndex{ (pid, it) =>
+    val non_empties_prime = data.mapPartitionsWithIndex{ (pid, it) =>
       val cell = cells(pid)
       val cenvelope = cell.boundary
       val non_empty = it.filter{ edge =>
@@ -35,14 +33,15 @@ object EmptyCellManager2 {
       }
       val r = (cell.id, non_empty)
       Iterator(r)
-    }//.persist(settings.persistance)
-    val empties = empties_prime.collect()
+    }
+    //.persist(settings.persistance)
+    val non_empties = non_empties_prime.collect()
 
     if(settings.debug){
       log(s"INFO|nEdges${letter}=${data.count}")
-      log(s"INFO|nEmpties${letter}=${empties.filter(!_._2).size}")
+      log(s"INFO|nEmpties${letter}=${non_empties.filter(!_._2).size}")
       save(s"/tmp/edgesE${letter}.wkt"){
-        empties.map{ e =>
+        non_empties.map{ e =>
           val cell = cells(e._1)
           val wkt = cell.wkt
           val emp = e._2
@@ -52,7 +51,7 @@ object EmptyCellManager2 {
       }
     }
 
-    empties
+    non_empties
   }
 
   case class EmptyCell(point: Point, pid: Cell, empty:Cell,
@@ -76,13 +75,59 @@ object EmptyCellManager2 {
   case class ECellMap(lid1: String, lid2: String)
   case class ECellInfo(lid2: String, empty: EmptyCell)
 
+  def filterEmptyCellsOnPerimeter(non_empties: Array[(Cell, Boolean)],
+    empties: Array[(Cell, Boolean)])(implicit geofactory: GeometryFactory):
+      (Array[(Cell, Boolean)],Array[(Cell, Boolean)])  = {
+
+    val validBoundary = non_empties
+      .map{ case(cell, flag) =>
+        val envelope = cell.toPolygon.getEnvelopeInternal
+        envelope
+        //new Envelope(envelope) // Have to create new one to not modify original cells...
+      }.reduce{ (anEnvelope, anotherEnvelope) =>
+        anEnvelope.expandToInclude(anotherEnvelope)
+        anEnvelope
+      }
+
+    val (
+      emptiesInValidBoundary,
+      emptiesOutValidBoundary
+    ) = empties.partition{ case(cell, flag) =>
+      val centroid = cell.mbr.getCentroid
+      validBoundary.contains(centroid.getX, centroid.getY)
+    }
+
+    (non_empties ++ emptiesOutValidBoundary, emptiesInValidBoundary)
+  }
+
+  def getValidBoundary(ne: Array[(Cell, Boolean)]): Envelope = {
+    ne.map{ case(cell, flag) =>
+        val envelope = cell.mbr.getEnvelopeInternal
+        new Envelope(envelope) // Have to create new one to not modify original cells...
+      }.reduce{ (anEnvelope, anotherEnvelope) =>
+        anEnvelope.expandToInclude(anotherEnvelope)
+        anEnvelope
+      }
+  }
+
   def runEmptyCells[T](sdcel: RDD[(Half_edge, String, Envelope, Polygon)],
-    empties: Array[(Int, Boolean)], letter: String = "A")
+    non_empties: Array[(Int, Boolean)], letter: String = "A")
     (implicit geofactory: GeometryFactory, settings: Settings, spark: SparkSession,
       quadtree: StandardQuadTree[T], cells: Map[Int, Cell]): Map[String, EmptyCell] = {
 
-    val (ne, e) = empties.map{ case(id, emp) => (cells(id), emp) }
-      .partition{ case(cell, non_empty) => non_empty }
+    val (ne_prime, e_prime) = non_empties.map{ case(cid, non_empty) =>
+      (cells(cid), non_empty)
+    }.partition{ case(cell, non_empty) => non_empty }
+
+    val (ne, e) = filterEmptyCellsOnPerimeter(ne_prime, e_prime)
+
+    if(settings.debug){
+      save(s"/tmp/edgesV${letter}.wkt"){
+        val validBoundary = getValidBoundary(ne)
+        val wkt = envelope2polygon(validBoundary).toText
+        List(wkt)
+      }
+    }
 
     if(e.isEmpty){
       Map.empty[String, EmptyCell]

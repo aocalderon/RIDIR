@@ -1,0 +1,9 @@
+#!/bin/bash
+
+NPARTITIONS=14000
+HDFS_PATH=gadm/scaleup2/S$1
+echo "DATASET   = $HDFS_PATH"
+LOCAL_PATH=/home/acald013/RIDIR/local_path/gadm/l3vsl2
+TOLERANCE=1e-3
+
+ ./sdcel_partitioner_byquadtree $HDFS_PATH/A.wkt $HDFS_PATH/B.wkt $HDFS_PATH/P$NPARTITIONS $LOCAL_PATH/P$NPARTITIONS/quadtree.wkt $LOCAL_PATH/P$NPARTITIONS/boundary.wkt $TOLERANCE

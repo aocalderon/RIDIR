@@ -1,0 +1,31 @@
+#!/bin/bash
+
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-n|--iterations)
+	    ITERATIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-p|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+./Perf -d gadm/scaleup2/S0 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0
+./Perf -d gadm/scaleup2/S1 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0
+./Perf -d gadm/scaleup2/S2 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0
+./Perf -d gadm/scaleup2/S3 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0

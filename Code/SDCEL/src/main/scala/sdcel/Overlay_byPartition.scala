@@ -16,7 +16,6 @@ import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries._
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2._
 
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getEmptyCells, runEmptyCells}
 import edu.ucr.dblab.sdcel.PartitionReader.{readQuadtree, readEdges_byPartition}
 import edu.ucr.dblab.sdcel.DCELOverlay2.{overlay, overlayByLevel, overlayMaster}
 import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, log, log2, logger}

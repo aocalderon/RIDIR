@@ -10,7 +10,7 @@ import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.slf4j.{Logger, LoggerFactory}
 import ch.cern.sparkmeasure.TaskMetrics
 
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getEmptyCells, runEmptyCells}
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getNonEmptyCells, runEmptyCells}
 import edu.ucr.dblab.sdcel.PartitionReader.{readQuadtree, readEdges}
 import edu.ucr.dblab.sdcel.DCELOverlay2.{overlay, overlayByLevel, overlayMaster}
 import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, saveSDCEL, loadSDCEL, log, log2, logger}
@@ -85,14 +85,14 @@ object SDCEL2 {
       (ldcelA, m, ldcelB, m)
     } else {
       val edgesRDDA = readEdges(params.input1(), "A")
-      val emptiesA = getEmptyCells(edgesRDDA, "A")
+      val non_emptiesA = getNonEmptyCells(edgesRDDA, "A")
       val edgesRDDB = readEdges(params.input2(), "B")
-      val emptiesB = getEmptyCells(edgesRDDB, "B")
+      val non_emptiesB = getNonEmptyCells(edgesRDDB, "B")
       log2(s"TIME|read|$qtag")
 
       // Creating local dcel layer A...
       val ldcelA = createLocalDCELs(edgesRDDA, "A")
-      val ma = runEmptyCells(ldcelA, emptiesA, "A")
+      val ma = runEmptyCells(ldcelA, non_emptiesA, "A")
       log2(s"TIME|layer1|$qtag")
       if(params.savesdcel()){
         saveSDCEL(s"${params.input1().split("edgesA")(0)}/ldcelA", ldcelA, ma)
@@ -100,7 +100,7 @@ object SDCEL2 {
 
       // Creating local dcel layer B...
       val ldcelB = createLocalDCELs(edgesRDDB, "B")
-      val mb = runEmptyCells(ldcelB, emptiesB, "B")
+      val mb = runEmptyCells(ldcelB, non_emptiesB, "B")
       log2(s"TIME|layer2|$qtag")
       if(params.savesdcel()){
         saveSDCEL(s"${params.input2().split("edgesB")(0)}/ldcelB", ldcelB, mb)

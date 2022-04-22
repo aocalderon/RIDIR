@@ -25,25 +25,30 @@ object Cumulative {
     logger.info("Reading data...")
     val data = spark.read.text(params.input()).rdd.map{ line =>
       val arr = line.getString(0).split("\t")
-      val wkt   = arr(0)
-      val edges = arr(3).toInt
-      val cumulative = arr(4).toLong
+      val wkt        = arr(0)
+      val edges      = arr(3).toInt
+      val cumulative = arr(4).toInt
+      //val centroid   = arr(1)
+      //val temp       = s"$wkt\t$centroid"
 
       (wkt, edges, cumulative)
     }.cache()
 
     logger.info("Doing the splits...")    
     val total_edges = data.map{ case(w, e, c) => e }.reduce(_ + _)
+    logger.info(s"Total edges: $total_edges")
     val parts = params.parts()
-    val bound = total_edges * 1.0 / parts 
+    val bound = total_edges * 1.0 / parts
+    logger.info(s"Bound at: $bound")
     val bounds = (1 to parts).map{_ * bound}.toList
+    logger.info(s"Bounds: ${bounds.mkString(" ")}")
     val rdds = splitByBound(bounds, data, List.empty[RDD[String]])
 
     logger.info("Saving data...")
     val filename = Paths.get(params.input()).getFileName.toString
     val tag = filename.split("\\.")(0)
     rdds.zipWithIndex.foreach{ case(rdd, id) =>
-      rdd.toDF.write.mode(SaveMode.Overwrite).text(s"${params.output()}/${tag}_${id}")
+      rdd.toDF.write.mode(SaveMode.Overwrite).text(s"${params.output()}/${tag}${id}")
     }
 
     logger.info("Closing session...")
@@ -51,7 +56,7 @@ object Cumulative {
   }
 
   @tailrec
-  def splitByBound(bounds: List[Double], data: RDD[(String, Int, Long)],
+  def splitByBound(bounds: List[Double], data: RDD[(String, Int, Int)],
     splits: List[RDD[String]]): List[RDD[String]] = {
 
     bounds match {
