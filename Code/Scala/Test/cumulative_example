@@ -1,0 +1,2 @@
+./cumulative.sh file:///home/acald013/Datasets/CA_scaleup/CA2000.wkt file:///home/acald013/Datasets/CA_scaleup/A/ 4
+./cumulative.sh file:///home/acald013/Datasets/CA_scaleup/CA2010.wkt file:///home/acald013/Datasets/CA_scaleup/B/ 4
