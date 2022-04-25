@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import os.path
+import subprocess
 
 from datetime import datetime, timedelta
 from datetime import date as dt
@@ -70,11 +71,13 @@ def main():
 				dates.append(date)
 			for (date, tasks) in zip(dates, tasks):
 				line = ", ".join([task[2] for task in tasks])
-				latex = "{0} & 4 & {1}. \\\\ \hline".format(date, line)
+				latex = "{0} & 9AM-1PM & 4 & {1}. \\\\ \hline".format(date, line)
 				filehandle.write("{0}\n".format(latex))
 				print(latex)
 			print("\n")
 			filehandle.close()
+		subprocess.run(["pdflatex", "main.tex"])
+		subprocess.run(["evince", "main.pdf"])
 	except HttpError as err:
 		print(err)
 if __name__ == '__main__':
