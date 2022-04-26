@@ -47,6 +47,7 @@ mkdir -p ~/RIDIR/local_path/CA_scaleup/S3/P1000
 ####
 ## Copy the same quadtre and boundary for each part...
 ####
+
 cp ~/RIDIR/local_path/CA/1000/* ~/RIDIR/local_path/CA_scaleup/S0/P1000/
 cp ~/RIDIR/local_path/CA/1000/* ~/RIDIR/local_path/CA_scaleup/S1/P1000/
 cp ~/RIDIR/local_path/CA/1000/* ~/RIDIR/local_path/CA_scaleup/S2/P1000/
@@ -55,6 +56,7 @@ cp ~/RIDIR/local_path/CA/1000/* ~/RIDIR/local_path/CA_scaleup/S3/P1000/
 ####
 ## Run sdcel_partitioner_byquadtree script at each part...
 ####
+
 PART=0
 HDFS_PATH=CA_scaleup/S${PART}
 LOCAL_PATH=/home/acald013/RIDIR/local_path/$HDFS_PATH
@@ -83,4 +85,10 @@ PARTITIONS=1000
 TOLERANCE=1e-3
 ./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
 
-## 
+####
+## Run Perf
+####
+./Perf -d CA_scaleup/S0 -t 1e-3 -p 1000 -x 3  -m yarn -n 5
+./Perf -d CA_scaleup/S1 -t 1e-3 -p 1000 -x 6  -m yarn -n 5
+./Perf -d CA_scaleup/S2 -t 1e-3 -p 1000 -x 9  -m yarn -n 5
+./Perf -d CA_scaleup/S3 -t 1e-3 -p 1000 -x 12 -m yarn -n 5

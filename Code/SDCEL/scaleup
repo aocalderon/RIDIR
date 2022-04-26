@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
 done
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-./Perf -d gadm/scaleup2/S0 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0
-./Perf -d gadm/scaleup2/S1 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0
-./Perf -d gadm/scaleup2/S2 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0
-./Perf -d gadm/scaleup2/S3 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -o 0
+./Perf -d gadm/scaleup2/S0 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 3
+./Perf -d gadm/scaleup2/S1 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 6
+./Perf -d gadm/scaleup2/S2 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 9
+./Perf -d gadm/scaleup2/S3 -p $PARTITIONS -t 1e-3 -n $ITERATIONS -m yarn -x 12
