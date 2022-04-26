@@ -1,7 +1,7 @@
 library(tidyverse)
 setwd("~/RIDIR/Data/GADM_scaleup/")
 
-data0 = enframe(read_lines("GADM_scaleup_v01.txt"), value="line")
+data0 = enframe(read_lines("GADM_scaleup_v03.txt"), value="line")
 
 data1 = data0 %>%
   filter(str_detect(line, 'TIME')) 
@@ -31,3 +31,5 @@ p = ggplot(data3, aes(x = size, y = time)) +
   labs(x="Size [number of edges]", y="Time [s]", title=paste0("Scale up for GADM dataset")) +
   facet_wrap(~ stage)
 plot(p)
+
+ggsave(paste0("GADM_scaleup.pdf"), width = 8, height = 5)
