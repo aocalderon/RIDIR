@@ -61,9 +61,9 @@ CLASS_NAME=edu.ucr.dblab.tests.Closer
 LOG_FILE=${HOME}/Spark/3.2/conf/log4j.properties
 
 PARAMS=(
+    --master local[11] \
     --files $LOG_FILE \
 	    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
-	    --conf spark.executor.memory=5g \
 	    --packages $PACKAGES \
 	    --class $CLASS_NAME $CLASS_JAR \
 	    --input $INPUT --output $OUTPUT --partitions $PARTITIONS --x $X --y $Y --k $K

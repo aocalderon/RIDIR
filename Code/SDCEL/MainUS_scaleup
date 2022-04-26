@@ -1,0 +1,56 @@
+hdfs dfs -mkdir Census/MainUS/scaleup
+##
+hdfs dfs -mkdir Census/MainUS/scaleup/S0
+hdfs dfs -mkdir Census/MainUS/scaleup/S1
+hdfs dfs -mkdir Census/MainUS/scaleup/S2
+hdfs dfs -mkdir Census/MainUS/scaleup/S3
+##
+hdfs dfs -mkdir Census/MainUS/scaleup/S0/P7000
+hdfs dfs -mkdir Census/MainUS/scaleup/S1/P7000
+hdfs dfs -mkdir Census/MainUS/scaleup/S2/P7000
+hdfs dfs -mkdir Census/MainUS/scaleup/S3/P7000
+##
+hdfs dfs -put A0.wkt Census/MainUS/scaleup/S0
+hdfs dfs -put B0.wkt Census/MainUS/scaleup/S0
+hdfs dfs -put A1.wkt Census/MainUS/scaleup/S1
+hdfs dfs -put B1.wkt Census/MainUS/scaleup/S1
+hdfs dfs -put A2.wkt Census/MainUS/scaleup/S2
+hdfs dfs -put B2.wkt Census/MainUS/scaleup/S2
+hdfs dfs -put A3.wkt Census/MainUS/scaleup/S3
+hdfs dfs -put B3.wkt Census/MainUS/scaleup/S3
+##
+mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S0/P7000
+mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S1/P7000
+mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S2/P7000
+mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S3/P7000
+##
+cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S0/P7000
+cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S1/P7000
+cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S2/P7000
+cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S3/P7000
+
+##
+PARTITIONS=7000
+TOLERANCE=1e-3
+PART=0
+HDFS_PATH=Census/MainUS/scaleup/S${PART}
+LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
+./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
+PART=1
+HDFS_PATH=Census/MainUS/scaleup/S${PART}
+LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
+./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
+PART=2
+HDFS_PATH=Census/MainUS/scaleup/S${PART}
+LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
+./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
+PART=3
+HDFS_PATH=Census/MainUS/scaleup/S${PART}
+LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
+./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
+
+##
+./Perf -d Census/MainUS/scaleup/S0 -t 1e-3 -p 7000 -x 3  -m yarn -n 5
+./Perf -d Census/MainUS/scaleup/S1 -t 1e-3 -p 7000 -x 6  -m yarn -n 5
+./Perf -d Census/MainUS/scaleup/S2 -t 1e-3 -p 7000 -x 9  -m yarn -n 5
+./Perf -d Census/MainUS/scaleup/S3 -t 1e-3 -p 7000 -x 12 -m yarn -n 5 

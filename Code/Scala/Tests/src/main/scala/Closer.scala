@@ -26,7 +26,6 @@ object Closer {
     logger.info("Starting session...")
     implicit val params: CloserConf = new CloserConf(args)
     implicit val spark:SparkSession = SparkSession.builder()
-      .master("local[*]")
       .appName("Closer")
       .config("spark.serializer", classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[SedonaKryoRegistrator].getName)
