@@ -1,0 +1,38 @@
+#!/usr/bin/bash
+
+SOURCE_PATH=/home/acald013/Datasets/Census/MainUS
+THE_X=1815896.85872021
+THE_Y=509691.08600000
+DEFAULT_PARTITIONS=256
+
+TARGET_PATH=${SOURCE_PATH}/scaleup
+if [ -d "$TARGET_PATH" ]
+then
+	echo "Directory already exists. Removing content..."
+	rm -fR $TARGET_PATH
+fi
+
+echo "Creating temp folders..."
+mkdir -p ${TARGET_PATH}/A
+mkdir -p ${TARGET_PATH}/B
+
+echo "Running scripts..."
+${HOME}/RIDIR/Code/Scala/Tests/closer.sh -i file://${SOURCE_PATH}/A.wkt -o file://${TARGET_PATH}/A -p $DEFAULT_PARTITIONS -k 0 -x $THE_X -y $THE_Y 
+${HOME}/RIDIR/Code/Scala/Tests/closer.sh -i file://${SOURCE_PATH}/B.wkt -o file://${TARGET_PATH}/B -p $DEFAULT_PARTITIONS -k 0 -x $THE_X -y $THE_Y
+
+echo "Moving A datasets..."
+cat ${TARGET_PATH}/A/A0/part-* > ${TARGET_PATH}/A0.wkt
+cat ${TARGET_PATH}/A/A1/part-* > ${TARGET_PATH}/A1.wkt
+cat ${TARGET_PATH}/A/A2/part-* > ${TARGET_PATH}/A2.wkt
+cat ${TARGET_PATH}/A/A3/part-* > ${TARGET_PATH}/A3.wkt
+
+echo "Moving B datasets..."
+cat ${TARGET_PATH}/B/B0/part-* > ${TARGET_PATH}/B0.wkt
+cat ${TARGET_PATH}/B/B1/part-* > ${TARGET_PATH}/B1.wkt
+cat ${TARGET_PATH}/B/B2/part-* > ${TARGET_PATH}/B2.wkt
+cat ${TARGET_PATH}/B/B3/part-* > ${TARGET_PATH}/B3.wkt
+
+echo "Removing temp folders..."
+rm -fR ${TARGET_PATH}/A
+rm -fR ${TARGET_PATH}/B
+

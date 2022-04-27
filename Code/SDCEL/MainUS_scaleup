@@ -1,56 +1,69 @@
-hdfs dfs -mkdir Census/MainUS/scaleup
-##
-hdfs dfs -mkdir Census/MainUS/scaleup/S0
-hdfs dfs -mkdir Census/MainUS/scaleup/S1
-hdfs dfs -mkdir Census/MainUS/scaleup/S2
-hdfs dfs -mkdir Census/MainUS/scaleup/S3
-##
-hdfs dfs -mkdir Census/MainUS/scaleup/S0/P7000
-hdfs dfs -mkdir Census/MainUS/scaleup/S1/P7000
-hdfs dfs -mkdir Census/MainUS/scaleup/S2/P7000
-hdfs dfs -mkdir Census/MainUS/scaleup/S3/P7000
-##
-hdfs dfs -put A0.wkt Census/MainUS/scaleup/S0
-hdfs dfs -put B0.wkt Census/MainUS/scaleup/S0
-hdfs dfs -put A1.wkt Census/MainUS/scaleup/S1
-hdfs dfs -put B1.wkt Census/MainUS/scaleup/S1
-hdfs dfs -put A2.wkt Census/MainUS/scaleup/S2
-hdfs dfs -put B2.wkt Census/MainUS/scaleup/S2
-hdfs dfs -put A3.wkt Census/MainUS/scaleup/S3
-hdfs dfs -put B3.wkt Census/MainUS/scaleup/S3
-##
-mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S0/P7000
-mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S1/P7000
-mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S2/P7000
-mkdir -p ~/RIDIR/local_path/Census/MainUS/scaleup/S3/P7000
-##
-cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S0/P7000
-cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S1/P7000
-cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S2/P7000
-cp ~/RIDIR/local_path/Census/MainUS/P7000/* ~/RIDIR/local_path/Census/MainUS/scaleup/S3/P7000
+#!/usr/bin/bash
 
-##
-PARTITIONS=7000
+PARTS=4
+ITERATIONS=5
 TOLERANCE=1e-3
-PART=0
-HDFS_PATH=Census/MainUS/scaleup/S${PART}
-LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
-./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
-PART=1
-HDFS_PATH=Census/MainUS/scaleup/S${PART}
-LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
-./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
-PART=2
-HDFS_PATH=Census/MainUS/scaleup/S${PART}
-LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
-./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
-PART=3
-HDFS_PATH=Census/MainUS/scaleup/S${PART}
-LOCAL_PATH=${HOME}/RIDIR/local_path/$HDFS_PATH                                                                                                                                                             
-./sdcel_partitioner_byquadtree ${HDFS_PATH}/A${PART}.wkt ${HDFS_PATH}/B${PART}.wkt ${HDFS_PATH}/P${PARTITIONS} ${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt $TOLERANCE
+PARTITIONS=7000
+HDFS_PATH=Census/MainUS/scaleup
+PARTS_PATH=${HOME}/Datasets/Census/MainUS/scaleup
 
 ##
-./Perf -d Census/MainUS/scaleup/S0 -t 1e-3 -p 7000 -x 3  -m yarn -n 5
-./Perf -d Census/MainUS/scaleup/S1 -t 1e-3 -p 7000 -x 6  -m yarn -n 5
-./Perf -d Census/MainUS/scaleup/S2 -t 1e-3 -p 7000 -x 9  -m yarn -n 5
-./Perf -d Census/MainUS/scaleup/S3 -t 1e-3 -p 7000 -x 12 -m yarn -n 5 
+echo "Checking ROOT folder..."
+hdfs dfs -test -d ${HDFS_PATH}
+if [ $? == 0  ]; then
+    hdfs dfs -rm -r -skipTrash ${HDFS_PATH}
+fi
+hdfs dfs -mkdir ${HDFS_PATH}
+##
+hdfs dfs -mkdir ${HDFS_PATH}/S0
+hdfs dfs -mkdir ${HDFS_PATH}/S1
+hdfs dfs -mkdir ${HDFS_PATH}/S2
+hdfs dfs -mkdir ${HDFS_PATH}/S3
+##
+hdfs dfs -mkdir ${HDFS_PATH}/S0/P${PARTITIONS}
+hdfs dfs -mkdir ${HDFS_PATH}/S1/P${PARTITIONS}
+hdfs dfs -mkdir ${HDFS_PATH}/S2/P${PARTITIONS}
+hdfs dfs -mkdir ${HDFS_PATH}/S3/P${PARTITIONS}
+
+##
+echo "Uploading  datasets..."
+hdfs dfs -put ${PARTS_PATH}/A0.wkt ${HDFS_PATH}/S0
+hdfs dfs -put ${PARTS_PATH}/B0.wkt ${HDFS_PATH}/S0
+hdfs dfs -put ${PARTS_PATH}/A1.wkt ${HDFS_PATH}/S1
+hdfs dfs -put ${PARTS_PATH}/B1.wkt ${HDFS_PATH}/S1
+hdfs dfs -put ${PARTS_PATH}/A2.wkt ${HDFS_PATH}/S2
+hdfs dfs -put ${PARTS_PATH}/B2.wkt ${HDFS_PATH}/S2
+hdfs dfs -put ${PARTS_PATH}/A3.wkt ${HDFS_PATH}/S3
+hdfs dfs -put ${PARTS_PATH}/B3.wkt ${HDFS_PATH}/S3
+
+##
+echo "Copying quadtree and boundary data..."
+mkdir -p ${HOME}/RIDIR/local_path/${HDFS_PATH}/S0/P${PARTITIONS}
+mkdir -p ${HOME}/RIDIR/local_path/${HDFS_PATH}/S1/P${PARTITIONS}
+mkdir -p ${HOME}/RIDIR/local_path/${HDFS_PATH}/S2/P${PARTITIONS}
+mkdir -p ${HOME}/RIDIR/local_path/${HDFS_PATH}/S3/P${PARTITIONS}
+##
+cp ${HOME}/RIDIR/local_path/Census/MainUS/P${PARTITIONS}/* ${HOME}/RIDIR/local_path/${HDFS_PATH}/S0/P${PARTITIONS}
+cp ${HOME}/RIDIR/local_path/Census/MainUS/P${PARTITIONS}/* ${HOME}/RIDIR/local_path/${HDFS_PATH}/S1/P${PARTITIONS}
+cp ${HOME}/RIDIR/local_path/Census/MainUS/P${PARTITIONS}/* ${HOME}/RIDIR/local_path/${HDFS_PATH}/S2/P${PARTITIONS}
+cp ${HOME}/RIDIR/local_path/Census/MainUS/P${PARTITIONS}/* ${HOME}/RIDIR/local_path/${HDFS_PATH}/S3/P${PARTITIONS}
+
+##
+for((PART=0; PART<$PARTS; PART++)); do
+    PART_PATH=${HDFS_PATH}/S${PART}
+    LOCAL_PATH=${HOME}/RIDIR/local_path/$PART_PATH
+    PARAMS=(
+	${PART_PATH}/A${PART}.wkt ${PART_PATH}/B${PART}.wkt\
+	${PART_PATH}/P${PARTITIONS}\
+	${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt\
+	${TOLERANCE}
+    )
+    echo "./sdcel_partitioner_byquadtree ${PARAMS[@]}"
+    ./sdcel_partitioner_byquadtree ${PARAMS[@]}
+done
+
+##
+#./Perf -d ${HDFS_PATH}/S0 -t ${TOLERANCE} -p ${PARTITIONS} -x 3  -m yarn -n ${ITERATIONS}
+#./Perf -d ${HDFS_PATH}/S1 -t ${TOLERANCE} -p ${PARTITIONS} -x 6  -m yarn -n ${ITERATIONS}
+#./Perf -d ${HDFS_PATH}/S2 -t ${TOLERANCE} -p ${PARTITIONS} -x 9  -m yarn -n ${ITERATIONS}
+#./Perf -d ${HDFS_PATH}/S3 -t ${TOLERANCE} -p ${PARTITIONS} -x 12 -m yarn -n ${ITERATIONS}
