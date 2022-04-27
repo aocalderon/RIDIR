@@ -1,7 +1,7 @@
 library(tidyverse)
 setwd("~/RIDIR/Data/CA_scaleup/")
 
-data0 = enframe(read_lines("CA_scaleup_v01.txt"), value="line")
+data0 = enframe(read_lines("CA_scaleup_v02.txt"), value="line")
 
 data1 = data0 %>%
   filter(str_detect(line, 'TIME')) 
