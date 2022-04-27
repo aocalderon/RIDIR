@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-./Perf -d Census/MainUS/scaleup/S0 -t 1e-3 -p 7000 -x 3  -m yarn -n 5
-./Perf -d Census/MainUS/scaleup/S1 -t 1e-3 -p 7000 -x 6  -m yarn -n 5
-./Perf -d Census/MainUS/scaleup/S2 -t 1e-3 -p 7000 -x 9  -m yarn -n 5
-./Perf -d Census/MainUS/scaleup/S3 -t 1e-3 -p 7000 -x 12 -m yarn -n 5
+./Perf -d Census/MainUS/scaleup/S0 -t 1e-3 -p 7000 -x 3  -m yarn -n 4
+./Perf -d Census/MainUS/scaleup/S1 -t 1e-3 -p 7000 -x 6  -m yarn -n 4
+./Perf -d Census/MainUS/scaleup/S2 -t 1e-3 -p 7000 -x 9  -m yarn -n 4
+./Perf -d Census/MainUS/scaleup/S3 -t 1e-3 -p 7000 -x 12 -m yarn -n 4
