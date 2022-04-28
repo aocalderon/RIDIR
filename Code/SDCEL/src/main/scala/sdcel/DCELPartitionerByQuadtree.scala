@@ -42,7 +42,7 @@ object DCELPartitionerByQuadtree {
     log(s"INFO|scale=${settings.scale}")
     val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
-    log("TIME|Start")
+    log("TIMEP|Start")
 
     // Reading data...
     val edgesRDDA = if(!params.readid()) read(params.input1()) else read2(params.input1())
@@ -53,7 +53,7 @@ object DCELPartitionerByQuadtree {
     log(s"INFO|edgesB=$nEdgesRDDB")
     val edgesRDD = edgesRDDA.getRawSpatialRDD.rdd  union edgesRDDB.getRawSpatialRDD.rdd
     val nEdgesRDD = nEdgesRDDA + nEdgesRDDB
-    log("TIME|Read")
+    log("TIMEP|Read")
 
     // Reading quatree...
     val (quadtree, cells) = readQuadtree[LineString](params.quadtree(), params.boundary())
@@ -66,7 +66,7 @@ object DCELPartitionerByQuadtree {
     // Saving to HDFS adding info about edges crossing border cells...
     saveToHDFSWithCrossingInfo(edgesA, cells, params.apath())
     saveToHDFSWithCrossingInfo(edgesB, cells, params.bpath())
-    log("TIME|Saving")
+    log("TIMEP|Saving")
 
     if(settings.debug){
       save("/tmp/edgesA.wkt"){

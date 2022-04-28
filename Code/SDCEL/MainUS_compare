@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+## Comparing US2000 small layer vs US2010 full layer...
+
+## Run just one time
+# hdfs dfs -mkdir Census/MainUS/compare
+# hdfs dfs -mkdir Census/MainUS/compare/T0
+# hdfs dfs -mkdir Census/MainUS/compare/T1
+
+##
+TAG=0
+PARTITIONS=7000
+
+##
+hdfs dfs -cp Census/MainUS/scaleup/S0/A0.wkt Census/MainUS/compare/T${TAG}/A.wkt
+hdfs dfs -cp Census/MainUS/scaleup/S3/B3.wkt Census/MainUS/compare/T${TAG}/B.wkt
+
+##
+hdfs dfs -mkdir Census/MainUS/compare/T${TAG}/P${PARTITIONS}
+
+##
+mkdir -p ~/RIDIR/local_path/Census/MainUS/compare/T${TAG}/P${PARTITIONS}
+cp ~/RIDIR/local_path/Census/MainUS/P${PARTITIONS}/* ~/RIDIR/local_path/Census/MainUS/compare/T${TAG}/P${PARTITIONS}/
+
+##
+TOLERANCE=1e-3
+HDFS_PATH=Census/MainUS/compare/T${TAG}
+LOCAL_PATH=${HOME}/RIDIR/local_path/${HDFS_PATH}
+PARAMS=(
+    ${HDFS_PATH}/A.wkt ${HDFS_PATH}/B.wkt \
+		${HDFS_PATH}/P${PARTITIONS} \
+		${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt \
+		${TOLERANCE}
+)
+PARTITIONER_PATH=${HOME}/RIDIR/Code/SDCEL/sdcel_partitioner_byquadtree
+echo "${PARTITIONER_PATH} ${PARAMS[@]}"
+$PARTITIONER_PATH ${PARAMS[@]}
+
+## OUTPUT
+# 2022-04-28 11:09:20,861|28318|application_1648870353198_1278|INFO|edgesA=8866186
+# 2022-04-28 11:09:32,825|40282|application_1648870353198_1278|INFO|edgesB=36764043
+
+##
+${HOME}/RIDIR/Code/SDCEL/Perf -d $HDFS_PATH -t $TOLERANCE -p $PARTITIONS -m yarn -n 5
