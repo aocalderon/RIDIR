@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+## Comparing L3 small layer vs L2 full layer...
+
+##
+TAG=1
+
+##
+hdfs dfs -cp gadm/scaleup2/S3/A.wkt gadm/compare/T${TAG}/A.wkt
+hdfs dfs -cp gadm/scaleup2/S0/B.wkt gadm/compare/T${TAG}/B.wkt
+
+##
+hdfs dfs -mkdir gadm/compare/T${TAG}/P14000
+
+##
+mkdir -p ~/RIDIR/local_path/gadm/compare/T${TAG}/P14000
+cp ~/RIDIR/local_path/gadm/l3vsl2/P14000/* ~/RIDIR/local_path/gadm/compare/T${TAG}/P14000/
+
+##
+PARTITIONS=14000
+TOLERANCE=1e-3
+HDFS_PATH=gadm/compare/T${TAG}
+LOCAL_PATH=${HOME}/RIDIR/local_path/${HDFS_PATH}
+PARAMS=(
+    ${HDFS_PATH}/A.wkt ${HDFS_PATH}/B.wkt \
+		${HDFS_PATH}/P${PARTITIONS} \
+		${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt \
+		${TOLERANCE}
+)
+echo "${HOME}/RIDIR/Code/SDCEL/sdcel_partitioner_byquadtree ${PARAMS[@]}"
+# ${HOME}/RIDIR/Code/SDCEL/sdcel_partitioner_byquadtree ${PARAMS[@]}
+
+## OUTPUT
+
+##
+${HOME}/RIDIR/Code/SDCEL/Perf -d $HDFS_PATH -t $TOLERANCE -p $PARTITIONS -m yarn -n 5
