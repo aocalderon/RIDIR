@@ -1,9 +1,8 @@
 library(tidyverse)
-setwd("~/RIDIR/Data/GADM_compare/")
+setwd("~/RIDIR/Data/MainUS_compare/")
 
-data0a = enframe(read_lines("GADM_compare_T0_v01.txt"), value="line")
-data0b = enframe(read_lines("GADM_compare_T1_v01.txt"), value="line")
-
+data0a = enframe(read_lines("MainUS_compare_v01.txt"), value="line")
+data0b = enframe(read_lines("MainUS_compare_v02.txt"), value="line")
 data0 = bind_rows(data0a, data0b)
 
 data1 = data0 %>%
@@ -11,7 +10,7 @@ data1 = data0 %>%
 
 fields1 = c("ts","start","appId","time","tag","stage","data")
 fields2 = c("dataset", "tolerance", "overlay_method", "overlay_level", "partitions", "nodes", "run")
-fields3 = c(NA, NA, "l1l2")
+fields3 = c(NA, NA, NA, "l1l2")
 data2 = data1 %>% 
   separate(sep = "\\|", col = "line", into = fields1, extra = "drop") %>%
   separate(sep = "_"  , col = "data", into = fields2, extra = "drop") %>%
@@ -24,7 +23,7 @@ data2 = data1 %>%
 data3 = data2 %>%
   group_by(stage, l1l2) %>% summarise(time = mean(time))  
 
-write_tsv(data3, "GADM_compare.tsv")
+write_tsv(data3, "MainUS_compare.tsv")
 
 p = ggplot(data3, aes(x = stage, y = time, fill = l1l2)) + 
   geom_col(width = 0.7, position="dodge") + 

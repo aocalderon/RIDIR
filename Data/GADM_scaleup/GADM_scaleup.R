@@ -32,4 +32,6 @@ p = ggplot(data3, aes(x = size, y = time)) +
   facet_wrap(~ stage)
 plot(p)
 
+W = as.numeric(Sys.getenv("R_WIDTH"))
+H = as.numeric(Sys.getenv("R_HEIGHT"))
 ggsave(paste0("GADM_scaleup.pdf"), width = 8, height = 5)
