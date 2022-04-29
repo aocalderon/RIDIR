@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+## Comparing CA2000 small layer vs CA2010 full layer...
+
+## Run just one time
+echo "Making folders..."
+hdfs dfs -mkdir CA_compare
+hdfs dfs -mkdir CA_compare/T0
+hdfs dfs -mkdir CA_compare/T1
+
+##
+TAG=0
+PARTITIONS=1000
+
+##
+echo "Moving datasets..."
+hdfs dfs -cp CA_scaleup/S0/A0.wkt CA_compare/T${TAG}/A.wkt
+hdfs dfs -cp CA_scaleup/S3/B3.wkt CA_compare/T${TAG}/B.wkt
+
+##
+hdfs dfs -mkdir CA_compare/T${TAG}/P${PARTITIONS}
+
+##
+echo "Copying quadtree and boundary..."
+mkdir -p ~/RIDIR/local_path/CA_compare/T${TAG}/P${PARTITIONS}
+cp ~/RIDIR/local_path/CA_scaleup/S0/P${PARTITIONS}/* ~/RIDIR/local_path/CA_compare/T${TAG}/P${PARTITIONS}/
+
+##
+echo "Partitioning edges..."
+TOLERANCE=1e-3
+HDFS_PATH=CA_compare/T${TAG}
+LOCAL_PATH=${HOME}/RIDIR/local_path/${HDFS_PATH}
+PARAMS=(
+    ${HDFS_PATH}/A.wkt ${HDFS_PATH}/B.wkt \
+		${HDFS_PATH}/P${PARTITIONS} \
+		${LOCAL_PATH}/P${PARTITIONS}/quadtree.wkt ${LOCAL_PATH}/P${PARTITIONS}/boundary.wkt \
+		${TOLERANCE}
+)
+PARTITIONER_PATH=${HOME}/RIDIR/Code/SDCEL/sdcel_partitioner_byquadtree
+echo "${PARTITIONER_PATH} ${PARAMS[@]}"
+$PARTITIONER_PATH ${PARAMS[@]}
+
+## OUTPUT
+
+##
+echo "Running performance..."
+${HOME}/RIDIR/Code/SDCEL/Perf -d $HDFS_PATH -t $TOLERANCE -p $PARTITIONS -m yarn -n 5
