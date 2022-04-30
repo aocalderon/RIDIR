@@ -22,6 +22,8 @@ libraryDependencies += "ch.cern.sparkmeasure" %% "spark-measure" % "0.16"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.2"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % "test"
 
+libraryDependencies += "com.github.davidmoten" % "hilbert-curve" % "0.2.2"
+
 mainClass in (Compile, run) := Some("edu.ucr.dblab.SDCEL")
 mainClass in (Compile, packageBin) := Some("edu.ucr.dbla.SDCEL")
 

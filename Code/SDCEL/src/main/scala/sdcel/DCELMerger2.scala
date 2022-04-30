@@ -9,6 +9,13 @@ import com.vividsolutions.jts.geomgraph.EdgeIntersection
 import com.vividsolutions.jts.geomgraph.Edge
 import com.vividsolutions.jts.index.strtree._
 
+import org.davidmoten.hilbert.{SmallHilbertCurve, HilbertCurve}
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import org.davidmoten.hilbert.HilbertCurveRenderer
+import org.davidmoten.hilbert.HilbertCurveRenderer.Option
+
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
@@ -28,6 +35,34 @@ object DCELMerger2 {
     // Getting edge splits...
     val ha = extractHedges(hlepA)
     val hb = extractHedges(hlepB)
+
+    if(settings.debug){
+      val pid = TaskContext.getPartitionId
+      if(pid == 113){
+        val bits = 16
+        val hilbert = HilbertCurve.small().bits(bits).dimensions(2)
+        val ha_index = ha.map{ h =>
+          val x = (h.v1.x * 1000).toLong
+          val y = (h.v1.y * 1000).toLong
+          val i = hilbert.index(x, y)
+          (i , h)
+        }.sortBy(_._1)
+        val hb_index = hb.map{ h =>
+          val x = (h.v1.x * 1000).toLong
+          val y = (h.v1.y * 1000).toLong
+          val i = hilbert.index(x, y)
+          (i , h)
+        }.sortBy(_._1)
+
+        //HilbertCurveRenderer.renderToFile(bits, 10000, "/tmp/test_" + bits + ".png",
+        //  Option.COLORIZE)
+        val a = ha_index.map{ case(x, h) => s"${h.edge.getPointN(0).toText}\t$x\t${h.tag}\n"}
+        save("/tmp/edgesAI.wkt"){ a }
+        val b = hb_index.map{ case(x, h) => s"${h.edge.getPointN(0).toText}\t$x\t${h.tag}\n"}
+        save("/tmp/edgesBI.wkt"){ b }
+      }
+    }
+
     val (aList, bList) = intersects(ha, hb)
     val hedges0 = (aList ++ bList)
 

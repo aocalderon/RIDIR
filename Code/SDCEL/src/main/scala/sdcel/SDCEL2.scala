@@ -45,10 +45,15 @@ object SDCEL2 {
       }
     )
     val command = System.getProperty("sun.java.command")
-    log2(s"COMMAND|$command")
-    log(s"INFO|tolerance=${settings.tolerance}")
-    log(s"INFO|overlay_option=${settings.ooption}")
-    log(s"INFO|overlay_level=${settings.olevel}")
+    if(settings.debug){
+      log(s"INFO|command=$command")
+      log(s"INFO|tolerance=${settings.tolerance}")
+      log(s"INFO|overlay_option=${settings.ooption}")
+      log(s"INFO|overlay_level=${settings.olevel}")
+      log(s"INFO|local=${settings.local}")
+      log(s"INFO|appId=${settings.appId}")
+      log(s"INFO|persistance=${settings.persistance}")
+    }
     implicit val model = new PrecisionModel(settings.scale)
     implicit val geofactory = new GeometryFactory(model)
 
