@@ -19,10 +19,10 @@ libraryDependencies += "org.slf4j" % "slf4j-log4j12" % "1.7.25"
 libraryDependencies += "org.rogach" % "scallop_2.11" % "2.1.3"
 libraryDependencies += "ch.cern.sparkmeasure" %% "spark-measure" % "0.16"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.2"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % "test"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.12"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.12" % "test"
 
-libraryDependencies += "com.github.davidmoten" % "hilbert-curve" % "0.2.2"
+libraryDependencies += "com.google.guava" % "guava" % "31.1-jre"
 
 mainClass in (Compile, run) := Some("edu.ucr.dblab.SDCEL")
 mainClass in (Compile, packageBin) := Some("edu.ucr.dbla.SDCEL")

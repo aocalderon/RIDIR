@@ -1,19 +1,352 @@
 package edu.ucr.dblab.sdcel.geometries
 
-import scala.annotation.tailrec
+import org.apache.spark.TaskContext
+
 import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry, Envelope}
 import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
 import com.vividsolutions.jts.geomgraph.Edge
 import com.vividsolutions.jts.io.WKTReader
 
+import com.google.common.collect.TreeMultiset
+
+import scala.collection.JavaConverters._
+import scala.annotation.tailrec
+import java.util.Comparator
+
 import edu.ucr.dblab.sdcel.Utils.logger
+import edu.ucr.dblab.debug.AVLTreeST
 
 case class Tag(label: String, pid: Int){
   override def toString: String = s"$label$pid"
 }
 
-case class HEdge(coords: Array[Coordinate], h: Half_edge) extends Edge(coords)
+case class HEdge(coords: Array[Coordinate], h: Half_edge)  extends Edge(coords)
 case class LEdge(coords: Array[Coordinate], l: LineString) extends Edge(coords)
+
+object EmptyCoordinate {
+  private val coordinate: Coordinate  = new Coordinate()
+  coordinate.setOrdinate(0, Double.NaN)
+  coordinate.setOrdinate(1, Double.NaN)
+  def getCoordinate: Coordinate = coordinate
+}
+
+sealed trait Label
+case object A extends Label
+case object B extends Label
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+sealed trait Event
+case object LEFT_ENDPOINT  extends Event
+case object RIGHT_ENDPOINT extends Event
+case object INTERSECTION   extends Event
+
+object StatusKey{
+  def intersection(one: Option[StatusKey], another: Option[StatusKey], p: Coordinate): Boolean = {
+    one match{
+      case None => false
+      case Some(one) => {
+        another match {
+          case None => false
+          case Some(another) => one.hedge.intersection(another.hedge).exists( _.x > p.x )
+        }
+      }
+    }
+  }
+
+  def above(status: AVLTreeST[StatusKey, StatusKey], key: StatusKey): Option[StatusKey] = {
+    val S = status.keys().asScala.toList
+    S.find(_.hedge.tag == key.hedge.tag) match {
+      case Some(s) => Some( S(S.indexOf(s) + 1) )
+      case None => None
+    }
+  }
+
+  def below(status: AVLTreeST[StatusKey, StatusKey], key: StatusKey): Option[StatusKey] = {
+    val S = status.keys().asScala.toList
+    S.find(_.hedge.tag == key.hedge.tag) match {
+      case Some(s) => Some( S(S.indexOf(s) - 1) )
+      case None => None
+    }
+  }
+
+  def above(s1: StatusKey, s2: StatusKey): Boolean = {
+    isAbove(s2.left, s1) match {
+      case  1 => true
+      case -1 => false
+      case  0 => {
+        isAbove(s2.right, s1) match {
+          case  1 => true
+          case -1 => false
+          case  0 => false // TODO: lines are colinear
+        }
+      }
+    }
+  }
+
+  def above(s: StatusKey, p1: Coordinate, p2: Coordinate): Boolean = {
+    isAbove(p1, s) match {
+      case  1 => true
+      case -1 => false
+      case  0 => {
+        isAbove(p2, s) match {
+          case  1 => true
+          case -1 => false
+          case  0 => false // TODO: lines are colinear
+        }
+      }
+    }
+  }
+
+  def isAbove(T: Coordinate, s: StatusKey): Int = {
+    val P = s.left
+    val Q = s.right
+    val a = (Q.y - P.y) / (Q.x - P.x)
+    val b = 1
+    val c = P.y - (a * P.x)
+
+    val f =  a * T.x - b * T.y + c
+
+    f match {
+      case x if x <  0 =>  1 
+      case x if x == 0 =>  0 // Point T is colinear... 
+      case x if x >  0 => -1 
+    }
+  }
+}
+case class StatusKey(hedge: Half_edge, p: Coordinate) extends Ordered[StatusKey]{
+  var left:  Coordinate = hedge.left
+  var right: Coordinate = hedge.right
+
+  // If point c is left to line a-b [> 0: Left, < 0: Right, = 0: Colinear]...
+  def locate(point: Coordinate): Double =
+    (right.x - left.x) * (point.y - left.y) - (right.y - left.y) * (point.x - left.x)
+
+  /*
+  def compare(that: StatusKey): Int = {
+    StatusKey.isAbove(this.p, that)
+   }
+   */
+
+  def compare(that: StatusKey): Int = {
+    that.locate(this.p) match {
+      case x if x  > 0 =>  1
+      case x if x == 0 =>  0 // Point T is colinear...
+      case x if x <  0 => -1
+    }
+  }
+
+  def above(status: AVLTreeST[StatusKey, StatusKey]): Option[StatusKey] = {
+    val rank = status.rank(this)
+    try {
+      Some( status.get(status.select(rank + 1)) )
+    } catch {
+      case e: Exception => None
+    }
+  }
+
+  def below(status: AVLTreeST[StatusKey, StatusKey]): Option[StatusKey] = {
+    val rank = status.rank(this)
+    try {
+      Some( status.get(status.select(rank - 1)) )
+    } catch {
+      case e: Exception => None
+    }
+  }
+
+  def intersects(that: Option[StatusKey]): Boolean = {
+    that match {
+      case Some(that) => this.hedge.intersects(that.hedge)
+      case None => false
+    }
+  }
+
+  def intersection(that: StatusKey): Coordinate = this.hedge.intersection(that.hedge).head
+
+  override def toString: String = this.hedge.tag 
+}
+
+object SL_Hedge {
+  def above(status: TreeMultiset[SL_Hedge], hedge: SL_Hedge): Option[SL_Hedge] = {
+    val statusList = status.asScala.toList
+    val index = statusList.indexOf(hedge)
+    try{
+      Some(statusList(index - 1))
+    } catch {
+      case e: Exception => None
+    }
+  }
+
+  def below(status: TreeMultiset[SL_Hedge], hedge: SL_Hedge): Option[SL_Hedge] = {
+    val statusList = status.asScala.toList
+    val index = statusList.indexOf(hedge)
+    try{
+      Some(statusList(index + 1))
+    } catch {
+      case e: Exception => None
+    }
+  }
+
+  def intersects(h: SL_Hedge, h_option: Option[SL_Hedge]): Boolean = {
+    h_option match {
+      case Some(h_prime) => h.edge.intersects(h_prime.edge)
+      case None => false
+    }
+  }
+
+  def intersects(h1_opt: Option[SL_Hedge], h2_opt: Option[SL_Hedge], point: Coordinate): Boolean = {
+    h1_opt match {
+      case Some(h1) => {
+        h2_opt match {
+          case Some(h2) => {
+            if(h1.edge.intersects(h2.edge)){
+              h1.edge.intersection(h2.edge).getCoordinates.exists{_.x > point.x}
+            } else {
+              false
+            }
+          }
+          case None => false
+        }
+      }
+      case None => false
+    }
+  }
+
+  def sortByTheLeftOf(h1: SL_Hedge, h2: SL_Hedge): (SL_Hedge, SL_Hedge) = {
+    val y1 = h1.endpoints.minBy(_.x).y
+    val y2 = h2.endpoints.minBy(_.x).y
+    if(y1 > y2) (h1, h2) else (h2, h1) 
+  }
+
+  def interchange(h1: SL_Hedge, h2: SL_Hedge, status: TreeMultiset[SL_Hedge])
+      : TreeMultiset[SL_Hedge] = {
+
+    ???
+  }
+}
+
+case class SL_Hedge(hedge: Half_edge, p: EventPoint) extends Ordered[SL_Hedge] {
+  val x_sweep: Double = p.getEventPoint.x
+  val endpoints: List[Coordinate] = hedge.endpoints
+  val edge: LineString = hedge.edge
+  val wkt: String = hedge.wkt
+
+  val sweepline: LineString = {
+    val envelope: Envelope = edge.getEnvelopeInternal
+    val minY = envelope.getMinY
+    val maxY = envelope.getMaxY
+    val c1   = new Coordinate(x_sweep, minY)
+    val c2   = new Coordinate(x_sweep, maxY)
+    edge.getFactory.createLineString(Array(c1, c2))
+  }
+
+  def sweeplineByX(x: Double): LineString = {
+    val envelope: Envelope = edge.getEnvelopeInternal
+    val minY = envelope.getMinY
+    val maxY = envelope.getMaxY
+    val c1   = new Coordinate(x, minY)
+    val c2   = new Coordinate(x, maxY)
+    edge.getFactory.createLineString(Array(c1, c2))
+  }
+
+  def intersection(that: SL_Hedge): Coordinate = {
+    this.edge.intersection(that.edge).getCoordinates.sortBy(_.y).head
+  }
+
+  def intersection2(that: SL_Hedge): Array[Coordinate] = {
+    this.edge.intersection(that.edge).getCoordinates
+  }
+
+  def intersectSweepLine: Coordinate = {
+    val intersections = this.edge.intersection(sweepline)
+    intersections.getCoordinates.sortBy(_.y).head
+  }
+
+  def intersectSweepLine(x: Double): Coordinate = this.edge.intersection(sweeplineByX(x))
+    .getCoordinates.sortBy(_.y).head
+
+  def intersectSweepLine2: Option[Coordinate] = {
+    val intersections = this.edge.intersection(sweepline)
+    val intersect = try {
+      Some(intersections.getCoordinates.sortBy(_.y).head)
+    } catch {
+      case e: java.util.NoSuchElementException => {
+        println(s"SL_Hedge outside of sweepline...")
+        None
+      }
+    }
+    intersect
+  }
+
+  def canEqual(a: Any) = a.isInstanceOf[SL_Hedge]
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case that: SL_Hedge => {
+        that.canEqual(this) &&
+        this.p.id == that.p.id 
+      }
+      case _ => false
+    }
+  }
+
+  override def hashCode: Int = {
+    val prime = 31
+    var result = 1
+    result = prime * result + p.id;
+    //result = prime * result + (if (name == null) 0 else name.hashCode)
+    result
+  }
+
+  def compare(that: SL_Hedge): Int = {
+    val i1 = this.intersectSweepLine2.get
+    val i2 = that.intersectSweepLine2.get
+    i1.compareTo(i2)
+    //this.p.id compare that.p.id
+  }
+}
+
+case class EventPoint(hedges: List[Half_edge], event: Event, id: Int = -1,
+  intersection: Coordinate = EmptyCoordinate.getCoordinate) {
+
+  val head: Half_edge = hedges.head
+  val last: Half_edge = hedges.last
+
+  def getEventPoint = {
+    val h = hedges.head
+    val endpoints = h.endpoints
+    event match {
+      case LEFT_ENDPOINT  => if(!h.isVertical) endpoints.minBy(_.x) else endpoints.minBy(_.y)
+      case RIGHT_ENDPOINT => if(!h.isVertical) endpoints.maxBy(_.x) else endpoints.maxBy(_.y)
+      case INTERSECTION   => intersection
+    }
+  }
+
+  def getLeftEventPoint = {
+    val h = hedges.head
+    val endpoints = h.endpoints
+    if(!h.isVertical) endpoints.minBy(_.x) else endpoints.minBy(_.y)
+  }
+}
+object CoordYX_Ordering extends Ordering[Coordinate] {
+  def compare(a:Coordinate, b: Coordinate) = {
+    if( a.y != b.y) a.y compare b.y else a.x compare b.x
+  }
+}
+object EventPoint_Ordering extends Ordering[EventPoint] {
+  def compare(a: EventPoint, b: EventPoint) = {
+    val ap = a.getEventPoint
+    val bp = b.getEventPoint
+    if( bp.x != ap.x ){
+      bp.x compare ap.x
+    } else if( bp.y != ap.y ){
+      bp.y compare ap.y
+    } else {
+      0
+    }
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
   label: String = "A", crossingInfo: String = "None", nedges: Int = -1) {
@@ -41,6 +374,7 @@ case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
 }
 
 object Half_edge {
+  
   def save(hedge: Half_edge, pid: Int): String = {
     val  id  = hedge.id
     val wkt  = hedge.edge.toText
@@ -83,7 +417,7 @@ object Half_edge {
   }
 }
 
-case class Half_edge(edge: LineString) {
+case class Half_edge(edge: LineString){
   val coords = edge.getCoordinates
   val v1 = coords(0)
   val v2 = coords(1)
@@ -99,6 +433,14 @@ case class Half_edge(edge: LineString) {
     case 2 => (Vertex(v1), Vertex(v2, false))
     case 3 => (Vertex(v1, false), Vertex(v2, false))
   }
+
+  val endpoints = List(v1, v2)
+  val left  = endpoints.minBy(_.x)
+  val right = endpoints.maxBy(_.x)
+  val above = endpoints.maxBy(_.y)
+  val below = endpoints.minBy(_.y)
+  val minX = left.x
+  val minY = below.y
 
   val wkt = edge.toText()
   var id: Long = 0L
@@ -118,6 +460,20 @@ case class Half_edge(edge: LineString) {
   var MAX_RECURSION: Int = Int.MaxValue
 
   override def toString = s"${edge.toText}\t$data\t${tag}"
+
+  def getLabelEnum: Label = if(data.label == "A") A else B
+
+  def intersects(that: Half_edge): Boolean = this.edge.intersects(that.edge)
+  def intersection(that: Half_edge): Array[Coordinate] = {
+    this.edge.intersection(that.edge).getCoordinates
+  }
+
+
+  def isVertical: Boolean   = v1.x == v2.x
+  def isHorizontal: Boolean = v1.y == v2.y
+
+  def leftPlusDelta(delta: Double):  Coordinate = new Coordinate(left.x, left.y + delta)
+  def rightPlusDelta(delta: Double): Coordinate = new Coordinate(right.x, right.y + delta)
 
   def getPolygonId(): Int = {
     @tailrec
