@@ -155,9 +155,18 @@ case class StatusKey(hedge: Half_edge, p: Coordinate) extends Ordered[StatusKey]
   }
 
   def intersects(that: Option[StatusKey]): Boolean = {
-    that match {
-      case Some(that) => this.hedge.intersects(that.hedge)
-      case None => false
+    try{
+      that match {
+        case Some(that) => this.hedge.intersects(that.hedge)
+        case None => false
+      }
+    } catch {
+      case e: java.lang.NullPointerException => {
+        println(this)
+        println(that)
+        System.exit(0)
+        false
+      }
     }
   }
 

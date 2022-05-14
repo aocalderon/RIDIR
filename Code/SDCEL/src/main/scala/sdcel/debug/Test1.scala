@@ -1,46 +1,68 @@
 package edu.ucr.dblab.debug
 
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate}
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, Cell, SL_Hedge, StatusKey}
+import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate, Point}
+import edu.ucr.dblab.sdcel.geometries.{Half_edge, StatusKey}
 import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering, CoordYX_Ordering}
 import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, INTERSECTION, RIGHT_ENDPOINT}
 import edu.ucr.dblab.sdcel.Utils.save
-import com.google.common.collect.TreeMultiset
-import scala.collection.mutable.{PriorityQueue}
+import scala.collection.mutable.{PriorityQueue, ListBuffer}
 import scala.collection.JavaConverters._
-import java.util.TreeMap
 
 object BSTreeTest{
   def main(args: Array[String]) = {
-    implicit val geofactory = new GeometryFactory(new PrecisionModel(1000.0))
-    implicit val cells = Map(0 -> getCell)
+    implicit val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000.0))
+    val debug: Boolean = true
+    val method: String = "File"
+    val filename: String = "/home/acald013/tmp/edgesH.wkt"
+    val n: Int = 20
 
-    val hedges = generateHedges
-    save("/tmp/edgesH.wkt"){
-      hedges.map{ d => s"${d.wkt}\t${d.tag}\n" }
+    val hedges = method match {
+      case "Dummy"  => generateHedges
+      case "Random" => generateRandomHedges(n)
+      case "File"   => generateFromFile(filename)
+      case _ => generateHedges
     }
+
+    if(debug){
+      save("/tmp/edgesH.wkt"){
+        hedges.map{ d => s"${d.wkt}\t${d.tag}\n" }
+      }
+    }
+
+    sweepline(hedges, debug).foreach{println}
+  }
+
+  def sweepline(hedges: List[Half_edge], debug: Boolean = false)
+    (implicit geofactory: GeometryFactory): List[Point] = {
 
     val event_points = hedges.zipWithIndex.map{ case(h, id) =>
       val left  = EventPoint(List(h), LEFT_ENDPOINT,  id)
       val right = EventPoint(List(h), RIGHT_ENDPOINT, id)
       List( left, right )
     }.flatten
+
     val scheduler: PriorityQueue[EventPoint] =
       PriorityQueue( event_points: _* )(EventPoint_Ordering)
-    save("/tmp/edgesE.wkt"){
-      scheduler.clone.dequeueAll.zipWithIndex.map{ case(e, t) =>
-        val x = e.getEventPoint.x
-        val y = e.getEventPoint.y
-        val h = e.head
-        s"${h.wkt}\t${t}\t${h.tag}\t${e.id}\t${x}\t${y}\t${e.event}\n"
+
+    if(debug){
+      save("/tmp/edgesE.wkt"){
+        scheduler.clone.dequeueAll.zipWithIndex.map{ case(e, t) =>
+          val x = e.getEventPoint.x
+          val y = e.getEventPoint.y
+          val h = e.head
+          s"${h.wkt}\t${t}\t${h.tag}\t${e.id}\t${x}\t${y}\t${e.event}\n"
+        }
       }
     }
     
     val status: AVLTreeST[StatusKey, StatusKey] = new AVLTreeST[StatusKey, StatusKey]()
     val alpha: Queue[(StatusKey, StatusKey)] = new Queue() 
+    var I = new ListBuffer[Point]()
 
-    while(!scheduler.isEmpty){
-
+    val n = hedges.size
+    val max = n * (n - 1) / 2.0
+    var j = 0
+    while(!scheduler.isEmpty && j < max){
       val point = scheduler.dequeue
       val tag = point.event match {
         case LEFT_ENDPOINT => {
@@ -74,8 +96,8 @@ object BSTreeTest{
           else
             (s1_prime, s2_prime)
 
-          val s3 = StatusKey.above(status, s1)
-          val s4 = StatusKey.below(status, s2)
+          val s3 = s1.above(status)
+          val s4 = s2.below(status)
 
           if( s2.intersects(s3) ) alpha.enqueue( (s2, s3.get) )
           if( s1.intersects(s4) ) alpha.enqueue( (s1, s4.get) ) 
@@ -94,14 +116,18 @@ object BSTreeTest{
         val intersection = s1.intersection(s2)
         val point = EventPoint(List(s1.hedge, s2.hedge), INTERSECTION,  -1, intersection)
         if(scheduler.exists(_ == point) == false){
-          val wkt = geofactory.createPoint(point.intersection).toText()
+          val i = geofactory.createPoint(point.intersection)
+          I.append(i)
           scheduler.enqueue(point)
-          inters.append(s" (${point.head.tag}, ${point.last.tag}, ${wkt})")
+          inters.append(s" (${point.head.tag}, ${point.last.tag}, ${i.toText})")
         }
       }
 
-      printStatus(status, point, tag, inters)
+      if(debug) printStatus(status, point, tag, inters)
+      j = j + 1
     }
+
+    I.toList.distinct
   }
 
   def printStatus(status: AVLTreeST[StatusKey, StatusKey], point: EventPoint, tag: String,
@@ -117,12 +143,38 @@ object BSTreeTest{
     println(f"${point.event}%15s ${tag}%10s ${coords}%15s [${out}%25s] ${inters.toString}")
   }
 
-  def getCell(implicit geofactory: GeometryFactory): Cell = {
-    val a = new Coordinate( 0, 0)
-    val b = new Coordinate(10, 0)
-    val c = new Coordinate(10,10)
-    val d = new Coordinate( 0,10)
-    Cell(0, "0", geofactory.createLinearRing(Array(a,b,c,d,a)))
+  def generateFromFile(filename: String)(implicit geofactory: GeometryFactory): List[Half_edge] = {
+    import scala.io.Source
+    import com.vividsolutions.jts.io.WKTReader
+    import com.vividsolutions.jts.geom.LineString
+
+    val reader = new WKTReader(geofactory)
+    val buffer = Source.fromFile(filename)
+    val hedges = buffer.getLines.map{ line =>
+      val arr = line.split("\t")
+      val linestring = reader.read(arr(0)).asInstanceOf[LineString]
+      val hedge = Half_edge(linestring)
+      hedge.tag = arr(1)
+      hedge
+    }.toList
+    buffer.close
+
+    hedges
+  }
+
+  def generateRandomHedges(n: Int, factor: Double = 1000.0)
+    (implicit geofactory: GeometryFactory): List[Half_edge] = {
+
+    import scala.util.Random
+
+    (0 to n).map{ x =>
+      val v1 = new Coordinate(Random.nextDouble() * factor, Random.nextDouble() * factor)
+      val v2 = new Coordinate(Random.nextDouble() * factor, Random.nextDouble() * factor)
+      val l  = geofactory.createLineString(Array(v1, v2))
+      val h  = Half_edge(l)
+      h.tag = x.toString
+      h
+    }.toList
   }
 
   def generateHedges(implicit geofactory: GeometryFactory): List[Half_edge] = {
