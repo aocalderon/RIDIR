@@ -19,7 +19,7 @@ import org.apache.spark.TaskContext
 import com.google.common.collect.TreeMultiset
 
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge, Tag, Cell}
-import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering, SL_Hedge}
+import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering}
 import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, RIGHT_ENDPOINT, INTERSECTION}
 import edu.ucr.dblab.sdcel.geometries.{Label, A, B}
 import Utils._
@@ -72,83 +72,6 @@ object DCELMerger2 {
             val enum = s.hedges.head.getLabelEnum
 
             s"${sweepline}\t$t\t${s.event}\t${s.id}\t${coord.x}\t${enum}\n"
-          }
-        }
-
-        case class StatusRecord(t: Int, i: Int, slHedge: SL_Hedge, c: Coordinate, id: Int)
-        val SweepLine_Status: TreeMultiset[SL_Hedge] = TreeMultiset.create()
-        val Alpha = Queue[(SL_Hedge, SL_Hedge)]()
-
-        var t = 0
-        val buffer = scala.collection.mutable.ListBuffer[StatusRecord]()
-        val status_buffer = scala.collection.mutable.ListBuffer[Int]()
-
-        while(!EventPoint_Scheduler.isEmpty){
-          val p = EventPoint_Scheduler.dequeue
-          if(p.event == LEFT_ENDPOINT){
-            val h = SL_Hedge(p.hedges.head, p)
-            SweepLine_Status.add(h)
-            status_buffer.append(h.p.id)
-            val h1 = SL_Hedge.above(SweepLine_Status, h)
-            val h2 = SL_Hedge.below(SweepLine_Status, h)
-            if(SL_Hedge.intersects(h, h1)) Alpha.enqueue( (h, h1.get) )
-            if(SL_Hedge.intersects(h, h2)) Alpha.enqueue( (h, h2.get) )
-          } else {
-            if(p.event == RIGHT_ENDPOINT){
-              val h = SL_Hedge(p.hedges.head, p)
-              val h1 = SL_Hedge.above(SweepLine_Status, h)
-              val h2 = SL_Hedge.below(SweepLine_Status, h)
-              val point = p.getEventPoint
-              if(SL_Hedge.intersects(h1, h2, point)) Alpha.enqueue( (h1.get, h2.get) )
-              SweepLine_Status.remove(h)
-              status_buffer.remove(status_buffer.indexOf(h.p.id))
-              print(s"Size: [${SweepLine_Status.size()}] ID: [${h.p.id}] Event: [${p.event}] ")
-              println(s"Status: [${status_buffer.toList.sorted.mkString(" ")}]")
-            } else {
-              /*
-              val h1_prime = SL_Hedge(p.hedges.head, p)
-              val h2_prime = SL_Hedge(p.hedges.last, p)
-              val (h1, h2) = SL_Hedge.sortByTheLeftOf(h1_prime, h2_prime)
-              val h3 = SL_Hedge.above(SweepLine_Status, h1)
-              val h4 = SL_Hedge.below(SweepLine_Status, h2)
-              if(SL_Hedge.intersects(h2, h3)) Alpha.enqueue( (h2, h3.get) )
-              if(SL_Hedge.intersects(h1, h4)) Alpha.enqueue( (h1, h4.get) )
-               */
-            }
-          }
-          /*
-          while(!Alpha.isEmpty){
-            val (h1, h2) = Alpha.dequeue
-            h1.intersection2(h2).foreach{ intersection =>
-              val x = intersection.x
-              val X = PS_Segment(List(h1.hedge,h2.hedge), INTERSECTION, -1, intersection)
-              if(EventPoint_Scheduler.exists(_ == X) == false){
-                val wkt = geofactory.createPoint(intersection).toText
-                println(s"${wkt}\t${h1.wkt}\t${h2.wkt}")
-                EventPoint_Scheduler.enqueue(X)
-              }
-
-            }
-          }
-           */
-          val status = SweepLine_Status.asScala.zipWithIndex.map{ case(h, i) =>
-            StatusRecord(t, i, h, p.getEventPoint, p.id)
-          }.toList.sortBy(_.i)
-          buffer.append(status: _*)
-          
-          t = t + 1
-        }
-
-        //Alpha.map{ case(a,b) => a.edge.intersection(b.edge).toText()}.foreach{println}
-
-        save("/tmp/edgesStatus.wkt"){
-          buffer.toList.map{ record =>
-            val t   = record.t
-            val i   = record.i
-            val id  = record.id
-            val wkt = record.slHedge.hedge.wkt
-
-            s"$wkt\t$t\t$i\t$id\n"
           }
         }
       }

@@ -1,7 +1,7 @@
 package edu.ucr.dblab.debug
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate, Point}
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, StatusKey}
+import edu.ucr.dblab.sdcel.geometries.{Half_edge, StatusKey, StatusValue, Sweep, Seg}
 import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering, CoordYX_Ordering}
 import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, INTERSECTION, RIGHT_ENDPOINT}
 import edu.ucr.dblab.sdcel.Utils.save
@@ -11,10 +11,11 @@ import scala.collection.JavaConverters._
 object BSTreeTest{
   def main(args: Array[String]) = {
     implicit val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000.0))
+    
     val debug: Boolean = true
-    val method: String = "File"
+    val method: String = "Random"
     val filename: String = "/home/acald013/tmp/edgesH.wkt"
-    val n: Int = 20
+    val n: Int = 250
 
     val hedges = method match {
       case "Dummy"  => generateHedges
@@ -41,11 +42,11 @@ object BSTreeTest{
       List( left, right )
     }.flatten
 
-    val scheduler: PriorityQueue[EventPoint] =
+    implicit val scheduler: PriorityQueue[EventPoint] =
       PriorityQueue( event_points: _* )(EventPoint_Ordering)
 
     if(debug){
-      save("/tmp/edgesE.wkt"){
+      save("/tmp/edgesScheduler.wkt"){
         scheduler.clone.dequeueAll.zipWithIndex.map{ case(e, t) =>
           val x = e.getEventPoint.x
           val y = e.getEventPoint.y
@@ -53,10 +54,44 @@ object BSTreeTest{
           s"${h.wkt}\t${t}\t${h.tag}\t${e.id}\t${x}\t${y}\t${e.event}\n"
         }
       }
+      save("/tmp/edgesStatus.wkt"){
+        val sweeps = scheduler.clone.dequeueAll.zipWithIndex.map{ case(e, t) =>
+          val x = e.getEventPoint.x
+          val c = Array(new Coordinate(x, 0), new Coordinate(x,1000))
+          val sweep = geofactory.createLineString(c)
+          sweep.setUserData(t)
+          sweep
+        }
+
+        val _join = for {
+          sweep <- sweeps
+          hedge <- hedges if (sweep.intersects(hedge.edge))
+            } yield {
+          val inter = sweep.intersection(hedge.edge).getCoordinates.head
+          (sweep.toText, hedge.tag, inter, sweep.getUserData.asInstanceOf[Int])
+        }
+        val r = _join.groupBy(_._1).map{ case(key, values) =>
+          (s"""${key}\t${values.sortBy(_._3.y).map(_._2).mkString(" ")}\n""", values.map(_._4).head)
+        }.toList.sortBy(_._2).map(_._1)
+
+        r
+      }
     }
-    
-    val status: AVLTreeST[StatusKey, StatusKey] = new AVLTreeST[StatusKey, StatusKey]()
-    val alpha: Queue[(StatusKey, StatusKey)] = new Queue() 
+
+    val edges = hedges.map{ hedge =>
+      Seg(hedge).edge
+    }
+    import edu.ucr.dblab.bo.BentleyOttmann
+    val intersector = new BentleyOttmann(edges.asJava)
+    save("/tmp/edgesI.wkt"){
+      intersector.get_intersections.asScala.zipWithIndex.map{ case (intersect, id)  =>
+        val wkt = geofactory.createPoint(intersect.asJTSCoordinate()).toText
+        s"$wkt\t$id\n"
+      }
+    }
+
+    implicit val status: AVLTreeST[StatusKey, StatusValue] = new AVLTreeST[StatusKey, StatusValue]()
+    val alpha: Queue[(StatusValue, StatusValue)] = new Queue() 
     var I = new ListBuffer[Point]()
 
     val n = hedges.size
@@ -64,18 +99,22 @@ object BSTreeTest{
     var j = 0
     while(!scheduler.isEmpty && j < max){
       val point = scheduler.dequeue
+      implicit val sweep: Sweep = Sweep(point.getEventPoint.x)
       val tag = point.event match {
         case LEFT_ENDPOINT => {
-          val s = StatusKey(point.head, point.head.left)
-          status.put(s, s)
+          val h = point.head
+          val s = StatusKey(h.left, h.right, h.tag)
+          val value = StatusValue(s, h)
+          status.put(s, value)
           val s1 = s.above(status)
           val s2 = s.below(status)
-          if( s.intersects(s1) ) alpha.enqueue( (s1.get, s) ) 
-          if( s.intersects(s2) ) alpha.enqueue( ( s,s2.get) )
+          if( s.intersects(s1) ) alpha.enqueue( (s1.get, value) ) 
+          if( s.intersects(s2) ) alpha.enqueue( (s2.get, value) )
           s"PUT $s"
         }
         case RIGHT_ENDPOINT => {
-          val s = StatusKey(point.head, point.head.left)
+          val h = point.head
+          val s = StatusKey(h.left, h.right, h.tag)
           val s1 = s.above(status)
           val s2 = s.below(status)
           val p = point.getEventPoint
@@ -88,23 +127,48 @@ object BSTreeTest{
           val p = point.getEventPoint
           val h1 = hedges(0)
           val h2 = hedges(1)
-          val s1_prime = StatusKey(h1, h1.left)
-          val s2_prime = StatusKey(h2, h2.left)
+          val s1_prime = StatusKey(h1.left, h1.right, h1.tag)
+          val s2_prime = StatusKey(h2.left, h2.right, h2.tag)
 
           val (s1, s2) = if(StatusKey.above(s1_prime, s2_prime.left, s2_prime.right))
-            (s2_prime, s1_prime)
+            (status.get(s2_prime), status.get(s1_prime))
           else
-            (s1_prime, s2_prime)
+            (status.get(s1_prime), status.get(s2_prime))
 
-          val s3 = s1.above(status)
-          val s4 = s2.below(status)
+          if(debug){
+            println(s"s1: ${s1}")
+            println(s"s2: ${s2}")
+          }
 
-          if( s2.intersects(s3) ) alpha.enqueue( (s2, s3.get) )
-          if( s1.intersects(s4) ) alpha.enqueue( (s1, s4.get) ) 
+          val s3 = StatusKey.above(s1)
+          val s4 = StatusKey.below(s2)
 
-          val temp = status.get(s1)
-          status.put(s1, s2)
-          status.put(s2, temp)
+          if(debug){
+            println(s"s3: ${s3}")
+            println(s"s4: ${s4}")
+          }
+
+          if( s2.key.intersects(s3) ){
+            if(debug) println(s"Intersection between s2($s2) and s3($s3)")
+            alpha.enqueue( (s2, s3.get) )
+          }
+          if( s1.key.intersects(s4) ){
+            if(debug) println(s"Intersection between s1($s1) and s4($s4)")
+            alpha.enqueue( (s1, s4.get) )
+          }
+
+          val s1Value = s1
+          println(s"s1Value: $s1Value")
+          val s2Value = s2
+          println(s"s2Value: $s2Value")
+          status.delete(s1_prime)
+          printStatus(point, s"DEL $s1_prime")
+          status.delete(s2_prime)
+          printStatus(point, s"DEL $s2_prime")
+          status.put(s1.key, s1Value)
+          printStatus(point, s"PUT $s1Value")
+          status.put(s2.key, s2Value)
+          printStatus(point, s"PUT $s2Value")
 
           s"INT $s1 $s2"
         }
@@ -113,25 +177,28 @@ object BSTreeTest{
       val inters = new StringBuffer()
       while(!alpha.isEmpty){
         val (s1, s2) = alpha.dequeue
-        val intersection = s1.intersection(s2)
+        val intersection = s1.key.intersection(s2)
         val point = EventPoint(List(s1.hedge, s2.hedge), INTERSECTION,  -1, intersection)
         if(scheduler.exists(_ == point) == false){
           val i = geofactory.createPoint(point.intersection)
           I.append(i)
-          scheduler.enqueue(point)
+          //scheduler.enqueue(point)
           inters.append(s" (${point.head.tag}, ${point.last.tag}, ${i.toText})")
         }
       }
 
-      if(debug) printStatus(status, point, tag, inters)
+      if(debug) printStatus(point, tag, inters)
       j = j + 1
+
+      if(point.getEventPoint.x == 205.81 && point.getEventPoint.y == 211.005)
+        System.exit(0)
     }
 
     I.toList.distinct
   }
 
-  def printStatus(status: AVLTreeST[StatusKey, StatusKey], point: EventPoint, tag: String,
-    inters: StringBuffer): Unit = {
+  def printStatus(point: EventPoint, tag: String, inters: StringBuffer = new StringBuffer())
+      (implicit status: AVLTreeST[StatusKey, StatusValue], geofactory: GeometryFactory): Unit = {
 
     val p = point.getEventPoint
     val coords = s"(${p.x}, ${p.y})"
@@ -140,7 +207,7 @@ object BSTreeTest{
       value.hedge.tag
     }.mkString(" ")
 
-    println(f"${point.event}%15s ${tag}%10s ${coords}%15s [${out}%25s] ${inters.toString}")
+    println(f"${point.event}%15s ${tag}%10s ${coords}%15s [${out}] ${inters.toString}")
   }
 
   def generateFromFile(filename: String)(implicit geofactory: GeometryFactory): List[Half_edge] = {

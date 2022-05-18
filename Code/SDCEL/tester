@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 CLASS=$1
+ARGS=$2
 
 EXECUTORS=12
 CORES=9
@@ -16,7 +17,7 @@ PARAMS=(
     --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar \
     --master $MASTER --deploy-mode client \
     --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
-    --class $CLASS $JAR 
+    --class $CLASS $JAR $ARGS
 )
 echo "spark-submit ${PARAMS[@]}"
 spark-submit ${PARAMS[@]}
