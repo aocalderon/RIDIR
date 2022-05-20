@@ -14,6 +14,7 @@ public class Segment {
     private Point p_1;
     private Point p_2;
     double value;
+    String label;
 
     public Segment(Point p_1, Point p_2) {
         this.p_1 = p_1;
@@ -53,6 +54,14 @@ public class Segment {
         return this.value;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return this.label;
+    }
+
     public com.vividsolutions.jts.geom.LineString asJTSLine() {
 	GeometryFactory geofactory = new GeometryFactory(new PrecisionModel(1000.0));
 	Coordinate p1 = this.p_1.asJTSCoordinate();
@@ -60,7 +69,14 @@ public class Segment {
 	Coordinate[] arr = new Coordinate[2]; 
 	arr[0] = p1;
 	arr[1] = p2;
-	return geofactory.createLineString(arr);
+	LineString line = geofactory.createLineString(arr);
+	line.setUserData(this.label);
+	return line;
     }
 
+    @Override
+    public String toString() {
+	return "" + this.asJTSLine() + "\t" + this.value;
+    }
+    
 }

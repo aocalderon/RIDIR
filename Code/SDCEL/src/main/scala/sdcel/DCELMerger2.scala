@@ -39,41 +39,19 @@ object DCELMerger2 {
     if(settings.debug){
       val pid = TaskContext.getPartitionId
       if(pid == 113){
+        import edu.ucr.dblab.bo.BentleyOttmann
+
         val nha = ha.length
         val nhb = hb.length
-        val baseLabel = if( nha > nhb ) A else B
+        val (hs1, hs2, baseLabel) = if( nha > nhb ) (ha, hb, A) else (hb, ha, B)
         println(s"Segments as base: ${if(baseLabel == A) nha else nhb}")
         println(s"Segments to add:  ${if(baseLabel == A) nhb else nha}")
 
-        val sl_segments = (ha ++ hb).zipWithIndex.map{ case(h, id) =>
-          val left  = EventPoint(List(h), LEFT_ENDPOINT,  id)
-          val right = EventPoint(List(h), RIGHT_ENDPOINT, id)
-          List( left, right )
-        }.flatten
+        // 1. Feed scheduler with hs1 + hs2...
+        // 2. Push from scheduler just points from hs2...
+        // 3. Keep in status just segments from hs1...
+        // 4. Report...
 
-        val EventPoint_Scheduler: PriorityQueue[EventPoint] =
-          PriorityQueue( sl_segments: _* )(EventPoint_Ordering)
-        
-        save("/tmp/edgesE.wkt"){
-          EventPoint_Scheduler.clone.dequeueAll.zipWithIndex.map{ case(s, t) =>
-            val x = s.getEventPoint.x
-            val y = s.getEventPoint.y
-            s"${s.hedges.head.wkt}\t${t}\t${s.id}\t${x}\t${y}\t${s.event}\n"
-          }
-        }
-        save("/tmp/edgesL.wkt"){
-          EventPoint_Scheduler.clone().dequeueAll.zipWithIndex.map{ case(s, t) =>
-            val envelope = cells(pid).mbr.getEnvelopeInternal
-            val maxy = envelope.getMaxY
-            val miny = envelope.getMinY
-            val coord = s.getEventPoint
-            val arr = Array(new Coordinate(coord.x, miny), new Coordinate(coord.x, maxy))
-            val sweepline = geofactory.createLineString(arr).toText
-            val enum = s.hedges.head.getLabelEnum
-
-            s"${sweepline}\t$t\t${s.event}\t${s.id}\t${coord.x}\t${enum}\n"
-          }
-        }
       }
     }
 

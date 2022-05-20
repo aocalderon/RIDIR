@@ -17,20 +17,26 @@ import edu.ucr.dblab.sdcel.geometries.{LEFT_ENDPOINT, INTERSECTION, RIGHT_ENDPOI
 import edu.ucr.dblab.sdcel.Utils.{save, logger}
 
 object BO {
-
   def main(args: Array[String]): Unit = {
-    implicit val geofactory: GeometryFactory = new GeometryFactory(new PrecisionModel(1000.0))
     val params = new BOConf(args)
-    val debug: Boolean   = params.debug()
-    val method: String   = params.method()
-    val filename: String = params.filename()
-    val n: Int = params.n()
-    val runId: Int = params.runid()
 
-    println(s"METHOD: $method")
-    println(s"DEBUG:  $debug")
-    println(s"N:      $n")
-    println(s"FILE:   $filename")
+    val debug: Boolean    = params.debug()
+    val method: String    = params.method()
+    val filename: String  = params.filename()
+    val n: Int            = params.n()
+    val runId: Int        = params.runid()
+    val tolerance: Double = params.tolerance()
+    val scale: Double     = 1 / tolerance
+
+    implicit val model: PrecisionModel = new PrecisionModel(scale)
+    implicit val geofactory: GeometryFactory = new GeometryFactory(model)
+
+    println(s"METHOD:     $method   ")
+    println(s"TOLERANCE:  $tolerance")
+    println(s"SCALE:      ${geofactory.getPrecisionModel.getScale}")
+    println(s"N:          $n        ")
+    println(s"FILE:       $filename ")
+    println(s"DEBUG:      $debug    ")
 
     val hedges = method match {
       case "Dummy"  => generateHedges
@@ -224,11 +230,12 @@ object BO {
 import org.rogach.scallop._
 
 class BOConf(args: Seq[String]) extends ScallopConf(args) {
-  val debug: ScallopOption[Boolean]   = opt[Boolean] (default = Some(true))
-  val method: ScallopOption[String]   = opt[String]  (default = Some("Random"))
-  val filename: ScallopOption[String] = opt[String]  (default = Some("/home/acald013/tmp/edgesH.wkt")) 
-  val n: ScallopOption[Int]           = opt[Int]     (default = Some(250))
-  val runid: ScallopOption[Int]       = opt[Int]     (default = Some(0))
+  val debug: ScallopOption[Boolean]    = opt[Boolean] (default = Some(true))
+  val method: ScallopOption[String]    = opt[String]  (default = Some("Random"))
+  val filename: ScallopOption[String]  = opt[String]  (default = Some("edgesH.wkt")) 
+  val tolerance: ScallopOption[Double] = opt[Double]  (default = Some(1e-3))
+  val n: ScallopOption[Int]            = opt[Int]     (default = Some(250))
+  val runid: ScallopOption[Int]        = opt[Int]     (default = Some(0))
 
   verify()
 }

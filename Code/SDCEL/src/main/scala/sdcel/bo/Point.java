@@ -39,4 +39,9 @@ public class Point {
     public Coordinate asJTSCoordinate() {
 	return new Coordinate(this.x_coord, this.y_coord);
     }
+
+    @Override
+    public String toString() {
+	return "POINT (" + x_coord + " " + y_coord + ")";
+    }
 }

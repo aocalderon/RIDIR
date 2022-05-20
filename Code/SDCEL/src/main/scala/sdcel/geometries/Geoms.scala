@@ -30,6 +30,8 @@ case class Seg(hedge: Half_edge) {
     val p2 = new BOPoint(hedge.right.x, hedge.right.y)
     new BOSegment(p1, p2)
   }
+
+  override def toString: String = s"$edge"
 }
 
 object EmptyCoordinate {
