@@ -20,10 +20,12 @@ import com.google.common.collect.TreeMultiset
 
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge, Tag, Cell}
 import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering}
-import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, RIGHT_ENDPOINT, INTERSECTION}
+import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, RIGHT_ENDPOINT, INTERSECT}
 import edu.ucr.dblab.sdcel.geometries.{Label, A, B}
+import edu.ucr.dblab.debug.BO2._
 import Utils._
 import PartitionReader.{envelope2polygon}
+
 import org.slf4j.{Logger, LoggerFactory}
 
 object DCELMerger2 {
@@ -47,12 +49,26 @@ object DCELMerger2 {
         println(s"Segments as base: ${if(baseLabel == A) nha else nhb}")
         println(s"Segments to add:  ${if(baseLabel == A) nhb else nha}")
 
-        // 1. Feed scheduler with hs1 + hs2...
-        
-        // 2. Push from scheduler just points from hs2...
-        // 3. Keep in status just segments from hs1...
-        // 4. Report...
+        save("/tmp/edgesHS1.wkt"){
+          hs1.map{h => s"${h.wkt}\t${h.id}\n"}
+        }
+        save("/tmp/edgesHS2.wkt"){
+          hs2.map{h => s"${h.wkt}\t${h.id}\n"}
+        }
 
+        val inters1 = sweepline2(hs1, hs2)
+        val inters2 = sweeplineJTS2(hs1, hs2)
+
+        save("/tmp/edgesI1.wkt"){
+          inters1.map{ i =>
+            s"${i.point.toText}\t${i.lines.mkString("\t")}\n"
+          }
+        }
+        save("/tmp/edgesI2.wkt"){
+          inters2.map{ i =>
+            s"${i.toText}\n"
+          }
+        }
       }
     }
 

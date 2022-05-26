@@ -27,7 +27,7 @@ public class Main {
         long t2 = System.currentTimeMillis();
 
         test.print_intersections();
-        ArrayList<Point> intersections = test.get_intersections();
+        ArrayList<Intersection> intersections = test.get_intersections();
 
         //new GUI(data, intersections);
 

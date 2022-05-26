@@ -10,7 +10,7 @@ EMEMORY=32g
 SPARK_JARS=${HOME}/Spark/2.4/jars/
 JAR=${HOME}/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
-MASTER=local[10]
+MASTER=local[1]
 PARAMS=(
     --files $LOG_FILE \
     --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \

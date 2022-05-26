@@ -1,5 +1,6 @@
 package edu.ucr.dblab.bo;
 
+import com.vividsolutions.jts.geom.LineString;
 import java.util.*;
 
 /**
@@ -59,4 +60,16 @@ public class Event {
         return this.value;
     }
 
+    @Override
+    public String toString() {
+	LineString s_1 = segments.get(0).asJTSLine();
+	double dist = s_1.getLength();
+	String segs = s_1.toString();
+	if(segments.size() == 2) {
+	    LineString s_2 = segments.get(0).asJTSLine();
+	    segs = segs + s_2.toString();
+	}
+	
+	return "" + point + "\t" + dist + "\t" + segs + "\t" + value + "\t" + type;
+    }
 }

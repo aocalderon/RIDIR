@@ -3,7 +3,7 @@ package edu.ucr.dblab.debug
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate, Point}
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, StatusKey, StatusValue, Sweep, Seg}
 import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering, CoordYX_Ordering}
-import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, INTERSECTION, RIGHT_ENDPOINT}
+import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, INTERSECT, RIGHT_ENDPOINT}
 import edu.ucr.dblab.sdcel.Utils.save
 import scala.collection.mutable.{PriorityQueue, ListBuffer}
 import scala.collection.JavaConverters._
@@ -85,7 +85,7 @@ object BSTreeTest{
     val intersector = new BentleyOttmann(edges.asJava)
     save("/tmp/edgesI.wkt"){
       intersector.get_intersections.asScala.zipWithIndex.map{ case (intersect, id)  =>
-        val wkt = geofactory.createPoint(intersect.asJTSCoordinate()).toText
+        val wkt = geofactory.createPoint(intersect.getPoint.asJTSCoordinate()).toText
         s"$wkt\t$id\n"
       }
     }
@@ -122,7 +122,7 @@ object BSTreeTest{
           status.delete(s)
           s"DEL $s"
         }
-        case INTERSECTION => {
+        case INTERSECT => {
           val hedges = point.hedges
           val p = point.getEventPoint
           val h1 = hedges(0)
@@ -178,7 +178,7 @@ object BSTreeTest{
       while(!alpha.isEmpty){
         val (s1, s2) = alpha.dequeue
         val intersection = s1.key.intersection(s2)
-        val point = EventPoint(List(s1.hedge, s2.hedge), INTERSECTION,  -1, intersection)
+        val point = EventPoint(List(s1.hedge, s2.hedge), INTERSECT,  -1, intersection)
         if(scheduler.exists(_ == point) == false){
           val i = geofactory.createPoint(point.intersection)
           I.append(i)

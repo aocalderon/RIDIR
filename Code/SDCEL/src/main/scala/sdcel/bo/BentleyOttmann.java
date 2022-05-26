@@ -1,5 +1,6 @@
 package edu.ucr.dblab.bo;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import java.util.*;
 
 /**
@@ -10,7 +11,8 @@ public class BentleyOttmann {
 
     private Queue<Event> Q;
     private NavigableSet<Segment> T;
-    private ArrayList<Point> X;
+    private ArrayList<Intersection> X;
+    private Boolean debug;
 
     public BentleyOttmann(List<Segment> input_data) {
         this.Q = new PriorityQueue<>(new event_comparator());
@@ -21,6 +23,9 @@ public class BentleyOttmann {
             this.Q.add(new Event(s.second(), s, 1));
         }
     }
+
+    public void debugOn (){ debug = true; }
+    public void debugOff(){ debug = false; }
 
     public void find_intersections() {
         while(!this.Q.isEmpty()) {
@@ -83,36 +88,20 @@ public class BentleyOttmann {
                         this.remove_future(r, s_2);
                     }
                 }
-                this.X.add(e.get_point());
+		Point p = e.get_point();
+                this.X.add(new Intersection(p, s_1, s_2));
                 break;
             }
         }
     }
 
-    private Segment getLowerA(Segment s){
-	Segment r = this.T.lower(s);
-	while( r != null && r.getLabel().equals("A")){
-	    r = this.T.lower(r);
-	}
-	return r;
-    }
-    
-    private Segment getHigherA(Segment s){
-	Segment t = this.T.higher(s);
-	while( t != null && t.getLabel().equals("A") ){
-	    t = this.T.higher(t);
-	}
-	return t;
-    }
-
     public void printStatus() {
-	Iterator it = this.T.iterator();
-	while (it.hasNext()) {
-            System.out.println(it.next());
+        for(Segment s : this.T) {
+            System.out.println("" + s);
         }
     }
 
-    public void findIntersections() {
+    public void findIntersections() {	
         while(!this.Q.isEmpty()) {
             Event e = this.Q.poll();
             double L = e.get_value();
@@ -135,6 +124,8 @@ public class BentleyOttmann {
                         Segment t = this.T.higher(s);
                         this.removeFuture(r, t);
                     }
+		    //printStatus();
+		    //System.out.println();
                 }
                 break;
             case 1:
@@ -179,7 +170,7 @@ public class BentleyOttmann {
 
 		if(s_1.getLabel() == s_2.getLabel()) break;
 
-		this.X.add(e.get_point());
+		this.X.add(new Intersection(e.get_point(), s_1, s_2));
                 break;
             }
         }
@@ -190,6 +181,7 @@ public class BentleyOttmann {
         double y1 = s_1.first().get_y_coord();
         double x2 = s_1.second().get_x_coord();
         double y2 = s_1.second().get_y_coord();
+
         double x3 = s_2.first().get_x_coord();
         double y3 = s_2.first().get_y_coord();
         double x4 = s_2.second().get_x_coord();
@@ -197,14 +189,14 @@ public class BentleyOttmann {
 	
         double r = (x2 - x1) * (y4 - y3) - (y2 - y1) * (x4 - x3);
 
-	if(r != 0) { // Prevent zero division...
+	if(r != 0) { 
             double t = ((x3 - x1) * (y4 - y3) - (y3 - y1) * (x4 - x3)) / r;
             double u = ((x3 - x1) * (y2 - y1) - (y3 - y1) * (x2 - x1)) / r;
 	    
-            if(t >= 0 && t <= 1 && u >= 0 && u <= 1) { // TODO: ?
+            if(t >= 0 && t <= 1 && u >= 0 && u <= 1) { // Find intersection point...
                 double x_c = x1 + t * (x2 - x1);
                 double y_c = y1 + t * (y2 - y1);
-                if(x_c > L) { // Right to the sweep line...
+                if( L < x_c ) { // Right to the sweep line...
 		    Point point = new Point(x_c, y_c);
 		    ArrayList arr = new ArrayList<>(Arrays.asList(s_1, s_2));
 		    // Add to scheduler...
@@ -212,8 +204,9 @@ public class BentleyOttmann {
                     return true;
                 }
             }
-        }
-        return false; // Co-linear?
+        } 
+	
+        return false; // No intersection...
     }
 
     private boolean report_intersection(Segment s_1, Segment s_2, double L) {
@@ -287,17 +280,18 @@ public class BentleyOttmann {
     }
 
     public void print_intersections() {
-        for(Point p : this.X) {
+        for(Intersection i : this.X) {
+	    Point p = i.getPoint();
             System.out.println("(" + p.get_x_coord() + ", " + p.get_y_coord() + ")");
         }
     }
 
-    public ArrayList<Point> getIntersections() {
+    public ArrayList<Intersection> getIntersections() {
 	this.findIntersections();
         return this.X;
     }
 
-    public ArrayList<Point> get_intersections() {
+    public ArrayList<Intersection> get_intersections() {
 	this.find_intersections();
         return this.X;
     }
@@ -305,10 +299,10 @@ public class BentleyOttmann {
     private class event_comparator implements Comparator<Event> {
         @Override
         public int compare(Event e_1, Event e_2) {
-            if(e_1.get_value() > e_2.get_value()) {
+            if( e_1.get_value() > e_2.get_value() ) {
                 return 1;
             }
-            if(e_1.get_value() < e_2.get_value()) {
+            if( e_1.get_value() < e_2.get_value() ) {
                 return -1;
             }
             return 0;
