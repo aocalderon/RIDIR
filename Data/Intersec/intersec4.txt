@@ -1,0 +1,443 @@
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:48:35,195|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:48:35,202|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:48:35,941|746|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:48:35,969|774|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:48:36,142|947|Saved /tmp/edgesI1.wkt in 0.02s [9553 records].
+2022-05-24 10:48:36,594|1399|Saved /tmp/edgesI2.wkt in 0.01s [9553 records].
+Number of intersections: Is 9553 == 9553 ? true
+POINT (23.7635 272.5548)	POINT (23.7635 272.5548)	0.0
+POINT (26.789 449.4495)	POINT (26.789 449.4495)	0.0
+POINT (31.5152 48.618)	POINT (31.5152 48.618)	3.8263897345803626E-14
+POINT (34.9117 382.8258)	POINT (34.9117 382.8258)	0.0
+POINT (34.927 116.5901)	POINT (34.927 116.5901)	2.8421709430404007E-14
+POINT (35.4099 378.7399)	POINT (35.4099 378.7399)	7.105427357601002E-15
+POINT (36.2772 281.491)	POINT (36.2772 281.491)	0.0
+POINT (37.1134 632.7197)	POINT (37.1134 632.7197)	7.105427357601002E-15
+POINT (37.1743 379.2113)	POINT (37.1743 379.2113)	7.105427357601002E-15
+POINT (37.7781 384.0134)	POINT (37.7781 384.0134)	7.105427357601002E-15
+Avg: 4.9325040241737406E-14 Max: 4.320473787097368E-12
+2022-05-24 10:48:36,726|1531|INFO|0|9553|9553|4.320473787097368E-12|4.712021094293174E-10|9553|4.9325040241737406E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:48:39,970|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:48:39,976|6|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:48:40,754|784|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:48:40,780|810|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:48:40,933|963|Saved /tmp/edgesI1.wkt in 0.01s [9385 records].
+2022-05-24 10:48:41,358|1388|Saved /tmp/edgesI2.wkt in 0.01s [9385 records].
+Number of intersections: Is 9385 == 9385 ? true
+POINT (12.4511 679.2133)	POINT (12.4511 679.2133)	1.7763568394002505E-15
+POINT (12.9626 633.0204)	POINT (12.9626 633.0204)	0.0
+POINT (16.934 274.3095)	POINT (16.934 274.3095)	3.552713678800501E-15
+POINT (18.0265 175.6405)	POINT (18.0265 175.6405)	2.864289338439558E-14
+POINT (18.3004 150.897)	POINT (18.3004 150.897)	2.8421709430404007E-14
+POINT (18.6818 116.4485)	POINT (18.6818 116.4485)	5.6843418860808015E-14
+POINT (24.3071 114.2672)	POINT (24.3071 114.2672)	7.32410687763558E-14
+POINT (25.4934 722.8593)	POINT (25.4934 722.8593)	0.0
+POINT (28.1618 586.6617)	POINT (28.1618 586.6617)	0.0
+POINT (29.6123 504.6666)	POINT (29.6123 504.6666)	5.6843418860808015E-14
+Avg: 4.866233897053217E-14 Max: 1.6484591469634324E-12
+2022-05-24 10:48:41,483|1513|INFO|0|9385|9385|1.6484591469634324E-12|4.5669605123844444E-10|9385|4.866233897053217E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:48:44,671|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:48:44,678|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:48:45,385|714|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:48:45,422|751|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:48:45,558|887|Saved /tmp/edgesI1.wkt in 0.01s [8066 records].
+2022-05-24 10:48:46,017|1346|Saved /tmp/edgesI2.wkt in 0.01s [8066 records].
+Number of intersections: Is 8066 == 8066 ? true
+POINT (17.8539 770.6258)	POINT (17.8539 770.6258)	3.552713678800501E-15
+POINT (22.5378 701.8284)	POINT (22.5378 701.8284)	3.552713678800501E-15
+POINT (26.9453 637.0884)	POINT (26.9453 637.0884)	3.552713678800501E-15
+POINT (28.1536 619.3405)	POINT (28.1536 619.3405)	3.552713678800501E-15
+POINT (29.0353 806.0804)	POINT (29.0353 806.0804)	3.552713678800501E-15
+POINT (30.4603 560.5425)	POINT (30.4603 560.5425)	0.0
+POINT (33.0838 431.393)	POINT (33.0838 431.393)	0.0
+POINT (34.1709 377.8787)	POINT (34.1709 377.8787)	0.0
+POINT (34.3906 367.0632)	POINT (34.3906 367.0632)	0.0
+POINT (35.7796 368.7752)	POINT (35.7796 368.7752)	1.4210854715202004E-14
+Avg: 4.680286710034373E-14 Max: 1.892126076324216E-12
+2022-05-24 10:48:46,135|1464|INFO|0|8066|8066|1.892126076324216E-12|3.775119260313725E-10|8066|4.680286710034373E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:48:49,515|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:48:49,521|6|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:48:50,234|719|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:48:50,258|743|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:48:50,447|932|Saved /tmp/edgesI1.wkt in 0.03s [9696 records].
+2022-05-24 10:48:50,932|1417|Saved /tmp/edgesI2.wkt in 0.01s [9696 records].
+Number of intersections: Is 9696 == 9696 ? true
+POINT (7.392 134.3801)	POINT (7.392 134.3801)	2.8421709430404007E-14
+POINT (10.2502 744.5984)	POINT (10.2502 744.5984)	1.7763568394002505E-15
+POINT (19.4319 242.1933)	POINT (19.4319 242.1933)	6.355287432313019E-14
+POINT (21.089 182.9969)	POINT (21.089 182.9969)	0.0
+POINT (26.9071 151.1104)	POINT (26.9071 151.1104)	3.552713678800501E-15
+POINT (33.2707 539.5725)	POINT (33.2707 539.5725)	7.105427357601002E-15
+POINT (33.5829 538.384)	POINT (33.5829 538.384)	1.4210854715202004E-14
+POINT (33.6338 227.5237)	POINT (33.6338 227.5237)	0.0
+POINT (40.6034 194.0032)	POINT (40.6034 194.0032)	0.0
+POINT (40.8359 532.9641)	POINT (40.8359 532.9641)	7.105427357601002E-15
+Avg: 4.769108658293557E-14 Max: 2.3745313426622286E-12
+2022-05-24 10:48:51,077|1562|INFO|0|9696|9696|2.3745313426622286E-12|4.624127755081433E-10|9696|4.769108658293557E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:48:54,183|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:48:54,197|14|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:48:54,896|713|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:48:54,922|739|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:48:55,081|898|Saved /tmp/edgesI1.wkt in 0.01s [8588 records].
+2022-05-24 10:48:55,469|1286|Saved /tmp/edgesI2.wkt in 0.01s [8588 records].
+Number of intersections: Is 8588 == 8588 ? true
+POINT (5.6587 484.7885)	POINT (5.6587 484.7885)	1.7763568394002505E-15
+POINT (26.8416 492.2604)	POINT (26.8416 492.2604)	3.552713678800501E-14
+POINT (28.9268 493.5079)	POINT (28.9268 493.5079)	3.552713678800501E-15
+POINT (29.6375 258.7526)	POINT (29.6375 258.7526)	0.0
+POINT (29.9113 256.1716)	POINT (29.9113 256.1716)	5.695433295429594E-14
+POINT (31.6032 479.2903)	POINT (31.6032 479.2903)	3.552713678800501E-15
+POINT (32.8541 228.4314)	POINT (32.8541 228.4314)	7.105427357601002E-15
+POINT (35.0276 259.1771)	POINT (35.0276 259.1771)	7.105427357601002E-15
+POINT (36.4718 266.1892)	POINT (36.4718 266.1892)	7.105427357601002E-15
+POINT (37.9018 231.9846)	POINT (37.9018 231.9846)	6.07087979554246E-14
+Avg: 4.7211967600429337E-14 Max: 1.5722112818752215E-12
+2022-05-24 10:48:55,588|1405|INFO|0|8588|8588|1.5722112818752215E-12|4.054563777524871E-10|8588|4.7211967600429337E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:48:58,954|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:48:58,963|9|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:48:59,743|789|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:48:59,769|815|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:48:59,924|970|Saved /tmp/edgesI1.wkt in 0.01s [9096 records].
+2022-05-24 10:49:00,390|1436|Saved /tmp/edgesI2.wkt in 0.01s [9096 records].
+Number of intersections: Is 9096 == 9096 ? true
+POINT (18.513 189.8464)	POINT (18.513 189.8464)	2.864289338439558E-14
+POINT (23.9031 828.3336)	POINT (23.9031 828.3336)	3.552713678800501E-15
+POINT (36.4226 675.3797)	POINT (36.4226 675.3797)	7.105427357601002E-15
+POINT (36.4535 799.5547)	POINT (36.4535 799.5547)	1.4210854715202004E-14
+POINT (37.1904 179.3857)	POINT (37.1904 179.3857)	0.0
+POINT (42.4769 95.2262)	POINT (42.4769 95.2262)	7.105427357601002E-15
+POINT (44.0404 623.8007)	POINT (44.0404 623.8007)	0.0
+POINT (46.1159 743.9914)	POINT (46.1159 743.9914)	0.0
+POINT (48.1587 173.2426)	POINT (48.1587 173.2426)	7.105427357601002E-15
+POINT (49.3928 253.3432)	POINT (49.3928 253.3432)	2.929642751054232E-14
+Avg: 4.499840420616495E-14 Max: 1.8331451766013172E-12
+2022-05-24 10:49:00,553|1599|INFO|0|9096|9096|1.8331451766013172E-12|4.0930548465927635E-10|9096|4.499840420616495E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:03,640|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:03,649|9|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:04,398|758|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:04,423|783|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:04,587|947|Saved /tmp/edgesI1.wkt in 0.01s [9795 records].
+2022-05-24 10:49:05,013|1373|Saved /tmp/edgesI2.wkt in 0.01s [9795 records].
+Number of intersections: Is 9795 == 9795 ? true
+POINT (12.7725 57.4972)	POINT (12.7725 57.4972)	1.7763568394002505E-15
+POINT (14.9975 55.8244)	POINT (14.9975 55.8244)	7.105427357601002E-15
+POINT (19.4647 52.466)	POINT (19.4647 52.466)	0.0
+POINT (24.6051 48.6014)	POINT (24.6051 48.6014)	3.552713678800501E-15
+POINT (30.1389 242.425)	POINT (30.1389 242.425)	4.263256414560601E-14
+POINT (34.2139 477.0376)	POINT (34.2139 477.0376)	1.4210854715202004E-14
+POINT (34.7593 476.3305)	POINT (34.7593 476.3305)	0.0
+POINT (37.3703 369.9339)	POINT (37.3703 369.9339)	8.526512829121202E-14
+POINT (40.2625 691.3786)	POINT (40.2625 691.3786)	1.4210854715202004E-14
+POINT (41.8635 842.8135)	POINT (41.8635 842.8135)	7.105427357601002E-15
+Avg: 4.8463759836181485E-14 Max: 1.6795282479840987E-12
+2022-05-24 10:49:05,124|1484|INFO|0|9795|9795|1.6795282479840987E-12|4.747025275953977E-10|9795|4.8463759836181485E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:08,407|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:08,414|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:09,210|803|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:09,236|829|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:09,409|1002|Saved /tmp/edgesI1.wkt in 0.02s [10223 records].
+2022-05-24 10:49:09,889|1482|Saved /tmp/edgesI2.wkt in 0.01s [10223 records].
+Number of intersections: Is 10223 == 10223 ? true
+POINT (17.9338 403.469)	POINT (17.9338 403.469)	7.105427357601002E-15
+POINT (44.7816 665.5568)	POINT (44.7816 665.5568)	1.4210854715202004E-14
+POINT (51.3285 412.1947)	POINT (51.3285 412.1947)	2.8421709430404007E-14
+POINT (54.6686 556.4557)	POINT (54.6686 556.4557)	3.552713678800501E-14
+POINT (54.6703 124.208)	POINT (54.6703 124.208)	5.123796534383003E-14
+POINT (58.383 401.2126)	POINT (58.383 401.2126)	0.0
+POINT (61.3747 410.7333)	POINT (61.3747 410.7333)	1.4210854715202004E-14
+POINT (61.9274 410.6529)	POINT (61.9274 410.6529)	7.105427357601002E-15
+POINT (63.6281 452.6404)	POINT (63.6281 452.6404)	0.0
+POINT (67.9572 562.4108)	POINT (67.9572 562.4108)	1.4210854715202004E-14
+Avg: 4.6461249704202253E-14 Max: 9.374856803373542E-13
+2022-05-24 10:49:10,015|1608|INFO|0|10223|10223|9.374856803373542E-13|4.749733557260597E-10|10223|4.6461249704202253E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:13,182|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:13,190|8|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:13,949|767|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:13,974|792|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:14,153|971|Saved /tmp/edgesI1.wkt in 0.01s [9926 records].
+2022-05-24 10:49:14,601|1419|Saved /tmp/edgesI2.wkt in 0.01s [9926 records].
+Number of intersections: Is 9926 == 9926 ? true
+POINT (19.69 747.1033)	POINT (19.69 747.1033)	0.0
+POINT (23.2134 620.2018)	POINT (23.2134 620.2018)	2.8421709430404007E-14
+POINT (23.4712 459.0645)	POINT (23.4712 459.0645)	7.105427357601002E-15
+POINT (24.0409 254.7671)	POINT (24.0409 254.7671)	2.8421709430404007E-14
+POINT (25.7543 875.0617)	POINT (25.7543 875.0617)	3.552713678800501E-15
+POINT (28.5125 454.2956)	POINT (28.5125 454.2956)	1.4210854715202004E-14
+POINT (30.1848 333.7706)	POINT (30.1848 333.7706)	5.728578676879116E-14
+POINT (37.0813 460.4367)	POINT (37.0813 460.4367)	7.105427357601002E-15
+POINT (38.801 444.5631)	POINT (38.801 444.5631)	5.728578676879116E-14
+POINT (39.6337 455.2706)	POINT (39.6337 455.2706)	5.728578676879116E-14
+Avg: 4.67583999000092E-14 Max: 1.2862197421537486E-12
+2022-05-24 10:49:14,728|1546|INFO|0|9926|9926|1.2862197421537486E-12|4.641238774074914E-10|9926|4.67583999000092E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:17,863|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:17,870|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:18,549|686|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:18,578|715|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:18,718|855|Saved /tmp/edgesI1.wkt in 0.01s [8918 records].
+2022-05-24 10:49:19,148|1285|Saved /tmp/edgesI2.wkt in 0.01s [8918 records].
+Number of intersections: Is 8918 == 8918 ? true
+POINT (25.3787 545.9933)	POINT (25.3787 545.9933)	3.552713678800501E-15
+POINT (28.5095 524.294)	POINT (28.5095 524.294)	0.0
+POINT (30.0539 513.5901)	POINT (30.0539 513.5901)	3.552713678800501E-15
+POINT (42.8931 424.6033)	POINT (42.8931 424.6033)	7.105427357601002E-15
+POINT (46.0506 556.7416)	POINT (46.0506 556.7416)	5.6843418860808015E-14
+POINT (48.7617 852.4134)	POINT (48.7617 852.4134)	1.4210854715202004E-14
+POINT (49.9762 843.3051)	POINT (49.9762 843.3051)	0.0
+POINT (50.7109 218.1422)	POINT (50.7109 218.1422)	3.1776437161565096E-14
+POINT (52.8461 355.6199)	POINT (52.8461 355.6199)	5.728578676879116E-14
+POINT (53.1755 914.9783)	POINT (53.1755 914.9783)	7.105427357601002E-15
+Avg: 4.7057857907198533E-14 Max: 1.8304993077554874E-12
+2022-05-24 10:49:19,265|1402|INFO|0|8918|8918|1.8304993077554874E-12|4.1966197681639653E-10|8918|4.7057857907198533E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:22,917|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:22,924|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:23,627|710|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:23,676|759|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:23,835|918|Saved /tmp/edgesI1.wkt in 0.01s [9038 records].
+2022-05-24 10:49:24,274|1357|Saved /tmp/edgesI2.wkt in 0.01s [9038 records].
+Number of intersections: Is 9038 == 9038 ? true
+POINT (16.3984 233.7532)	POINT (16.3984 233.7532)	0.0
+POINT (24.052 182.7004)	POINT (24.052 182.7004)	1.0658141036401503E-13
+POINT (30.1054 795.6857)	POINT (30.1054 795.6857)	3.552713678800501E-15
+POINT (31.2502 803.4459)	POINT (31.2502 803.4459)	0.0
+POINT (32.7743 202.9234)	POINT (32.7743 202.9234)	2.929642751054232E-14
+POINT (32.8914 439.924)	POINT (32.8914 439.924)	0.0
+POINT (41.5127 203.058)	POINT (41.5127 203.058)	1.8758866506294801E-13
+POINT (42.6907 880.9972)	POINT (42.6907 880.9972)	1.139086659085919E-13
+POINT (43.0161 883.2032)	POINT (43.0161 883.2032)	0.0
+POINT (43.5507 227.9085)	POINT (43.5507 227.9085)	3.1776437161565096E-14
+Avg: 4.6421068099988596E-14 Max: 1.1991132345047497E-12
+2022-05-24 10:49:24,408|1491|INFO|0|9038|9038|1.1991132345047497E-12|4.1955361348769695E-10|9038|4.6421068099988596E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:27,530|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:27,536|6|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:28,220|690|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:28,245|715|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:28,392|862|Saved /tmp/edgesI1.wkt in 0.01s [9116 records].
+2022-05-24 10:49:28,781|1251|Saved /tmp/edgesI2.wkt in 0.01s [9116 records].
+Number of intersections: Is 9116 == 9116 ? true
+POINT (9.682 347.1563)	POINT (9.682 347.1563)	3.552713678800501E-15
+POINT (26.7751 347.0399)	POINT (26.7751 347.0399)	1.7763568394002505E-14
+POINT (30.2419 259.0206)	POINT (30.2419 259.0206)	5.6843418860808015E-14
+POINT (30.2637 259.2247)	POINT (30.2637 259.2247)	0.0
+POINT (33.9292 390.5588)	POINT (33.9292 390.5588)	7.105427357601002E-15
+POINT (35.4033 307.3285)	POINT (35.4033 307.3285)	7.105427357601002E-15
+POINT (35.9468 654.8906)	POINT (35.9468 654.8906)	1.1368683772161603E-13
+POINT (35.9705 652.0715)	POINT (35.9705 652.0715)	0.0
+POINT (36.2762 615.6905)	POINT (36.2762 615.6905)	1.139086659085919E-13
+POINT (36.8291 265.314)	POINT (36.8291 265.314)	1.4210854715202004E-14
+Avg: 4.6559751330652576E-14 Max: 1.8646027759651505E-12
+2022-05-24 10:49:28,890|1360|INFO|0|9116|9116|1.8646027759651505E-12|4.2443869313022886E-10|9116|4.6559751330652576E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:32,133|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:32,140|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:32,769|636|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:32,794|661|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:32,929|796|Saved /tmp/edgesI1.wkt in 0.01s [8090 records].
+2022-05-24 10:49:33,334|1201|Saved /tmp/edgesI2.wkt in 0.01s [8090 records].
+Number of intersections: Is 8090 == 8090 ? true
+POINT (17.6351 288.4678)	POINT (17.6351 288.4678)	1.0658141036401503E-14
+POINT (22.5849 287.9549)	POINT (22.5849 287.9549)	3.552713678800501E-15
+POINT (25.6622 212.7212)	POINT (25.6622 212.7212)	0.0
+POINT (29.1122 287.2785)	POINT (29.1122 287.2785)	0.0
+POINT (29.1769 729.2496)	POINT (29.1769 729.2496)	1.7763568394002505E-14
+POINT (35.1368 286.6542)	POINT (35.1368 286.6542)	0.0
+POINT (38.5866 716.4092)	POINT (38.5866 716.4092)	0.0
+POINT (39.4797 511.3277)	POINT (39.4797 511.3277)	0.0
+POINT (40.1506 525.8283)	POINT (40.1506 525.8283)	1.1368683772161603E-13
+POINT (40.5556 534.5807)	POINT (40.5556 534.5807)	7.105427357601002E-15
+Avg: 4.560587674419921E-14 Max: 1.487734644831835E-12
+2022-05-24 10:49:33,451|1318|INFO|0|8090|8090|1.487734644831835E-12|3.689515428605716E-10|8090|4.560587674419921E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:36,753|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:36,760|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:37,604|851|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:37,632|879|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:37,795|1042|Saved /tmp/edgesI1.wkt in 0.01s [10132 records].
+2022-05-24 10:49:38,189|1436|Saved /tmp/edgesI2.wkt in 0.01s [10132 records].
+Number of intersections: Is 10132 == 10132 ? true
+POINT (24.709 221.3891)	POINT (24.709 221.3891)	3.552713678800501E-15
+POINT (41.6133 599.9947)	POINT (41.6133 599.9947)	1.1368683772161603E-13
+POINT (46.7308 98.9181)	POINT (46.7308 98.9181)	2.8421709430404007E-14
+POINT (47.6049 525.091)	POINT (47.6049 525.091)	0.0
+POINT (52.0686 867.7342)	POINT (52.0686 867.7342)	2.8421709430404007E-14
+POINT (55.2305 429.7607)	POINT (55.2305 429.7607)	0.0
+POINT (56.7936 316.2364)	POINT (56.7936 316.2364)	5.6843418860808015E-14
+POINT (57.9011 396.374)	POINT (57.9011 396.374)	7.105427357601002E-15
+POINT (58.7603 385.633)	POINT (58.7603 385.633)	0.0
+POINT (59.0975 381.4177)	POINT (59.0975 381.4177)	5.6843418860808015E-14
+Avg: 4.713452733677857E-14 Max: 1.9293296132306226E-12
+2022-05-24 10:49:38,321|1568|INFO|0|10132|10132|1.9293296132306226E-12|4.775670309762405E-10|10132|4.713452733677857E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:41,497|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:41,505|8|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:42,201|704|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:42,232|735|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:42,386|889|Saved /tmp/edgesI1.wkt in 0.01s [8788 records].
+2022-05-24 10:49:42,792|1295|Saved /tmp/edgesI2.wkt in 0.01s [8788 records].
+Number of intersections: Is 8788 == 8788 ? true
+POINT (10.9055 513.6187)	POINT (10.9055 513.6187)	0.0
+POINT (13.2073 390.6988)	POINT (13.2073 390.6988)	0.0
+POINT (33.1049 675.1226)	POINT (33.1049 675.1226)	1.4210854715202004E-14
+POINT (34.1315 491.4552)	POINT (34.1315 491.4552)	1.4210854715202004E-14
+POINT (37.7136 412.9529)	POINT (37.7136 412.9529)	0.0
+POINT (38.2111 434.9789)	POINT (38.2111 434.9789)	0.0
+POINT (38.2535 768.9268)	POINT (38.2535 768.9268)	0.0
+POINT (38.7528 458.96)	POINT (38.7528 458.96)	5.6843418860808015E-14
+POINT (39.5154 492.7228)	POINT (39.5154 492.7228)	7.105427357601002E-15
+POINT (40.9324 555.4603)	POINT (40.9324 555.4603)	7.105427357601002E-15
+Avg: 4.8608176927142915E-14 Max: 1.1545232821155134E-11
+2022-05-24 10:49:42,919|1422|INFO|0|8788|8788|1.1545232821155134E-11|4.271686588357319E-10|8788|4.8608176927142915E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:46,209|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:46,216|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:46,947|738|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:46,973|764|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:47,164|955|Saved /tmp/edgesI1.wkt in 0.01s [8955 records].
+2022-05-24 10:49:47,573|1364|Saved /tmp/edgesI2.wkt in 0.01s [8955 records].
+Number of intersections: Is 8955 == 8955 ? true
+POINT (21.6877 147.7214)	POINT (21.6877 147.7214)	2.929642751054232E-14
+POINT (33.0956 836.704)	POINT (33.0956 836.704)	1.1457157353758233E-13
+POINT (33.7962 833.527)	POINT (33.7962 833.527)	7.105427357601002E-15
+POINT (34.7767 834.159)	POINT (34.7767 834.159)	0.0
+POINT (34.7946 833.8255)	POINT (34.7946 833.8255)	0.0
+POINT (36.6131 335.4914)	POINT (36.6131 335.4914)	5.728578676879116E-14
+POINT (36.8492 795.4607)	POINT (36.8492 795.4607)	0.0
+POINT (36.9168 462.9416)	POINT (36.9168 462.9416)	0.0
+POINT (38.136 771.4342)	POINT (38.136 771.4342)	0.0
+POINT (38.1751 917.2813)	POINT (38.1751 917.2813)	0.0
+Avg: 4.561786071220969E-14 Max: 8.35211477813949E-12
+2022-05-24 10:49:47,687|1478|INFO|0|8955|8955|8.35211477813949E-12|4.085079426778378E-10|8955|4.561786071220969E-14
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar --master local[10] --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 32g --driver-memory 30g --class edu.ucr.dblab.debug.BO2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar --n 200
+METHOD:     Random   
+TOLERANCE:  0.001
+SCALE:      1000.0
+N:          200        
+FILE:       edgesH.wkt 
+DEBUG:      true    
+2022-05-24 10:49:50,833|0|Saved /tmp/edgesH1.wkt in 0.00s [200 records].
+2022-05-24 10:49:50,840|7|Saved /tmp/edgesH2.wkt in 0.00s [200 records].
+2022-05-24 10:49:51,607|774|Saved /tmp/edgesS1.wkt in 0.00s [200 records].
+2022-05-24 10:49:51,633|800|Saved /tmp/edgesS2.wkt in 0.00s [200 records].
+2022-05-24 10:49:51,798|965|Saved /tmp/edgesI1.wkt in 0.02s [10156 records].
+2022-05-24 10:49:52,254|1421|Saved /tmp/edgesI2.wkt in 0.01s [10156 records].
+Number of intersections: Is 10156 == 10156 ? true
+POINT (12.2177 776.853)	POINT (12.2177 776.853)	3.907985046680551E-14
+POINT (25.35 385.8973)	POINT (25.35 385.8973)	3.552713678800501E-15
+POINT (27.4279 750.3729)	POINT (27.4279 750.3729)	2.1316282072803006E-14
+POINT (30.8419 455.1819)	POINT (30.8419 455.1819)	7.105427357601002E-15
+POINT (32.0539 812.3918)	POINT (32.0539 812.3918)	0.0
+POINT (33.7156 491.4347)	POINT (33.7156 491.4347)	7.105427357601002E-15
+POINT (35.7285 483.0667)	POINT (35.7285 483.0667)	0.0
+POINT (36.1855 522.5949)	POINT (36.1855 522.5949)	0.0
+POINT (36.5476 527.1626)	POINT (36.5476 527.1626)	0.0
+POINT (37.6646 541.2545)	POINT (37.6646 541.2545)	7.105427357601002E-15
+Avg: 4.82462118941278E-14 Max: 1.2962293852742026E-12
+2022-05-24 10:49:52,420|1587|INFO|0|10156|10156|1.2962293852742026E-12|4.89988527996762E-10|10156|4.82462118941278E-14
+

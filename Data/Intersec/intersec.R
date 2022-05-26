@@ -1,7 +1,7 @@
 library(tidyverse)
 setwd("~/RIDIR/Data/Intersec/")
 
-data0 = enframe(read_lines("intersec3.txt"), value="line")
+data0 = enframe(read_lines("intersec4.txt"), value="line")
 
 data1 = data0 %>%
   filter(str_detect(line, 'INFO')) 
