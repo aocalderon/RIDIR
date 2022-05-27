@@ -89,8 +89,8 @@ object BO2 {
   def sweepline2(hs1: List[Half_edge], hs2: List[Half_edge], debug: Boolean = false)
     (implicit geofactory: GeometryFactory): List[Intersection] = {
 
-    val segs1 = hs1.map{ h => Segment(h.v1, h.v2, "A", h.id) }
-    val segs2 = hs2.map{ h => Segment(h.v1, h.v2, "B", h.id) }
+    val segs1 = hs1.map{ h => Segment(h, "A") }
+    val segs2 = hs2.map{ h => Segment(h, "B") }
     val segs  = (segs1 ++ segs2)
 
     val intersector = BentleyOttmann2

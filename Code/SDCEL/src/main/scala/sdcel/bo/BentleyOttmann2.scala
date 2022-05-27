@@ -4,9 +4,11 @@ import com.vividsolutions.jts.geom.{GeometryFactory}
 import com.vividsolutions.jts.geom.{Coordinate, LineString, Point}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, ArrayBuffer}
 
 import java.util.{PriorityQueue, TreeSet}
+
+import edu.ucr.dblab.sdcel.geometries.Half_edge
 
 case class Intersection(p: Coordinate, seg1: Segment, seg2: Segment)
   (implicit geofactory: GeometryFactory) {
@@ -47,9 +49,94 @@ case class Event(point: Coordinate, segments: List[Segment], ttype: Int) extends
   }
 }
 
-case class Segment(p_1: Coordinate, p_2: Coordinate, label: String, id: Long)
+object Tree {
+
+  def node(segment: Segment)(implicit T: TreeSet[Node]): Node = T.floor( Node(segment.value) )
+
+  def add(segment: Segment)(implicit T: TreeSet[Node]): Boolean = {
+    val N = node(segment)
+    N.add(segment)
+  }
+
+  def remove(segment: Segment)(implicit T: TreeSet[Node]): Boolean = {
+    val N = node(segment)
+    if(N.size > 1){
+      N.remove(segment)
+    } else {
+      T.remove(N)
+    }
+  }
+
+  def swap(seg1: Segment, seg2: Segment)(implicit T: TreeSet[Node]): Unit = {
+    remove(seg1)
+    remove(seg2)
+    seg2.value = node(seg1).value
+    seg1.value = node(seg2).value
+    add(seg1)
+    add(seg2)
+  }
+
+  def higher(segment: Segment)(implicit T: TreeSet[Node]): Segment = {
+    val N = node(segment)
+    val segs = N.segments
+    if( segment.id == segs.last.id ){ // Pick head in higher T Node...
+      T.higher(N).segments.head
+    } else { // Pick next Segment in current segs...
+      segs( segs.indexWhere(_.id == segment.id) + 1 )
+    }
+  }
+
+  def lower(segment: Segment)(implicit T: TreeSet[Node]): Segment = {
+    val N = node(segment)
+    val segs = N.segments
+    if( segment.id == segs.head.id ){ // Pick last in lower T Node...
+      T.lower(N).segments.last
+    } else { // Pick prev Segment in current segs...
+      segs( segs.indexWhere(_.id == segment.id) - 1 )
+    }
+  }
+}
+
+case class Node(value: Double,
+  var segments: ArrayBuffer[Segment] = ArrayBuffer.empty[Segment]) extends Ordered[Node] {
+
+  def add(seg: Segment)    = {
+    if( !segments.exists(_.id == seg.id) ){
+      segments.append(seg)
+      sort
+      true
+    } else {
+      false
+    }
+  }
+
+  def remove(seg: Segment) = {
+    val index = segments.indexWhere(_.id == seg.id)
+    if( index >= 0 ){
+      segments.remove(index)
+      true
+    } else {
+      false
+    }
+  }
+
+  def size: Int = segments.size
+
+  def sort = { segments = segments.sortBy(_.angle) }
+
+  override def compare(that: Node): Int = -( this.value compare that.value )
+
+  override def toString: String = segments.mkString("\n")
+}
+
+case class Segment(h: Half_edge, label: String)
   (implicit geofactory: GeometryFactory) extends Ordered[Segment]{
-  
+
+  val p_1: Coordinate = h.v1
+  val p_2: Coordinate = h.v2
+  val id: Long = h.id 
+  val lid: String = s"${label}${id}"
+  val angle: Double = hangle(p_1, p_2)
   var value: Double = this.calculateValue(this.first.x)
 
   def first: Coordinate = {
@@ -82,17 +169,20 @@ case class Segment(p_1: Coordinate, p_2: Coordinate, label: String, id: Long)
     y1 + ( (dy / dx) * vx ) // TODO: NaN value does not seem to affect...
   }
 
-  def isVertical:   Boolean = p_1.x == p_2.x
+  def isVertical: Boolean = p_1.x == p_2.x
+
   def isHorizontal: Boolean = p_1.y == p_2.y
   
-  override def compare(that: Segment): Int = {
-    if( this.value > that.value ) {
-      -1
-    } else if( this.value < that.value ) {
-      1
+  private def hangle(p_1: Coordinate, p_2: Coordinate): Double = {
+    val dx = p_1.x - p_2.x
+    val dy = p_1.y - p_2.y
+    val length = math.sqrt( (dx * dx) + (dy * dy) )
+    val angle = if(dy > 0){
+      math.acos(dx / length)
     } else {
-      0
+      2 * math.Pi - math.acos(dx / length)
     }
+    math.toDegrees(angle)
   }
 
   def asJTSLine: LineString = {
@@ -102,6 +192,16 @@ case class Segment(p_1: Coordinate, p_2: Coordinate, label: String, id: Long)
   }
 
   def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value"
+
+  override def compare(that: Segment): Int = {
+    if( this.value > that.value ) {
+      -1
+    } else if( this.value < that.value ) {
+      1
+    } else {
+      0
+    }
+  }
 
   override def toString: String =
     f"${asJTSLine.toText}%-60s ${label}%-4s ${id}%-3s ${this.value}%-20s"
@@ -126,8 +226,10 @@ object BentleyOttmann2 {
 
   def printStatus(filter: String = "*") = {
     filter match {
-      case "*" => this.T.iterator().asScala.foreach{ println }
-      case _   => this.T.iterator().asScala.filter(_.label != filter).foreach{ println }
+      case "*" => this.T.iterator().asScala.zipWithIndex
+          .map{ case(s, x)  => s"$x\t$s" }.foreach{ println }
+      case _   => this.T.iterator().asScala.filter(_.label != filter).zipWithIndex
+          .map{ case(s, x)  => s"$s\t$x" }.foreach{ println }
     }
     println
   }
@@ -151,7 +253,18 @@ object BentleyOttmann2 {
         case 0 => {
           for{ s <- e.segments }{ 
             this.recalculate(L)
+
+            if( s.lid == "A402" || s.lid == "A174" ){
+              println(s"DEBUG:\t$s")
+              printStatus()
+            }
+
             this.T.add(s)
+
+            if( s.lid == "A402" || s.lid == "A174" ){
+              println(s"DEBUG:\t$s")
+              printStatus()
+            }
 
             if( this.T.lower(s) != null ) {
               val r: Segment = this.T.lower(s)
