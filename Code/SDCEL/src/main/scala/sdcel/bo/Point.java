@@ -1,5 +1,6 @@
 package edu.ucr.dblab.bo;
 
+import static java.lang.Math.sqrt;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
@@ -34,6 +35,13 @@ public class Point {
 
     public void set_y_coord(double y_coord) {
         this.y_coord = y_coord;
+    }
+
+    public double distance(Point that){
+	double dx = this.x_coord - that.x_coord;
+	double dy = this.y_coord - that.x_coord;
+
+	return sqrt( (dx * dx) + (dy * dy) );
     }
 
     public Coordinate asJTSCoordinate() {

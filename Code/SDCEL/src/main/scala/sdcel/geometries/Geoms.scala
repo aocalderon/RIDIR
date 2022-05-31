@@ -50,7 +50,7 @@ case object B extends Label
 sealed trait Event
 case object LEFT_ENDPOINT  extends Event
 case object RIGHT_ENDPOINT extends Event
-case object INTERSECTION   extends Event
+case object INTERSECT      extends Event
 
 object StatusKey{
   def intersection(one: Option[StatusValue], another: Option[StatusValue], p: Coordinate)
@@ -230,7 +230,7 @@ case class EventPoint(hedges: List[Half_edge], event: Event, id: Int = -1,
     event match {
       case LEFT_ENDPOINT  => if(!h.isVertical) endpoints.minBy(_.x) else endpoints.minBy(_.y)
       case RIGHT_ENDPOINT => if(!h.isVertical) endpoints.maxBy(_.x) else endpoints.maxBy(_.y)
-      case INTERSECTION   => intersection
+      case INTERSECT      => intersection
     }
   }
 
@@ -347,10 +347,39 @@ case class Half_edge(edge: LineString){
   }
 
   val endpoints = List(v1, v2)
-  val left  = endpoints.minBy(_.x)
-  val right = endpoints.maxBy(_.x)
-  val above = endpoints.maxBy(_.y)
-  val below = endpoints.minBy(_.y)
+
+  val left  = {
+    if(v1.x < v2.x) v1
+    else if(v1.x > v2.x) v2
+    else {
+      if(v1.y < v2.y) v1
+      else v2
+    }
+  }
+  val right = {
+    if(v1.x > v2.x) v1
+    else if(v1.x < v2.x) v2
+    else {
+      if(v1.y > v2.y) v1
+      else v2
+    }
+  }
+  val above = {
+    if(v1.y < v2.y) v1
+    else if(v1.y > v2.y) v2
+    else {
+      if(v1.x < v2.x) v1
+      else v2
+    }
+  }
+  val below = {
+    if(v1.y > v2.y) v1
+    else if(v1.y < v2.y) v2
+    else {
+      if(v1.x > v2.x) v1
+      else v2
+    }
+  }
   val minX = left.x
   val minY = below.y
 
@@ -379,7 +408,6 @@ case class Half_edge(edge: LineString){
   def intersection(that: Half_edge): Array[Coordinate] = {
     this.edge.intersection(that.edge).getCoordinates
   }
-
 
   def isVertical: Boolean   = v1.x == v2.x
   def isHorizontal: Boolean = v1.y == v2.y
@@ -434,7 +462,9 @@ case class Half_edge(edge: LineString){
 
   def split(p: Coordinate)(implicit geofactory: GeometryFactory): List[Half_edge] = {
     if(p == v1 || p == v2 || !edge.getEnvelopeInternal.intersects(p)){
-      List(this) // if intersection is on the extremes or outside (there is not split at all), it returns the same...
+      List(this)
+      // if intersection is on the extremes or outside (there is not split at all),
+      // it returns the same...
     } else {
       val h0 = this.prev
       val l1 = geofactory.createLineString(Array(v1, p))

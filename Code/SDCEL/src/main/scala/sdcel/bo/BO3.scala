@@ -1,4 +1,4 @@
-package edu.ucr.dblab.debug
+package edu.ucr.dblab.bo3
 
 import scala.collection.mutable.{PriorityQueue}
 import scala.collection.JavaConverters._
@@ -10,21 +10,17 @@ import com.vividsolutions.jts.algorithm.RobustLineIntersector
 import com.vividsolutions.jts.geomgraph.EdgeIntersection
 import com.vividsolutions.jts.geomgraph.Edge
 
-import edu.ucr.dblab.bo2.{BentleyOttmann2, Segment, Intersection}
-import edu.ucr.dblab.debug.BO.{generateRandomHedges, generateFromFile, sweepline}
+import edu.ucr.dblab.debug.BO.{generateRandomHedges, generateFromFile}
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, HEdge}
-import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering, CoordYX_Ordering}
-import edu.ucr.dblab.sdcel.geometries.{LEFT_ENDPOINT, INTERSECT, RIGHT_ENDPOINT}
 import edu.ucr.dblab.sdcel.Utils.{save, logger}
 
-object BO2 {
+object BO3 {
   def main(args: Array[String]): Unit = {
     val params = new BOConf(args)
 
     val debug: Boolean    = params.debug()
     val method: String    = params.method()
-    val file1: String     = params.file1()
-    val file2: String     = params.file2()
+    val filename: String  = params.file1()
     val n: Int            = params.n()
     val runId: Int        = params.runid()
     val tolerance: Double = params.tolerance()
@@ -37,17 +33,13 @@ object BO2 {
     println(s"TOLERANCE:  $tolerance")
     println(s"SCALE:      ${geofactory.getPrecisionModel.getScale}")
     println(s"N:          $n        ")
-    println(s"FILE 1:     $file1    ")
-    println(s"FILE 2:     $file2    ")
+    println(s"FILE:       $filename ")
     println(s"DEBUG:      $debug    ")
 
-    val (hs1, hs2) = method match {
-      case "Random" =>
-        ( generateRandomHedges(n), generateRandomHedges(n, "B") )
-      case "File"   =>
-        ( generateFromFile(file1).filter(!_.isVertical).filter(!_.isHorizontal),
-          generateFromFile(file2).filter(!_.isVertical).filter(!_.isHorizontal) )
-    }
+    //val hs1 = generateRandomHedges(n)
+    //val hs2 = generateRandomHedges(n, "B")
+    val hs1 = generateFromFile("/home/acald013/tmp/h1.wkt")
+    val hs2 = generateFromFile("/home/acald013/tmp/h2.wkt")
 
     if(debug){
       save("/tmp/edgesH1.wkt"){
@@ -58,8 +50,8 @@ object BO2 {
       }
     }
 
-    val inters1 = sweepline2(hs1, hs2, debug)
-    val inters2 = sweeplineJTS2(hs1, hs2, debug)
+    val inters1 = sweepline(hs1, hs2, debug)
+    val inters2 = sweeplineJTS(hs1, hs2, debug)
 
     val n1 = inters1.size
     val n2 = inters2.size
@@ -71,7 +63,7 @@ object BO2 {
 
     val stats = (I1 zip I2)
       .map{ case(i1, i2) =>
-        (i1, i2, i1.point.distance(i2))
+        (i1, i2, i1.p.distance(i2.getCoordinate))
       }
     stats.take(10).foreach{ case(i1, i2, d) =>
       println{s"${i1.point.toText}\t${i2.toText}\t${d}"}
@@ -86,24 +78,26 @@ object BO2 {
     logger.info(s"INFO|${runId}|${n1}|${n2}|${max}|${sum}|${len}|${avg}")
   }
 
-  def sweepline2(hs1: List[Half_edge], hs2: List[Half_edge], debug: Boolean = false)
+  def sweepline(hs1: List[Half_edge], hs2: List[Half_edge], debug: Boolean = false)
     (implicit geofactory: GeometryFactory): List[Intersection] = {
 
-    val segs1 = hs1.map{ h => Segment(h, "A") }
-    val segs2 = hs2.map{ h => Segment(h, "B") }
-    val segs  = (segs1 ++ segs2)
+    val edges1 = hs1.map{ h => Segment(h, "A") }
+    val edges2 = hs2.map{ h => Segment(h, "B") }
+    if(debug){
+      save("/tmp/edgesS1.wkt"){
+        edges1.map( e => s"${e.wkt}\n" )
+      }
+      save("/tmp/edgesS2.wkt"){
+        edges2.map( e => s"${e.wkt}\n" )
+      }
+    }
+    val edges = edges1 ++ edges2
 
-    val intersector = BentleyOttmann2
-    intersector.readSegments(segs)
+    val intersector = BentleyOttmann
+    intersector.readSegments( edges )
     val intersections = intersector.getIntersections
 
     if(debug){
-      save("/tmp/edgesS1.wkt"){
-        segs1.map( s => s"${s.wkt}\n" )
-      }
-      save("/tmp/edgesS2.wkt"){
-        segs2.map( s => s"${s.wkt}\n" )
-      }
       save("/tmp/edgesI1.wkt"){
         intersections.zipWithIndex.map{ case (intersect, id)  =>
           val i = geofactory.createPoint(intersect.p)
@@ -115,10 +109,10 @@ object BO2 {
       }
     }
 
-    intersections
+    intersections.toList
   }
 
-  def sweeplineJTS2(hs1: List[Half_edge], hs2: List[Half_edge], debug: Boolean = false)
+  def sweeplineJTS(hs1: List[Half_edge], hs2: List[Half_edge], debug: Boolean = false)
     (implicit geofactory: GeometryFactory): List[Point] = {
 
     val aList = hs1.map{ h =>
@@ -138,7 +132,7 @@ object BO2 {
 
     val aPoints = aList.asScala.flatMap{ a =>
       val iList = a.getEdgeIntersectionList.iterator.asScala.toList
-      if( iList.size == 0 ){
+      if(iList.size == 0){
         List.empty[Point]
       } else {
         iList.map{ i =>
@@ -173,3 +167,18 @@ object BO2 {
     ab
   }  
 }
+
+import org.rogach.scallop._
+
+class BOConf(args: Seq[String]) extends ScallopConf(args) {
+  val debug: ScallopOption[Boolean]    = opt[Boolean] (default = Some(true))
+  val method: ScallopOption[String]    = opt[String]  (default = Some("Random"))
+  val file1: ScallopOption[String]     = opt[String]  (default = Some("")) 
+  val file2: ScallopOption[String]     = opt[String]  (default = Some("")) 
+  val tolerance: ScallopOption[Double] = opt[Double]  (default = Some(1e-3))
+  val n: ScallopOption[Int]            = opt[Int]     (default = Some(250))
+  val runid: ScallopOption[Int]        = opt[Int]     (default = Some(0))
+
+  verify()
+}
+

@@ -13,7 +13,7 @@ import com.vividsolutions.jts.geomgraph.Edge
 import edu.ucr.dblab.bo.BentleyOttmann
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, HEdge, Seg}
 import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering, CoordYX_Ordering}
-import edu.ucr.dblab.sdcel.geometries.{LEFT_ENDPOINT, INTERSECTION, RIGHT_ENDPOINT}
+import edu.ucr.dblab.sdcel.geometries.{LEFT_ENDPOINT, INTERSECT, RIGHT_ENDPOINT}
 import edu.ucr.dblab.sdcel.Utils.{save, logger}
 
 object BO {
@@ -22,7 +22,8 @@ object BO {
 
     val debug: Boolean    = params.debug()
     val method: String    = params.method()
-    val filename: String  = params.filename()
+    val file1: String     = params.file1()
+    val file2: String     = params.file2()
     val n: Int            = params.n()
     val runId: Int        = params.runid()
     val tolerance: Double = params.tolerance()
@@ -35,13 +36,14 @@ object BO {
     println(s"TOLERANCE:  $tolerance")
     println(s"SCALE:      ${geofactory.getPrecisionModel.getScale}")
     println(s"N:          $n        ")
-    println(s"FILE:       $filename ")
+    println(s"FILE 1:     $file1    ")
+    println(s"FILE 2:     $file2    ")
     println(s"DEBUG:      $debug    ")
 
     val hedges = method match {
       case "Dummy"  => generateHedges
       case "Random" => generateRandomHedges(n)
-      case "File"   => generateFromFile(filename)
+      case "File"   => generateFromFile(file1)
       case _ => generateHedges
     }
 
@@ -130,7 +132,7 @@ object BO {
     val intersector = new BentleyOttmann(edges.asJava)
     val intersections = intersector.get_intersections.asScala.zipWithIndex
       .map{ case (intersect, id)  =>
-        val i = geofactory.createPoint(intersect.asJTSCoordinate())
+        val i = geofactory.createPoint(intersect.getPoint.asJTSCoordinate())
         i.setUserData(id)
         i
       }.toList
@@ -185,7 +187,7 @@ object BO {
       val arr = line.split("\t")
       val linestring = reader.read(arr(0)).asInstanceOf[LineString]
       val hedge = Half_edge(linestring)
-      hedge.tag = arr(1)
+      hedge.id  = arr(1).toInt
       hedge
     }.toList
     buffer.close
@@ -193,7 +195,7 @@ object BO {
     hedges
   }
 
-  def generateRandomHedges(n: Int, factor: Double = 1000.0)
+  def generateRandomHedges(n: Int, label: String = "A", factor: Double = 1000.0)
     (implicit geofactory: GeometryFactory): List[Half_edge] = {
 
     import scala.util.Random
@@ -203,7 +205,8 @@ object BO {
       val v2 = new Coordinate(Random.nextDouble() * factor, Random.nextDouble() * factor)
       val l  = geofactory.createLineString(Array(v1, v2))
       val h  = Half_edge(l)
-      h.tag = x.toString
+      h.tag = label
+      h.id  = x
       h
     }.toList
   }
@@ -232,7 +235,8 @@ import org.rogach.scallop._
 class BOConf(args: Seq[String]) extends ScallopConf(args) {
   val debug: ScallopOption[Boolean]    = opt[Boolean] (default = Some(true))
   val method: ScallopOption[String]    = opt[String]  (default = Some("Random"))
-  val filename: ScallopOption[String]  = opt[String]  (default = Some("edgesH.wkt")) 
+  val file1: ScallopOption[String]     = opt[String]  (default = Some("")) 
+  val file2: ScallopOption[String]     = opt[String]  (default = Some("")) 
   val tolerance: ScallopOption[Double] = opt[Double]  (default = Some(1e-3))
   val n: ScallopOption[Int]            = opt[Int]     (default = Some(250))
   val runid: ScallopOption[Int]        = opt[Int]     (default = Some(0))
