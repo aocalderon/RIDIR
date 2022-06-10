@@ -39,16 +39,16 @@ class SweeplineSpec extends AnyFlatSpec with should.Matchers {
   val J = hedges.filter(_.tag == "J").head
   val K = hedges.filter(_.tag == "K").head
 
-  val a1 = StatusKey(A, A.left)
-  val b = StatusKey(B, B.left)
-  val c = StatusKey(C, C.left)
-  val d = StatusKey(D, D.left)
-  val e = StatusKey(E, E.left)
-  val f = StatusKey(F, F.left)
-  val g = StatusKey(G, G.left)
-  val i = StatusKey(I, I.left)
-  val j = StatusKey(J, J.left)
-  val k = StatusKey(K, K.left)
+  val a1 = StatusKey(A.left, A.right)
+  val b = StatusKey(B.left, B.right)
+  val c = StatusKey(C.left, C.right)
+  val d = StatusKey(D.left, D.right)
+  val e = StatusKey(E.left, E.right)
+  val f = StatusKey(F.left, F.right)
+  val g = StatusKey(G.left, G.right)
+  val i = StatusKey(I.left, I.right)
+  val j = StatusKey(J.left, J.right)
+  val k = StatusKey(K.left, K.right)
 
   "A" should "be above I" in { StatusKey.isAbove(i.left, a1) should be (-1) }
   it  should "be below F" in { StatusKey.isAbove(f.left, a1) should be  (1) }

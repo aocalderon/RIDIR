@@ -1,6 +1,6 @@
 package edu.ucr.dblab.bo3
 
-import com.vividsolutions.jts.geom.{GeometryFactory}
+import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import com.vividsolutions.jts.geom.{Coordinate, LineString, Point}
 
 import scala.collection.JavaConverters._
@@ -9,6 +9,7 @@ import scala.collection.mutable.{ListBuffer, ArrayBuffer}
 import java.util.{PriorityQueue, TreeSet}
 
 import edu.ucr.dblab.sdcel.geometries.Half_edge
+import edu.ucr.dblab.sdcel.Utils.round
 
 case class Intersection(p: Coordinate, seg1: Segment, seg2: Segment)
   (implicit geofactory: GeometryFactory) {
@@ -18,8 +19,10 @@ case class Intersection(p: Coordinate, seg1: Segment, seg2: Segment)
   val lines: List[LineString] = List(seg1.asJTSLine, seg2.asJTSLine)
 }
 
-case class Event(point: Coordinate, segments: List[Segment], ttype: Int) extends Ordered[Event] {
-  val value = if(ttype == 1 && segments(0).isVertical)
+case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
+  (implicit geofactory: GeometryFactory) extends Ordered[Event] {
+
+  val value = if(ttype == 1 && segments(0).isVertical) // TODO: cover special case...
     point.x + 0.001
   else
     point.x
@@ -34,25 +37,41 @@ case class Event(point: Coordinate, segments: List[Segment], ttype: Int) extends
     }
   }
 
-  def L: String = s"LINESTRING($value 0, $value 1000 )"
+  private def L: String = s"LINESTRING($value 0, $value 1000 )"
+
+  def asJTSLine: LineString = geofactory.createLineString(
+    Array(new Coordinate(value, 0), new Coordinate(value, 1000))
+  )
 
   def wkt: String = {
     val coords = s"${point.x} ${point.y}"
     val segs = segments.map{ seg => s"${seg.label}${seg.id}" }.mkString(" ")
-    //s"POINT($coords)\t$value\t$coords\t$ttype\t$segs"
+
     s"$L\t$value\t$coords\t$ttype\t$segs"
   }
 
   override def toString: String = {
-    val coords = s"${point.x} ${point.y}"
-    val wkt = s"POINT($coords)"
-    val segs = segments.map(_.id).mkString(" ")
+    val coords = s"(${point.x} ${point.y})"
+    val wkt = s"POINT${coords}"
+    val segs = segments.map(_.id).mkString(", ")
 
-    f"$wkt%-50s $value%-15s $coords%-20s $ttype"
+    f"$wkt%-25s value: ${value} event_point: $coords type: $ttype segs_id: { $segs }"
   }
 }
 
 object Tree {
+  implicit val geofactory = new GeometryFactory()
+
+  def empty_seg(implicit geofactory: GeometryFactory): Segment = {
+    val epsilon = 0.001
+    val p1 = new Coordinate(Double.MinValue, Double.MinValue)
+    val p2 = new Coordinate(Double.MinValue + epsilon, Double.MinValue)
+    val fake_h = Half_edge(geofactory.createLineString(Array(p1, p2)))
+    fake_h.id = Long.MinValue
+    Segment(fake_h, "*")
+  }
+  val empty_node: Node = Node(Double.MinValue, ArrayBuffer(empty_seg))
+
   def node(segment: Segment)(implicit T: TreeSet[Node]): Node = T.floor( Node(segment.value) )
 
   def add(segment: Segment)(implicit T: TreeSet[Node]): Boolean = {
@@ -87,13 +106,13 @@ object Tree {
     add(seg2)
   }
 
-  def recalculate(L: Double)(implicit T: TreeSet[Node]): Unit = {
-    val iter = T.iterator()
-    while(iter.hasNext()) {
-      val node = iter.next()
+  def recalculate(L: Double)(implicit T: TreeSet[Node]): Iterator[Long] = {
+    T.asScala.foreach{ node =>
       node.value = node.segments.head.calculateValue(L)
       node.segments.foreach{ seg => seg.value = node.value }
     }
+    
+    T.iterator.asScala.map{ _.segments.map(_.id) }.flatten
   }
 
   def higher(segment: Segment)(implicit T: TreeSet[Node]): Segment = {
@@ -130,6 +149,8 @@ object Tree {
 case class Node(var value: Double,
   var segments: ArrayBuffer[Segment] = ArrayBuffer.empty[Segment]) extends Ordered[Node] {
 
+  var id: Long = -1
+
   def add(seg: Segment)    = {
     if( !segments.exists(_.id == seg.id) ){
       segments.append(seg)
@@ -152,11 +173,20 @@ case class Node(var value: Double,
 
   def size: Int = segments.size
 
-  def sort = { segments = segments.sortBy(_.angle) }
+  def sort: Unit = { segments = segments.sortBy(_.angle) }
 
-  override def compare(that: Node): Int = -( this.value compare that.value )
+  def wkt: String = segments.map{ seg => s"${seg.wkt}\t${id}\t${value}\n" }.mkString("")
 
-  override def toString: String = segments.mkString("\n")
+  override def compare(that: Node): Int = {
+    -( this.value compare that.value )
+  }
+
+  override def toString: String = {
+    segments.map{ segment =>
+      s"node_id: $id \t node_value: ${round(value, 2)} \t segment: ${segment} "
+    }.mkString("\n")
+  }
+
 }
 
 case class Segment(h: Half_edge, label: String)
@@ -167,7 +197,13 @@ case class Segment(h: Half_edge, label: String)
   val id:    Long = h.id 
   val lid:   String = s"${label}${id}"
   val angle: Double = hangle(p_1, p_2)
+  val source:   Coordinate = h.v1
+  val target:   Coordinate = h.v2
   var value: Double = this.calculateValue(this.first.x)
+
+  def dx: Double = target.x - source.x
+  def dy: Double = target.y - source.y
+  def slope: Double = dy / dx
 
   def first: Coordinate = {
     if( p_1.x < p_2.x ) { p_1 }
@@ -223,22 +259,16 @@ case class Segment(h: Half_edge, label: String)
 
   def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value"
 
-  override def compare(that: Segment): Int = {
-    if( this.value > that.value ) {
-      -1
-    } else if( this.value < that.value ) {
-      1
-    } else {
-      0
-    }
-  }
+  override def compare(that: Segment): Int = this.value compare that.value
 
   override def toString: String =
-    f"${asJTSLine.toText}%-60s ${label}%-4s ${id}%-3s ${this.value}%-20s"
+    f"${asJTSLine.toText}%-30s label: ${label}%-4s id: ${id}%-3s value: ${this.value}%-20s"
 }
 
 object BentleyOttmann {
-  implicit var T: TreeSet[Node]            = new TreeSet[Node]()
+  implicit val model: PrecisionModel = new PrecisionModel(1e-3)
+  implicit val geofactory: GeometryFactory = new GeometryFactory(model)
+  implicit var T: TreeSet[Node]   = new TreeSet[Node]()
   var Q: PriorityQueue[Event]     = new PriorityQueue[Event]()
   var X: ListBuffer[Intersection] = new ListBuffer[Intersection]()
 
@@ -248,6 +278,135 @@ object BentleyOttmann {
       this.Q.add(Event(s.second, List(s), 1))
     }
   }
+
+  //////////////////////////////////////// Primitives [Start] ////////////////////////////////////////
+
+  val NO_IDEA = 2
+
+  // Based on https://www.geeksforgeeks.org/orientation-3-ordered-points/
+  // To find orientation of ordered triplet (p1, p2, p3). The function returns
+  // following values:
+  // -1 --> Clockwise
+  //  0 --> p, q and r are collinear
+  //  1 --> Counterclockwise
+  def orientation(p1: Coordinate, p2: Coordinate,p3: Coordinate): Int = {
+    // See 10th slides from following link for derivation of the formula...
+    // http://www.dcs.gla.ac.uk/~pat/52233/slides/Geometry1x1.pdf
+    val value = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y)
+
+    value match {
+      case x if x <  0 =>  1  //  counterclock wise
+      case x if x == 0 =>  0  //  collinear
+      case x if x  > 0 => -1  //  clock wise
+    }
+  }
+
+  def oritentation(s: Segment, p: Coordinate): Int = {
+    orientation(s.h.v1, s.h.v2, p)
+  }
+
+  private def sign(x: Double): Int = {
+    x match {
+      case _ if x <  0 => -1  
+      case _ if x == 0 =>  0  
+      case _ if x  > 0 =>  1
+      case _ => NO_IDEA
+    }
+  }
+
+  def cmp_slopes(s1: Segment, s2: Segment): Int = sign(s1.slope - s2.slope)
+
+  /* See section 20 at (Mehlhorn and Naher, 1994) */
+  def compareSegments(s1: Segment, s2: Segment, p_sweep: Coordinate): Int = {
+    cmp_segments(
+      s1.source.x, s1.source.y,
+      s2.source.x, s2.source.y,
+      s2.target.x, s2.target.y,
+      p_sweep.x, p_sweep.y,
+      s1.dx, s1.dy,
+      s2.dx, s2.dy
+    )
+  }
+
+  /* See section 19 at (Mehlhorn and Naher, 1994) */
+  private def cmp_segments(
+     px: Double,  py: Double, // s1.source
+    spx: Double, spy: Double, // s2.source
+    sqx: Double, sqy: Double, // s2.target
+     rx: Double,  ry: Double, // p_sweep (sweepline's current point)
+     dx: Double,  dy: Double, // s1 delta x and y
+    sdx: Double, sdy: Double  // s2 delta x and y
+  ): Int = {
+
+    /* Segments are identical */
+    val sign1 = sign( dy * sdx - sdy *  dx)
+    val areIdentical = if( sign1 == 0 || sign1 == NO_IDEA ){
+      val mdx = sqx - px
+      val mdy = sdy - py
+      val sign2 = sign( dy * mdx - mdy *  dx)
+      if( sign2 == 0 || sign2 == NO_IDEA ){
+        val sign3 = sign(sdy * mdx - mdy * sdx)
+        if( sign3 == 0 || sign3 == NO_IDEA ){
+          if( sign1 == 0 && sign2 == 0 && sign3 == 0 ) {
+            Some(0)
+          } else {
+            Some(NO_IDEA)
+          }
+        } else {
+          None
+        }
+      } else {
+        None
+      }
+    } else {
+      None
+    }
+    
+    areIdentical match {
+      case Some(i) => i
+      case None => { /* The underlaying segments are different */
+        if( dx == 0 ) {  // if s1 is vertical...
+          val a = spy * sdx - spx * sdy
+          val b = sdy *  rx -  ry * sdx
+          val i = sign( a + b )
+          i match {
+            case x if i <= 0 =>  1
+            case x if i  > 0 => -1
+            case _ => NO_IDEA
+          }
+        } else if( sdx == 0) { // if s2 is vertical...
+          val a = py * dx - px * dy
+          val b = dy * rx - ry * dx
+          val i = sign( a + b )
+          i match {
+            case x if i <= 0 =>  1
+            case x if i  > 0 => -1
+            case _ => NO_IDEA
+          }
+        } else { // neither s1 nor s2 is vertical...
+          val a = sdx * (  py *  dx +  dy * ( rx -  px) )
+          val b =  dx * ( spy * sdx + sdy * ( rx - spx) )
+          val sign2 = sign( a - b )
+          if( sign2 == NO_IDEA ) NO_IDEA
+          else if( sign2 != 0 ) sign2
+          else {
+            val c = py * dx - px * dy
+            val d = dy * rx - ry * dx
+            val sign3 = sign( c + d )
+            sign3 match {
+              case x if sign3 <= 0 =>  sign1
+              case x if sign3  > 0 => -sign1
+              case _ => NO_IDEA
+            }
+          }
+        }
+      }
+    }
+
+
+  }
+
+  //////////////////////////////////////// Primitives [End] ////////////////////////////////////////
 
   def getIntersections(implicit geofactory: GeometryFactory): List[Intersection] = {
     findIntersections
@@ -279,8 +438,8 @@ object BentleyOttmann {
       e.ttype match {
         case 0 => {
           for{ s <- e.segments }{ 
-            val node = Node(s.value, ArrayBuffer(s))
             Tree.recalculate(L)
+            val node = Node(s.value, ArrayBuffer(s))
             this.T.add(node)
 
             if( Tree.lower(s) != null ) {
@@ -321,7 +480,6 @@ object BentleyOttmann {
               this.reportIntersection(r, t, L)
             }
 
-            Tree.recalculate(L)
             T.iterator().asScala.foreach{ node =>
               val wkt = node.segments.map{ s =>
                 s"POINT($L ${node.value})\t${s.label}${s.id}\t$j"

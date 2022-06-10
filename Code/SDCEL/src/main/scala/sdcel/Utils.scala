@@ -160,6 +160,11 @@ object Utils {
     Math.round(number * scale) / scale
   }
 
+  def round(number: Double, decimals: Int): Double = {
+    val scale = Math.pow(10, decimals)
+    Math.round(number * scale) / scale
+  }
+
   import Numeric.Implicits._
   def mean[T: Numeric](xs: Iterable[T]): Double = xs.sum.toDouble / xs.size
   def variance[T: Numeric](xs: Iterable[T]): Double = {
