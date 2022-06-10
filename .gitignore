@@ -100,3 +100,4 @@ Code/Validation/GeometryChecker/target/*
 Code/Validation/GeometryChecker/project/*
 Code/Validation/GeometryChecker/.ensime
 Code/Validation/GeometryChecker/.ensime_cache/*
+Code/SDCEL/.bsp/sbt.json
