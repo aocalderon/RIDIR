@@ -13,6 +13,8 @@ libraryDependencies += "org.datasyslab" % "geospark-sql_2.3" % "1.2.0"
 libraryDependencies += "org.datasyslab" % "geospark-viz_2.3" % "1.2.0"
 libraryDependencies += "org.datasyslab" % "JTSplus" % "0.1.4"
 
+libraryDependencies += "org.jgrapht" % "jgrapht-core" % "1.4.0"
+
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.25"
 libraryDependencies += "org.slf4j" % "slf4j-log4j12" % "1.7.25"
 

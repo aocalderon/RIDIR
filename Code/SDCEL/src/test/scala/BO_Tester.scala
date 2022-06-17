@@ -4,7 +4,7 @@ import flatspec._
 import matchers._
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate, Point}
-import edu.ucr.dblab.bo3.{BentleyOttmann, Segment, Event, Tree, Node}
+import edu.ucr.dblab.bo3.{OrderedEvent, BentleyOttmann, Segment, Event, Tree, Node}
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 import edu.ucr.dblab.sdcel.Utils.{save, logger}
 
@@ -18,6 +18,65 @@ class BO_Tester extends AnyFlatSpec with should.Matchers {
   implicit val model: PrecisionModel = new PrecisionModel(1000.0)
   implicit val geofactory: GeometryFactory = new GeometryFactory(model)
   implicit val sta = ListBuffer[Point]()
+
+  ////////////////////////////////////////// CompareEvent //////////////////////////////////////////
+
+  val e1  = Event(new Coordinate(2, 3),   List.empty[Segment], 0)
+  val e2  = Event(new Coordinate(3, 1),   List.empty[Segment], 0)
+  val e3  = Event(new Coordinate(4.5, 4), List.empty[Segment], 0)
+  val e4  = Event(new Coordinate(5.5, 1), List.empty[Segment], 0)
+  val e5  = Event(new Coordinate(4.5, 1), List.empty[Segment], 0)
+  val e6  = Event(new Coordinate(1, 1),   List.empty[Segment], 0)
+  val e7  = Event(new Coordinate(2, 1),   List.empty[Segment], 0)
+  val e8  = Event(new Coordinate(2.5, 2), List.empty[Segment], 0)
+  val e9  = Event(new Coordinate(4.5, 3), List.empty[Segment], 0)
+  val e10 = Event(new Coordinate(1, 1),   List.empty[Segment], 0)
+  val e11 = Event(new Coordinate(4.5, 3), List.empty[Segment], 0)
+  val e12 = Event(new Coordinate(4.5, 2), List.empty[Segment], 0)
+
+  val x = List(
+    OrderedEvent(e1), OrderedEvent(e2), OrderedEvent(e3), OrderedEvent(e4),
+    OrderedEvent(e5), OrderedEvent(e6), OrderedEvent(e7), OrderedEvent(e8),
+    OrderedEvent(e9), OrderedEvent(e10), OrderedEvent(e11), OrderedEvent(e12)
+  ).sorted.map(_.event.point)
+
+  val c1  = new Coordinate(1, 1)
+  val c2  = new Coordinate(1, 1)
+  val c3  = new Coordinate(2, 1)
+  val c4  = new Coordinate(2, 3)
+  val c5  = new Coordinate(2.5, 2)
+  val c6  = new Coordinate(3, 1)
+  val c7  = new Coordinate(4.5, 1)
+  val c8  = new Coordinate(4.5, 2)
+  val c9  = new Coordinate(4.5, 3)
+  val c10 = new Coordinate(4.5, 3)
+  val c11 = new Coordinate(4.5, 4)
+  val c12 = new Coordinate(5.5, 1)
+
+  val x_prime = List(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12)
+
+  "X" should "be equal to X'" in { x.equals(x_prime) should be (true) }
+
+  ////////////////////////////////////////// Orientation //////////////////////////////////////////
+
+  val p  = new Coordinate(2, 5)
+  val q  = new Coordinate(8, 7)
+  val r1 = new Coordinate(7, 11)
+  val r2 = new Coordinate(5, 6)
+  val r3 = new Coordinate(1, 1)
+
+  "Points p, q, r1 " should " be left oriented" in {
+    BentleyOttmann.orientation(p, q, r1) should be  (1)
+  }
+  "Points p, q, r2 " should " be collinear" in {
+    BentleyOttmann.orientation(p, q, r2) should be  (0)
+  }
+  "Points p, q, r3 " should " be right oriented" in {
+    BentleyOttmann.orientation(p, q, r3) should be (-1)
+  }
+
+  ////////////////////////////////////////////// End //////////////////////////////////////////////
+
 
   val p0  = new Coordinate(2, 1); val p1  = new Coordinate(7, 4)
   val p2  = new Coordinate(7, 1); val p3  = new Coordinate(1, 4)
@@ -75,17 +134,16 @@ class BO_Tester extends AnyFlatSpec with should.Matchers {
   }
 
   val segsInT = ArrayBuffer[(Coordinate, Iterator[Long])]()
+  val evenInQ = ArrayBuffer[String]()
   while(!scheduler.isEmpty) {
     val event = scheduler.poll()
-    println(s"============================ NEW EVENT ============================")
-    println(s"EVENT: $event")
+    evenInQ.append(s"${event.segsIds}")
 
     event.ttype match {
       case 0 => {
         val seg = event.segments.head
         status.add( Node( seg.value, ArrayBuffer(seg) ) )
         val Tsegs = Tree.recalculate(event.value)
-        //println(s"${event.value}\t${Tsegs.mkString(" ")}")
         
         segsInT.append( (event.point, Tsegs)  )
       }
@@ -93,7 +151,6 @@ class BO_Tester extends AnyFlatSpec with should.Matchers {
         val seg = event.segments.head
         status.remove( Node( seg.value, ArrayBuffer(seg) ) )
         val Tsegs = Tree.recalculate(event.value)
-        //println(s"${event.value}\t${Tsegs.mkString(" ")}")
         
         segsInT.append( (event.point, Tsegs)  )
       }
@@ -102,28 +159,19 @@ class BO_Tester extends AnyFlatSpec with should.Matchers {
         status.remove( Node( seg.value, ArrayBuffer(seg) ) )
         status.add( Node( seg.value, ArrayBuffer(seg) ) )
         val Tsegs = Tree.recalculate(event.value)
-        //println(s"${event.value}\t${Tsegs.mkString(" ")}")
         
         segsInT.append( (event.point, Tsegs)  )
       }
     }
   }
 
-  ////////////////////////////////////////// Orientation //////////////////////////////////////////
-  val p  = new Coordinate(2, 5)
-  val q  = new Coordinate(8, 7)
-  val r1 = new Coordinate(7, 11)
-  val r2 = new Coordinate(5, 6)
-  val r3 = new Coordinate(1, 1)
-
-  "Points p, q, r1 " should " be left oriented" in {
-    BentleyOttmann.orientation(p, q, r1) should be  (1)
-  }
-  "Points p, q, r2 " should " be collinear" in {
-    BentleyOttmann.orientation(p, q, r2) should be  (0)
-  }
-  "Points p, q, r3 " should " be right oriented" in {
-    BentleyOttmann.orientation(p, q, r3) should be (-1)
+  val evenInQ_prime = Array(
+    "2", "1", "5", "6", "3", "4", "4,5", "3,4", "1,2", "4", "3", "6", "2", "1", "5"
+  )
+  println(evenInQ.mkString(" "))
+  println(evenInQ_prime.mkString(" "))
+  "Events in Q " should " be in the same order thatn Q'" in {
+    evenInQ.toArray.equals(evenInQ_prime) should be (true)
   }
 
   ////////////////////////////////////////// Functions //////////////////////////////////////////

@@ -3,280 +3,111 @@ package edu.ucr.dblab.bo3
 import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import com.vividsolutions.jts.geom.{Coordinate, LineString, Point}
 
+import org.jgrapht.graph.{SimpleDirectedGraph, DefaultEdge}
+import org.jgrapht.Graphs
+
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ListBuffer, ArrayBuffer}
+import scala.collection.mutable.{ListBuffer, ArrayBuffer, HashMap}
 
 import java.util.{PriorityQueue, TreeSet}
 
 import edu.ucr.dblab.sdcel.geometries.Half_edge
-import edu.ucr.dblab.sdcel.Utils.round
-
-case class Intersection(p: Coordinate, seg1: Segment, seg2: Segment)
-  (implicit geofactory: GeometryFactory) {
-
-  val point: Point = geofactory.createPoint(p)
-
-  val lines: List[LineString] = List(seg1.asJTSLine, seg2.asJTSLine)
-}
-
-case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
-  (implicit geofactory: GeometryFactory) extends Ordered[Event] {
-
-  val value = if(ttype == 1 && segments(0).isVertical) // TODO: cover special case...
-    point.x + 0.001
-  else
-    point.x
-
-  override def compare(that: Event): Int = {
-    if( this.value > that.value ) {
-      1
-    } else if( this.value < that.value ) {
-     -1
-    } else {
-      this.point.y compare that.point.y
-    }
-  }
-
-  private def L: String = s"LINESTRING($value 0, $value 1000 )"
-
-  def asJTSLine: LineString = geofactory.createLineString(
-    Array(new Coordinate(value, 0), new Coordinate(value, 1000))
-  )
-
-  def wkt: String = {
-    val coords = s"${point.x} ${point.y}"
-    val segs = segments.map{ seg => s"${seg.label}${seg.id}" }.mkString(" ")
-
-    s"$L\t$value\t$coords\t$ttype\t$segs"
-  }
-
-  override def toString: String = {
-    val coords = s"(${point.x} ${point.y})"
-    val wkt = s"POINT${coords}"
-    val segs = segments.map(_.id).mkString(", ")
-
-    f"$wkt%-25s value: ${value} event_point: $coords type: $ttype segs_id: { $segs }"
-  }
-}
-
-object Tree {
-  implicit val geofactory = new GeometryFactory()
-
-  def empty_seg(implicit geofactory: GeometryFactory): Segment = {
-    val epsilon = 0.001
-    val p1 = new Coordinate(Double.MinValue, Double.MinValue)
-    val p2 = new Coordinate(Double.MinValue + epsilon, Double.MinValue)
-    val fake_h = Half_edge(geofactory.createLineString(Array(p1, p2)))
-    fake_h.id = Long.MinValue
-    Segment(fake_h, "*")
-  }
-  val empty_node: Node = Node(Double.MinValue, ArrayBuffer(empty_seg))
-
-  def node(segment: Segment)(implicit T: TreeSet[Node]): Node = T.floor( Node(segment.value) )
-
-  def add(segment: Segment)(implicit T: TreeSet[Node]): Boolean = {
-    val N = node(segment)
-    if( N != null ){
-      N.add(segment)
-    } else {
-      T.add(Node(segment.value, ArrayBuffer(segment)))
-    }
-  }
-
-  def remove(segment: Segment)(implicit T: TreeSet[Node]): Boolean = {
-    val N = node(segment)
-    if(N != null){
-      if(N.size > 1){
-        N.remove(segment)
-      } else {
-        T.remove(N)
-      }
-    } else {
-      false
-    }
-  }
-
-  def swap(seg1: Segment, seg2: Segment)(implicit T: TreeSet[Node]): Unit = {
-    remove(seg1)
-    remove(seg2)
-    val value  = seg1.value
-    seg1.value = seg2.value
-    seg2.value = value
-    add(seg1)
-    add(seg2)
-  }
-
-  def recalculate(L: Double)(implicit T: TreeSet[Node]): Iterator[Long] = {
-    T.asScala.foreach{ node =>
-      node.value = node.segments.head.calculateValue(L)
-      node.segments.foreach{ seg => seg.value = node.value }
-    }
-    
-    T.iterator.asScala.map{ _.segments.map(_.id) }.flatten
-  }
-
-  def higher(segment: Segment)(implicit T: TreeSet[Node]): Segment = {
-    val N = node(segment)
-    if(N != null){
-      val segs = N.segments
-      if( segment.id == segs.last.id ){ // Pick head in higher T Node...
-        if( T.higher(N) != null) T.higher(N).segments.head else null
-      } else { // Pick next Segment in current segs...
-        val index = segs.indexWhere(_.id == segment.id)
-        if(index < segs.size - 1) segs( index + 1 ) else null
-      }
-    } else {
-      null
-    }
-  }
-
-  def lower(segment: Segment)(implicit T: TreeSet[Node]): Segment = {
-    val N = node(segment)
-    if(N != null){
-      val segs = N.segments
-      if( segment.id == segs.head.id ){ // Pick last in lower T Node...
-        if( T.lower(N) != null ) T.lower(N).segments.last else null
-      } else { // Pick prev Segment in current segs...
-        val index = segs.indexWhere(_.id == segment.id)
-        if(index > 1) segs( index  - 1 ) else null
-      }
-    } else {
-      null
-    }
-  }
-}
-
-case class Node(var value: Double,
-  var segments: ArrayBuffer[Segment] = ArrayBuffer.empty[Segment]) extends Ordered[Node] {
-
-  var id: Long = -1
-
-  def add(seg: Segment)    = {
-    if( !segments.exists(_.id == seg.id) ){
-      segments.append(seg)
-      sort
-      true
-    } else {
-      false
-    }
-  }
-
-  def remove(seg: Segment) = {
-    val index = segments.indexWhere(_.id == seg.id)
-    if( index >= 0 ){
-      segments.remove(index)
-      true
-    } else {
-      false
-    }
-  }
-
-  def size: Int = segments.size
-
-  def sort: Unit = { segments = segments.sortBy(_.angle) }
-
-  def wkt: String = segments.map{ seg => s"${seg.wkt}\t${id}\t${value}\n" }.mkString("")
-
-  override def compare(that: Node): Int = {
-    -( this.value compare that.value )
-  }
-
-  override def toString: String = {
-    segments.map{ segment =>
-      s"node_id: $id \t node_value: ${round(value, 2)} \t segment: ${segment} "
-    }.mkString("\n")
-  }
-
-}
-
-case class Segment(h: Half_edge, label: String)
-  (implicit geofactory: GeometryFactory) extends Ordered[Segment]{
-
-  val p_1:   Coordinate = h.v1
-  val p_2:   Coordinate = h.v2
-  val id:    Long = h.id 
-  val lid:   String = s"${label}${id}"
-  val angle: Double = hangle(p_1, p_2)
-  val source:   Coordinate = h.v1
-  val target:   Coordinate = h.v2
-  var value: Double = this.calculateValue(this.first.x)
-
-  def dx: Double = target.x - source.x
-  def dy: Double = target.y - source.y
-  def slope: Double = dy / dx
-
-  def first: Coordinate = {
-    if( p_1.x < p_2.x ) { p_1 }
-    else if( p_1.x > p_2.x ) { p_2 }
-    else {
-      if( p_1.y < p_2.y ) { p_1 }
-      else { p_2 }
-    }
-  }
-  
-  def second: Coordinate = {
-    if( p_1.x < p_2.x ) { p_2 }
-    else if( p_1.x > p_2.x ) { p_1 }
-    else {
-      if( p_1.y < p_2.y ) { p_2 }
-      else { p_1 }
-    }
-  }
-
-  def calculateValue(value: Double): Double = {
-    val x1 = this.first.x; val x2 = this.second.x
-    val y1 = this.first.y; val y2 = this.second.y
-
-    val dx = x2 - x1 // TODO: Track Zero division...
-    val dy = y2 - y1
-
-    val vx = value - x1
-    
-    y1 + ( (dy / dx) * vx ) // TODO: NaN value does not seem to affect...
-  }
-
-  def isVertical: Boolean = p_1.x == p_2.x
-
-  def isHorizontal: Boolean = p_1.y == p_2.y
-  
-  private def hangle(p_1: Coordinate, p_2: Coordinate): Double = {
-    val dx = p_1.x - p_2.x
-    val dy = p_1.y - p_2.y
-    val length = math.sqrt( (dx * dx) + (dy * dy) )
-    val angle = if(dy > 0){
-      math.acos(dx / length)
-    } else {
-      2 * math.Pi - math.acos(dx / length)
-    }
-    math.toDegrees(angle)
-  }
-
-  def asJTSLine: LineString = {
-    val line = geofactory.createLineString(Array(p_1, p_2))
-    line.setUserData(s"$label\t$id\t$value")
-    line
-  }
-
-  def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value"
-
-  override def compare(that: Segment): Int = this.value compare that.value
-
-  override def toString: String =
-    f"${asJTSLine.toText}%-30s label: ${label}%-4s id: ${id}%-3s value: ${this.value}%-20s"
-}
 
 object BentleyOttmann {
   implicit val model: PrecisionModel = new PrecisionModel(1e-3)
   implicit val geofactory: GeometryFactory = new GeometryFactory(model)
-  implicit var T: TreeSet[Node]   = new TreeSet[Node]()
-  var Q: PriorityQueue[Event]     = new PriorityQueue[Event]()
-  var X: ListBuffer[Intersection] = new ListBuffer[Intersection]()
+  implicit var T: TreeSet[Node]        = new TreeSet[Node]()
+  implicit var Q: PriorityQueue[Event] = new PriorityQueue[Event]()
+  var X: ListBuffer[Intersection]      = new ListBuffer[Intersection]()
+
+  /**** Main Class Start ****/
+  def sweep_segments(segs1: List[Segment], segs2: List[Segment]): List[Intersection] = {
+    // local declarations...
+    val S: List[Segment] = segs1 ++ segs2
+    val G: SimpleDirectedGraph[Coordinate, NNode] =
+      new SimpleDirectedGraph[Coordinate, NNode](classOf[NNode])
+    val X_structure: PriorityQueue[Event] = new PriorityQueue[Event]()
+    val last_node: Map[Segment, NNode] = List.empty[(Segment, NNode)].toMap
+    val seg_queue: PriorityQueue[Segment] = new PriorityQueue[Segment]( new segmentByXY )
+
+    // Initialization...
+    val L = ListBuffer[Segment]()
+    val M = ListBuffer[(Segment, Segment)]()
+    S.foreach{ s =>
+      X_structure.add(Event(s.first,  List(s), 0))
+      X_structure.add(Event(s.second, List(s), 1))
+
+      if(s.source != s.target) { // Ignore zero-length segments...
+        val s1 = if(!s.isVertical){ if(!s.isLeftOriented)    { s.reverse } else { s } }
+                             else { if(!s.isUpwardsOriented) { s.reverse } else { s } }
+        M.append(s1 -> s)
+        L.append(s1)
+        seg_queue.add(s1)
+      }
+    }
+    val internal: List[Segment] = L.toList
+    val original: Map[Segment, Segment] = M.toMap
+
+    val (lower_sentinel, upper_sentinel) = getSentinels
+    var p_sweep = lower_sentinel.source
+    val cmp = new sweep_cmp()
+    cmp.sweep = p_sweep
+    val Y_structure: TreeSet[Segment] = new TreeSet[Segment](cmp)
+    Y_structure.add(lower_sentinel)
+    Y_structure.add(upper_sentinel)
+    var next_seg = seg_queue.poll() 
+
+    ???
+  }
+  /***** Main Class End *****/
+
+  def getSentinels(implicit geofactory: GeometryFactory): (Segment, Segment) = {
+    val infinity = Double.MaxValue
+    val arr1 = Array( new Coordinate(-infinity, -infinity), new Coordinate(-infinity, infinity) )
+    val arr2 = Array( new Coordinate( infinity, -infinity), new Coordinate( infinity, infinity) )
+    val l1 = geofactory.createLineString(arr1)
+    val l2 = geofactory.createLineString(arr2)
+    val h1 = Half_edge(l1)
+    val h2 = Half_edge(l2)
+    val lower = Segment(h1, "*")
+    val upper = Segment(h2, "*")
+    (lower, upper)
+  }
 
   def readSegments(input_data: List[Segment]): Unit = {
     input_data.foreach { s =>
       this.Q.add(Event(s.first,  List(s), 0))
       this.Q.add(Event(s.second, List(s), 1))
     }
+  }
+
+  def getInternalOriginalMap(segments: List[Segment], seg_queue: PriorityQueue[Segment]):
+      (Map[Segment, Segment], List[Segment]) = {
+
+    val L = ListBuffer[Segment]()
+    val M = segments.map{ segment =>
+      if(!segment.isVertical){
+        if(!segment.isLeftOriented){
+          val r = segment.reverse
+          L.append(r)
+          (r, segment)
+        } else {
+          L.append(segment)
+          (segment, segment)
+        }
+      } else {
+        if(!segment.isUpwardsOriented){
+          val r = segment.reverse
+          L.append(r)
+          (r, segment)
+        } else {
+          L.append(segment)
+          (segment, segment)
+        }
+      }
+    }.toMap
+
+    (M, L.toList)
   }
 
   //////////////////////////////////////// Primitives [Start] ////////////////////////////////////////
@@ -301,7 +132,7 @@ object BentleyOttmann {
     }
   }
 
-  def oritentation(s: Segment, p: Coordinate): Int = {
+  def orientation(s: Segment, p: Coordinate): Int = {
     orientation(s.h.v1, s.h.v2, p)
   }
 
@@ -314,7 +145,26 @@ object BentleyOttmann {
     }
   }
 
-  def cmp_slopes(s1: Segment, s2: Segment): Int = sign(s1.slope - s2.slope)
+  /* See section 10.7 pag 739 at LEDA Book (Mehlhorn et al, 1997)*/
+  def intersection_of_lines(s1: Segment, s2: Segment): Option[Coordinate] = {
+    if(s1.slope == s2.slope){
+      None
+    } else if(s1.isDegenerate || s2.isDegenerate){
+      None
+    } else {
+      s1.intersection(s2)
+    }
+  }
+
+  /* See section 10.7 pag 739 at LEDA Book (Mehlhorn et al, 1997)*/
+  def cmp_slopes(s1: Segment, s2: Segment): Int = {
+    (s1.slope, s2.slope) match {
+      case (None, None) => 0
+      case (Some(slope), None) => 0
+      case (None, Some(slope)) => 0
+      case (Some(ss1), Some(ss2)) => sign(ss1 - ss2)
+    }
+  }
 
   /* See section 20 at (Mehlhorn and Naher, 1994) */
   def compareSegments(s1: Segment, s2: Segment, p_sweep: Coordinate): Int = {
@@ -578,4 +428,166 @@ object BentleyOttmann {
       case None    =>  
     }
   }
+}
+
+case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
+  (implicit geofactory: GeometryFactory) extends Ordered[Event] {
+
+  val segsIds = s"${segments.map(_.id).mkString(",")}"
+
+  val value = point.x
+
+  /* compare function asked at LEDA boot pag 739 */
+  def compare(that: Event): Int = {
+    val C = this.point.x compare that.point.x
+
+    val R = C match{
+      case 0 => this.point.y compare that.point.y
+      case _ => C
+    }
+
+    R
+  }
+
+  def sweepAsWKT(minY: Double = 0.0, maxY: Double = 1000.0): String = {
+    s"LINESTRING( $value 0, $value 1000 )"
+  }
+
+  def asJTSLine: LineString = geofactory.createLineString(
+    Array(new Coordinate(value, 0), new Coordinate(value, 1000))
+  )
+
+  def wkt: String = {
+    val coords = s"${point.x} ${point.y}"
+    val segs = segments.map{ seg => s"${seg.label}${seg.id}" }.mkString(" ")
+
+    s"${sweepAsWKT()}\t$value\t$coords\t$ttype\t$segs"
+  }
+
+  override def toString: String = {
+    val coords = s"(${point.x} ${point.y})"
+    val wkt = s"POINT${coords}"
+    val segs = segments.map(_.id).mkString(", ")
+
+    f"$wkt%-25s value: ${value} event_point: $coords type: $ttype segs_id: { $segs }"
+  }
+}
+
+case class Segment(h: Half_edge, label: String)
+  (implicit geofactory: GeometryFactory) extends Ordered[Segment]{
+
+  val p_1:    Coordinate = h.v1
+  val p_2:    Coordinate = h.v2
+  val source: Coordinate = h.v1
+  val target: Coordinate = h.v2
+  val id:    Long = h.id
+  val line:  LineString = h.edge
+  val lid:   String = s"${label}${id}"
+  val angle: Double = hangle(source, target)
+  var value: Double = this.calculateValue(this.first.x)
+
+  def dx: Double = target.x - source.x
+  def dy: Double = target.y - source.y
+  def slope: Option[Double] = {
+    if( dx == 0 ){
+      None
+    } else {
+      Some( dy / dx )
+    }
+  }
+
+  def identical(that: Segment): Boolean = {
+    this.source == that.source && this.target == that.target
+  }
+
+  def isTrivial(sweep: Coordinate): Boolean = this.source == sweep && this.target == sweep  
+
+  def first: Coordinate = {
+    if( p_1.x < p_2.x ) { p_1 }
+    else if( p_1.x > p_2.x ) { p_2 }
+    else {
+      if( p_1.y < p_2.y ) { p_1 }
+      else { p_2 }
+    }
+  }
+  
+  def second: Coordinate = {
+    if( p_1.x < p_2.x ) { p_2 }
+    else if( p_1.x > p_2.x ) { p_1 }
+    else {
+      if( p_1.y < p_2.y ) { p_2 }
+      else { p_1 }
+    }
+  }
+
+  def calculateValue(value: Double): Double = {
+    val x1 = this.first.x; val x2 = this.second.x
+    val y1 = this.first.y; val y2 = this.second.y
+
+    val dx = x2 - x1 // TODO: Track Zero division...
+    val dy = y2 - y1
+
+    val vx = value - x1
+    
+    y1 + ( (dy / dx) * vx ) // TODO: NaN value does not seem to affect...
+  }
+
+  def isVertical: Boolean = dx == 0
+
+  def isHorizontal: Boolean = dy == 0
+
+  def isLeftOriented: Boolean = source.x > target.x
+
+  def isUpwardsOriented: Boolean = source.y < target.y
+
+  def isDegenerate: Boolean = {
+    if(isVertical){
+      true
+    } else {
+      false
+    }
+  }
+
+  def reverse: Segment = {
+    val edge = line.reverse().asInstanceOf[LineString]
+    edge.setUserData(line.getUserData)
+    val h = Half_edge(edge)
+    h.id = this.h.id
+
+    Segment(h, this.label)
+  }
+
+  def intersection(that: Segment): Option[Coordinate] = {
+    val coords = this.line.intersection(that.line).getCoordinates
+    if(coords.size == 1){
+      Some(coords.head)
+    } else {
+      None
+    }
+  }
+  
+  def asJTSLine: LineString = {
+    val line = geofactory.createLineString(Array(p_1, p_2))
+    line.setUserData(s"$label\t$id\t$value")
+    line
+  }
+
+  def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value"
+
+  private def hangle(p_1: Coordinate, p_2: Coordinate): Double = {
+    val dx = p_1.x - p_2.x
+    val dy = p_1.y - p_2.y
+    val length = math.sqrt( (dx * dx) + (dy * dy) )
+    val angle = if(dy > 0){
+      math.acos(dx / length)
+    } else {
+      2 * math.Pi - math.acos(dx / length)
+    }
+    math.toDegrees(angle)
+  }
+
+  override def compare(that: Segment): Int = this.value compare that.value
+
+  override def toString: String =
+    f"${asJTSLine.toText}%-30s label: ${label}%-4s id: ${id}%-3s value: ${this.value}%-20s"
 }
