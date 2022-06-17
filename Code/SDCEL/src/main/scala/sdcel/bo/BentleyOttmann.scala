@@ -55,7 +55,22 @@ object BentleyOttmann {
     val Y_structure: TreeSet[Segment] = new TreeSet[Segment](cmp)
     Y_structure.add(lower_sentinel)
     Y_structure.add(upper_sentinel)
-    var next_seg = seg_queue.poll() 
+    var next_seg = seg_queue.poll()
+
+    while( !X_structure.isEmpty ) {
+      val event = X_structure.poll()
+      p_sweep = event.point
+      cmp.sweep = p_sweep
+      val v = G.addVertex(p_sweep)
+      // handle passing and ending segments...
+      val sit = event.segments.head
+      
+
+      // insert starting segments...
+
+      // compute new intersections and update X_structure...
+
+    }
 
     ???
   }
