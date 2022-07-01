@@ -9,8 +9,9 @@ import org.jgrapht.Graphs
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, ArrayBuffer, HashMap}
 
-import java.util.{PriorityQueue, TreeSet}
+import java.util.{PriorityQueue, TreeSet, TreeMap}
 
+import edu.ucr.dblab.sdcel.Utils.{save, logger}
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 
 object BentleyOttmann {
@@ -18,24 +19,26 @@ object BentleyOttmann {
   implicit val geofactory: GeometryFactory = new GeometryFactory(model)
   implicit var T: TreeSet[Node]        = new TreeSet[Node]()
   implicit var Q: PriorityQueue[Event] = new PriorityQueue[Event]()
+  implicit val G: SimpleDirectedGraph[Coordinate, SegmentEdge] =
+    new SimpleDirectedGraph[Coordinate, SegmentEdge](classOf[SegmentEdge])
   var X: ListBuffer[Intersection]      = new ListBuffer[Intersection]()
 
   /**** Main Class Start ****/
-  def sweep_segments(segs1: List[Segment], segs2: List[Segment]): List[Intersection] = {
+  def sweep_segments(segs1: List[Segment], segs2: List[Segment])
+    (implicit settings: Settings): List[Intersection] = {
+
     // local declarations...
     val S: List[Segment] = segs1 ++ segs2
-    val G: SimpleDirectedGraph[Coordinate, NNode] =
-      new SimpleDirectedGraph[Coordinate, NNode](classOf[NNode])
-    val X_structure: PriorityQueue[Event] = new PriorityQueue[Event]()
-    val last_node: Map[Segment, NNode] = List.empty[(Segment, NNode)].toMap
+    implicit val X_structure: TreeMap[Coordinate, Seq_item] = new TreeMap[Coordinate, Seq_item]()
+    implicit val last_node: Map[Segment, Coordinate] = List.empty[(Segment, Coordinate)].toMap
     val seg_queue: PriorityQueue[Segment] = new PriorityQueue[Segment]( new segmentByXY )
 
     // Initialization...
     val L = ListBuffer[Segment]()
     val M = ListBuffer[(Segment, Segment)]()
     S.foreach{ s =>
-      X_structure.add(Event(s.first,  List(s), 0))
-      X_structure.add(Event(s.second, List(s), 1))
+      X_structure.put(s.first,  null)
+      X_structure.put(s.second, null)
 
       if(s.source != s.target) { // Ignore zero-length segments...
         val s1 = if(!s.isVertical){ if(!s.isLeftOriented)    { s.reverse } else { s } }
@@ -46,24 +49,60 @@ object BentleyOttmann {
       }
     }
     val internal: List[Segment] = L.toList
-    val original: Map[Segment, Segment] = M.toMap
+    implicit val original: Map[Segment, Segment] = M.toMap
 
     val (lower_sentinel, upper_sentinel) = getSentinels
     var p_sweep = lower_sentinel.source
     val cmp = new sweep_cmp()
-    cmp.sweep = p_sweep
-    val Y_structure: TreeSet[Segment] = new TreeSet[Segment](cmp)
-    Y_structure.add(lower_sentinel)
-    Y_structure.add(upper_sentinel)
+    cmp.setPosition(p_sweep)
+    implicit val Y_structure: TreeMap[Segment, Seq_item] = new TreeMap[Segment, Seq_item](cmp)
+
+    val r1 = Y_structure.put(lower_sentinel, null)
+    val r2 = Y_structure.put(upper_sentinel, null)
     var next_seg = seg_queue.poll()
 
+    if( settings.debug ){
+      save("/tmp/edgesX.wkt"){
+        getAll_X(X_structure).zipWithIndex.map{ case(event_point, index) =>
+          val x = event_point.x
+          val y = event_point.y
+
+          s"POINT( $x $y )\t$event_point\t$index\n"
+        }
+      }
+
+      save("/tmp/edgesY.wkt"){
+        Y_structure.asScala.map{ case(s, it) =>
+          s"${s.wkt}\n"
+        }.toList
+      }
+
+
+    }
+
     while( !X_structure.isEmpty ) {
-      val event = X_structure.poll()
-      p_sweep = event.point
-      cmp.sweep = p_sweep
-      val v = G.addVertex(p_sweep)
+      val event = X_structure.pollFirstEntry()
+      p_sweep = event.getKey
+      cmp.setPosition(p_sweep)
+      G.addVertex(p_sweep)
+      val v: Coordinate = p_sweep
+      
+
       // handle passing and ending segments...
-      val sit = event.segments.head
+      var sit = if( event.getValue == null ){ 
+        val temp_segment = createSegment(p_sweep, p_sweep)
+        Y_structure.get(temp_segment)
+      } else {
+        event.getValue
+      }
+
+      if( sit != null ){
+        // determine passing and ending segments...
+
+        // reverse order of passing segments...
+
+      }
+
       
 
       // insert starting segments...
@@ -72,20 +111,171 @@ object BentleyOttmann {
 
     }
 
-    ???
+    List.empty[Intersection]
   }
   /***** Main Class End *****/
 
+  /* Determine passing and ending segments. LEDA book pag 748. */
+  def determineSegments(sit_prime: Seq_item, event: Seq_item, v: Coordinate, p_sweep: Coordinate)
+    (implicit
+      settings:    Settings,
+      Y_structure: TreeMap[Segment, Seq_item],
+      original:    Map[Segment, Segment],
+      last_node:   TreeMap[Segment, Coordinate],
+      G:           SimpleDirectedGraph[Coordinate, SegmentEdge]
+    ): (Seq_item, Seq_item, Seq_item, Seq_item) = {
+
+    // walk up...
+    var sit_succ: Seq_item = null
+    var sit_pred: Seq_item = null
+    var sit_pred_succ: Seq_item = null
+    var sit_first: Seq_item = null
+
+    var sit: Seq_item = sit_prime
+    while( inf(sit) == event || inf(sit) == succ(sit) ) { sit = succ(sit) }
+    sit_succ = succ(sit)
+    val sit_last: Seq_item = sit
+    if( settings.use_optimization ) { /* optimization, part 1  */ }
+
+    // walk down
+    var overlapping: Boolean = false
+    do {
+      overlapping = false
+      val s = key(sit)
+      val w = last_node.get(s)
+      if( !settings.embed && s.source == original(s).source ){
+        new_edge(w, v, s)
+      } else {
+        new_edge(v, w, s)
+      }
+      if( identical(p_sweep, s.target) ) { // ending segment...
+        val it = pred(sit)
+        if( inf(it) == sit ) {
+          overlapping = true
+          change_inf( it, inf(sit) )
+        }
+        del_item(sit)
+        sit = it
+      } else { // passing segment...
+        if( inf(sit) != succ(sit) ) change_inf( sit, null )
+        last_node.replace(s, v)
+        sit = pred(sit)
+      }
+    } while(inf(sit) == event || overlapping || inf(sit) == succ(sit) )
+      sit_pred = sit
+    sit_first = succ(sit_pred)
+    sit_pred_succ = sit_first
+
+    (sit_succ, sit_pred, sit_pred_succ, sit_first)
+  }
+
+  /* Reverse order of passing segmentes. LEDA Book pag 749 */
+  def reverseOrder(sit_succ: Seq_item, sit_pred: Seq_item, sit_pred_succ: Seq_item,
+    sit_first: Seq_item)
+    (implicit
+      settings:    Settings,
+      Y_structure: TreeMap[Segment, Seq_item]
+    ): Unit = {
+
+    var sit = sit_first
+    // reverse subsequences of overlapping segments (if existing)...
+    while( sit != sit_succ ){
+      val sub_first = sit
+      var sub_last  = sub_first
+      while( inf(sub_last) == succ(sub_last) ) sub_last = succ(sub_last)
+      if( sub_last !=  sub_first ) {
+
+      }
+    }
+  }
+
+  def identical(p: Coordinate, q: Coordinate): Boolean = p.equals2D(q)
+
+  /* Sortseq methods */
+  def lookup(k: Segment)(implicit Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+    Y_structure.get(k)
+  }
+
+  def insert(k: Segment, i: Seq_item)(implicit Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+    if( lookup(k) == null ){
+      Y_structure.put(k, i)
+      i
+    } else {
+      Y_structure.replace(k, i)
+    }
+  }
+
+  def key(sit: Seq_item): Segment = sit.key.getKeySegment
+
+  def inf(sit: Seq_item)(implicit Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+    Y_structure.get( key(sit) )
+  }
+
+  def succ(sit: Seq_item)(implicit Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+    Y_structure.higherEntry( key(sit) ).getValue
+  }
+
+  def pred(sit: Seq_item)(implicit Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+    Y_structure.lowerEntry( key(sit) ).getValue
+  }
+
+  def del_item(it: Seq_item)(implicit Y_structure: TreeMap[Segment, Seq_item]): Unit = {
+    Y_structure.remove( key(it) )
+  }
+
+  /* Makes it2 the information of item it1 (LEDA book pag 182) */
+  def change_inf(it1: Seq_item, it2: Seq_item): Unit = { it1.inf = it2 }
+
+  def reverse_items(it1: Seq_item, it2: Seq_item): Unit = {
+    val temp = it1.inf
+    it1.inf = it2.inf
+    it2.inf = temp
+  }
+
+  def new_node(p: Coordinate)(implicit settings: Settings): Coordinate = {
+    G.addVertex(p)
+    p
+  }
+
+  def new_edge(v: Coordinate, w: Coordinate, s: Segment)(implicit settings: Settings): SegmentEdge = {
+    val se = SegmentEdge(s)
+    G.addEdge(v, w, se)
+    se
+  }
+
+  def getAll_X(X: TreeMap[Coordinate, Seq_item]): List[Coordinate] = {
+    def get(X: TreeMap[Coordinate, Seq_item], cursor: Coordinate, R: List[Coordinate]):
+        List[Coordinate] = {
+      if(cursor == X.lastKey()){
+        R :+ cursor
+      } else {
+        val newR = R :+ cursor
+        get(X, X.higherKey(cursor), newR)
+      }
+    }
+
+    get(X, X.firstKey(), List.empty[Coordinate])
+  }
+
+  def createSegment(p1: Coordinate, p2: Coordinate)(implicit geofactory: GeometryFactory): Segment = {
+    val line = geofactory.createLineString(Array(p1, p2))
+    val hedge = Half_edge(line)
+    hedge.id = -3
+    Segment(hedge, "*")
+  }
+
   def getSentinels(implicit geofactory: GeometryFactory): (Segment, Segment) = {
-    val infinity = Double.MaxValue
+    val infinity = Double.MaxValue - 1
     val arr1 = Array( new Coordinate(-infinity, -infinity), new Coordinate(-infinity, infinity) )
     val arr2 = Array( new Coordinate( infinity, -infinity), new Coordinate( infinity, infinity) )
     val l1 = geofactory.createLineString(arr1)
     val l2 = geofactory.createLineString(arr2)
     val h1 = Half_edge(l1)
+    h1.id = -1
     val h2 = Half_edge(l2)
-    val lower = Segment(h1, "*")
-    val upper = Segment(h2, "*")
+    h2.id = -2
+    val lower = Segment(h1, "Lower")
+    val upper = Segment(h2, "Upper")
     (lower, upper)
   }
 
@@ -94,6 +284,67 @@ object BentleyOttmann {
       this.Q.add(Event(s.first,  List(s), 0))
       this.Q.add(Event(s.second, List(s), 1))
     }
+  }
+
+  def loadData(implicit geofactory: GeometryFactory): (List[Point], List[Segment]) = {
+    val j = geofactory.createPoint(new Coordinate( 0.125, 1.450)); j.setUserData("j")
+    val i = geofactory.createPoint(new Coordinate( 6.000, 7.000)); i.setUserData("i")
+    val m = geofactory.createPoint(new Coordinate(-0.300, 5.250)); m.setUserData("m")
+    val g = geofactory.createPoint(new Coordinate( 5.000, 5.250)); g.setUserData("g")
+    val n = geofactory.createPoint(new Coordinate(-0.300, 6.500)); n.setUserData("n")
+    val h = geofactory.createPoint(new Coordinate( 5.000, 8.150)); h.setUserData("h")
+    val k = geofactory.createPoint(new Coordinate( 1.000, 1.000)); k.setUserData("k")
+    val b = geofactory.createPoint(new Coordinate( 1.000, 9.500)); b.setUserData("b")
+    val d = geofactory.createPoint(new Coordinate( 2.800, 2.000)); d.setUserData("d")
+    val e = geofactory.createPoint(new Coordinate( 3.250, 9.000)); e.setUserData("e")
+
+    val l1 = geofactory.createLineString(Array(j.getCoordinate, i.getCoordinate))
+    val l2 = geofactory.createLineString(Array(m.getCoordinate, g.getCoordinate))
+    val l3 = geofactory.createLineString(Array(n.getCoordinate, h.getCoordinate))
+    val l4 = geofactory.createLineString(Array(k.getCoordinate, b.getCoordinate))
+    val l7 = geofactory.createLineString(Array(e.getCoordinate, g.getCoordinate))
+
+    val p1 = new Coordinate(-10, 1.75);val p2 = new Coordinate(10, 1.75)
+    val l10 = geofactory.createLineString(Array(p1, p2)) 
+    val p3 = new Coordinate(-10, 3.25);val p4 = new Coordinate(10, 3.25)
+    val l11 = geofactory.createLineString(Array(p3, p4)) 
+
+    val f = l1.intersection(l2).asInstanceOf[Point];  f.setUserData("f")
+    val a = l3.intersection(l4).asInstanceOf[Point];  a.setUserData("a")
+    val p = l2.intersection(l4).asInstanceOf[Point];  p.setUserData("p")
+    val l = l1.intersection(l10).asInstanceOf[Point]; l.setUserData("l")
+    val c = l1.intersection(l11).asInstanceOf[Point]; c.setUserData("c")
+
+    val P = List(a,b,c,d,e,f,g,h,i,j,k,l,m,n,p)
+
+    val l5 = geofactory.createLineString(Array(a.getCoordinate, e.getCoordinate))
+    val l6 = geofactory.createLineString(Array(d.getCoordinate, f.getCoordinate))
+    val l8 = geofactory.createLineString(Array(l.getCoordinate, c.getCoordinate))
+    val l9 = geofactory.createLineString(Array(p.getCoordinate, e.getCoordinate))
+
+    val h1 = Half_edge(l1); h1.id = 1
+    val h2 = Half_edge(l2); h2.id = 2
+    val h3 = Half_edge(l3); h3.id = 3
+    val h4 = Half_edge(l4); h4.id = 4
+    val h5 = Half_edge(l5); h5.id = 5
+    val h6 = Half_edge(l6); h6.id = 6
+    val h7 = Half_edge(l7); h7.id = 7
+    val h8 = Half_edge(l8); h8.id = 8
+    val h9 = Half_edge(l9); h9.id = 9
+
+    val s1 = Segment(h1, "A")
+    val s2 = Segment(h2, "A")
+    val s3 = Segment(h3, "A")
+    val s4 = Segment(h4, "A")
+    val s5 = Segment(h5, "A")
+    val s6 = Segment(h6, "A")
+    val s7 = Segment(h7, "A")
+    val s8 = Segment(h8, "A")
+    val s9 = Segment(h9, "A")
+
+    val S = List(s1,s2,s3,s4,s5,s6,s7,s8,s9)
+
+    (P, S)
   }
 
   def getInternalOriginalMap(segments: List[Segment], seg_queue: PriorityQueue[Segment]):
@@ -144,6 +395,12 @@ object BentleyOttmann {
       case x if x <  0 =>  1  //  counterclock wise
       case x if x == 0 =>  0  //  collinear
       case x if x  > 0 => -1  //  clock wise
+      case _ => {
+        // Happening with Double Overflow (Infinity * Zero)...
+        logger.warn("Warning on point - segment orientation...")
+        logger.warn(s"value: $value\tp1: $p1\tp2: $p2\tp3: $p3")
+        -1
+      }
     }
   }
 
@@ -298,7 +555,7 @@ object BentleyOttmann {
       val e: Event  = this.Q.poll()
       val L: Double = e.value
 
-      f.write(s"${e.wkt}\t$j\n")
+      f.write(s"${e.wkt()}\t$j\n")
 
       e.ttype match {
         case 0 => {
@@ -445,6 +702,10 @@ object BentleyOttmann {
   }
 }
 
+/************************************************************************************/
+/*****   Evnet case class             ***********************************************/
+/************************************************************************************/
+
 case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
   (implicit geofactory: GeometryFactory) extends Ordered[Event] {
 
@@ -465,18 +726,18 @@ case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
   }
 
   def sweepAsWKT(minY: Double = 0.0, maxY: Double = 1000.0): String = {
-    s"LINESTRING( $value 0, $value 1000 )"
+    s"LINESTRING( $value $minY, $value $maxY )"
   }
 
   def asJTSLine: LineString = geofactory.createLineString(
     Array(new Coordinate(value, 0), new Coordinate(value, 1000))
   )
 
-  def wkt: String = {
+  def wkt(minY: Double = 0.0, maxY: Double = 1000.0): String = {
     val coords = s"${point.x} ${point.y}"
     val segs = segments.map{ seg => s"${seg.label}${seg.id}" }.mkString(" ")
 
-    s"${sweepAsWKT()}\t$value\t$coords\t$ttype\t$segs"
+    s"${sweepAsWKT(minY, maxY)}\t$value\t$coords\t$ttype\t$segs"
   }
 
   override def toString: String = {
@@ -487,6 +748,10 @@ case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
     f"$wkt%-25s value: ${value} event_point: $coords type: $ttype segs_id: { $segs }"
   }
 }
+
+/************************************************************************************/
+/*****   Segmant case class           ***********************************************/
+/************************************************************************************/
 
 case class Segment(h: Half_edge, label: String)
   (implicit geofactory: GeometryFactory) extends Ordered[Segment]{
@@ -500,6 +765,8 @@ case class Segment(h: Half_edge, label: String)
   val lid:   String = s"${label}${id}"
   val angle: Double = hangle(source, target)
   var value: Double = this.calculateValue(this.first.x)
+  var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
+  val debug: Boolean = false
 
   def dx: Double = target.x - source.x
   def dy: Double = target.y - source.y
@@ -601,7 +868,15 @@ case class Segment(h: Half_edge, label: String)
     math.toDegrees(angle)
   }
 
-  override def compare(that: Segment): Int = this.value compare that.value
+  val cmp = new sweep_cmp()
+  override def compare(that: Segment): Int = {
+    cmp.setPosition(this.sweep)
+    val r = cmp.compare(this, that)
+    if(debug) {
+      println(s"compare ${this.id} and ${that.id}: $r")
+    }
+    r
+  }
 
   override def toString: String =
     f"${asJTSLine.toText}%-30s label: ${label}%-4s id: ${id}%-3s value: ${this.value}%-20s"

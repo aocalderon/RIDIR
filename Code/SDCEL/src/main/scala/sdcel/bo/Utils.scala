@@ -2,7 +2,7 @@ package edu.ucr.dblab.bo3
 
 import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Point, LineString}
 
-import org.jgrapht.graph.DefaultEdge
+import org.jgrapht.graph.{SimpleDirectedGraph, DefaultEdge}
 
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 import edu.ucr.dblab.sdcel.Utils.logger
@@ -10,12 +10,68 @@ import edu.ucr.dblab.sdcel.Utils.logger
 import scala.collection.JavaConverters._
 import scala.collection.mutable.{ListBuffer, ArrayBuffer}
 
-import java.util.{PriorityQueue, TreeSet, Comparator}
+import java.util.{PriorityQueue, TreeSet, TreeMap, Comparator}
+
+/* Case class to model global settings */
+case class Settings(
+  debug: Boolean = false,
+  embed: Boolean = false,
+  use_optimization: Boolean = false,
+  tolerance: Double = 1e-3,
+  geofactory: GeometryFactory = new GeometryFactory()
+)
+
+/* Case class to model a sequential item (seq_item) suitable for the X and Y strucrutes */
+/* LEDA book pag 138-141 */
+object Structures extends Enumeration {
+  type Structure = Value
+  val X, Y = Value
+}
+
+import Structures._
+
+case class Key(key: Any, structure: Structure = null){
+  def getKeyPoint: Coordinate = if(key.isInstanceOf[Point])
+    key.asInstanceOf[Coordinate]
+  else
+    null
+
+  def getKeySegment: Segment = if(key.isInstanceOf[Segment])
+    key.asInstanceOf[Segment]
+  else
+    null
+
+  def getInfo(implicit X_structure: TreeMap[Coordinate, Seq_item],
+    Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+
+    structure match {
+      case X => {
+        X_structure.get(getKeyPoint).inf
+      }
+      case Y => {
+        Y_structure.get(getKeySegment).inf
+      }
+    }
+  }
+
+  def getKey: (Structure, Coordinate, Segment) = {
+    structure match {
+      case X => (X, getKeyPoint, null)
+      case Y => (Y, null, getKeySegment)
+    }
+  }
+}
+
+case class Seq_item(key: Key, var inf: Seq_item = null)
 
 /* Java class extending Comparator for ordering segments in status (Y_structure) */
 /* As stated at LEDA book pag 742 */
 class sweep_cmp() extends Comparator[Segment]{
-  var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
+  private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
+
+  def setPosition(p: Coordinate): Unit = {
+    sweep = p
+  }
 
   def sign(x: Long): Int = x match {
     case _ if x <  0 => -1
@@ -26,7 +82,6 @@ class sweep_cmp() extends Comparator[Segment]{
   def compare(s1: Segment, s2: Segment): Int = {
     // Precondition
     // sweep is identical to the left endpoint of either s1 or s2...
-
     if(s1.identical(s2)){
       0
     } else {
@@ -64,7 +119,7 @@ case class Intersection(p: Coordinate, seg1: Segment, seg2: Segment)
 
 /* Support class to model the Graph's type node */
 /* Follows LEDA book pag 743 */
-case class NNode(segment: Segment) extends DefaultEdge {
+case class SegmentEdge(segment: Segment) extends DefaultEdge {
   override def toString: String =
     s"source: ${this.getSource}\ttarget: ${this.getTarget}\tsegment: $segment"
 }

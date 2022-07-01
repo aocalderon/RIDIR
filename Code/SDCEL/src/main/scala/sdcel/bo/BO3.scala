@@ -29,6 +29,14 @@ object BO3 {
     implicit val model: PrecisionModel = new PrecisionModel(scale)
     implicit val geofactory: GeometryFactory = new GeometryFactory(model)
 
+    implicit val settings: Settings = Settings(
+      debug = debug,
+      tolerance = tolerance,
+
+      geofactory = geofactory
+    )
+
+
     println(s"METHOD:     $method   ")
     println(s"TOLERANCE:  $tolerance")
     println(s"SCALE:      ${geofactory.getPrecisionModel.getScale}")
@@ -90,41 +98,22 @@ object BO3 {
 
     if(debug){
       save("/tmp/edgesSCH.wkt"){
-        scheduler.iterator.asScala.toList.map( e => s"${e.wkt}\t${e.value}\t${e.ttype}\n" )
+        scheduler.iterator.asScala.toList.map( e => s"${e.wkt(maxY = 10)}\t${e.value}\t${e.ttype}\n" )
       }
     }
 
-    val f = new PrintWriter("/tmp/edgesSTA.wkt")
-    while(!scheduler.isEmpty) {
-      val event = scheduler.poll()
-      println(s"============================ NEW EVENT ============================")
-      println(s"EVENT: $event")
+    // Load data...
+    val (points, data) = BentleyOttmann.loadData
+    // Calling main function...
+    BentleyOttmann.sweep_segments( data, List.empty[Segment] )
 
-      event.ttype match {
-        case 0 => {
-          val seg = event.segments.head
-          status.add( Node( seg.value, ArrayBuffer(seg) ) )
-          Tree.recalculate(event.value)
-
-          printStatus(f, event.value)
-        }
-        case 1 => {
-          val seg = event.segments.head
-          status.remove( Node( seg.value, ArrayBuffer(seg) ) )
-          Tree.recalculate(event.value)
-
-          printStatus(f, event.value)
-        }
-        case 2 => {
-          val seg = event.segments.head
-          status.remove( Node( seg.value, ArrayBuffer(seg) ) )
-          status.add( Node( seg.value, ArrayBuffer(seg) ) )
-          Tree.recalculate(event.value)
-
-          printStatus(f, event.value)
-        }
+    if(debug){
+      save("/tmp/edgesPts.wkt"){
+        points.map(p => s"${p.toText}\t${p.getUserData}\n")
       }
-      f.close()
+      save("/tmp/edgesSegs.wkt"){
+        data.map(s => s"${s.wkt}\n")
+      }
     }
 
     def printStatus(f: PrintWriter, x: Double, filter: String = "*")
@@ -143,52 +132,6 @@ object BO3 {
       }.mkString("")
       f.write(wkt)
     }
-
-    ////////////////////////////////////////////////////////////////
-
-    /*
-    //val hs1 = generateRandomHedges(n)
-    //val hs2 = generateRandomHedges(n, "B")
-    val hs1 = generateFromFile("/home/acald013/tmp/h1.wkt")
-    val hs2 = generateFromFile("/home/acald013/tmp/h2.wkt")
-
-    if(debug){
-      save("/tmp/edgesH1.wkt"){
-        hs1.map{ h => s"${h.wkt}\t${h.id}\n" }
-      }
-      save("/tmp/edgesH2.wkt"){
-        hs2.map{ h => s"${h.wkt}\t${h.id}\n" }
-      }
-    }
-
-    val inters1 = sweepline(hs1, hs2, debug)
-    val inters2 = sweeplineJTS(hs1, hs2, debug)
-
-    val n1 = inters1.size
-    val n2 = inters2.size
-    println(s"Number of intersections: Is $n1 == $n2 ? ${n1 == n2}")
-
-    val I1 = inters1.sortBy{ i => (i.p.x,  i.p.y) }
-    val I2 = inters2.sortBy{ i => (i.getX, i.getY)}
-    val sample = 10
-
-    val stats = (I1 zip I2)
-      .map{ case(i1, i2) =>
-        (i1, i2, i1.p.distance(i2.getCoordinate))
-      }
-    stats.take(10).foreach{ case(i1, i2, d) =>
-      println{s"${i1.point.toText}\t${i2.toText}\t${d}"}
-    }
-    val S = stats.map(_._3)
-    val max = S.max
-    val sum = S.sum
-    val len = S.length
-    val avg = sum / len
-    println(s"Avg: ${avg} Max: ${max}")
-
-     logger.info(s"INFO|${runId}|${n1}|${n2}|${max}|${sum}|${len}|${avg}")
-
-     */
   }
 
   def sweepline(hs1: List[Half_edge], hs2: List[Half_edge], debug: Boolean = false)
@@ -291,6 +234,9 @@ class BOConf(args: Seq[String]) extends ScallopConf(args) {
   val tolerance: ScallopOption[Double] = opt[Double]  (default = Some(1e-3))
   val n: ScallopOption[Int]            = opt[Int]     (default = Some(250))
   val runid: ScallopOption[Int]        = opt[Int]     (default = Some(0))
+
+  val embed: ScallopOption[Boolean]        = opt[Boolean] (default = Some(false))
+  val optimization: ScallopOption[Boolean] = opt[Boolean] (default = Some(false))  
 
   verify()
 }
