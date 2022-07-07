@@ -25,12 +25,13 @@ object BentleyOttmann {
 
   /**** Main Class Start ****/
   def sweep_segments(segs1: List[Segment], segs2: List[Segment])
-    (implicit settings: Settings): List[Intersection] = {
+    (implicit settings: Settings, G: SimpleDirectedGraph[Coordinate, SegmentEdge])
+      : List[Intersection] = {
 
     // local declarations...
     val S: List[Segment] = segs1 ++ segs2
     implicit val X_structure: TreeMap[Coordinate, Seq_item] = new TreeMap[Coordinate, Seq_item]()
-    implicit val last_node: Map[Segment, Coordinate] = List.empty[(Segment, Coordinate)].toMap
+    implicit val last_node: TreeMap[Segment, Coordinate] = new TreeMap[Segment, Coordinate]()
     val seg_queue: PriorityQueue[Segment] = new PriorityQueue[Segment]( new segmentByXY )
 
     // Initialization...
@@ -98,9 +99,10 @@ object BentleyOttmann {
 
       if( sit != null ){
         // determine passing and ending segments...
-
+        val (sit_succ, sit_pred, sit_pred_succ, sit_first) =
+          determineSegments(sit, event.getValue, v, p_sweep)
         // reverse order of passing segments...
-
+        reverseOrder(sit_succ, sit_pred, sit_pred_succ, sit_first)
       }
 
       
@@ -182,10 +184,17 @@ object BentleyOttmann {
     while( sit != sit_succ ){
       val sub_first = sit
       var sub_last  = sub_first
-      while( inf(sub_last) == succ(sub_last) ) sub_last = succ(sub_last)
-      if( sub_last !=  sub_first ) {
-
+      while( inf(sub_last) == succ(sub_last) ) {
+        sub_last = succ(sub_last)
       }
+      if( sub_last !=  sub_first ) {
+        reverse_items(sub_first, sub_last)
+      }
+      sit = succ(sub_first)
+    }
+    // reverse the entire bundle...
+    if( sit_first != sit_succ ){
+      reverse_items( succ(sit_pred), pred(sit_succ) )
     }
   }
 
@@ -196,7 +205,9 @@ object BentleyOttmann {
     Y_structure.get(k)
   }
 
-  def insert(k: Segment, i: Seq_item)(implicit Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+  def insert(k: Segment, i: Seq_item)
+    (implicit Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
+
     if( lookup(k) == null ){
       Y_structure.put(k, i)
       i
@@ -226,6 +237,7 @@ object BentleyOttmann {
   /* Makes it2 the information of item it1 (LEDA book pag 182) */
   def change_inf(it1: Seq_item, it2: Seq_item): Unit = { it1.inf = it2 }
 
+  /* TODO */
   def reverse_items(it1: Seq_item, it2: Seq_item): Unit = {
     val temp = it1.inf
     it1.inf = it2.inf
