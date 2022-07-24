@@ -1,7 +1,6 @@
-package edu.ucr.dblab.bo3
 
 import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
-import com.vividsolutions.jts.geom.{Envelope, Coordinate, LineString, Point}
+import com.vividsolutions.jts.geom.{Coordinate, LineString, Point}
 
 import org.jgrapht.graph.{SimpleDirectedGraph, DefaultEdge}
 import org.jgrapht.Graphs
@@ -452,7 +451,7 @@ object BentleyOttmann {
   // -1 --> Clockwise
   //  0 --> p, q and r are collinear
   //  1 --> Counterclockwise
-  def orientation(p1: Coordinate, p2: Coordinate, p3: Coordinate): Int = {
+  def orientation(p1: Coordinate, p2: Coordinate,p3: Coordinate): Int = {
     // See 10th slides from following link for derivation of the formula...
     // http://www.dcs.gla.ac.uk/~pat/52233/slides/Geometry1x1.pdf
     val value = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y)
@@ -819,7 +818,8 @@ case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
 /***************************   Segment case class   *********************************/
 /************************************************************************************/
 
-case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFactory){
+case class Segment(h: Half_edge, label: String)
+  (implicit geofactory: GeometryFactory) extends Ordered[Segment]{
 
   val p_1:    Coordinate = h.v1
   val p_2:    Coordinate = h.v2
@@ -843,13 +843,9 @@ case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFac
     }
   }
 
-  def envelope: Envelope = h.edge.getEnvelopeInternal
-
-  def within(that: Segment): Boolean = this.h.edge.within(that.h.edge)
-
-  def identical(that: Segment): Boolean = this.source == that.source && this.target == that.target
-
-  def overlaps(that:Segment): Boolean = this.within(that) || that.within(this)
+  def identical(that: Segment): Boolean = {
+    this.source == that.source && this.target == that.target
+  }
 
   def isTrivial(sweep: Coordinate): Boolean = this.source == sweep && this.target == sweep  
 
@@ -881,24 +877,6 @@ case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFac
     val vx = value - x1
     
     y1 + ( (dy / dx) * vx ) // TODO: NaN value does not seem to affect...
-  }
-
-  def calculateValue2(value: Double): Option[Double] = {
-    val x1 = this.first.x; val x2 = this.second.x
-    val y1 = this.first.y; val y2 = this.second.y
-
-    val dx = x2 - x1 // TODO: Track Zero division...
-    val V = if(dx == 0){
-      None
-    } else {
-      val dy = y2 - y1
-      val vx = value - x1
-      
-      Some( y1 + ( (dy / dx) * vx ) )
-    }
-    println(s"segment: ${this.wkt}\tvalue: $V")
-
-    V
   }
 
   def isVertical: Boolean = dx == 0
@@ -953,6 +931,16 @@ case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFac
       2 * math.Pi - math.acos(dx / length)
     }
     math.toDegrees(angle)
+  }
+
+  val cmp = new sweep_cmp()
+  override def compare(that: Segment): Int = {
+    cmp.setPosition(this.sweep)
+    val r = cmp.compare(this, that)
+    if(debug) {
+      println(s"compare ${this.id} and ${that.id}: $r")
+    }
+    r
   }
 
   override def toString: String =

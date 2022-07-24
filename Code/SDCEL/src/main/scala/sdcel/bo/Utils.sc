@@ -1,4 +1,3 @@
-package edu.ucr.dblab.bo3
 
 import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Point, LineString}
 
@@ -64,65 +63,6 @@ case class Key(key: Any, structure: Structure = null){
 
 case class Seq_item(key: Key, var inf: Seq_item = null)
 
-/* Custom implementation for segment comparator for the status data structure */
-class sweep_cmp2() extends Comparator[Segment]{
-  private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
-
-  def setSweep(p: Coordinate): Unit = { sweep = p }
-
-  def compare(s1: Segment, s2: Segment): Int = {
-    if(s1.identical(s2)){
-      s1.id compare s2.id
-    } else {
-      getIntersecWithSweep(s1, s2, sweep) match {
-        case  1 =>  1
-        case  0 => s1.id compare s2.id
-        case -1 => -1
-      }
-    }
-  }
-
-  private def getIntersecWithSweep(s1: Segment, s2: Segment, sweep: Coordinate): Int = {
-
-    var env = s1.envelope
-    env.expandToInclude(s2.envelope)
-    val coords = Array( new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY) )
-    val geofactory = new GeometryFactory
-    val line = geofactory.createLineString(coords)
-
-    try {
-      val y1 = line.intersection(s1.asJTSLine).getCentroid.getY
-      val y2 = line.intersection(s2.asJTSLine).getCentroid.getY
-
-      y1 compare y2
-    } catch {
-      case e: Exception => {
-        logger.error("s1 or s2 does not intersect with sweepline!!!")
-        -1
-      }
-    }
-  }
-}
-
-/* Custom implementation for segment comparator for the status data structure */
-class sweep_cmp3() extends Comparator[Segment]{
-  private var y = Double.MinValue
-
-  def setY(value: Double): Unit = { y = value }
-  def compare(s1: Segment, s2: Segment): Int = {
-    val v1 = s1.calculateValue2(y) match {
-      case None => -1 // TODO: segment is vertical...
-      case Some(x) => x
-    }
-    val v2 = s2.calculateValue2(y) match {
-      case None => -1 // TODO: segment is vertical...
-      case Some(x) => x
-    }
-
-    v1 compare v2
-  }
-}
-
 /* Java class extending Comparator for ordering segments in status (Y_structure) */
 /* As stated at LEDA book pag 742 */
 class sweep_cmp() extends Comparator[Segment]{
@@ -141,24 +81,18 @@ class sweep_cmp() extends Comparator[Segment]{
   def compare(s1: Segment, s2: Segment): Int = {
     // Precondition:
     // sweep is identical to the left endpoint of either s1 or s2...
-
-    println(s"comparing ${s1.id} vs ${s2.id}")
     if(s1.identical(s2)){
       0
     } else {
-      //println(s"${sweep} vs ${s1} = ${sweep.equals(s1.source)}")
       val s = if( sweep.equals(s1.source) ){
-        println(s"case 1")
         BentleyOttmann.orientation(s2, sweep)
       } else {
-        //println(s"${sweep} vs ${s2} = ${sweep.equals(s2.source)}")
         if( sweep.equals(s2.source) ){
-          println(s"case 2")
           BentleyOttmann.orientation(s1, sweep)
         } else {
-          println(s"case 3")
           logger.error("compare error in sweep!!!")
-          getIntersecWithSweep(s1, s2, sweep)
+          System.exit(1)
+          0
         }
       }
 
@@ -167,34 +101,11 @@ class sweep_cmp() extends Comparator[Segment]{
         s
       } else {
         val r = BentleyOttmann.orientation(s2, s1.target)
-        // overlapping segments will be ordered by their ids...
         if( r >= 0 ) r else sign(s1.id - s2.id)
       }
     }
   }
-
-  private def getIntersecWithSweep(s1: Segment, s2: Segment, sweep: Coordinate): Int = {
-
-    var env = s1.envelope
-    env.expandToInclude(s2.envelope)
-    val coords = Array( new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY) )
-    val geofactory = new GeometryFactory
-    val line = geofactory.createLineString(coords)
-
-    try {
-      val y1 = line.intersection(s1.asJTSLine).getCentroid.getY
-      val y2 = line.intersection(s2.asJTSLine).getCentroid.getY
-
-      y1 compare y2
-    } catch {
-      case e: Exception => {
-        logger.error("s1 or s2 does not intersect with sweepline!!!")
-        -1
-      }
-    }
-  }
 }
-
 
 /* Just a case class to model an intersection point */
 case class Intersection(p: Coordinate, seg1: Segment, seg2: Segment)

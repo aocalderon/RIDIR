@@ -10,6 +10,9 @@ import com.vividsolutions.jts.algorithm.RobustLineIntersector
 import com.vividsolutions.jts.geomgraph.EdgeIntersection
 import com.vividsolutions.jts.geomgraph.Edge
 
+import org.jgrapht.graph.{SimpleDirectedGraph, DefaultEdge}
+import org.jgrapht.Graphs
+
 import edu.ucr.dblab.debug.BO.{generateRandomHedges, generateFromFile}
 import edu.ucr.dblab.sdcel.geometries.{Half_edge, HEdge}
 import edu.ucr.dblab.sdcel.Utils.{save, logger}
@@ -102,6 +105,10 @@ object BO3 {
       }
     }
 
+    //
+    implicit val G: SimpleDirectedGraph[Coordinate, SegmentEdge] =
+      new SimpleDirectedGraph[Coordinate, SegmentEdge](classOf[SegmentEdge])
+    
     // Load data...
     val (points, data) = BentleyOttmann.loadData
     // Calling main function...
