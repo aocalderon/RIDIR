@@ -233,12 +233,13 @@ object BentleyOttmann {
 
   /**********************************************************************/
   /* START: Sortseq methods (LEDA Book pag 181). Basic Functionality... */
+  /*        Extracting just those used and requested in pag 740...      */
   /**********************************************************************/
 
   // Returns the key of item it...
   def key(it: Seq_item): Segment = it.key.getKeySegment
 
-  // Returns the information of item it...
+  // Returns the information of item it (get retuns null if this map contains no mapping for the key)...
   def inf(it: Seq_item)(implicit S: TreeMap[Segment, Seq_item]): Seq_item = S.get( key(it) )
 
   // Returns the item with key k (null if no such item exits in S)...
