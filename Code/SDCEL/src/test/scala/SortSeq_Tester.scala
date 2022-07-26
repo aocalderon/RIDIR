@@ -60,21 +60,16 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
   // Setting the order criteria for Y-Structure
   val cmp = new sweep_cmp()
   cmp.setPosition(p_sweep)
-
   val cmp2 = new sweep_cmp2()
   cmp2.setSweep(p_sweep)
 
-  val cmp3 = new sweep_cmp3()
-  cmp3.setY(p_sweep.y)
-
   // The Y-Structure: Sweep line status...
   case class T(key: Segment, value: String)
-  implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp2)
+  implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp)
 
   segments.foreach{ seg =>
-    //seg.sweep = p_sweep
     val o = Y_structure.put(seg, T(seg, seg.id.toString))
-    println(Y_structure.keySet().asScala.map(_.id).toList.mkString(" "))
+    println( Y_structure.keySet().iterator().asScala.map(_.id).mkString(" ") )
   }
 
   if(debug){
