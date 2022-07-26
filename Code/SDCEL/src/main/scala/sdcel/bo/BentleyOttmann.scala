@@ -935,9 +935,18 @@ case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFac
       None
     }
   }
+
+  def intersectionY(that_line: LineString): Double = {
+    val this_line = this.h.edge
+    if ( this_line.intersects(that_line) ) {
+      this_line.intersection(that_line).getCentroid.getY
+    } else {
+      Double.MinValue
+    }
+  }
   
   def asJTSLine: LineString = {
-    val line = geofactory.createLineString(Array(p_1, p_2))
+    val line = this.h.edge
     line.setUserData(s"$label\t$id\t$value")
     line
   }
