@@ -42,6 +42,9 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
   val hh: Seq[Half_edge] = List(h3, h5, h6, h8, h1, h7)
   val segments: Seq[Segment] = hh.map{ h => Segment(h, "A") }
 
+  // Model of data node for the status binary tree...
+  case class T(key: Segment, value: String)
+
   if(debug){
     save("/tmp/edgesSSsegs.wkt"){
       segments.map{ seg =>
@@ -55,22 +58,32 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
 
   // Setting lower and upper sentinels to bound the algorithm...
   val (lower_sentinel, upper_sentinel) = BentleyOttmann.getSentinels
-  var p_sweep = new Coordinate(2.0, 1.0)
 
+  (2.0 to  5.0 by 0.5).map{ x =>
+    var p_sweep = new Coordinate(x, 1.0)
+    // Setting the order criteria for Y-Structure
+    val cmp = new sweep_cmp()
+    cmp.setPosition(p_sweep)
+    val cmp2 = new sweep_cmp2()
+    cmp2.setSweep(p_sweep)
+    // The Y-Structure: Sweep line status...
+    implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp)
+
+    segments.foreach{ seg => Y_structure.put(seg, T(seg, seg.id.toString)) }
+
+    val status = Y_structure.keySet().iterator().asScala.map(_.id).mkString(" ")
+    s"$p_sweep\t$status"
+  }.foreach{println}
+
+  var p_sweep = new Coordinate(2.0, 1.0)
   // Setting the order criteria for Y-Structure
   val cmp = new sweep_cmp()
   cmp.setPosition(p_sweep)
   val cmp2 = new sweep_cmp2()
   cmp2.setSweep(p_sweep)
-
   // The Y-Structure: Sweep line status...
-  case class T(key: Segment, value: String)
   implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp)
-
-  segments.foreach{ seg =>
-    val o = Y_structure.put(seg, T(seg, seg.id.toString))
-    println( Y_structure.keySet().iterator().asScala.map(_.id).mkString(" ") )
-  }
+  segments.foreach { seg => val o = Y_structure.put(seg, T(seg, seg.id.toString)) }
 
   if(debug){
     save("/tmp/edgesSSstatus.wkt"){
