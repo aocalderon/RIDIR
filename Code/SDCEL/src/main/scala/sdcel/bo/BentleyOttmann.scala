@@ -1,4 +1,4 @@
-package edu.ucr.dblab.bo3
+ package edu.ucr.dblab.bo3
 
 import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import com.vividsolutions.jts.geom.{Envelope, Coordinate, LineString, Point}
@@ -263,16 +263,17 @@ object BentleyOttmann {
     (implicit S: TreeMap[Segment, Seq_item]): Seq_item = S.ceilingEntry(k).getValue
 
   // Equivalent to locate(k)...
-  def succ(it: Seq_item)(implicit S: TreeMap[Segment, Seq_item]): Seq_item = locate( key(it) )
+  def succ(it: Seq_item)
+    (implicit S: TreeMap[Segment, Seq_item]): Seq_item = locate( key(it) )
 
   // Returns the item [k', i] in S such that k' is maximal with k' <= k (null if no such item exists)
   def pred(it: Seq_item)
     (implicit S: TreeMap[Segment, Seq_item]): Seq_item = S.floorEntry( key(it) ).getValue
 
-  // Returns true if S is empty, false otherwise.
+  // Returns true if S is empty, false otherwise...
   def empty(implicit S: TreeMap[Segment, Seq_item]): Boolean = S.isEmpty 
 
-  // Returns the item with minimal key (null if S is empty).
+  // Returns the item with minimal key (null if S is empty)...
   def min(implicit S: TreeMap[Segment, Seq_item]): Seq_item = S.firstEntry().getValue
 
   // Removes the item with key k from S (null operation if no such item exists)...
@@ -285,12 +286,13 @@ object BentleyOttmann {
   def change_inf(it: Seq_item, i: Seq_item): Unit = { it.inf = i }
 
   // If it1 and it2 are items of S with it1 before it2 then reverse_items(it1, it2)
-  // reverses the subsequence of S starting at item it1 and ending at item it2.
+  // reverses the subsequence of S starting at item it1 and ending at item it2...
+  // pag 
   def reverse_items(it1: Seq_item, it2: Seq_item)(implicit S: TreeMap[Segment, Seq_item]): Unit = {
     val sub_map = S.subMap( key(it1), key(it2) ).asScala  // get the slice from it1 to it2...
     val keys = sub_map.map(_._1).toList                   // extract the keys...
-    keys.foreach{ k => S.remove(k) }                      // remove items from S...
     val vals = sub_map.map(_._2).toList.reverse           // extract and reverse the values...
+    keys.foreach{ k => S.remove(k) }                      // remove items from S...
     val s_prime = keys.zip(vals)                          // match keys and new values...
     s_prime.foreach{ case(k, v) => S.put(k, v) }          // adding new items to S...
   }
