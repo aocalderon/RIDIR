@@ -1,16 +1,14 @@
 package edu.ucr.dblab.bo3
 
-import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Point, LineString}
-
-import org.jgrapht.graph.{SimpleDirectedGraph, DefaultEdge}
-
-import edu.ucr.dblab.sdcel.geometries.Half_edge
+import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, LineString, Point}
 import edu.ucr.dblab.sdcel.Utils.logger
+import edu.ucr.dblab.sdcel.geometries.Half_edge
+import org.jgrapht.graph.DefaultEdge
 
+import java.util
+import java.util.{Comparator, TreeMap, TreeSet}
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ListBuffer, ArrayBuffer}
-
-import java.util.{PriorityQueue, TreeSet, TreeMap, Comparator}
+import scala.collection.mutable.ArrayBuffer
 
 /* Case class to model global settings */
 case class Settings(
@@ -28,7 +26,7 @@ object Structures extends Enumeration {
   val X, Y = Value
 }
 
-import Structures._
+import edu.ucr.dblab.bo3.Structures._
 
 case class Key(key: Any, structure: Structure = null){
   def getKeyPoint: Coordinate = if(key.isInstanceOf[Point])
@@ -36,21 +34,17 @@ case class Key(key: Any, structure: Structure = null){
   else
     null
 
-  def getKeySegment: Segment = if(key.isInstanceOf[Segment])
-    key.asInstanceOf[Segment]
-  else
-    null
+  def getKeySegment: Segment = key match {
+    case segment: Segment => segment
+    case _ => null
+  }
 
   def getInfo(implicit X_structure: TreeMap[Coordinate, Seq_item],
     Y_structure: TreeMap[Segment, Seq_item]): Seq_item = {
 
     structure match {
-      case X => {
-        X_structure.get(getKeyPoint).inf
-      }
-      case Y => {
-        Y_structure.get(getKeySegment).inf
-      }
+      case X => X_structure.get(getKeyPoint).inf
+      case Y => Y_structure.get(getKeySegment).inf
     }
   }
 
@@ -64,73 +58,15 @@ case class Key(key: Any, structure: Structure = null){
 
 case class Seq_item(key: Key, var inf: Seq_item = null)
 
-/* Custom implementation for segment comparator for the status data structure */
-class sweep_cmp2() extends Comparator[Segment]{
-  private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
-
-  def setSweep(p: Coordinate): Unit = { sweep = p }
-
-  def compare(s1: Segment, s2: Segment): Int = {
-    if(s1.identical(s2)){
-      s1.id compare s2.id
-    } else {
-      getIntersecWithSweep(s1, s2, sweep) match {
-        case  1 =>  1
-        case  0 => s1.id compare s2.id
-        case -1 => -1
-      }
-    }
-  }
-
-  private def getIntersecWithSweep(s1: Segment, s2: Segment, sweep: Coordinate): Int = {
-
-    var env = s1.envelope
-    env.expandToInclude(s2.envelope)
-    val coords = Array( new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY) )
-    val geofactory = new GeometryFactory
-    val line = geofactory.createLineString(coords)
-
-    try {
-      val y1 = line.intersection(s1.asJTSLine).getCentroid.getY
-      val y2 = line.intersection(s2.asJTSLine).getCentroid.getY
-
-      y1 compare y2
-    } catch {
-      case e: Exception => {
-        logger.error("s1 or s2 does not intersect with sweepline!!!")
-        -1
-      }
-    }
-  }
-}
-
-/* Custom implementation for segment comparator for the status data structure */
-class sweep_cmp3() extends Comparator[Segment]{
-  private var y = Double.MinValue
-
-  def setY(value: Double): Unit = { y = value }
-  def compare(s1: Segment, s2: Segment): Int = {
-    val v1 = s1.calculateValue2(y) match {
-      case None => -1 // TODO: segment is vertical...
-      case Some(x) => x
-    }
-    val v2 = s2.calculateValue2(y) match {
-      case None => -1 // TODO: segment is vertical...
-      case Some(x) => x
-    }
-
-    v1 compare v2
-  }
-}
-
+/***************************************/
+/*** START: Status compare functions ***/
+/***************************************/
 /* Java class extending Comparator for ordering segments in status (Y_structure) */
 /* As stated at LEDA book pag 742 */
 class sweep_cmp() extends Comparator[Segment]{
   private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
 
-  def setPosition(p: Coordinate): Unit = {
-    sweep = p
-  }
+  def setPosition(p: Coordinate): Unit = { sweep = p }
 
   def sign(x: Long): Int = x match {
     case _ if x <  0 => -1
@@ -142,23 +78,17 @@ class sweep_cmp() extends Comparator[Segment]{
     // Precondition:
     // sweep is identical to the left endpoint of either s1 or s2...
 
-    println(s"comparing ${s1.id} vs ${s2.id}")
     if(s1.identical(s2)){
       0
     } else {
-      //println(s"${sweep} vs ${s1} = ${sweep.equals(s1.source)}")
       val s = if( sweep.equals(s1.source) ){
-        println(s"case 1")
         BentleyOttmann.orientation(s2, sweep)
       } else {
-        //println(s"${sweep} vs ${s2} = ${sweep.equals(s2.source)}")
         if( sweep.equals(s2.source) ){
-          println(s"case 2")
           BentleyOttmann.orientation(s1, sweep)
         } else {
-          println(s"case 3")
-          logger.error("compare error in sweep!!!")
-          getIntersecWithSweep(s1, s2, sweep)
+          logger.error("Error in sweep_cmp -> compare !!!")
+          compareIntersectionsWithSweepline(s1, s2, sweep)
         }
       }
 
@@ -173,28 +103,52 @@ class sweep_cmp() extends Comparator[Segment]{
     }
   }
 
-  private def getIntersecWithSweep(s1: Segment, s2: Segment, sweep: Coordinate): Int = {
-
+  private def compareIntersectionsWithSweepline(s1: Segment, s2: Segment, sweep: Coordinate): Int = {
     var env = s1.envelope
     env.expandToInclude(s2.envelope)
-    val coords = Array( new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY) )
-    val geofactory = new GeometryFactory
-    val line = geofactory.createLineString(coords)
+    val coordinates = Array( new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY) )
+    val line = s1.h.edge.getFactory.createLineString(coordinates)
 
     try {
       val y1 = line.intersection(s1.asJTSLine).getCentroid.getY
       val y2 = line.intersection(s2.asJTSLine).getCentroid.getY
-
       y1 compare y2
     } catch {
-      case e: Exception => {
+      case e: Exception =>
         logger.error("s1 or s2 does not intersect with sweepline!!!")
         -1
-      }
     }
   }
 }
 
+/* Custom implementation for segment comparator for the status data structure */
+/* Just for debugging purposes */
+class sweep_cmp2() extends Comparator[Segment]{
+  private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
+
+  def setSweep(p: Coordinate): Unit = { sweep = p }
+
+  def compare(s1: Segment, s2: Segment): Int = {
+    if(s1.identical(s2)){
+      s1.id compare s2.id
+    } else {
+      val sweepline = getSweepline(s1, s2, sweep)
+      val y1 = s1.intersectionY(sweepline)
+      val y2 = s2.intersectionY(sweepline)
+      y1 compare y2
+    }
+  }
+
+  private def getSweepline(s1: Segment, s2: Segment, sweep: Coordinate): LineString = {
+    val env = s1.envelope
+    env.expandToInclude(s2.envelope)
+    val coordinates = Array( new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY) )
+    s1.h.edge.getFactory.createLineString(coordinates)
+  }
+}
+/*************************************/
+/*** END: Status compare functions ***/
+/*************************************/
 
 /* Just a case class to model an intersection point */
 case class Intersection(p: Coordinate, seg1: Segment, seg2: Segment)
@@ -228,7 +182,7 @@ class segmentByXY() extends Comparator[Segment]{
 
 /* Tree object to model a data structure to support multiple segments per node */
 object Tree {
-  implicit val geofactory = new GeometryFactory()
+  implicit val geofactory: GeometryFactory = new GeometryFactory()
 
   def empty_seg(implicit geofactory: GeometryFactory): Segment = {
     val epsilon = 0.001
@@ -240,7 +194,7 @@ object Tree {
   }
   val empty_node: Node = Node(Double.MinValue, ArrayBuffer(empty_seg))
 
-  def node(segment: Segment)(implicit T: TreeSet[Node]): Node = T.floor( Node(segment.value) )
+  def node(segment: Segment)(implicit T: util.TreeSet[Node]): Node = T.floor( Node(segment.value) )
 
   def add(segment: Segment)(implicit T: TreeSet[Node]): Boolean = {
     val N = node(segment)

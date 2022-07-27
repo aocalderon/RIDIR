@@ -11,6 +11,8 @@
 *~
 *#
 
+Code/SDCEL/.idea/*
+
 Code/CGAL/DCEL/Makefile
 Code/CGAL/DCEL/CMakeFiles/*
 Code/CGAL/DCEL/dcel
