@@ -8,6 +8,8 @@ import org.scalatest.matchers._
 import java.util
 import scala.collection.JavaConverters._
 
+// just a comment...
+
 class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
   val debug: Boolean = true
   implicit val model: PrecisionModel = new PrecisionModel(1000.0)
