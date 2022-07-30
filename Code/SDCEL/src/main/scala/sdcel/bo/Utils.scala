@@ -135,7 +135,8 @@ class sweep_cmp2() extends Comparator[Segment]{
       val sweepline = getSweepline(s1, s2, sweep)
       val y1 = s1.intersectionY(sweepline)
       val y2 = s2.intersectionY(sweepline)
-      y1 compare y2
+      val c = y1 compare y2
+      if (c == 0) { s1.id compare s2.id } else { c }
     }
   }
 
