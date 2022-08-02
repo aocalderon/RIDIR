@@ -60,16 +60,17 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
   val (lower_sentinel, upper_sentinel) = BentleyOttmann.getSentinels
 
   val ground_truth: Map[Double, String] = Map(
-    2.0 -> "3 5 6 8 1 7",
-    2.5 -> "3 5 6 1 8 7",
+    2.0 -> "2 4 3 5 6 8 1 7",
+    2.5 -> "2 4 3 5 6 1 8 7",
     3.0 -> "2 3 5 1 6 8 7 4",
-    3.5 -> "2 3 1 5 6 4 7 8",
+    3.5 -> "2 3 1 5 6 7 8 4",
     4.0 -> "2 3 1 5 6 4 7 8",
     4.5 -> "1 2 3 5 4 6 7 8",
     5.0 -> "1 2 3 4 5 6 7 8"
   )
-  (3.5 to 3.5 by 0.5).foreach{ x =>
-    var p_sweep = new Coordinate(x, 0.0)
+
+  (2.0 to 5.0 by 0.5).foreach{ x =>
+    val p_sweep = new Coordinate(x, 0.0)
     // Setting the order criteria for Y-Structure
     val cmp = new sweep_cmp()
     cmp.setPosition(p_sweep)
@@ -86,21 +87,16 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
     }
   }
 
-
-  var p_sweep = new Coordinate(3.0, 1.0)
+  var p_sweep = new Coordinate(3.5, 1.0)
   // Setting the order criteria for Y-Structure
-  val cmp = new sweep_cmp()
-  cmp.setPosition(p_sweep)
+  //val cmp = new sweep_cmp()
+  //cmp.setPosition(p_sweep)
   val cmp2 = new sweep_cmp2()
   cmp2.setSweep(p_sweep)
   // The Y-Structure: Sweep line status...
   implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp2)
   segments.foreach { seg =>
-    Y_structure.put(seg, T(seg, seg.id.toString))
-  }
-  val status = Y_structure.keySet().iterator().asScala.map(_.id).mkString(" ")
-  s"Status at $p_sweep " should " 2 3 5 1 6 8 7 4" in {
-    status should be("2 3 5 1 6 8 7 4")
+    Y_structure.put( seg, T(seg, seg.id.toString) )
   }
 
   if(debug){

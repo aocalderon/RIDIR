@@ -930,9 +930,9 @@ case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFac
   }
 
   def intersection(that: Segment): Option[Coordinate] = {
-    val coords = this.line.intersection(that.line).getCoordinates
-    if(coords.size == 1){
-      Some(coords.head)
+    val coordinates = this.line.intersection(that.line).getCoordinates
+    if(coordinates.size == 1){
+      Some(coordinates.head)
     } else {
       None
     }
