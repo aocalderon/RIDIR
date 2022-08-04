@@ -4,7 +4,7 @@ import flatspec._
 import matchers._
 
 import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate, Point}
-import edu.ucr.dblab.bo3.{BentleyOttmann, Segment, Event, Tree, Node}
+import sdcel.bo.{BentleyOttmann, Segment, Event, Tree, Node}
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 import edu.ucr.dblab.sdcel.Utils.{save, logger}
 

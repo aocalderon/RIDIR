@@ -1,21 +1,14 @@
-package edu.ucr.dblab.bo3
+package sdcel.bo
 
-import scala.collection.mutable.{PriorityQueue}
-import scala.collection.JavaConverters._
-
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory, Coordinate, Point}
-import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector
-import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
 import com.vividsolutions.jts.algorithm.RobustLineIntersector
+import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, Point, PrecisionModel}
 import com.vividsolutions.jts.geomgraph.EdgeIntersection
-import com.vividsolutions.jts.geomgraph.Edge
+import com.vividsolutions.jts.geomgraph.index.{SegmentIntersector, SimpleMCSweepLineIntersector}
+import edu.ucr.dblab.sdcel.Utils.save
+import edu.ucr.dblab.sdcel.geometries.{HEdge, Half_edge}
+import org.jgrapht.graph.SimpleDirectedGraph
 
-import org.jgrapht.graph.{SimpleDirectedGraph, DefaultEdge}
-import org.jgrapht.Graphs
-
-import edu.ucr.dblab.debug.BO.{generateRandomHedges, generateFromFile}
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, HEdge}
-import edu.ucr.dblab.sdcel.Utils.{save, logger}
+import scala.collection.JavaConverters._
 
 object BO3 {
   def main(args: Array[String]): Unit = {
@@ -48,9 +41,8 @@ object BO3 {
     println(s"DEBUG:      $debug    ")
 
     ////////////////////////////////////////////////////////////////
-    import java.util.{PriorityQueue, TreeSet}
-    import scala.collection.mutable.ArrayBuffer
     import java.io.PrintWriter
+    import java.util.{PriorityQueue, TreeSet}
 
     val p0  = new Coordinate(2, 1); val p1  = new Coordinate(7, 4)
     val p2  = new Coordinate(7, 1); val p3  = new Coordinate(1, 4)

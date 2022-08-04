@@ -1,18 +1,13 @@
- package edu.ucr.dblab.bo3
+ package sdcel.bo
 
-import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
-import com.vividsolutions.jts.geom.{Envelope, Coordinate, LineString, Point}
-
-import org.jgrapht.graph.{SimpleDirectedGraph, DefaultEdge}
-import org.jgrapht.Graphs
-
-import scala.collection.JavaConverters._
-import scala.collection.mutable.{ListBuffer, ArrayBuffer, HashMap}
-
-import java.util.{PriorityQueue, TreeSet, TreeMap}
-
-import edu.ucr.dblab.sdcel.Utils.{save, logger}
+import com.vividsolutions.jts.geom._
+import edu.ucr.dblab.sdcel.Utils.{logger, save}
 import edu.ucr.dblab.sdcel.geometries.Half_edge
+import org.jgrapht.graph.SimpleDirectedGraph
+
+import java.util.{PriorityQueue, TreeMap, TreeSet}
+import scala.collection.JavaConverters._
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 object BentleyOttmann {
   implicit val model: PrecisionModel = new PrecisionModel(1e-3)
@@ -22,14 +17,25 @@ object BentleyOttmann {
   implicit val G: SimpleDirectedGraph[Coordinate, SegmentEdge] =
     new SimpleDirectedGraph[Coordinate, SegmentEdge](classOf[SegmentEdge])
   var X: ListBuffer[Intersection]      = new ListBuffer[Intersection]()
+  val NO_IDEA = 2
 
+  /**************************/
   /**** Main Class Start ****/
+  /**************************/
   def sweep_segments(segs1: List[Segment], segs2: List[Segment])
     (implicit settings: Settings, G: SimpleDirectedGraph[Coordinate, SegmentEdge])
       : List[Intersection] = {
 
     // local declarations...
     val S: List[Segment] = segs1 ++ segs2
+
+    if(settings.debug){
+      save("/tmp/edgesS.wkt"){
+        S.map{ s =>
+          s"${s.wkt}\t${s.id}\n"
+        }
+      }
+    }
 
     // The X-Structure: Event queue...
     implicit val X_structure: TreeMap[Coordinate, Seq_item] = new TreeMap[Coordinate, Seq_item]()
@@ -61,8 +67,8 @@ object BentleyOttmann {
     var p_sweep = lower_sentinel.source
 
     // Setting the order criteria for Y-Structure
-    val cmp = new sweep_cmp()
-    cmp.setPosition(p_sweep)
+    val cmp = new sweep_cmp2()
+    cmp.setSweep(p_sweep)
 
     // The Y-Structure: Sweep line status...
     implicit val Y_structure: TreeMap[Segment, Seq_item] = new TreeMap[Segment, Seq_item](cmp)
@@ -94,7 +100,7 @@ object BentleyOttmann {
     while( !X_structure.isEmpty ) {
       val event = X_structure.pollFirstEntry()
       p_sweep = event.getKey
-      cmp.setPosition(p_sweep)
+      cmp.setSweep(p_sweep)
       G.addVertex(p_sweep)
       val v: Coordinate = p_sweep    
 
@@ -122,7 +128,9 @@ object BentleyOttmann {
 
     List.empty[Intersection]
   }
+  /**************************/
   /***** Main Class End *****/
+  /**************************/
 
   /* Determine passing and ending segments. LEDA book pag 748. */
   def determineSegments(sit_prime: Seq_item, event: Seq_item, v: Coordinate, p_sweep: Coordinate)
@@ -131,6 +139,7 @@ object BentleyOttmann {
       Y_structure: TreeMap[Segment, Seq_item],
       original:    Map[Segment, Segment],
       last_node:   TreeMap[Segment, Coordinate],
+
       G:           SimpleDirectedGraph[Coordinate, SegmentEdge]
     ): (Seq_item, Seq_item, Seq_item, Seq_item) = {
 
@@ -446,8 +455,6 @@ object BentleyOttmann {
   }
 
   //////////////////////////////////////// Primitives [Start] ////////////////////////////////////////
-
-  val NO_IDEA = 2
 
   // Based on https://www.geeksforgeeks.org/orientation-3-ordered-points/
   // To find orientation of ordered triplet (p1, p2, p3). The function returns

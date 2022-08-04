@@ -1,4 +1,4 @@
-package edu.ucr.dblab.bo3
+package sdcel.bo
 
 import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, LineString, Point}
 import edu.ucr.dblab.sdcel.Utils.logger
@@ -26,7 +26,7 @@ object Structures extends Enumeration {
   val X, Y = Value
 }
 
-import edu.ucr.dblab.bo3.Structures._
+import sdcel.bo.Structures._
 
 case class Key(key: Any, structure: Structure = null){
   def getKeyPoint: Coordinate = if(key.isInstanceOf[Point])

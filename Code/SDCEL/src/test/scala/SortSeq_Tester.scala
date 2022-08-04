@@ -1,5 +1,5 @@
 import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, LineString, PrecisionModel}
-import edu.ucr.dblab.bo3._
+import sdcel.bo._
 import edu.ucr.dblab.sdcel.Utils.save
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 import org.scalatest.flatspec._
@@ -43,7 +43,7 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
   val segments: Seq[Segment] = hh.map{ h => Segment(h, "A") }
 
   // Model of data node for the status binary tree...
-  case class T(key: Segment, value: String)
+  case class T(key: Segment, value: T)
 
   if(debug){
     save("/tmp/edgesSSsegs.wkt"){
@@ -79,7 +79,7 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
     // The Y-Structure: Sweep line status...
     implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp2)
 
-    segments.foreach{ seg => Y_structure.put(seg, T(seg, seg.id.toString)) }
+    segments.foreach{ seg => Y_structure.put(seg, T(seg, null)) }
 
     val status = Y_structure.keySet().iterator().asScala.map(_.id).mkString(" ")
     s"Status at $p_sweep " should ground_truth(x) in {
@@ -96,7 +96,7 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
   // The Y-Structure: Sweep line status...
   implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp2)
   segments.foreach { seg =>
-    Y_structure.put( seg, T(seg, seg.id.toString) )
+    Y_structure.put( seg, T(seg, null) )
   }
 
   if(debug){
