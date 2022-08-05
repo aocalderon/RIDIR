@@ -173,15 +173,9 @@ case class SegmentEdge(segment: Segment) extends DefaultEdge {
 
 /* Compare class to order the priority queue asked at LEDA book pag 743 */
 class segmentByXY() extends Comparator[Segment]{
-  def compare(s1: Segment, s2: Segment): Int = {
-    val C = s1.first.x compare s2.first.x
-
-    val R = C match{
-      case 0 => s1.second.y compare s2.second.y
-      case _ => C
-    }
-
-    R
+  def compare(a: Segment, b: Segment): Int = {
+    //s1.source.compareTo(s2.source)
+    a.source.x compare b.source.x
   }
 }
 

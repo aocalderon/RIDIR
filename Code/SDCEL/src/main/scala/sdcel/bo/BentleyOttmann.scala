@@ -39,24 +39,34 @@ object BentleyOttmann {
 
     // The X-Structure: Event queue...
     implicit val X_structure: TreeMap[Coordinate, Seq_item] = new TreeMap[Coordinate, Seq_item]()
-
     implicit val last_node: TreeMap[Segment, Coordinate] = new TreeMap[Segment, Coordinate]()
-    val seg_queue: PriorityQueue[Segment] = new PriorityQueue[Segment]( new segmentByXY )
+    implicit val seg_queue: TreeMap[Coordinate, Segment] = new TreeMap[Coordinate, Segment]()
 
     // Initialization...
     val L = ListBuffer[Segment]()
     val M = ListBuffer[(Segment, Segment)]()
     // Feeding the X-Structure...
     S.foreach{ s =>
-      X_structure.put(s.first,  null)
-      X_structure.put(s.second, null)
+      val it1 = X_structure.put(s.source, Seq_item(Key(s, Structures.Y), null))
+      val it2 = X_structure.put(s.target, Seq_item(Key(s, Structures.Y), null))
 
       if(s.source != s.target) { // Ignore zero-length segments...
-        val s1 = if(!s.isVertical){ if(!s.isLeftOriented)    { s.reverse } else { s } }
-                             else { if(!s.isUpwardsOriented) { s.reverse } else { s } }
+        val s1 = if(!s.isVertical){
+          if(!s.isLeftOriented){
+            s.reverse
+          } else {
+            s
+          }
+        } else {
+          if(!s.isUpwardsOriented) {
+            s.reverse
+          } else {
+            s
+          }
+        }
         M.append(s1 -> s)
         L.append(s1)
-        seg_queue.add(s1)
+        seg_queue.put(s1.source, s1)
       }
     }
     val internal: List[Segment] = L.toList
@@ -76,7 +86,7 @@ object BentleyOttmann {
     // Adding sentinels...
     val r1 = Y_structure.put(lower_sentinel, null)
     val r2 = Y_structure.put(upper_sentinel, null)
-    var next_seg = seg_queue.poll()
+    var next_seg = seg_queue.firstEntry().getValue
 
     // Just for debugging purposes...
     if( settings.debug ){
@@ -126,7 +136,7 @@ object BentleyOttmann {
 
     }
 
-    List.empty[Intersection]
+                                List.empty[Intersection]
   }
   /**************************/
   /***** Main Class End *****/
@@ -139,7 +149,6 @@ object BentleyOttmann {
       Y_structure: TreeMap[Segment, Seq_item],
       original:    Map[Segment, Segment],
       last_node:   TreeMap[Segment, Coordinate],
-
       G:           SimpleDirectedGraph[Coordinate, SegmentEdge]
     ): (Seq_item, Seq_item, Seq_item, Seq_item) = {
 
@@ -915,7 +924,7 @@ case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFac
 
   def isHorizontal: Boolean = dy == 0
 
-  def isLeftOriented: Boolean = source.x > target.x
+  def isLeftOriented: Boolean = source.x < target.x
 
   def isUpwardsOriented: Boolean = source.y < target.y
 
