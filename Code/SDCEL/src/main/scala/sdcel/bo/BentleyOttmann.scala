@@ -47,8 +47,8 @@ object BentleyOttmann {
     val M = ListBuffer[(Segment, Segment)]()
     // Feeding the X-Structure...
     S.foreach{ s =>
-      val it1 = X_structure.put(s.source, Seq_item(Key(s, Structures.Y), null))
-      val it2 = X_structure.put(s.target, Seq_item(Key(s, Structures.Y), null))
+      val it1 = X_structure.put(s.source, null)
+      val it2 = X_structure.put(s.target, null)
 
       if(s.source != s.target) { // Ignore zero-length segments...
         val s1 = if(!s.isVertical){
@@ -115,11 +115,10 @@ object BentleyOttmann {
       val v: Coordinate = p_sweep    
 
       // Handle passing and ending segments...
-      var sit = if( event.getValue == null ){ 
+      var sit = event.getValue // get info
+      sit = if( sit == null ){
         lookup( createSegment(p_sweep, p_sweep) )
-      } else {
-        event.getValue
-      }
+      } else { sit }
 
       if( sit != null ){
         // Determine passing and ending segments...
@@ -130,7 +129,7 @@ object BentleyOttmann {
       }
 
       // Insert starting segments...
-
+      insertStartingSegments(sit, p_sweep, next_seg)
 
       // Compute new intersections and update X_structure...
 
@@ -159,8 +158,11 @@ object BentleyOttmann {
     var sit_first: Seq_item = null
 
     var sit: Seq_item = sit_prime
-    while( inf(sit) == event || inf(sit) == succ(sit) ) { sit = succ(sit) }
-    sit_succ = succ(sit)
+    while( inf(sit) == event ||
+      inf(sit) == succ( key(sit)) ) {
+      sit = succ( key(sit) )
+    }
+    sit_succ = succ( key(sit) )
     val sit_last: Seq_item = sit
     if( settings.use_optimization ) { /* optimization, part 1  */ }
 
@@ -176,7 +178,7 @@ object BentleyOttmann {
         new_edge(v, w, s)
       }
       if( identical(p_sweep, s.target) ) { // ending segment...
-        val it = pred(sit)
+        val it = pred( key(sit) )
         if( inf(it) == sit ) {
           overlapping = true
           change_inf( it, inf(sit) )
@@ -184,14 +186,14 @@ object BentleyOttmann {
         del_item(sit)
         sit = it
       } else { // passing segment...
-        if( inf(sit) != succ(sit) ) change_inf( sit, null )
+        if( inf(sit) != succ( key(sit)) ) change_inf( sit, null )
         last_node.replace(s, v)
-        sit = pred(sit)
+        sit = pred( key(sit) )
       }
-    } while ( inf(sit) == event || overlapping || inf(sit) == succ(sit) )
+    } while ( inf(sit) == event || overlapping || inf(sit) == succ( key(sit)) )
 
     sit_pred = sit
-    sit_first = succ(sit_pred)
+    sit_first = succ( key(sit_pred) )
     sit_pred_succ = sit_first
 
     (sit_succ, sit_pred, sit_pred_succ, sit_first)
@@ -211,18 +213,18 @@ object BentleyOttmann {
     while( sit != sit_succ ){
       val sub_first = sit
       var sub_last  = sub_first
-      while( inf(sub_last) == succ(sub_last) ) {
-        sub_last = succ(sub_last)
+      while( inf(sub_last) == succ( key(sub_last) ) ) {
+        sub_last = succ( key(sub_last) )
       }
       if( sub_last !=  sub_first ) {
         reverse_items(sub_first, sub_last)
       }
-      sit = succ(sub_first)
+      sit = succ( key(sub_first) )
     }
 
     // reverse the entire bundle...
     if( sit_first != sit_succ ){
-      reverse_items( succ(sit_pred), pred(sit_succ) )
+      reverse_items( succ( key(sit_pred) ), pred( key(sit_succ) ) )
     }
 
     sit
@@ -235,7 +237,7 @@ object BentleyOttmann {
     var sit = sit_prime
     while( identical(p_sweep, next_seg.source) ) {
       val s_sit = locate(next_seg)
-      val p_sit = pred(s_sit)
+      val p_sit = pred( key(s_sit) )
 
       val s = key(s_sit)
       if( orientation(s, next_seg.source) == 0 && orientation(s, next_seg.target) == 0 ) {
@@ -278,16 +280,27 @@ object BentleyOttmann {
 
   // Returns the item [k', i] in S such that k' is minimal with k' >= k (null if no such item exists)
   def locate(k: Segment)
-    (implicit S: TreeMap[Segment, Seq_item]): Seq_item = S.ceilingEntry(k).getValue
+    (implicit S: TreeMap[Segment, Seq_item]): Seq_item = {
+    try{
+      S.ceilingEntry(k).getValue
+    } catch {
+      case e: NullPointerException => null
+    }
+  }
 
   // Equivalent to locate(k)...
-  def succ(it: Seq_item)
-    (implicit S: TreeMap[Segment, Seq_item]): Seq_item = locate( key(it) )
+  def succ(k: Segment)
+    (implicit S: TreeMap[Segment, Seq_item]): Seq_item = locate( k )
 
   // Returns the item [k', i] in S such that k' is maximal with k' <= k (null if no such item exists)
-  def pred(it: Seq_item)
-    (implicit S: TreeMap[Segment, Seq_item]): Seq_item = S.floorEntry( key(it) ).getValue
-
+  def pred(k: Segment)
+    (implicit S: TreeMap[Segment, Seq_item]): Seq_item = {
+    try {
+      S.floorEntry( k ).getValue
+    } catch {
+      case e: NullPointerException => null
+    }
+  }
   // Returns true if S is empty, false otherwise...
   def empty(implicit S: TreeMap[Segment, Seq_item]): Boolean = S.isEmpty 
 
@@ -432,6 +445,47 @@ object BentleyOttmann {
     val S = List(s1,s2,s3,s4,s5,s6,s7,s8,s9)
 
     (P, S)
+  }
+
+  def loadData2(implicit geofactory: GeometryFactory): (List[Point], List[Segment]) = {
+    val p0 = new Coordinate(2, 8);
+    val p1 = new Coordinate(5, 1) // a
+    val p2 = new Coordinate(3, 1);
+    val p3 = new Coordinate(5, 3) // b
+    val p4 = new Coordinate(2, 1);
+    val p5 = new Coordinate(5, 4) // c
+    val p6 = new Coordinate(3, 10);
+    val p7 = new Coordinate(5, 5) // d
+    val p8 = new Coordinate(2, 3);
+    val p9 = new Coordinate(5, 6) // e
+    val p10 = new Coordinate(2, 5);
+    val p11 = new Coordinate(5, 7) // f
+    val p12 = new Coordinate(2, 9);
+    val p13 = new Coordinate(5, 8) // g
+    val p14 = new Coordinate(2, 7);
+    val p15 = new Coordinate(5, 10) // h
+    val l1: LineString = geofactory.createLineString(Array(p0, p1))
+    val l2: LineString = geofactory.createLineString(Array(p2, p3))
+    val l3: LineString = geofactory.createLineString(Array(p4, p5))
+    val l4: LineString = geofactory.createLineString(Array(p6, p7))
+    val l5: LineString = geofactory.createLineString(Array(p8, p9))
+    val l6: LineString = geofactory.createLineString(Array(p10, p11))
+    val l7: LineString = geofactory.createLineString(Array(p12, p13))
+    val l8: LineString = geofactory.createLineString(Array(p14, p15))
+    val h1: Half_edge = Half_edge(l1); h1.id = 1
+    val h2: Half_edge = Half_edge(l2); h2.id = 2
+    val h3: Half_edge = Half_edge(l3); h3.id = 3
+    val h4: Half_edge = Half_edge(l4); h4.id = 4
+    val h5: Half_edge = Half_edge(l5); h5.id = 5
+    val h6: Half_edge = Half_edge(l6); h6.id = 6
+    val h7: Half_edge = Half_edge(l7); h7.id = 7
+    val h8: Half_edge = Half_edge(l8); h8.id = 8
+    val hh: Seq[Half_edge] = List(h2, h3, h5, h6, h8, h1, h7, h4)
+    val S: Seq[Segment] = hh.map { h => Segment(h, "A") }
+
+    val P = S.map{ s => List(s.source, s.target) }.flatten.map{ c => geofactory.createPoint(c)}.distinct
+
+    (P.toList, S.toList)
   }
 
   def getInternalOriginalMap(segments: List[Segment], seg_queue: PriorityQueue[Segment]):
