@@ -38,9 +38,11 @@ object BentleyOttmann {
     }
 
     // The X-Structure: Event queue...
-    implicit val X_structure: TreeMap[Coordinate, Seq_item] = new TreeMap[Coordinate, Seq_item]()
+    val coordinateComparator = new CoordinateComparator()
+    implicit val X_structure: TreeMap[Coordinate, Seq_item] = new TreeMap[Coordinate, Seq_item](coordinateComparator)
     implicit val last_node: TreeMap[Segment, Coordinate] = new TreeMap[Segment, Coordinate]()
-    implicit val seg_queue: TreeMap[Coordinate, Segment] = new TreeMap[Coordinate, Segment]()
+    val coordinateComparatorById = new CoordinateComparatorById()
+    implicit val seg_queue: TreeMap[Coordinate, Segment] = new TreeMap[Coordinate, Segment](coordinateComparatorById)
 
     // Initialization...
     val L = ListBuffer[Segment]()
@@ -50,23 +52,15 @@ object BentleyOttmann {
       val it1 = X_structure.put(s.source, null)
       val it2 = X_structure.put(s.target, null)
 
-      if(s.source != s.target) { // Ignore zero-length segments...
-        val s1 = if(!s.isVertical){
-          if(!s.isLeftOriented){
-            s.reverse
-          } else {
-            s
-          }
-        } else {
-          if(!s.isUpwardsOriented) {
-            s.reverse
-          } else {
-            s
-          }
-        }
+      if( !s.hasZero_Length ) { // Ignore zero-length segments...
+        val p = s.source
+        val q = s.target
+        val s1 = if( p.compareTo(q) < 0 ) Segment.create(p, q, s) else Segment.create(q, p, s)
         M.append(s1 -> s)
         L.append(s1)
-        seg_queue.put(s1.source, s1)
+        val ss1 = s1.source
+        val ss1_key = new Coordinate(ss1.x, ss1.y, s1.id)
+        seg_queue.put(ss1_key, s1)
       }
     }
     val internal: List[Segment] = L.toList
@@ -488,6 +482,37 @@ object BentleyOttmann {
     (P.toList, S.toList)
   }
 
+  def loadData3(implicit geofactory: GeometryFactory): (List[Point], List[Segment]) = {
+    val p1  = new Coordinate(1, 2) // a
+    val p2  = new Coordinate(4, 1) // b
+    val p3  = new Coordinate(3, 5) // c
+    val p4  = new Coordinate(1, 3) // d
+    val p5  = new Coordinate(1, 4) // e
+    val p6  = new Coordinate(2, 2) // f
+    val p7  = new Coordinate(3, 3) // g
+    val p8  = new Coordinate(3, 2) // h
+    val p9  = new Coordinate(4, 2) // i
+    val p10 = new Coordinate(4, 5) // j
+    val l1: LineString = geofactory.createLineString(Array(p1, p2))
+    val l2: LineString = geofactory.createLineString(Array(p1, p3))
+    val l3: LineString = geofactory.createLineString(Array(p4, p5))
+    val l4: LineString = geofactory.createLineString(Array(p7, p6))
+    val l5: LineString = geofactory.createLineString(Array(p8, p8))
+    val l6: LineString = geofactory.createLineString(Array(p10, p9))
+    val h1: Half_edge = Half_edge(l1); h1.id = 1
+    val h2: Half_edge = Half_edge(l2); h2.id = 2
+    val h3: Half_edge = Half_edge(l3); h3.id = 3
+    val h4: Half_edge = Half_edge(l4); h4.id = 4
+    val h5: Half_edge = Half_edge(l5); h5.id = 5
+    val h6: Half_edge = Half_edge(l6); h6.id = 6
+    val hh: Seq[Half_edge] = List(h1, h2, h3, h4, h5, h6)
+    val S: Seq[Segment] = hh.map{ h => Segment(h) }
+
+    val P = S.map { s => List(s.source, s.target) }.flatten.map { c => geofactory.createPoint(c) }.distinct
+
+    (P.toList, S.toList)
+  }
+
   def getInternalOriginalMap(segments: List[Segment], seg_queue: PriorityQueue[Segment]):
       (Map[Segment, Segment], List[Segment]) = {
 
@@ -892,7 +917,14 @@ case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
 /***************************   Segment case class   *********************************/
 /************************************************************************************/
 
-case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFactory){
+object Segment {
+  def create(p: Coordinate, q: Coordinate, s_prime: Segment)(implicit geofactory: GeometryFactory): Segment = {
+    val l = geofactory.createLineString(Array(p, q))
+    val h = Half_edge(l); h.id = s_prime.id
+    Segment(h)
+  }
+}
+case class Segment(h: Half_edge, label: String = "*")(implicit geofactory: GeometryFactory){
 
   val p_1:    Coordinate = h.v1
   val p_2:    Coordinate = h.v2
@@ -924,7 +956,9 @@ case class Segment(h: Half_edge, label: String)(implicit geofactory: GeometryFac
 
   def overlaps(that:Segment): Boolean = this.within(that) || that.within(this)
 
-  def isTrivial(sweep: Coordinate): Boolean = this.source == sweep && this.target == sweep  
+  def isTrivial(sweep: Coordinate): Boolean = this.source == sweep && this.target == sweep
+
+  def hasZero_Length: Boolean = this.source == this.target
 
   def first: Coordinate = {
     if( p_1.x < p_2.x ) { p_1 }

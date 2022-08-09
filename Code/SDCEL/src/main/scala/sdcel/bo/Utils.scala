@@ -172,13 +172,19 @@ case class SegmentEdge(segment: Segment) extends DefaultEdge {
 }
 
 /* Compare class to order the priority queue asked at LEDA book pag 743 */
-class segmentByXY() extends Comparator[Segment]{
-  def compare(a: Segment, b: Segment): Int = {
-    //s1.source.compareTo(s2.source)
-    a.source.x compare b.source.x
+class CoordinateComparator() extends Comparator[Coordinate]{
+  def compare(a: Coordinate, b: Coordinate): Int = {
+    a.compareTo(b)
   }
 }
-
+class CoordinateComparatorById() extends Comparator[Coordinate]{
+  def compare(a: Coordinate, b: Coordinate): Int = {
+    a.compareTo(b) match {
+      case x if x == 0 => a.z compare b.z
+      case x if x != 0 => x
+    }
+  }
+}
 /* Tree object to model a data structure to support multiple segments per node */
 object Tree {
   implicit val geofactory: GeometryFactory = new GeometryFactory()

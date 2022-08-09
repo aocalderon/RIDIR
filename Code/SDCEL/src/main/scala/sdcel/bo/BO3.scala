@@ -102,7 +102,7 @@ object BO3 {
       new SimpleDirectedGraph[Coordinate, SegmentEdge](classOf[SegmentEdge])
     
     // Load data...
-    val (points, data) = BentleyOttmann.loadData
+    val (points, data) = BentleyOttmann.loadData3
     // Calling main function...
     BentleyOttmann.sweep_segments( data, List.empty[Segment] )
 
