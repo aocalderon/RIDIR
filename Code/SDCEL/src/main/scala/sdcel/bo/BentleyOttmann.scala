@@ -67,12 +67,11 @@ object BentleyOttmann {
     implicit val original: Map[Segment, Segment] = M.toMap
 
     // Setting lower and upper sentinels to bound the algorithm...
-    val (lower_sentinel, upper_sentinel) = getSentinels
-    var p_sweep = lower_sentinel.source
+    val (lower_sentinel, upper_sentinel) = getSentinels(seg_queue.values().asScala.toList)
 
     // Setting the order criteria for Y-Structure
     val cmp = new sweep_cmp2()
-    cmp.setSweep(p_sweep)
+    cmp.setSweep(lower_sentinel.source)
 
     // The Y-Structure: Sweep line status...
     implicit val Y_structure: TreeMap[Segment, Seq_item] = new TreeMap[Segment, Seq_item](cmp)
@@ -80,7 +79,7 @@ object BentleyOttmann {
     // Adding sentinels...
     val r1 = Y_structure.put(lower_sentinel, null)
     val r2 = Y_structure.put(upper_sentinel, null)
-    var next_seg = seg_queue.firstEntry().getValue
+    val next_seg = seg_queue.firstEntry().getValue
 
     // Just for debugging purposes...
     if( settings.debug ){
@@ -103,10 +102,10 @@ object BentleyOttmann {
     // Main sweep loop (LEDA Book pag 745)...
     while( !X_structure.isEmpty ) {
       val event = X_structure.pollFirstEntry()
-      p_sweep = event.getKey
+      val p_sweep = event.getKey
       cmp.setSweep(p_sweep)
       G.addVertex(p_sweep)
-      val v: Coordinate = p_sweep    
+      val v: Coordinate = p_sweep
 
       // Handle passing and ending segments...
       var sit = event.getValue // get info
@@ -119,7 +118,7 @@ object BentleyOttmann {
         val (sit_succ, sit_pred, sit_pred_succ, sit_first) =
           determineSegments(sit, event.getValue, v, p_sweep)
         // Reverse order of passing segments...
-        reverseOrder(sit_succ, sit_pred, sit_pred_succ, sit_first)
+        //reverseOrder(sit_succ, sit_pred, sit_pred_succ, sit_first)
       }
 
       // Insert starting segments...
@@ -370,6 +369,28 @@ object BentleyOttmann {
     h2.id = -2
     val lower = Segment(h1, "Lower")
     val upper = Segment(h2, "Upper")
+    (lower, upper)
+  }
+
+  def getSentinels(segments: List[Segment])(implicit geofactory: GeometryFactory): (Segment, Segment) = {
+    val endpoints = segments.map{ segment => (segment.source.x, segment.source.y, segment.target.x, segment.target.y) }
+    val endpoints_x = endpoints.map(point => List(point._1, point._3)).flatten
+    val endpoints_y = endpoints.map(point => List(point._2, point._4)).flatten
+    val minx = endpoints_x.min
+    val maxx = endpoints_x.max
+    val miny = endpoints_y.min
+    val maxy = endpoints_y.max
+
+    val arr1 = Array(new Coordinate(minx, miny), new Coordinate(minx, maxy))
+    val arr2 = Array(new Coordinate(maxx, miny), new Coordinate(maxx, maxy))
+    val l1 = geofactory.createLineString(arr1)
+    val l2 = geofactory.createLineString(arr2)
+    val h1 = Half_edge(l1)
+    h1.id = -1
+    val h2 = Half_edge(l2)
+    h2.id = -2
+    val lower = Segment(h1, "L")
+    val upper = Segment(h2, "U")
     (lower, upper)
   }
 

@@ -129,7 +129,11 @@ class sweep_cmp2() extends Comparator[Segment]{
   def setSweep(p: Coordinate): Unit = { sweep = p }
 
   def compare(s1: Segment, s2: Segment): Int = {
-    if(s1.identical(s2)){
+    if(s2.id < 0) {
+      1
+    } else if(s1.id < 0) {
+      -1
+    } else if(s1.identical(s2)){
       s1.id compare s2.id
     } else {
       val sweepline = getSweepline(s1, s2, sweep)
