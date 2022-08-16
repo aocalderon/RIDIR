@@ -129,7 +129,11 @@ class sweep_cmp2() extends Comparator[Segment]{
   def setSweep(p: Coordinate): Unit = { sweep = p }
 
   def compare(s1: Segment, s2: Segment): Int = {
-    if(s1.identical(s2)){
+    if(s2.id < 0) {
+      1
+    } else if(s1.id < 0) {
+      -1
+    } else if(s1.identical(s2)){
       s1.id compare s2.id
     } else {
       val sweepline = getSweepline(s1, s2, sweep)
@@ -172,19 +176,19 @@ case class SegmentEdge(segment: Segment) extends DefaultEdge {
 }
 
 /* Compare class to order the priority queue asked at LEDA book pag 743 */
-class segmentByXY() extends Comparator[Segment]{
-  def compare(s1: Segment, s2: Segment): Int = {
-    val C = s1.first.x compare s2.first.x
-
-    val R = C match{
-      case 0 => s1.second.y compare s2.second.y
-      case _ => C
-    }
-
-    R
+class CoordinateComparator() extends Comparator[Coordinate]{
+  def compare(a: Coordinate, b: Coordinate): Int = {
+    a.compareTo(b)
   }
 }
-
+class CoordinateComparatorById() extends Comparator[Coordinate]{
+  def compare(a: Coordinate, b: Coordinate): Int = {
+    a.compareTo(b) match {
+      case x if x == 0 => a.z compare b.z
+      case x if x != 0 => x
+    }
+  }
+}
 /* Tree object to model a data structure to support multiple segments per node */
 object Tree {
   implicit val geofactory: GeometryFactory = new GeometryFactory()
