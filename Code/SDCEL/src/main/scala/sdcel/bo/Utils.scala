@@ -88,7 +88,7 @@ class sweep_cmp() extends Comparator[Segment]{
           BentleyOttmann.orientation(s1, sweep)
         } else {
           logger.error("Error in sweep_cmp -> compare !!!")
-          compareIntersectionsWithSweepline(s1, s2, sweep)
+          -1
         }
       }
 
