@@ -128,7 +128,7 @@ object BentleyOttmann {
 
     }
 
-                                List.empty[Intersection]
+    List.empty[Intersection]
   }
   /**************************/
   /***** Main Class End *****/
@@ -137,11 +137,11 @@ object BentleyOttmann {
   /* Determine passing and ending segments. LEDA book pag 748. */
   def determineSegments(sit_prime: Seq_item, event: Seq_item, v: Coordinate, p_sweep: Coordinate)
     (implicit
-      settings:    Settings,
-      Y_structure: TreeMap[Segment, Seq_item],
-      original:    Map[Segment, Segment],
-      last_node:   TreeMap[Segment, Coordinate],
-      G:           SimpleDirectedGraph[Coordinate, SegmentEdge]
+     settings:    Settings,
+     Y_structure: TreeMap[Segment, Seq_item],
+     original:    Map[Segment, Segment],
+     last_node:   TreeMap[Segment, Coordinate],
+     G:           SimpleDirectedGraph[Coordinate, SegmentEdge]
     ): (Seq_item, Seq_item, Seq_item, Seq_item) = {
 
     // walk up...
@@ -229,7 +229,7 @@ object BentleyOttmann {
 
     var sit = sit_prime
     while( identical(p_sweep, next_seg.source) ) {
-      val s_sit = locate(next_seg)
+      val s_sit = locate( next_seg )
       val p_sit = pred( key(s_sit) )
 
       val s = key(s_sit)
@@ -376,13 +376,14 @@ object BentleyOttmann {
     val endpoints = segments.map{ segment => (segment.source.x, segment.source.y, segment.target.x, segment.target.y) }
     val endpoints_x = endpoints.map(point => List(point._1, point._3)).flatten
     val endpoints_y = endpoints.map(point => List(point._2, point._4)).flatten
+    val gap = 1.0
     val minx = endpoints_x.min
     val maxx = endpoints_x.max
-    val miny = endpoints_y.min
-    val maxy = endpoints_y.max
+    val miny = endpoints_y.min - gap
+    val maxy = endpoints_y.max + gap
 
-    val arr1 = Array(new Coordinate(minx, miny), new Coordinate(minx, maxy))
-    val arr2 = Array(new Coordinate(maxx, miny), new Coordinate(maxx, maxy))
+    val arr1 = Array(new Coordinate(minx, miny), new Coordinate(maxx, miny))
+    val arr2 = Array(new Coordinate(minx, maxy), new Coordinate(maxx, maxy))
     val l1 = geofactory.createLineString(arr1)
     val l2 = geofactory.createLineString(arr2)
     val h1 = Half_edge(l1)
@@ -941,157 +942,181 @@ case class Event(point: Coordinate, segments: List[Segment], ttype: Int)
 object Segment {
   def create(p: Coordinate, q: Coordinate, s_prime: Segment)(implicit geofactory: GeometryFactory): Segment = {
     val l = geofactory.createLineString(Array(p, q))
-    val h = Half_edge(l); h.id = s_prime.id
+    val h = Half_edge(l);
+    h.id = s_prime.id
     Segment(h)
   }
 }
-case class Segment(h: Half_edge, label: String = "*")(implicit geofactory: GeometryFactory){
 
-  val p_1:    Coordinate = h.v1
-  val p_2:    Coordinate = h.v2
-  val source: Coordinate = h.v1
-  val target: Coordinate = h.v2
-  val id:     Long = h.id
-  val line:   LineString = h.edge
-  val lid:    String = s"${label}${id}"
-  val angle:  Double = hangle(source, target)
-  var value:  Double = this.calculateValue(this.first.x)
-  var sweep:  Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
-  val debug:  Boolean = false
+ case class Segment(h: Half_edge, label: String = "*")(implicit geofactory: GeometryFactory) {
 
-  def dx: Double = target.x - source.x
-  def dy: Double = target.y - source.y
-  def slope: Option[Double] = {
-    if( dx == 0 ){
-      None
-    } else {
-      Some( dy / dx )
-    }
-  }
+   val p_1: Coordinate = h.v1
+   val p_2: Coordinate = h.v2
+   val source: Coordinate = h.v1
+   val target: Coordinate = h.v2
+   val id: Long = h.id
+   val line: LineString = h.edge
+   val lid: String = s"${label}${id}"
+   val angle: Double = hangle(source, target)
+   var value: Double = this.calculateValue(this.first.x)
+   var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
+   val debug: Boolean = false
 
-  def envelope: Envelope = h.edge.getEnvelopeInternal
+   def dx: Double = target.x - source.x
 
-  def within(that: Segment): Boolean = this.h.edge.within(that.h.edge)
+   def dy: Double = target.y - source.y
 
-  def identical(that: Segment): Boolean = this.source == that.source && this.target == that.target
+   def slope: Option[Double] = {
+     if (dx == 0) {
+       None
+     } else {
+       Some(dy / dx)
+     }
+   }
 
-  def overlaps(that:Segment): Boolean = this.within(that) || that.within(this)
+   def envelope: Envelope = h.edge.getEnvelopeInternal
 
-  def isTrivial(sweep: Coordinate): Boolean = this.source == sweep && this.target == sweep
+   def within(that: Segment): Boolean = this.h.edge.within(that.h.edge)
 
-  def hasZero_Length: Boolean = this.source == this.target
+   def identical(that: Segment): Boolean = this.source == that.source && this.target == that.target
 
-  def first: Coordinate = {
-    if( p_1.x < p_2.x ) { p_1 }
-    else if( p_1.x > p_2.x ) { p_2 }
-    else {
-      if( p_1.y < p_2.y ) { p_1 }
-      else { p_2 }
-    }
-  }
-  
-  def second: Coordinate = {
-    if( p_1.x < p_2.x ) { p_2 }
-    else if( p_1.x > p_2.x ) { p_1 }
-    else {
-      if( p_1.y < p_2.y ) { p_2 }
-      else { p_1 }
-    }
-  }
+   def overlaps(that: Segment): Boolean = this.within(that) || that.within(this)
 
-  def calculateValue(value: Double): Double = {
-    val x1 = this.first.x; val x2 = this.second.x
-    val y1 = this.first.y; val y2 = this.second.y
+   def isTrivial(sweep: Coordinate): Boolean = this.source == sweep && this.target == sweep
 
-    val dx = x2 - x1 // TODO: Track Zero division...
-    val dy = y2 - y1
+   def hasZero_Length: Boolean = this.source == this.target
 
-    val vx = value - x1
-    
-    y1 + ( (dy / dx) * vx ) // TODO: NaN value does not seem to affect...
-  }
+   def first: Coordinate = {
+     if (p_1.x < p_2.x) {
+       p_1
+     }
+     else if (p_1.x > p_2.x) {
+       p_2
+     }
+     else {
+       if (p_1.y < p_2.y) {
+         p_1
+       }
+       else {
+         p_2
+       }
+     }
+   }
 
-  def calculateValue2(value: Double): Option[Double] = {
-    val x1 = this.first.x; val x2 = this.second.x
-    val y1 = this.first.y; val y2 = this.second.y
+   def second: Coordinate = {
+     if (p_1.x < p_2.x) {
+       p_2
+     }
+     else if (p_1.x > p_2.x) {
+       p_1
+     }
+     else {
+       if (p_1.y < p_2.y) {
+         p_2
+       }
+       else {
+         p_1
+       }
+     }
+   }
 
-    val dx = x2 - x1 // TODO: Track Zero division...
-    val V = if(dx == 0){
-      None
-    } else {
-      val dy = y2 - y1
-      val vx = value - x1
-      
-      Some( y1 + ( (dy / dx) * vx ) )
-    }
-    println(s"segment: ${this.wkt}\tvalue: $V")
+   def calculateValue(value: Double): Double = {
+     val x1 = this.first.x;
+     val x2 = this.second.x
+     val y1 = this.first.y;
+     val y2 = this.second.y
 
-    V
-  }
+     val dx = x2 - x1 // TODO: Track Zero division...
+     val dy = y2 - y1
 
-  def isVertical: Boolean = dx == 0
+     val vx = value - x1
 
-  def isHorizontal: Boolean = dy == 0
+     y1 + ((dy / dx) * vx) // TODO: NaN value does not seem to affect...
+   }
 
-  def isLeftOriented: Boolean = source.x < target.x
+   def calculateValue2(value: Double): Option[Double] = {
+     val x1 = this.first.x;
+     val x2 = this.second.x
+     val y1 = this.first.y;
+     val y2 = this.second.y
 
-  def isUpwardsOriented: Boolean = source.y < target.y
+     val dx = x2 - x1 // TODO: Track Zero division...
+     val V = if (dx == 0) {
+       None
+     } else {
+       val dy = y2 - y1
+       val vx = value - x1
 
-  def isDegenerate: Boolean = {
-    if(isVertical){
-      true
-    } else {
-      false
-    }
-  }
+       Some(y1 + ((dy / dx) * vx))
+     }
+     println(s"segment: ${this.wkt}\tvalue: $V")
 
-  def reverse: Segment = {
-    val edge = line.reverse().asInstanceOf[LineString]
-    edge.setUserData(line.getUserData)
-    val h = Half_edge(edge)
-    h.id = this.h.id
+     V
+   }
 
-    Segment(h, this.label)
-  }
+   def isVertical: Boolean = dx == 0
 
-  def intersection(that: Segment): Option[Coordinate] = {
-    val coordinates = this.line.intersection(that.line).getCoordinates
-    if(coordinates.size == 1){
-      Some(coordinates.head)
-    } else {
-      None
-    }
-  }
+   def isHorizontal: Boolean = dy == 0
 
-  def intersectionY(that_line: LineString): Double = {
-    val this_line = this.h.edge
-    if ( this_line.intersects(that_line) ) {
-      this_line.intersection(that_line).getCentroid.getY
-    } else {
-      Double.MinValue
-    }
-  }
-  
-  def asJTSLine: LineString = {
-    val line = this.h.edge
-    line.setUserData(s"$label\t$id\t$value")
-    line
-  }
+   def isLeftOriented: Boolean = source.x < target.x
 
-  def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value"
+   def isUpwardsOriented: Boolean = source.y < target.y
 
-  private def hangle(p_1: Coordinate, p_2: Coordinate): Double = {
-    val dx = p_1.x - p_2.x
-    val dy = p_1.y - p_2.y
-    val length = math.sqrt( (dx * dx) + (dy * dy) )
-    val angle = if(dy > 0){
-      math.acos(dx / length)
-    } else {
-      2 * math.Pi - math.acos(dx / length)
-    }
-    math.toDegrees(angle)
-  }
+   def isDegenerate: Boolean = {
+     if (isVertical) {
+       true
+     } else {
+       false
+     }
+   }
 
-  override def toString: String =
-    f"${asJTSLine.toText}%-30s label: ${label}%-4s id: ${id}%-3s value: ${this.value}%-20s"
-}
+   def reverse: Segment = {
+     val edge = line.reverse().asInstanceOf[LineString]
+     edge.setUserData(line.getUserData)
+     val h = Half_edge(edge)
+     h.id = this.h.id
+
+     Segment(h, this.label)
+   }
+
+   def intersection(that: Segment): Option[Coordinate] = {
+     val coordinates = this.line.intersection(that.line).getCoordinates
+     if (coordinates.size == 1) {
+       Some(coordinates.head)
+     } else {
+       None
+     }
+   }
+
+   def intersectionY(that_line: LineString): Double = {
+     val this_line = this.h.edge
+     if (this_line.intersects(that_line)) {
+       this_line.intersection(that_line).getCoordinates.minBy(_.y).y
+     } else {
+       Double.MinValue
+     }
+   }
+
+   def asJTSLine: LineString = {
+     val line = this.h.edge
+     line.setUserData(s"$label\t$id\t$value")
+     line
+   }
+
+   def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value"
+
+   private def hangle(p_1: Coordinate, p_2: Coordinate): Double = {
+     val dx = p_1.x - p_2.x
+     val dy = p_1.y - p_2.y
+     val length = math.sqrt((dx * dx) + (dy * dy))
+     val angle = if (dy > 0) {
+       math.acos(dx / length)
+     } else {
+       2 * math.Pi - math.acos(dx / length)
+     }
+     math.toDegrees(angle)
+   }
+
+   override def toString: String =
+     f"${asJTSLine.toText}%-30s label: ${label}%-4s id: ${id}%-3s value: ${this.value}%-20s"
+ }

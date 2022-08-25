@@ -73,7 +73,7 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
     val p_sweep = new Coordinate(x, 0.0)
     // Setting the order criteria for Y-Structure
     val cmp = new sweep_cmp()
-    cmp.setPosition(p_sweep)
+    cmp.setSweep(p_sweep)
     val cmp2 = new sweep_cmp2()
     cmp2.setSweep(p_sweep)
     // The Y-Structure: Sweep line status...
@@ -91,10 +91,11 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
   // Setting the order criteria for Y-Structure
   //val cmp = new sweep_cmp()
   //cmp.setPosition(p_sweep)
-  val cmp2 = new sweep_cmp2()
-  cmp2.setSweep(p_sweep)
+  val cmp = new sweep_cmp2()
+  cmp.setSweep(p_sweep)
   // The Y-Structure: Sweep line status...
-  implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp2)
+  implicit val Y_structure: util.TreeMap[Segment, T] = new util.TreeMap[Segment, T](cmp)
+
   segments.foreach { seg =>
     Y_structure.put( seg, T(seg, null) )
   }
@@ -109,6 +110,25 @@ class SortSeq_Tester extends AnyFlatSpec with should.Matchers {
     }
   }
 
+
+  import java.util.TreeMap
+  // Load data...
+  val (_, segs) = BentleyOttmann.loadData3
+
+  val coordinateComparator = new CoordinateComparator()
+  implicit val X_structure: TreeMap[Coordinate, Seq_item] = new TreeMap[Coordinate, Seq_item](coordinateComparator)
+
+  segs.foreach { seg =>
+    X_structure.put(seg.source, null)
+    X_structure.put(seg.target, null)
+  }
+
+  val (lower, upper) = BentleyOttmann.getSentinels(segs)
+
+  cmp.setSweep(lower.source)
+
+  Y_structure.put(lower_sentinel, null)
+  Y_structure.put(upper_sentinel, null)
 
   /*
    "Points p, q, r1 " should " be left oriented" in {

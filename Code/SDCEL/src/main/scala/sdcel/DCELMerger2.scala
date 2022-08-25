@@ -1,32 +1,17 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector
-import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
 import com.vividsolutions.jts.algorithm.RobustLineIntersector
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.{Polygon, Coordinate, Envelope}
+import com.vividsolutions.jts.geom.{Envelope, GeometryFactory, Polygon}
 import com.vividsolutions.jts.geomgraph.EdgeIntersection
-import com.vividsolutions.jts.geomgraph.Edge
+import com.vividsolutions.jts.geomgraph.index.{SegmentIntersector, SimpleMCSweepLineIntersector}
 import com.vividsolutions.jts.index.strtree._
-
-import scala.collection.JavaConverters._
-import scala.annotation.tailrec
-import scala.collection.mutable.{PriorityQueue, Queue}
-import scala.util.Sorting
-
+import edu.ucr.dblab.sdcel.Utils._
+import edu.ucr.dblab.sdcel.geometries._
 import org.apache.spark.TaskContext
+import org.slf4j.Logger
 
-import com.google.common.collect.TreeMultiset
-
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, Vertex, EdgeData, HEdge, Tag, Cell}
-import edu.ucr.dblab.sdcel.geometries.{EventPoint, EventPoint_Ordering}
-import edu.ucr.dblab.sdcel.geometries.{Event, LEFT_ENDPOINT, RIGHT_ENDPOINT, INTERSECT}
-import edu.ucr.dblab.sdcel.geometries.{Label, A, B}
-import edu.ucr.dblab.debug.BO2._
-import Utils._
-import PartitionReader.{envelope2polygon}
-
-import org.slf4j.{Logger, LoggerFactory}
+import scala.annotation.tailrec
+import scala.collection.JavaConverters._
 
 object DCELMerger2 {
   def merge(hlepA: List[(Half_edge,String,Envelope, Polygon)],
@@ -41,7 +26,6 @@ object DCELMerger2 {
     if(settings.debug){
       val pid = TaskContext.getPartitionId
       if(pid == 113){
-        import edu.ucr.dblab.bo.BentleyOttmann
 
         val nha = ha.length
         val nhb = hb.length
@@ -56,6 +40,7 @@ object DCELMerger2 {
           hs2.map{h => s"${h.wkt}\t${h.id}\n"}
         }
 
+        /*
         val inters1 = sweepline2(hs1, hs2)
         val inters2 = sweeplineJTS2(hs1, hs2)
 
@@ -69,6 +54,7 @@ object DCELMerger2 {
             s"${i.toText}\n"
           }
         }
+        */
       }
     }
 

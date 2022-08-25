@@ -23,17 +23,6 @@ case class Tag(label: String, pid: Int){
 case class HEdge(coords: Array[Coordinate], h: Half_edge)  extends Edge(coords)
 case class LEdge(coords: Array[Coordinate], l: LineString) extends Edge(coords)
 
-import edu.ucr.dblab.bo.{Point => BOPoint, Segment => BOSegment}
-case class Seg(hedge: Half_edge) {
-  val edge: BOSegment = {
-    val p1 = new BOPoint(hedge.left.x, hedge.left.y)
-    val p2 = new BOPoint(hedge.right.x, hedge.right.y)
-    new BOSegment(p1, p2)
-  }
-
-  override def toString: String = s"$edge"
-}
-
 object EmptyCoordinate {
   private val coordinate: Coordinate  = new Coordinate()
   coordinate.setOrdinate(0, Double.NaN)

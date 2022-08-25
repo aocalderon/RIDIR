@@ -66,7 +66,7 @@ case class Seq_item(key: Key, var inf: Seq_item = null)
 class sweep_cmp() extends Comparator[Segment]{
   private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
 
-  def setPosition(p: Coordinate): Unit = { sweep = p }
+  def setSweep(p: Coordinate): Unit = { sweep = p }
 
   def sign(x: Long): Int = x match {
     case _ if x <  0 => -1
@@ -88,12 +88,13 @@ class sweep_cmp() extends Comparator[Segment]{
           BentleyOttmann.orientation(s1, sweep)
         } else {
           logger.error("Error in sweep_cmp -> compare !!!")
+          println("ERROR")
           compareIntersectionsWithSweepline(s1, s2, sweep)
         }
       }
 
       // check if one of the segments is trivial (LEDA book pag 743)...
-      if(s >= 0 || s1.isTrivial(sweep) || s2.isTrivial(sweep)){
+      if(s != 0 || s1.isTrivial(sweep) || s2.isTrivial(sweep)){
         s
       } else {
         val r = BentleyOttmann.orientation(s2, s1.target)
@@ -129,11 +130,7 @@ class sweep_cmp2() extends Comparator[Segment]{
   def setSweep(p: Coordinate): Unit = { sweep = p }
 
   def compare(s1: Segment, s2: Segment): Int = {
-    if(s2.id < 0) {
-      1
-    } else if(s1.id < 0) {
-      -1
-    } else if(s1.identical(s2)){
+    if(s1.identical(s2)){
       s1.id compare s2.id
     } else {
       val sweepline = getSweepline(s1, s2, sweep)
