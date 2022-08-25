@@ -90,6 +90,7 @@ class sweep_cmp() extends Comparator[Segment]{
           logger.error("Error in sweep_cmp -> compare !!!")
           println("ERROR")
           compareIntersectionsWithSweepline(s1, s2, sweep)
+          //-1
         }
       }
 
