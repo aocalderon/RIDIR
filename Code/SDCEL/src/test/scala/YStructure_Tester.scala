@@ -31,11 +31,17 @@ class YStructure_Tester extends AnyFlatSpec with should.Matchers {
 
   implicit val Y_structure: TreeMap[Segment, Seq_item] = new TreeMap[Segment, Seq_item](cmp)
 
-  Y_structure.put( lower_sentinel, Seq_item( Key(lower_sentinel), null) )
   Y_structure.put( upper_sentinel, Seq_item( Key(upper_sentinel), null) )
+  Y_structure.put( lower_sentinel, Seq_item( Key(lower_sentinel), null) )
 
+
+  cmp.setSweep(s1.source)
   Y_structure.put(s1, null)
+
+  cmp.setSweep(s2.source)
   Y_structure.put(s2, null)
+
+  cmp.setSweep(s3.source)
   Y_structure.put(s3, null)
 
   Y_structure.asScala.iterator.map{ case(s, i) => s.id }.foreach(println)
