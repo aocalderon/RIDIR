@@ -9,6 +9,23 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 class YStructure_Tester extends AnyFlatSpec with should.Matchers {
+  def Y_structure_content(Y: TreeMap[Segment, Seq_item]): String = {
+    Y.asScala.iterator.filter{ case(s, i) => s.id >= 0}.map{ case(s, i) => s.id }.mkString(" ")
+  }
+
+  val ground_truth: Map[Int, String] = Map(
+    1 -> "1 2 3",
+    2 -> "1 4 2",
+    3 -> "1 5 4 2",
+    4 -> "1 6"
+  )
+
+  def Y_structure_test(number: Int)(implicit Y: TreeMap[Segment, Seq_item]): Unit = {
+    val r = Y_structure_content(Y)
+    println(r)
+    s"Y_structure in $number" should s"be $r" in { ground_truth(number) should be(r) }
+  }
+
   val debug: Boolean = true
   val tolerance: Double = 1e-3
   implicit val model: PrecisionModel = new PrecisionModel(1000.0)
@@ -34,7 +51,6 @@ class YStructure_Tester extends AnyFlatSpec with should.Matchers {
   Y_structure.put( upper_sentinel, Seq_item( Key(upper_sentinel), null) )
   Y_structure.put( lower_sentinel, Seq_item( Key(lower_sentinel), null) )
 
-
   cmp.setSweep(s1.source)
   Y_structure.put(s1, null)
 
@@ -44,21 +60,18 @@ class YStructure_Tester extends AnyFlatSpec with should.Matchers {
   cmp.setSweep(s3.source)
   Y_structure.put(s3, null)
 
-  Y_structure.asScala.iterator.map{ case(s, i) => s.id }.foreach(println)
-  println
+  Y_structure_test(1)
 
   Y_structure.remove(s3)
   cmp.setSweep(s4.source)
   Y_structure.put(s4, null)
 
-  Y_structure.asScala.iterator.map { case (s, i) => s.id }.foreach(println)
-  println
+  Y_structure_test(2)
 
   cmp.setSweep(s5.source)
   Y_structure.put(s5, null)
 
-  Y_structure.asScala.iterator.map { case (s, i) => s.id }.foreach(println)
-  println
+  Y_structure_test(3)
 
   Y_structure.remove(s2)
   Y_structure.remove(s4)
@@ -66,8 +79,7 @@ class YStructure_Tester extends AnyFlatSpec with should.Matchers {
   cmp.setSweep(s6.source)
   Y_structure.put(s6, null)
 
-  Y_structure.asScala.iterator.map { case (s, i) => s.id }.foreach(println)
-  println
+  Y_structure_test(4)
 }
 
 

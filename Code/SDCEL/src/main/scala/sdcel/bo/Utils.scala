@@ -87,10 +87,8 @@ class sweep_cmp() extends Comparator[Segment]{
         if( sweep.equals(s2.source) ){
           BentleyOttmann.orientation(s1, sweep)
         } else {
-          logger.error("Error in sweep_cmp -> compare !!!")
-          println("ERROR")
+          // In case of removal of a node and need of re-order...
           compareIntersectionsWithSweepline(s1, s2, sweep)
-          //-1
         }
       }
 
@@ -105,21 +103,23 @@ class sweep_cmp() extends Comparator[Segment]{
     }
   }
 
+  // It forces the intersection of each segment with the sweepline...
   private def compareIntersectionsWithSweepline(s1: Segment, s2: Segment, sweep: Coordinate): Int = {
-    var env = s1.envelope
-    env.expandToInclude(s2.envelope)
-    val coordinates = Array( new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY) )
-    val line = s1.h.edge.getFactory.createLineString(coordinates)
-
-    try {
-      val y1 = line.intersection(s1.asJTSLine).getCentroid.getY
-      val y2 = line.intersection(s2.asJTSLine).getCentroid.getY
-      y1 compare y2
-    } catch {
-      case e: Exception =>
-        logger.error("s1 or s2 does not intersect with sweepline!!!")
-        -1
+    val sweepline = getSweepline(s1, s2, sweep)
+    val y1 = s1.intersectionY(sweepline)
+    val y2 = s2.intersectionY(sweepline)
+    val c = y1 compare y2
+    if (c == 0) {
+      s1.id compare s2.id
+    } else {
+      c
     }
+  }
+  private def getSweepline(s1: Segment, s2: Segment, sweep: Coordinate): LineString = {
+    val env = s1.envelope
+    env.expandToInclude(s2.envelope)
+    val coordinates = Array(new Coordinate(sweep.x, env.getMinY), new Coordinate(sweep.x, env.getMaxY))
+    s1.h.edge.getFactory.createLineString(coordinates)
   }
 }
 
