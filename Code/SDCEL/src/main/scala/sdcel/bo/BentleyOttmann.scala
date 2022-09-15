@@ -23,8 +23,24 @@ object BentleyOttmann {
   /**** Main Class Start ****/
   /**************************/
   def sweep_segments(segs1: List[Segment], segs2: List[Segment])
-    (implicit settings: Settings, G: SimpleDirectedGraph[Coordinate, SegmentEdge])
-      : List[Intersection] = {
+    (implicit settings: Settings, G: SimpleDirectedGraph[Coordinate, SegmentEdge]): List[Intersection] = {
+
+    def compute_intersections(sit0: Seq_item)
+      (implicit Y_structure: TreeMap[Segment, Seq_item], X_structure: TreeMap[Coordinate, Seq_item]): Unit = {
+      // find successor of sit0 in Y_structure...
+      val sit1 = succ( key(sit0) )
+      val s0 = key(sit0)
+      val s1 = key(sit1)
+      if( orientation(s0, s1.target) <= 0 && orientation(s1, s0.target) >= 0 ) {
+        s0.intersection(s1) match { // find intersection between segments...
+          case Some(q) => {
+            val r = X_structure.put(q, sit0) // add event point to X_structure...
+            change_inf(sit0, r) // update info of sit0 in Y_structure...
+          }
+          case None => {}
+        }
+      }
+    }
 
     // local declarations...
     val S: List[Segment] = segs1 ++ segs2
@@ -70,7 +86,7 @@ object BentleyOttmann {
     val (lower_sentinel, upper_sentinel) = getSentinels(seg_queue.values().asScala.toList)
 
     // Setting the order criteria for Y-Structure
-    val cmp = new sweep_cmp2()
+    val cmp = new sweep_cmp()
     cmp.setSweep(lower_sentinel.source)
 
     // The Y-Structure: Sweep line status...
@@ -79,7 +95,7 @@ object BentleyOttmann {
     // Adding sentinels...
     val r1 = Y_structure.put(lower_sentinel, null)
     val r2 = Y_structure.put(upper_sentinel, null)
-    val next_seg = seg_queue.firstEntry().getValue
+    var next_seg = seg_queue.pollFirstEntry().getValue
 
     // Just for debugging purposes...
     if( settings.debug ){
@@ -113,19 +129,117 @@ object BentleyOttmann {
         lookup( createSegment(p_sweep, p_sweep) )
       } else { sit }
 
+      var sit_succ: Seq_item = null
+      var sit_pred: Seq_item = null
+      var sit_pred_succ: Seq_item = null
+      var sit_first: Seq_item = null
+
       if( sit != null ){
-        // Determine passing and ending segments...
-        val (sit_succ, sit_pred, sit_pred_succ, sit_first) =
-          determineSegments(sit, event.getValue, v, p_sweep)
-        // Reverse order of passing segments...
-        //reverseOrder(sit_succ, sit_pred, sit_pred_succ, sit_first)
+        /*** Determine passing and ending segments... Start ***/
+        while ( inf(sit) == event || inf(sit) == succ( key(sit) ) ) {
+          sit = succ( key(sit) )
+        }
+        sit_succ = succ( key(sit) )
+        val sit_last: Seq_item = sit
+        if (settings.use_optimization) {
+          /* optimization, part 1  */
+        }
+
+        // walk down
+        var overlapping: Boolean = false
+        do {
+          overlapping = false
+          val s = key(sit)
+          val w = last_node.get(s)
+          if (!settings.embed && s.source == original(s).source) {
+            new_edge(w, v, s)
+          } else {
+            new_edge(v, w, s)
+          }
+          if (identical(p_sweep, s.target)) { // ending segment...
+            val it = pred(key(sit))
+            if (inf(it) == sit) {
+              overlapping = true
+              change_inf(it, inf(sit))
+            }
+            del_item(sit)
+            sit = it
+          } else { // passing segment...
+            if (inf(sit) != succ(key(sit))) change_inf(sit, null)
+            last_node.replace(s, v)
+            sit = pred(key(sit))
+          }
+        } while (inf(sit) == event || overlapping || inf(sit) == succ(key(sit)))
+        sit_pred = sit
+        sit_first = succ(key(sit_pred))
+        sit_pred_succ = sit_first
+        /*** Determine passing and ending segments... End ***/
+
+        /*** Reverse order of passing segments... Start ***/
+        sit = sit_first
+
+        // reverse subsequences of overlapping segments (if existing)...
+        while (sit != sit_succ) {
+          val sub_first = sit
+          var sub_last = sub_first
+          while (inf(sub_last) == succ(key(sub_last))) {
+            sub_last = succ(key(sub_last))
+          }
+          if (sub_last != sub_first) {
+            reverse_items(sub_first, sub_last)
+          }
+          sit = succ(key(sub_first))
+        }
+
+        // reverse the entire bundle...
+        if (sit_first != sit_succ) {
+          reverse_items(succ(key(sit_pred)), pred(key(sit_succ)))
+        }
+        /*** Reverse order of passing segments... End ***/
       }
 
-      // Insert starting segments...
-      insertStartingSegments(sit, p_sweep, next_seg)
+      /*** Insert starting segments... Start ***/
+      while (identical(p_sweep, next_seg.source)) {
+        val s_sit = locate(next_seg)
+        val p_sit = pred(key(s_sit))
 
-      // Compute new intersections and update X_structure...
+        val s = key(s_sit)
+        sit = if (orientation(s, next_seg.source) == 0 && orientation(s, next_seg.target) == 0) {
+          Y_structure.put(next_seg, s_sit)
+        } else {
+          Y_structure.put(next_seg, Seq_item(Key(next_seg), null))
+        }
 
+        val p = key(p_sit)
+        if (orientation(p, next_seg.source) == 0 && orientation(p, next_seg.target) == 0) {
+          change_inf(p_sit, sit)
+        }
+        X_structure.put(next_seg.target, sit)
+        last_node.put(next_seg, v)
+        if( sit_succ == null ) {
+          sit_succ = s_sit
+          sit_pred = p_sit
+          sit_pred_succ = sit_succ
+        }
+
+        // delete minimum and assign new minimum to next_seg...
+        next_seg = seg_queue.pollFirstEntry().getValue
+      }
+      /*** Insert starting segments... End ***/
+
+      /*** Compute new intersections and update X_structure... Start ***/
+      if( sit_pred != null ) {
+        if( !settings.use_optimization ) {
+          change_inf(sit_pred, null)
+          compute_intersections(sit_pred)
+          sit = pred( key(sit_succ) )
+          if( sit != sit_pred )
+            compute_intersections(sit)
+        } else {
+          // optimization, part 2...
+        }
+      }
+      /*** Compute new intersections and update X_structure... End ***/
     }
 
     List.empty[Intersection]
@@ -134,112 +248,15 @@ object BentleyOttmann {
   /***** Main Class End *****/
   /**************************/
 
-  /* Determine passing and ending segments. LEDA book pag 748. */
-  def determineSegments(sit_prime: Seq_item, event: Seq_item, v: Coordinate, p_sweep: Coordinate)
-    (implicit
-     settings:    Settings,
-     Y_structure: TreeMap[Segment, Seq_item],
-     original:    Map[Segment, Segment],
-     last_node:   TreeMap[Segment, Coordinate],
-     G:           SimpleDirectedGraph[Coordinate, SegmentEdge]
-    ): (Seq_item, Seq_item, Seq_item, Seq_item) = {
 
-    // walk up...
-    var sit_succ: Seq_item = null
-    var sit_pred: Seq_item = null
-    var sit_pred_succ: Seq_item = null
-    var sit_first: Seq_item = null
-
-    var sit: Seq_item = sit_prime
-    while( inf(sit) == event ||
-      inf(sit) == succ( key(sit)) ) {
-      sit = succ( key(sit) )
-    }
-    sit_succ = succ( key(sit) )
-    val sit_last: Seq_item = sit
-    if( settings.use_optimization ) { /* optimization, part 1  */ }
-
-    // walk down
-    var overlapping: Boolean = false
-    do {
-      overlapping = false
-      val s = key(sit)
-      val w = last_node.get(s)
-      if( !settings.embed && s.source == original(s).source ){
-        new_edge(w, v, s)
-      } else {
-        new_edge(v, w, s)
-      }
-      if( identical(p_sweep, s.target) ) { // ending segment...
-        val it = pred( key(sit) )
-        if( inf(it) == sit ) {
-          overlapping = true
-          change_inf( it, inf(sit) )
-        }
-        del_item(sit)
-        sit = it
-      } else { // passing segment...
-        if( inf(sit) != succ( key(sit)) ) change_inf( sit, null )
-        last_node.replace(s, v)
-        sit = pred( key(sit) )
-      }
-    } while ( inf(sit) == event || overlapping || inf(sit) == succ( key(sit)) )
-
-    sit_pred = sit
-    sit_first = succ( key(sit_pred) )
-    sit_pred_succ = sit_first
-
-    (sit_succ, sit_pred, sit_pred_succ, sit_first)
-  }
-
-  /* Reverse order of passing segmentes. LEDA Book pag 749 */
-  def reverseOrder(sit_succ: Seq_item, sit_pred: Seq_item, sit_pred_succ: Seq_item,
-    sit_first: Seq_item)
-    (implicit
-      settings:    Settings,
-      Y_structure: TreeMap[Segment, Seq_item]
-    ): Seq_item = {
-
-    var sit = sit_first
-
-    // reverse subsequences of overlapping segments (if existing)...
-    while( sit != sit_succ ){
-      val sub_first = sit
-      var sub_last  = sub_first
-      while( inf(sub_last) == succ( key(sub_last) ) ) {
-        sub_last = succ( key(sub_last) )
-      }
-      if( sub_last !=  sub_first ) {
-        reverse_items(sub_first, sub_last)
-      }
-      sit = succ( key(sub_first) )
-    }
-
-    // reverse the entire bundle...
-    if( sit_first != sit_succ ){
-      reverse_items( succ( key(sit_pred) ), pred( key(sit_succ) ) )
-    }
-
-    sit
-  }
 
   /* Insertion of starting segments. LEDA Book pag 750 */
-  def insertStartingSegments(sit_prime: Seq_item, p_sweep: Coordinate, next_seg: Segment)
-    (implicit Y_structure: TreeMap[Segment, Seq_item]): Unit = {
+  def insertStartingSegments(sit_prime: Seq_item, p_sweep: Coordinate, next_seg: Segment, v: Coordinate)
+    (implicit Y_structure: TreeMap[Segment, Seq_item], X_structure: TreeMap[Coordinate, Seq_item],
+     last_node: TreeMap[Segment, Coordinate]): Unit = {
 
     var sit = sit_prime
-    while( identical(p_sweep, next_seg.source) ) {
-      val s_sit = locate( next_seg )
-      val p_sit = pred( key(s_sit) )
 
-      val s = key(s_sit)
-      if( orientation(s, next_seg.source) == 0 && orientation(s, next_seg.target) == 0 ) {
-
-      } else {
-
-      }
-
-    }
   }
 
   def identical(p: Coordinate, q: Coordinate): Boolean = p.equals2D(q)

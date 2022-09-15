@@ -1,12 +1,10 @@
-import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, LineString, PrecisionModel}
-import org.jgrapht.graph.SimpleDirectedGraph
+import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import sdcel.bo._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
 import java.util.TreeMap
 import scala.collection.JavaConverters._
-import scala.collection.mutable.ListBuffer
 
 class YStructure_Tester extends AnyFlatSpec with should.Matchers {
   def Y_structure_content(Y: TreeMap[Segment, Seq_item]): String = {
