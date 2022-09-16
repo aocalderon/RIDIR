@@ -2,7 +2,6 @@ import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, PrecisionModel,
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.Utils.save
 import edu.ucr.dblab.sdcel.geometries.Half_edge
-import org.opengis.geometry.coordinate.LineString
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 import sdcel.bo._
