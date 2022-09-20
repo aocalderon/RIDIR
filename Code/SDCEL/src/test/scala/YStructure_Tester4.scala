@@ -8,6 +8,7 @@ import sdcel.bo._
 
 import java.util.TreeMap
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
@@ -92,7 +93,7 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     segs
   }
 
-  def generateIntervals(env: Envelope, n: Int, stri: String, label: String = "+"): Array[ List[Segment] ] = {
+  def generateIntervals(env: Envelope, n: Int, stri: String, label: String = "+"): List[Segment] = {
     val y1 = env.getMinY
     val y2 = env.getMaxY
 
@@ -102,7 +103,7 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
       val x2 = arr(1).toDouble
       val env = new Envelope(x1, x2, y1, y2)
       generateSegmentsEnv(env, n, s"${label}$i")
-    }
+    }.reduceLeft{ (a, b) => a ++ b }
   }
 
   val debug: Boolean = true
@@ -133,18 +134,52 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
 
   val envelope = new Envelope(0, 1000, 0, 250)
   val stri = "200 300,400 500,750 900"
-  val intervals = generateIntervals(envelope, 10, stri, label = "B")
+  val small_dataset = generateIntervals(envelope, 10, stri, label = "B")
 
-  intervals.zipWithIndex.foreach{ case (segments, i) =>
-    save(s"/tmp/edgesSD${i}.wkt"){
-      segments.map{ segment =>
-        val wkt = segment.wkt
-        val  id = segment.id
-        s"$wkt\t$id\n"
-      }
+  save(s"/tmp/edgesSD.wkt"){
+    small_dataset.map{ segment =>
+      val wkt = segment.wkt
+      val  id = segment.id
+      s"$wkt\t$id\n"
     }
   }
 
+  case class EndPoint(position: Coordinate, id: Long)
+  val x_order = new TreeMap[Coordinate, Long]()
+  small_dataset.map{ segment =>
+    val a = EndPoint(segment.source, segment.id)
+    val b = EndPoint(segment.target, segment.id)
+    List(a, b)
+  }.flatten.foreach{ endpoint =>
+    x_order.put(endpoint.position, endpoint.id)
+  }
+
+  save(filename = "/tmp/edgesXO.wkt") {
+    x_order.asScala.iterator.zipWithIndex.map { case(endpoint, order) =>
+      s"POINT( ${endpoint._1.x} ${endpoint._1.y} )\t${order}\t${endpoint._1.x}\t${endpoint._2}\n"
+    }.toList
+  }
+
+  val counter = new ListBuffer[Long]
+  var nextBoundary = false
+  while(!x_order.isEmpty){
+    val entry = x_order.pollFirstEntry()
+    val id = entry.getValue
+    if(counter.contains(id)){
+      counter.remove(counter.indexOf(id))
+    } else {
+      counter.append(entry.getValue)
+    }
+    val boundary = if( counter.size == 0 || (counter.size == 1 && nextBoundary) ){
+      nextBoundary = true
+      val x = entry.getKey.x
+      s"LINESTRING( ${x} 0, ${x} 250 )"
+    } else {
+      nextBoundary = false
+      ""
+    }
+    println(s"${counter.mkString(" ")}   :${counter.size} ${boundary}")
+  }
   val (lower_sentinel, upper_sentinel) = BentleyOttmann.getSentinels(big_dataset)
 
   val cmp = new sweep_cmp()
