@@ -106,6 +106,77 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     }.reduceLeft{ (a, b) => a ++ b }
   }
 
+  def extractIntervals(x_order: TreeMap[Coordinate, Long]): List[Double] = {
+    val counter = new ListBuffer[Long]
+    val intervals = new ListBuffer[Double]
+    intervals.append(x_order.firstKey().x)
+    var nextBoundary = false
+    while (!x_order.isEmpty) {
+      val entry = x_order.pollFirstEntry()
+      val id = entry.getValue
+      if (counter.contains(id)) {
+        counter.remove(counter.indexOf(id))
+      } else {
+        counter.append(entry.getValue)
+      }
+      val boundary = if (counter.size == 0 || (counter.size == 1 && nextBoundary)) {
+        nextBoundary = true
+        val x = entry.getKey.x
+        intervals.append(x)
+        s"LINESTRING( ${x} 0, ${x} 250 )"
+      } else {
+        nextBoundary = false
+        ""
+      }
+      //println(s"${counter.mkString(" ")}   :${counter.size} ${boundary}")
+    }
+    intervals.toList
+  }
+
+  def createBoundaries(n: Int): String = {
+    val boundaries_prime = (1 to n).map { r => Random.nextInt(1000) }.sorted
+    val boundaries = boundaries_prime.zip(boundaries_prime.tail).zipWithIndex
+      .filter { case (r, i) => i % 2 == 0 }
+      .map { case (r, i) =>
+        val start = r._1
+        val end = r._2
+        s"$start $end"
+      }.mkString(",")
+
+    boundaries
+  }
+  def generateSmallDataset(envelope: Envelope, boundaries: String, n: Int = 10): List[Segment] = {
+    val small_dataset = generateIntervals(envelope, n, boundaries, label = "B")
+
+    save(s"/tmp/edgesSD.wkt") {
+      small_dataset.map { segment =>
+        val wkt = segment.wkt
+        val id = segment.id
+        s"$wkt\t$id\n"
+      }
+    }
+    small_dataset
+  }
+
+  def getX_order(small_dataset: List[Segment]): TreeMap[Coordinate, Long] = {
+    case class EndPoint(position: Coordinate, id: Long)
+    val x_order = new TreeMap[Coordinate, Long]()
+    small_dataset.map { segment =>
+      val a = EndPoint(segment.source, segment.id)
+      val b = EndPoint(segment.target, segment.id)
+      List(a, b)
+    }.flatten.foreach { endpoint =>
+      x_order.put(endpoint.position, endpoint.id)
+    }
+
+    save(filename = "/tmp/edgesXO.wkt") {
+      x_order.asScala.iterator.zipWithIndex.map { case (endpoint, order) =>
+        s"POINT( ${endpoint._1.x} ${endpoint._1.y} )\t${order}\t${endpoint._1.x}\t${endpoint._2}\n"
+      }.toList
+    }
+    x_order
+  }
+
   val debug: Boolean = true
   val tolerance: Double = 1e-3
   val generate: Boolean = false
@@ -132,54 +203,24 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     readSegments(filename = "/tmp/edgesBD.wkt")
   }
 
-  val envelope = new Envelope(0, 1000, 0, 250)
-  val stri = "200 300,400 500,750 900"
-  val small_dataset = generateIntervals(envelope, 10, stri, label = "B")
+  (1 to 100).foreach { i =>
+    val envelope = new Envelope(0, 1000, 0, 250)
+    val boundaries = createBoundaries(6)
+    val small_dataset = generateSmallDataset(envelope, boundaries)
+    val x_order = getX_order(small_dataset)
+    val intervals = extractIntervals(x_order)
 
-  save(s"/tmp/edgesSD.wkt"){
-    small_dataset.map{ segment =>
-      val wkt = segment.wkt
-      val  id = segment.id
-      s"$wkt\t$id\n"
+    println(s"$boundaries\t${intervals.size}")
+
+    save(filename = s"/tmp/edgesIN${i}.wkt") {
+      intervals.map { x =>
+        s"LINESTRING( ${x} 0, ${x} 250 )\n"
+      }
     }
   }
 
-  case class EndPoint(position: Coordinate, id: Long)
-  val x_order = new TreeMap[Coordinate, Long]()
-  small_dataset.map{ segment =>
-    val a = EndPoint(segment.source, segment.id)
-    val b = EndPoint(segment.target, segment.id)
-    List(a, b)
-  }.flatten.foreach{ endpoint =>
-    x_order.put(endpoint.position, endpoint.id)
-  }
 
-  save(filename = "/tmp/edgesXO.wkt") {
-    x_order.asScala.iterator.zipWithIndex.map { case(endpoint, order) =>
-      s"POINT( ${endpoint._1.x} ${endpoint._1.y} )\t${order}\t${endpoint._1.x}\t${endpoint._2}\n"
-    }.toList
-  }
 
-  val counter = new ListBuffer[Long]
-  var nextBoundary = false
-  while(!x_order.isEmpty){
-    val entry = x_order.pollFirstEntry()
-    val id = entry.getValue
-    if(counter.contains(id)){
-      counter.remove(counter.indexOf(id))
-    } else {
-      counter.append(entry.getValue)
-    }
-    val boundary = if( counter.size == 0 || (counter.size == 1 && nextBoundary) ){
-      nextBoundary = true
-      val x = entry.getKey.x
-      s"LINESTRING( ${x} 0, ${x} 250 )"
-    } else {
-      nextBoundary = false
-      ""
-    }
-    println(s"${counter.mkString(" ")}   :${counter.size} ${boundary}")
-  }
   val (lower_sentinel, upper_sentinel) = BentleyOttmann.getSentinels(big_dataset)
 
   val cmp = new sweep_cmp()
