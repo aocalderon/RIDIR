@@ -1,3 +1,5 @@
+package edu.ucr.dblab.sweeptest
+
 import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, LineString, PrecisionModel}
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.Utils.save
@@ -11,30 +13,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
-  def Y_structure_add(s: Segment)(implicit Y: TreeMap[Segment, Seq_item]): Unit = {
-    cmp.setSweep(s.source)
-    Y_structure.put(s, null)
-  }
-
-  def Y_structure_content(Y: TreeMap[Segment, Seq_item]): String = {
-    Y.asScala.iterator.filter { case (s, i) => s.id >= 0 }.map { case (s, i) => s.id }.mkString(" ")
-  }
-
-  def Y_structure_test(number: Int)(implicit Y: TreeMap[Segment, Seq_item]): Unit = {
-    val r = Y_structure_content(Y)
-    println(r)
-    s"Y_structure in $number" should s"be $r" in {
-      ground_truth(number) should be(r)
-    }
-  }
-
-  val ground_truth: Map[Int, String] = Map(
-    1 -> "1 2 3",
-    2 -> "1 4 2",
-    3 -> "1 5 4 2",
-    4 -> "1 6"
-  )
+object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
 
   def orderPoints(x1: Double, y1: Double, x2: Double, y2: Double): Array[Coordinate] = {
     val (a, b) = if(x1 < x2){ (x1, x2) } else { (x2, x1) }
@@ -93,7 +72,8 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     segs
   }
 
-  def generateIntervals(env: Envelope, n: Int, stri: String, label: String = "+"): List[Segment] = {
+  def generateIntervals(env: Envelope, n: Int, stri: String, label: String = "+")
+                       (implicit geofactory: GeometryFactory): List[Segment] = {
     val y1 = env.getMinY
     val y2 = env.getMaxY
 
@@ -145,7 +125,8 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
 
     boundaries
   }
-  def generateSmallDataset(envelope: Envelope, boundaries: String, n: Int = 10): List[Segment] = {
+  def generateSmallDataset(envelope: Envelope, boundaries: String, n: Int = 10)
+                          (implicit geofactory: GeometryFactory): List[Segment] = {
     val small_dataset = generateIntervals(envelope, n, boundaries, label = "B")
 
     save(s"/tmp/edgesSD.wkt") {
@@ -177,56 +158,47 @@ class YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     x_order
   }
 
-  val debug: Boolean = true
-  val tolerance: Double = 1e-3
-  val generate: Boolean = false
-  implicit val model: PrecisionModel = new PrecisionModel(1000.0)
-  implicit val geofactory: GeometryFactory = new GeometryFactory(model)
+  def main(args: Array[String]): Unit = {
+    val debug: Boolean = true
+    val tolerance: Double = 1e-3
+    val generate: Boolean = false
+    implicit val model: PrecisionModel = new PrecisionModel(1000.0)
+    implicit val geofactory: GeometryFactory = new GeometryFactory(model)
 
-  implicit val settings: Settings = Settings(
-    debug = debug,
-    tolerance = tolerance,
-    geofactory = geofactory
-  )
+    implicit val settings: Settings = Settings(
+      debug = debug,
+      tolerance = tolerance,
+      geofactory = geofactory
+    )
 
-  val big_dataset = if(generate) {
-    val bd = generateSegments(n = 100, xRange = 1000.0, yRange = 250.0, label = "A")
-    save("/tmp/edgesBD.wkt") {
-      bd.map { seg =>
-        val wkt = seg.wkt
-        val id = seg.id
-        s"$wkt\t$id\n"
+    val big_dataset = if (generate) {
+      val bd = generateSegments(n = 100, xRange = 1000.0, yRange = 250.0, label = "A")
+      save("/tmp/edgesBD.wkt") {
+        bd.map { seg =>
+          val wkt = seg.wkt
+          val id = seg.id
+          s"$wkt\t$id\n"
+        }
+      }
+      bd
+    } else {
+      readSegments(filename = "/tmp/edgesBD.wkt")
+    }
+
+    (1 to 100).foreach { i =>
+      val envelope = new Envelope(0, 1000, 0, 250)
+      val boundaries = createBoundaries(6)
+      val small_dataset = generateSmallDataset(envelope, boundaries)
+      val x_order = getX_order(small_dataset)
+      val intervals = extractIntervals(x_order)
+
+      println(s"$boundaries\t${intervals.size}")
+
+      save(filename = s"/tmp/edgesIN${i}.wkt") {
+        intervals.map { x =>
+          s"LINESTRING( ${x} 0, ${x} 250 )\n"
+        }
       }
     }
-    bd
-  } else {
-    readSegments(filename = "/tmp/edgesBD.wkt")
   }
-
-  (1 to 100).foreach { i =>
-    val envelope = new Envelope(0, 1000, 0, 250)
-    val boundaries = createBoundaries(6)
-    val small_dataset = generateSmallDataset(envelope, boundaries)
-    val x_order = getX_order(small_dataset)
-    val intervals = extractIntervals(x_order)
-
-    println(s"$boundaries\t${intervals.size}")
-
-    save(filename = s"/tmp/edgesIN${i}.wkt") {
-      intervals.map { x =>
-        s"LINESTRING( ${x} 0, ${x} 250 )\n"
-      }
-    }
-  }
-
-
-
-  val (lower_sentinel, upper_sentinel) = BentleyOttmann.getSentinels(big_dataset)
-
-  val cmp = new sweep_cmp()
-  cmp.setSweep(lower_sentinel.source)
-
-  implicit val Y_structure: TreeMap[Segment, Seq_item] = new TreeMap[Segment, Seq_item](cmp)
-
-  println("Done!")
 }
