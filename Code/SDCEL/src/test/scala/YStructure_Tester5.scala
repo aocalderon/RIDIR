@@ -19,17 +19,23 @@ import scala.collection.immutable.Map
 object YStructure_Tester5 extends AnyFlatSpec with should.Matchers {
 
   def main(args: Array[String]): Unit = {
+
     def Y_structure_add(s: Segment)(implicit Y: TreeMap[Segment, Segment], cmp: sweep_cmp): Unit = {
       cmp.setSweep(s.source)
       Y.put(s, s)
     }
 
-    def Y_structure_del(s: Segment)(implicit Y: TreeMap[Segment, Segment]): Unit = {
-      Y.remove(s.source)
+    def Y_structure_del(s: Segment)(implicit Y: TreeMap[Segment, Segment], cmp: sweep_cmp): Unit = {
+      cmp.setSweep(s.source)
+      Y.remove(s)
     }
 
     def Y_structure_content(implicit Y: TreeMap[Segment, Segment]): String = {
       Y.asScala.iterator.filter { case (s, i) => s.id >= 0 }.map { case (s, i) => s.id }.mkString(" ")
+    }
+
+    def Y_structure_content2(implicit Y: TreeMap[Long, Segment]): String = {
+      Y.asScala.iterator.filter { case (s, i) => s >= 0 }.map { case (s, i) => s }.mkString(" ")
     }
 
     def readIntervals(filename: String): List[Double] = {
@@ -63,10 +69,10 @@ object YStructure_Tester5 extends AnyFlatSpec with should.Matchers {
       }
       bd
     } else {
-      readSegments(filename = "/tmp/edgesDE.wkt")
+      readSegments(filename = "/home/and/RIDIR/tmp/edgesBD.wkt")
     }
 
-    val intervals = readIntervals(filename = "")
+    val intervals = readIntervals(filename = "/home/and/RIDIR/tmp/intervals.txt")
 
     // Feeding X_structure...
     case class EndPoint(segment: Segment, isStart: Boolean)
@@ -90,20 +96,30 @@ object YStructure_Tester5 extends AnyFlatSpec with should.Matchers {
     val (lower_sentinel, upper_sentinel) = BentleyOttmann.getSentinels(big_dataset)
     implicit val cmp = new sweep_cmp()
     cmp.setSweep(lower_sentinel.source)
-    implicit val Y_structure: TreeMap[Segment, Segment] = new TreeMap[Segment, Segment](cmp)
-    Y_structure_add(upper_sentinel)
-    Y_structure_add(lower_sentinel)
+    //implicit val Y_structure: TreeMap[Segment, Segment] = new TreeMap[Segment, Segment](cmp)
+    implicit val Y_structure: TreeMap[Long, Segment] = new TreeMap[Long, Segment]()
+    //Y_structure_add(upper_sentinel)
+    //Y_structure_add(lower_sentinel)
 
+    var n = 1
     while(!X_structure.isEmpty){
       val entry = X_structure.pollFirstEntry()
       val sweep_point = entry.getKey
       val endpoint = entry.getValue
+
       if(endpoint.isStart){
-        Y_structure_add(endpoint.segment)
+        //Y_structure_add(endpoint.segment)
+        Y_structure.put(endpoint.segment.id, endpoint.segment)
       } else {
-        Y_structure_del(endpoint.segment)
+        if(endpoint.segment.id == 59){
+          println("")
+        }
+        //Y_structure_del(endpoint.segment)
+        Y_structure.remove(endpoint.segment.id)
       }
-      println{ Y_structure_content }
+      val content = Y_structure_content2
+      println{ s"${n}. ${sweep_point.x}\t$content" }
+      n = n + 1
     }
   }
 }

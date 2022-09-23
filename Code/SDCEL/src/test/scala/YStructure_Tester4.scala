@@ -182,7 +182,7 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
       }
       bd
     } else {
-      readSegments(filename = "/tmp/edgesBD.wkt")
+      readSegments(filename = "/home/and/RIDIR/tmp/edgesBD.wkt")
     }
 
     (1 to 100).foreach { i =>
