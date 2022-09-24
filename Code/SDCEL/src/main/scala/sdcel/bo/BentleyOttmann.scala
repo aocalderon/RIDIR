@@ -1120,7 +1120,7 @@ object Segment {
      line
    }
 
-   def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value"
+   def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value\t$id"
 
    private def hangle(p_1: Coordinate, p_2: Coordinate): Double = {
      val dx = p_1.x - p_2.x

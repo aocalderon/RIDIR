@@ -36,7 +36,11 @@ object Utils {
   ){
     val scale = 1 / tolerance
   }
-  
+
+  //** Functions
+  def envelope2WKT(envelope: Envelope)(implicit geofactory: GeometryFactory): String = {
+    geofactory.toGeometry(envelope).toText
+  }
   def log(msg: String)(implicit settings: Settings): Unit = {
     val now = System.currentTimeMillis
     logger.info(s"${settings.appId}|$msg")

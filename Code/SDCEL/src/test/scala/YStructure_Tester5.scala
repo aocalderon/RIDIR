@@ -17,6 +17,18 @@ import YStructure_Tester4._
 import scala.collection.immutable.Map
 
 object YStructure_Tester5 extends AnyFlatSpec with should.Matchers {
+  def readIntervals(filename: String): List[(Double, Double)] = {
+    import scala.io.Source
+    val buffer = Source.fromFile(filename)
+    val intervals = buffer.getLines().map{ line =>
+      val arr = line.split(" ")
+      val xl = arr(0).toDouble
+      val xr = arr(1).toDouble
+      (xl, xr)
+    }.toList
+    buffer.close()
+    intervals
+  }
 
   def main(args: Array[String]): Unit = {
 
@@ -36,14 +48,6 @@ object YStructure_Tester5 extends AnyFlatSpec with should.Matchers {
 
     def Y_structure_content2(implicit Y: TreeMap[Long, Segment]): String = {
       Y.asScala.iterator.filter { case (s, i) => s >= 0 }.map { case (s, i) => s }.mkString(" ")
-    }
-
-    def readIntervals(filename: String): List[Double] = {
-      import scala.io.Source
-      val buffer = Source.fromFile(filename)
-      val intervals = buffer.getLines().map(_.toDouble).toList
-      buffer.close()
-      intervals
     }
 
     val debug: Boolean = true

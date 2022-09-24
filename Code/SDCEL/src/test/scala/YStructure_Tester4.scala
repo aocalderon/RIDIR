@@ -158,6 +158,25 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     x_order
   }
 
+  case class EndPoint(point: Coordinate, segment: Segment, isStart: Boolean)
+  def getX_orderBySegment(segments: List[Segment]): TreeMap[Coordinate, EndPoint] = {
+    val x_order = new TreeMap[Coordinate, EndPoint]()
+    segments.map { segment =>
+      val a = EndPoint(segment.source, segment, true)
+      val b = EndPoint(segment.target, segment, false)
+      List(a, b)
+    }.flatten.foreach { endpoint =>
+      x_order.put(endpoint.point, endpoint)
+    }
+
+    save(filename = "/tmp/edgesXO.wkt") {
+      x_order.asScala.iterator.zipWithIndex.map { case (endpoint, order) =>
+        s"POINT( ${endpoint._1.x} ${endpoint._1.y} )\t${order}\t${endpoint._1.x}\t${endpoint._2.segment.id}\n"
+      }.toList
+    }
+    x_order
+  }
+
   def main(args: Array[String]): Unit = {
     val debug: Boolean = true
     val tolerance: Double = 1e-3
