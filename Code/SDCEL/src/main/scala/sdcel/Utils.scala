@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.{ GeometryFactory, PrecisionModel }
 import com.vividsolutions.jts.geom.{ Geometry, Envelope, Coordinate }
 import com.vividsolutions.jts.geom.{ Polygon, LineString, Point }
 import com.vividsolutions.jts.io.WKTReader
+import com.vividsolutions.jts.geomgraph.Edge
 
 import org.apache.spark.sql.{ SparkSession, Dataset, Row, functions, SaveMode }
 import org.apache.spark.rdd.RDD
@@ -22,7 +23,7 @@ object Utils {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   //** Case Class
-  case class Timestamp(t: Long)
+    case class Timestamp(t: Long)
   case class Tick(var t: Long)
   case class Settings(
     tolerance: Double = 1e-3,

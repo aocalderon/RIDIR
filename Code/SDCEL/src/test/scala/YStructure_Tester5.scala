@@ -115,9 +115,6 @@ object YStructure_Tester5 extends AnyFlatSpec with should.Matchers {
         //Y_structure_add(endpoint.segment)
         Y_structure.put(endpoint.segment.id, endpoint.segment)
       } else {
-        if(endpoint.segment.id == 59){
-          println("")
-        }
         //Y_structure_del(endpoint.segment)
         Y_structure.remove(endpoint.segment.id)
       }

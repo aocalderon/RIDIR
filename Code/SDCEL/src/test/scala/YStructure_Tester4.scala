@@ -204,6 +204,14 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
       readSegments(filename = "/home/and/RIDIR/tmp/edgesBD.wkt")
     }
 
+    val envelope = new Envelope(0, 1000, 0, 250)
+    val boundaries = "400 450,875 925"
+    val small_dataset = generateSmallDataset(envelope, boundaries)
+    save(filename = s"/tmp/edgesSD.wkt") {
+      small_dataset.map { seg =>
+        s"${seg.wkt}\n"
+      }
+    }
     (1 to 100).foreach { i =>
       val envelope = new Envelope(0, 1000, 0, 250)
       val boundaries = createBoundaries(6)

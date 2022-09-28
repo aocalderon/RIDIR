@@ -1,6 +1,9 @@
  package sdcel.bo
 
 import com.vividsolutions.jts.geom._
+import com.vividsolutions.jts.geomgraph.{Edge, EdgeIntersection}
+import com.vividsolutions.jts.geomgraph.index.{SegmentIntersector, SimpleMCSweepLineIntersector}
+import com.vividsolutions.jts.algorithm.RobustLineIntersector
 import edu.ucr.dblab.sdcel.Utils.{logger, save}
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 import org.jgrapht.graph.SimpleDirectedGraph
@@ -22,6 +25,39 @@ object BentleyOttmann {
   /**************************/
   /**** Main Class Start ****/
   /**************************/
+
+  case class SEdge(coords: Array[Coordinate], segment: Segment) extends Edge(coords)
+  def getIntersectionPoints(big_dataset: List[Segment], small_dataset: List[Segment]): List[Coordinate] = {
+    val bd_sedges = big_dataset.map { segment =>
+      val coords = Array(segment.source, segment.target)
+      SEdge(coords, segment)
+    }.asJava
+    val sd_sedges = small_dataset.map { segment =>
+      val coords = Array(segment.source, segment.target)
+      SEdge(coords, segment)
+    }.asJava
+
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+    sweepline.computeIntersections(bd_sedges, sd_sedges, segmentIntersector)
+
+    val bd_intersections = bd_sedges.asScala.flatMap{ sedge =>
+      sedge.getEdgeIntersectionList.iterator.asScala.map{ i =>
+        val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
+        coord
+      }
+    }.toList
+    val sd_intersections = sd_sedges.asScala.flatMap { sedge =>
+      sedge.getEdgeIntersectionList.iterator.asScala.map { i =>
+        val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
+        coord
+      }
+    }.toList
+
+    bd_intersections ++ sd_intersections
+  }
+
   def sweep_segments(segs1: List[Segment], segs2: List[Segment])
     (implicit settings: Settings, G: SimpleDirectedGraph[Coordinate, SegmentEdge]): List[Intersection] = {
 
@@ -1120,7 +1156,7 @@ object Segment {
      line
    }
 
-   def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value\t$id"
+   def wkt: String = s"${asJTSLine.toText}\t${label}${id}\t$value\t$id\t${this.source.x}"
 
    private def hangle(p_1: Coordinate, p_2: Coordinate): Double = {
      val dx = p_1.x - p_2.x
