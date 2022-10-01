@@ -72,20 +72,6 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     segs
   }
 
-  def generateIntervals(env: Envelope, n: Int, stri: String, label: String = "+")
-                       (implicit geofactory: GeometryFactory): List[Segment] = {
-    val y1 = env.getMinY
-    val y2 = env.getMaxY
-
-    stri.split(",").zipWithIndex.map{ case (interval, i) =>
-      val arr = interval.split(" ")
-      val x1 = arr(0).toDouble
-      val x2 = arr(1).toDouble
-      val env = new Envelope(x1, x2, y1, y2)
-      generateSegmentsEnv(env, n, s"${label}$i")
-    }.reduceLeft{ (a, b) => a ++ b }
-  }
-
   def extractIntervals(x_order: TreeMap[Coordinate, Long]): List[Double] = {
     val counter = new ListBuffer[Long]
     val intervals = new ListBuffer[Double]
@@ -125,18 +111,18 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
 
     boundaries
   }
-  def generateSmallDataset(envelope: Envelope, boundaries: String, n: Int = 10)
+  def generateSmallDataset(envelope: Envelope, boundaries: String, n: Int = 10, label: String = "B")
                           (implicit geofactory: GeometryFactory): List[Segment] = {
-    val small_dataset = generateIntervals(envelope, n, boundaries, label = "B")
+    val y1 = envelope.getMinY
+    val y2 = envelope.getMaxY
 
-    save(s"/tmp/edgesSD.wkt") {
-      small_dataset.map { segment =>
-        val wkt = segment.wkt
-        val id = segment.id
-        s"$wkt\t$id\n"
-      }
-    }
-    small_dataset
+    boundaries.split(",").zipWithIndex.map { case (interval, i) =>
+      val arr = interval.split(" ")
+      val x1 = arr(0).toDouble
+      val x2 = arr(1).toDouble
+      val env = new Envelope(x1, x2, y1, y2)
+      generateSegmentsEnv(env, n, s"${label}$i")
+    }.reduceLeft { (a, b) => a ++ b }
   }
 
   def getX_order(small_dataset: List[Segment]): TreeMap[Coordinate, Long] = {
@@ -185,7 +171,7 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
   }
 
   def getBoundaries(envelope: Envelope, n: Int = 3, width: Int = 10): String = {
-    val boundaries_prime = (0 to n).flatMap { i =>
+    val boundaries_prime = (0 until n).flatMap { i =>
       val l = (Random.nextDouble() * envelope.getMaxX).toInt
       val r = l + (Random.nextDouble() * width).toInt
       List(l, r)
@@ -230,27 +216,13 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
     }
 
     val envelope = getEnvelope(big_dataset)
-    val boundaries = getBoundaries(envelope, n = 4, width = 500)
-    //val boundaries = "400 450,875 925"
-    val small_dataset = generateSmallDataset(envelope, boundaries)
-    save(filename = s"/tmp/edgesSD.wkt") {
-      small_dataset.map { seg =>
-        s"${seg.wkt}\n"
-      }
-    }
-    (1 to 1).foreach { i =>
-      val envelope = new Envelope(0, 1000, 0, 250)
-      val boundaries = createBoundaries(6)
-      val small_dataset = generateSmallDataset(envelope, boundaries)
-      val x_order = getX_order(small_dataset)
-      val intervals = extractIntervals(x_order)
-
-      println(s"$boundaries\t${intervals.size}")
-
-      save(filename = s"/tmp/edgesIN${i}.wkt") {
-        intervals.map { x =>
-          s"LINESTRING( ${x} 0, ${x} 250 )\n"
-        }
+    val boundaries = getBoundaries(envelope, n = 3, width = 750)
+    val sd = generateSmallDataset(envelope, boundaries, n = 50)
+    save("/tmp/edgesSDL.wkt") {
+      sd.map { seg =>
+        val wkt = seg.wkt
+        val id = seg.id
+        s"$wkt\t$id\n"
       }
     }
   }

@@ -202,8 +202,8 @@ object RangeTester1 extends AnyFlatSpec with should.Matchers {
     )
 
     // Reading data...
-    val big_dataset   = readSegments(filename = "/home/and/RIDIR/tmp/edgesBD.wkt")
-    val small_dataset = readSegments(filename = "/home/and/RIDIR/tmp/edgesSD.wkt")
+    val big_dataset   = readSegments(filename = "/home/and/RIDIR/tmp/edgesBDL.wkt")
+    val small_dataset = readSegments(filename = "/home/and/RIDIR/tmp/edgesSDL.wkt")
 
     // Extracting intervals...
     val intervals: List[Interval] = extractIntervals(small_dataset)
