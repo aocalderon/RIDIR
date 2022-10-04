@@ -1013,6 +1013,7 @@ object Segment {
    val angle: Double = hangle(source, target)
    var value: Double = this.calculateValue(this.first.x)
    var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
+   var start: Boolean = true
    val debug: Boolean = false
 
    def dx: Double = target.x - source.x
@@ -1034,6 +1035,10 @@ object Segment {
    def identical(that: Segment): Boolean = this.source == that.source && this.target == that.target
 
    def overlaps(that: Segment): Boolean = this.within(that) || that.within(this)
+
+   def setStart(value: Boolean) = { start = value }
+
+   def isStart: Boolean = start == true
 
    def isTrivial(sweep: Coordinate): Boolean = this.source == sweep && this.target == sweep
 
