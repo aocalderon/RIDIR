@@ -31,6 +31,15 @@ object SweepLiner {
     new Envelope(minx, maxx, miny, maxy)
   }
 
+  private def getSentinels(dataset: List[Segment])(implicit geofactory: GeometryFactory): (Segment, Segment) = {
+    val envelope = getEnvelope(dataset)
+    envelope.expandBy(1.0)
+
+    val low = mkSegment( (envelope.getMinX, envelope.getMinY), (envelope.getMaxX, envelope.getMinY), -1)
+    val up  = mkSegment( (envelope.getMinX, envelope.getMaxY), (envelope.getMaxX, envelope.getMaxY), -2)
+    (low, up)
+  }
+
   private def saveSegments(dataset: List[Segment], filename: String): Unit = {
     save(filename) {
       dataset.map { s =>
@@ -51,6 +60,21 @@ object SweepLiner {
 
     List(s1, s2, s3, s4, s5, s7, s8)
   }
+
+  private def loadDataset2(implicit geofactory: GeometryFactory): List[Segment] = {
+    val s1  = mkSegment(     (2, 8),    (5, 1), 1)
+    val s2  = mkSegment(     (3, 1),    (5, 3), 2)
+    val s3  = mkSegment(     (2, 1),    (5, 4), 3)
+    val s4  = mkSegment(    (3, 10),    (5, 5), 4)
+    val s5  = mkSegment(     (2, 3),    (5, 6), 5)
+    val s6  = mkSegment(     (2, 5),    (5, 7), 6)
+    val s7  = mkSegment(     (2, 9),    (5, 8), 7)
+    val s8  = mkSegment(     (2, 7),    (5,10), 8)
+    val s9  = mkSegment( (2.5, 0.5), (3.5,0.5), 9)
+    val s10 = mkSegment(   (4, 0.5), (4.5,0.5), 10)
+
+    List(s1, s2, s3, s4, s5, s7, s8, s6, s9, s10)
+  }
   private def generateDataset(n: Int, envelope: Envelope, length: Double = 100)
                              (implicit geofactory: GeometryFactory): List[Segment] = {
     val x1 = envelope.getMinX
@@ -70,9 +94,18 @@ object SweepLiner {
   }
 
   private def getStatusOrder(implicit status: TreeMap[Segment, Segment]): String = {
-    status.asScala.iterator.map {
-      _._1.id
+    status.asScala.iterator.filter(_._1.id >= 0).map { x =>
+      s"${x._1.id}(${x._1.value})"
     }.mkString(" ")
+  }
+
+  private def saveStatusOrder(p: Coordinate)(implicit status: TreeMap[Segment, Segment]): Unit = {
+    save(s"/tmp/edgesYO_${p.x.toString.replace(".", "-")}.wkt") {
+      status.asScala.iterator.filter(_._1.id >= 0).map { x =>
+        val s = x._1
+        s"POINT( ${p.x} ${s.value} )\t${s.id}\t${s.value}\n"
+      }.toList
+    }
   }
 
   private def getUCL(events: List[Event]): (Set[Segment], Set[Segment], Set[Segment]) = {
@@ -100,6 +133,26 @@ object SweepLiner {
     ucl(events, U, C, L)
   }
 
+  private def updateY_order(sweep_point: Coordinate, tolerance: Double = 0.0)
+                           (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
+    val ss = y_order.asScala.clone()
+    y_order.clear()
+    sweepComparator.setSweep(sweep_point, tolerance)
+    y_order.putAll(ss.asJava)
+  }
+
+  private def succ(p: Coordinate, tolerance: Double = 0.001)
+                  (implicit y_order: TreeMap[Segment, Segment], gf: GeometryFactory): Segment = {
+    val query = mkSegment( (p.x, p.y), (p.x + tolerance, p.y + tolerance), -3) // dummy segment for query purposes...
+    y_order.higherKey(query)
+  }
+
+  private def pred(p: Coordinate, tolerance: Double = 0.001)
+                  (implicit y_order: TreeMap[Segment, Segment], gf: GeometryFactory): Segment = {
+    val query = mkSegment((p.x, p.y), (p.x + tolerance, p.y + tolerance), -3) // dummy segment for query purposes...
+    y_order.lowerKey(query)
+  }
+
   case class Event(point: Coordinate, segment: Segment, mode: String) {
     def isStart: Boolean = mode == "START"
 
@@ -111,23 +164,25 @@ object SweepLiner {
   }
 
   def main(args: Array[String]): Unit = {
-    implicit val model = new PrecisionModel(1000.0)
+    val tolerance = 0.001
+    implicit val model = new PrecisionModel(1.0 / tolerance)
     implicit val geofactory = new GeometryFactory(model)
     val debug: Boolean = true
     val generate: Boolean = false
-    val envelope = new Envelope(0, 100, 0, 100)
+    val envelope_generate = new Envelope(0, 100, 0, 100)
     val n = 20
-    val length = envelope.getWidth * 0.1
+    val length = envelope_generate.getWidth * 0.1
 
-    val dataset = if(generate) generateDataset(n, envelope, length) else loadDataset
+    val dataset = if(generate) generateDataset(n, envelope_generate, length) else loadDataset2
+    val envelope = getEnvelope(dataset)
     saveSegments(dataset, "/tmp/edgesSS.wkt")
-    val sweepComparator = new SweepComparator(envelope, geofactory)
     implicit val x_order: TreeMap[Coordinate, List[Event]] = new TreeMap[Coordinate, List[Event]]
+    implicit val sweepComparator = new SweepComparator(envelope, geofactory)
     implicit val y_order: TreeMap[Segment, Segment] = new TreeMap[Segment, Segment](sweepComparator)
 
     dataset.flatMap { segment =>
       val start = Event(segment.source, segment, "START")
-      val end = Event(segment.target, segment, "END")
+      val end   = Event(segment.target, segment, "END")
       List(start, end)
     }.groupBy(_.point).foreach { point_event =>
       val point = point_event._1
@@ -149,17 +204,35 @@ object SweepLiner {
       }
     }
 
+    // Adding sentinels...
+    val (s1, s2) = getSentinels(dataset)
+    sweepComparator.setSweep(s1.source)
+    y_order.put(s1, s1)
+    y_order.put(s2, s2)
+
     while(!x_order.isEmpty){
       val event_point = x_order.pollFirstEntry()
       // Handle Event Point...
       val sweep_point = event_point.getKey
-      println(sweep_point)
+      println(s"At position (${sweep_point.x}, ${sweep_point.y}): ")
       val events = event_point.getValue
       val (u,c,l) = getUCL(events)
       if( (u union c union l).size > 1 ){
         val segments = u union c union l
         println(s"POINT( ${sweep_point.x} ${sweep_point.y} )\t${segments.map{_.id}.mkString(" ")}")
       }
+      // Deleting L(p) U C(p)...
+      updateY_order(sweep_point)
+      (c union l).foreach{ segment =>
+        y_order.remove(segment)
+      }
+      // Inserting U(p) U C(p)...
+      updateY_order(sweep_point, tolerance)
+      (u union c).foreach { segment =>
+        y_order.put(segment, segment)
+      }
+      println(s"Status: ${getStatusOrder}")
+      saveStatusOrder(sweep_point)
     }
 /*
     // brute force validation
@@ -183,28 +256,38 @@ object SweepLiner {
 }
 
 class SweepComparator(envelope: Envelope, geofactory: GeometryFactory) extends Comparator[Segment]{
-  private var sweep: Double = Double.MinValue
+  private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
+  private var sweepline: LineString = computeSweepline()
 
-  def setSweep(p: Double): Unit = {
+  def setSweep(p: Coordinate, tolerance: Double = 0.0): Unit = {
     sweep = p
+    sweepline = computeSweepline(tolerance)
   }
 
   def compare(s1: Segment, s2: Segment): Int = {
-    val r = y_intersect(s1).compare(y_intersect(s2))
+    s1.value = y_intersect(s1)
+    s2.value = y_intersect(s2)
+    val r = s1.value.compare(s2.value)
     if(r == 0){
-      s1.id compare s2.id
+      s1.id.compare(s2.id)
     } else {
       r
     }
   }
 
   private def y_intersect(s: Segment): Double = {
-    sweepline.intersection(s.line).getCoordinates.head.y
+    val intersects = sweepline.intersection(s.line).getCoordinates
+    if(intersects.isEmpty){
+      println(s"ERROR: No intersection between $s and sweepline $sweepline")
+    }
+    intersects.head.y
   }
 
-  private def sweepline: LineString = {
-    val p1 = new Coordinate(sweep, envelope.getMinY)
-    val p2 = new Coordinate(sweep, envelope.getMaxY)
-    geofactory.createLineString(Array(p1, p2))
+  private def computeSweepline(tolerance: Double = 0.0): LineString = {
+    val p1 = new Coordinate(sweep.x + tolerance, envelope.getMinY - 2.0)
+    val p2 = new Coordinate(sweep.x + tolerance, sweep.y + tolerance)
+    val p3 = new Coordinate(sweep.x, sweep.y + tolerance)
+    val p4 = new Coordinate(sweep.x, envelope.getMaxY + 2.0)
+    geofactory.createLineString(Array(p1, p2, p3, p4))
   }
 }
