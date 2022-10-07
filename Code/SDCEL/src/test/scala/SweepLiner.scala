@@ -153,6 +153,11 @@ object SweepLiner {
     y_order.lowerKey(query)
   }
 
+  def findNewEvent(seg_pred: Segment, seg_succ: Segment, point: Coordinate)
+                  (implicit x_order: TreeMap[Coordinate, List[Event]]): Unit = {
+
+  }
+
   case class Event(point: Coordinate, segment: Segment, mode: String) {
     def isStart: Boolean = mode == "START"
 
@@ -231,8 +236,30 @@ object SweepLiner {
       (u union c).foreach { segment =>
         y_order.put(segment, segment)
       }
+
+      if( (u union c).size == 0 ){
+        val seg_pred = pred(sweep_point)
+        val seg_succ = succ(sweep_point)
+        findNewEvent(seg_pred, seg_succ, sweep_point)
+      } else {
+        val seg_prime = (u union c).minBy{ s => y_order.get(s).value } // the lowest segment in U(p) U C(p)...
+        val seg_pred = y_order.lowerKey(seg_prime)
+        findNewEvent(seg_pred, seg_prime, sweep_point)
+        val seg_prime_prime = (u union c).maxBy{ s => y_order.get(s).value } // the highest segment in U(p) U C(p)...
+        val seg_succ = y_order.higherKey(seg_prime_prime)
+        findNewEvent(seg_prime_prime, seg_succ, sweep_point)
+      }
+
       println(s"Status: ${getStatusOrder}")
       saveStatusOrder(sweep_point)
+
+      if(sweep_point == new Coordinate(3.5, 0.5)){
+        val query = new Coordinate(3.5, 8.5)
+        val s = succ(query)
+        val p = pred(query)
+        println(s"Successor   to $query = $s")
+        println(s"Predecessor to $query = $p")
+      }
     }
 /*
     // brute force validation
