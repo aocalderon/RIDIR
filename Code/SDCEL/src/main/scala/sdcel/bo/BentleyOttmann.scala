@@ -1137,6 +1137,8 @@ object Segment {
      Segment(h, this.label)
    }
 
+   def intersects(that: Segment): Boolean = this.line.intersects(that.line)
+
    def intersection(that: Segment): Option[Coordinate] = {
      val coordinates = this.line.intersection(that.line).getCoordinates
      if (coordinates.size == 1) {
@@ -1144,6 +1146,45 @@ object Segment {
      } else {
        None
      }
+   }
+
+   def intersectionS(that: Segment): Option[Coordinate] = {
+     val a1 = this.target.y - this.source.y
+     val b1 = this.source.x - this.target.x
+     val c1 = a1 * this.source.x + b1 * this.source.y
+
+     val a2 = that.target.y - that.source.y
+     val b2 = that.source.x - that.target.x
+     val c2 = a2 * source.x + b2 * source.y
+
+     val delta = a1 * b2 - a2 * b1
+
+     delta match {
+       case 0 => None
+       case _ => {
+         // If lines are parallel, intersection point will contain infinite values
+         val x = (b2 * c1 - b1 * c2) / delta
+         val y = (a1 * c2 - a2 * c1) / delta
+         val i = new Coordinate(x, y)
+         Some( i )
+       }
+     }
+   }
+
+   def findIntersection(that: LineString): Coordinate = {
+     val a1 = this.target.y - this.source.y
+     val b1 = this.source.x - this.target.x
+     val c1 = a1 * this.source.x + b1 * this.source.y
+
+     val target = that.getCoordinates.last
+     val source = that.getCoordinates.head
+     val a2 = target.y - source.y
+     val b2 = source.x - target.x
+     val c2 = a2 * source.x + b2 * source.y
+
+     val delta = a1 * b2 - a2 * b1
+     // If lines are parallel, intersection point will contain infinite values
+     new Coordinate( (b2 * c1 - b1 * c2) / delta, (a1 * c2 - a2 * c1) / delta )
    }
 
    def intersectionY(that_line: LineString): Double = {

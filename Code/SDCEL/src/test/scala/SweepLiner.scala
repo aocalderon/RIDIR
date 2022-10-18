@@ -149,12 +149,22 @@ object SweepLiner {
     ucl(events, U, C, L)
   }
 
-  private def updateY_order(sweep_point: Coordinate, tolerance: Double = 0.0)
+  private def updateY_order(sweep_point: Coordinate)
                            (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
     val ss = y_order.asScala.clone()
     y_order.clear()
-    sweepComparator.setSweep(sweep_point, tolerance)
+    val sl = sweepComparator.setSweep(sweep_point)
     y_order.putAll(ss.asJava)
+    print("")
+  }
+
+  private def updateY_order2(sweep_point: Coordinate, tolerance: Double, segs: Set[Segment] = Set.empty[Segment])
+                           (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
+    val ss = y_order.asScala.clone() ++ segs.map(x => x -> x)
+    y_order.clear()
+    val sl = sweepComparator.setSweep(sweep_point, tolerance)
+    y_order.putAll(ss.asJava)
+    print("")
   }
 
   private def succ(p: Coordinate, tolerance: Double = 0.001)
@@ -191,28 +201,30 @@ object SweepLiner {
     a && b
   }
 
-  def findNewEvent(seg_pred: Segment, seg_succ: Segment, point: Coordinate, mode: String = "SI")
+  def findNewEvent(seg_pred: Segment, seg_succ: Segment, point: Coordinate)
                   (implicit x_order: TreeMap[Coordinate, List[Event]]): Unit = {
-    seg_pred.intersection(seg_succ) match {
-      case Some(intersection) => {
-        val a = point.x < intersection.x
-        val b = point.x == intersection.x && point.y < intersection.y
-        val c = !x_order.containsKey(intersection)
-        if(checkIntersection(intersection, point, List(seg_pred.id, seg_pred.id))) {
-          //println(s"Finding new event ($mode) at ${point} between ${seg_pred.id} and ${seg_succ.id}: ${intersection}")
-          val event_pred = Event(intersection, seg_pred, "INTERSECTION")
-          val event_succ = Event(intersection, seg_succ, "INTERSECTION")
-          val events = if(x_order.containsKey(intersection)) {
-            // if the intersection is already in the event queue we have to keep the possible previous segments...
-            List( event_pred, event_succ ) ++  x_order.get(intersection)
-          } else {
-            List( event_pred, event_succ )
+    if(seg_pred.intersects(seg_succ)) {
+      seg_pred.intersectionS(seg_succ) match {
+        case Some(intersection) => {
+          val a = point.x < intersection.x
+          val b = point.x == intersection.x && point.y < intersection.y
+          val c = !x_order.containsKey(intersection)
+          if (checkIntersection(intersection, point, List(seg_pred.id, seg_pred.id))) {
+            //println(s"Finding new event ($mode) at ${point} between ${seg_pred.id} and ${seg_succ.id}: ${intersection}")
+            val event_pred = Event(intersection, seg_pred, "INTERSECTION")
+            val event_succ = Event(intersection, seg_succ, "INTERSECTION")
+            val events = if (x_order.containsKey(intersection)) {
+              // if the intersection is already in the event queue we have to keep the possible previous segments...
+              List(event_pred, event_succ) ++ x_order.get(intersection)
+            } else {
+              List(event_pred, event_succ)
+            }
+            x_order.put(intersection, events)
           }
-          x_order.put(intersection, events)
         }
-      }
-      case None => {
-        //println(s"Finding new event ($mode) at ${point} between ${seg_pred.id} and ${seg_succ.id}")
+        case None => {
+          //println(s"Finding new event ($mode) at ${point} between ${seg_pred.id} and ${seg_succ.id}")
+        }
       }
     }
   }
@@ -236,7 +248,7 @@ object SweepLiner {
     val envelope_generate = new Envelope(0, 100, 0, 100)
     val n = 100
     val length = envelope_generate.getWidth * 0.25
-    val filename = "/home/and/RIDIR/tmp/edgesSS.wkt"
+    val filename = "/home/and/RIDIR/tmp/edgesS1.wkt"
 
     val dataset = generate match {
       case "sample" => loadDataset2
@@ -289,7 +301,8 @@ object SweepLiner {
       val events = event_point.getValue
       val (u, c, l) = getUCL(events)
 
-      if(c.map(_.id).contains(54) && c.map(_.id).contains(11)){
+      if(c.map(_.id).contains(54) && c.map(_.id).contains(64)){
+      //if(u.map(_.id).contains(54)){
         println()
       }
 
@@ -307,15 +320,13 @@ object SweepLiner {
         y_order.remove(segment)
       }
       // Inserting U(p) U C(p)...
-      updateY_order(sweep_point, tolerance)
-      (u union c).foreach { segment =>
-        y_order.put(segment, segment)
-      }
+      val uc = u union c
+      updateY_order2(sweep_point, tolerance, uc)
 
       if ((u union c).size == 0) {
         val seg_pred = pred(sweep_point)
         val seg_succ = succ(sweep_point)
-        findNewEvent(seg_pred, seg_succ, sweep_point, "E")
+        findNewEvent(seg_pred, seg_succ, sweep_point)
       } else {
         val uc = (u union c).map{ seg =>
           y_order.get(seg)
@@ -369,35 +380,25 @@ class SweepComparator(envelope: Envelope, geofactory: GeometryFactory) extends C
   private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
   var sweepline: LineString = computeSweepline()
 
-  def setSweep(p: Coordinate, tolerance: Double = 0.0): Unit = {
+  def setSweep(p: Coordinate, tolerance: Double = 0.0): LineString = {
     sweep = p
     sweepline = computeSweepline(tolerance)
+    sweepline
   }
 
   def compare(s1: Segment, s2: Segment): Int = {
-    s1.value = y_intersect(s1)
-    s2.value = y_intersect(s2)
-    val r = s1.value.compare(s2.value)
-    if(r == 0){
-      s1.id.compare(s2.id)
-    } else {
-      r
-    }
+    s1.value = s1.findIntersection(sweepline).y
+    s2.value = s2.findIntersection(sweepline).y
+
+    s1.value.compare(s2.value)
   }
 
-  private def y_intersect(s: Segment): Double = {
-    val intersects = sweepline.intersection(s.line).getCoordinates
-    if(intersects.isEmpty){
-      println(s"ERROR: No intersection between $s and sweepline $sweepline")
-    }
-    intersects.head.y
-  }
-
-  def computeSweepline(tolerance: Double = 0.0): LineString = {
-    val p1 = new Coordinate(sweep.x + tolerance, envelope.getMinY - 2.0)
-    val p2 = new Coordinate(sweep.x + tolerance, sweep.y)
-    val p3 = new Coordinate(sweep.x - tolerance, sweep.y + 2 * tolerance)
-    val p4 = new Coordinate(sweep.x - tolerance, envelope.getMaxY + 2.0)
-    geofactory.createLineString(Array(p1, p2, p3, p4))
+  def computeSweepline(gap: Double = 0.0): LineString = {
+    val minY = envelope.getMinY - 2.0 // adding some gap to intersect sentinels...
+    val maxY = envelope.getMaxY - 2.0 // adding some gap to intersect sentinels...
+    val p1 = new Coordinate(sweep.x, minY)
+    val p2 = new Coordinate(sweep.x + gap, maxY) // adding a small gap if we want to compute the
+                                                 // intersection just after the sweepline...
+    geofactory.createLineString(Array(p1, p2))
   }
 }
