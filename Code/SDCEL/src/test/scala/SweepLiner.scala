@@ -1,5 +1,6 @@
 package edu.ucr.dblab.sweeptest
 
+import com.vividsolutions.jts.{geom, io}
 import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, LineString, PrecisionModel}
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 import sdcel.bo.Segment
@@ -77,6 +78,19 @@ object SweepLiner {
 
     List(s1, s2, s3, s4, s5, s7, s8, s6, s9, s10)
   }
+
+  private def loadDataset3(implicit geofactory: GeometryFactory): List[Segment] = {
+    val s1 = mkSegment((0, 0), (0,-3), 1)
+    val s2 = mkSegment((0, 0), (1,-2), 2)
+    val s3 = mkSegment((0, 0), (2,-1), 3)
+    val s4 = mkSegment((0, 0), (3, 0), 4)
+    val s5 = mkSegment((0, 0), (2, 1), 5)
+    val s6 = mkSegment((0, 0), (1, 2), 6)
+    val s7 = mkSegment((0, 0), (0, 3), 7)
+
+    List(s1, s2, s3, s4, s5, s6, s7)
+  }
+
   private def generateDataset(n: Int, envelope: Envelope, length: Double = 100)
                              (implicit geofactory: GeometryFactory): List[Segment] = {
     val x1 = envelope.getMinX
@@ -160,8 +174,9 @@ object SweepLiner {
 
   private def updateY_order2(sweep_point: Coordinate, tolerance: Double, segs: Set[Segment] = Set.empty[Segment])
                            (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
-    val ss = y_order.asScala.clone() ++ segs.map(x => x -> x)
-    y_order.clear()
+    //val ss = y_order.asScala.clone() ++ segs.map(x => x -> x)
+    val ss = segs.map(x => x -> x).toMap
+    //y_order.clear()
     val sl = sweepComparator.setSweep(sweep_point, tolerance)
     y_order.putAll(ss.asJava)
     print("")
@@ -203,6 +218,8 @@ object SweepLiner {
 
   def findNewEvent(seg_pred: Segment, seg_succ: Segment, point: Coordinate)
                   (implicit x_order: TreeMap[Coordinate, List[Event]]): Unit = {
+    val x = seg_pred.intersects(seg_succ)
+    print("")
     if(seg_pred.intersects(seg_succ)) {
       seg_pred.intersectionS(seg_succ) match {
         case Some(intersection) => {
@@ -244,22 +261,24 @@ object SweepLiner {
     implicit val model = new PrecisionModel(1.0 / tolerance)
     implicit val geofactory = new GeometryFactory(model)
     val debug: Boolean = true
-    val generate: String = "read"
-    val envelope_generate = new Envelope(0, 100, 0, 100)
-    val n = 100
+    val generate: String = "random"
+    val envelope_generate = new Envelope(0, 1000, 0, 1000)
+    val n = 1000
     val length = envelope_generate.getWidth * 0.25
-    val filename = "/home/and/RIDIR/tmp/edgesS1.wkt"
+    val filename = "/home/and/RIDIR/tmp/edgesSS.wkt"
 
     val dataset = generate match {
       case "sample" => loadDataset2
+      case "slope"  => loadDataset3
       case "random" => generateDataset(n, envelope_generate, length)
       case "read"   => readDataset(filename)
       case _ => loadDataset
     }
+
     val envelope = getEnvelope(dataset)
     saveSegments(dataset, "/tmp/edgesSS.wkt")
     implicit val x_order: TreeMap[Coordinate, List[Event]] = new TreeMap[Coordinate, List[Event]]
-    implicit val sweepComparator = new SweepComparator(envelope, geofactory)
+    implicit val sweepComparator = new SweepComparator(envelope)
     implicit val y_order: TreeMap[Segment, Segment] = new TreeMap[Segment, Segment](sweepComparator)
 
     dataset.flatMap { segment =>
@@ -301,7 +320,7 @@ object SweepLiner {
       val events = event_point.getValue
       val (u, c, l) = getUCL(events)
 
-      if(c.map(_.id).contains(54) && c.map(_.id).contains(64)){
+      if(c.map(_.id).contains(54) && c.map(_.id).contains(11)){
       //if(u.map(_.id).contains(54)){
         println()
       }
@@ -321,7 +340,7 @@ object SweepLiner {
       }
       // Inserting U(p) U C(p)...
       val uc = u union c
-      updateY_order2(sweep_point, tolerance, uc)
+      updateY_order2(sweep_point, 0.00001, uc)
 
       if ((u union c).size == 0) {
         val seg_pred = pred(sweep_point)
@@ -371,34 +390,67 @@ object SweepLiner {
 
     save("/tmp/edgesI2.wkt") { I2 }
 
-    val r = I1.zip(I2).map{ case(a, b) => a == b }.reduce( _ && _ )
-    println(r)
+    import com.vividsolutions.jts.io.WKTReader
+    val reader = new WKTReader(geofactory)
+    val J1 = I1.map{ line =>
+      val arr = line.split("\t")
+      val wkt = arr(0)
+      val ids = arr(3).replace("\n", "")
+      (ids, reader.read(wkt))
+    }
+    val J2 = I2.map { line =>
+      val arr = line.split("\t")
+      val wkt = arr(0)
+      val ids = arr(3).replace("\n", "")
+      (ids, reader.read(wkt))
+    }
+    (J1 union J2).groupBy(_._1).map{ case(key, values) =>
+      val size = values.size
+      val points = values.map(_._2)
+      val dist = points.head.distance(points.last)
+      (key, size, dist)
+    }.filter(_._3 > 0.001).foreach{ println }
   }
 }
 
-class SweepComparator(envelope: Envelope, geofactory: GeometryFactory) extends Comparator[Segment]{
+class SweepComparator(envelope: Envelope) extends Comparator[Segment]{
+  private val model: PrecisionModel = new PrecisionModel(1e10)
+  private val geofa: GeometryFactory = new GeometryFactory(model)
   private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
-  var sweepline: LineString = computeSweepline()
+  private val epsilon = 0.001
+  var sweepline_endpoints: Array[Coordinate] = Array.empty[Coordinate]
+  var sweepline: LineString = geofa.createLineString(sweepline_endpoints)
 
-  def setSweep(p: Coordinate, tolerance: Double = 0.0): LineString = {
+  def setSweep(p: Coordinate, tolerance: Double = 0.0): String = {
     sweep = p
-    sweepline = computeSweepline(tolerance)
-    sweepline
+    sweepline_endpoints = computeSweepline(tolerance)
+    sweepline.toText
   }
 
   def compare(s1: Segment, s2: Segment): Int = {
-    s1.value = s1.findIntersection(sweepline).y
-    s2.value = s2.findIntersection(sweepline).y
+    val sl_source = sweepline_endpoints.head
+    val sl_target = sweepline_endpoints.last
+    s1.value = if(s1.isVertical) {
+      sweep.y + epsilon
+    } else {
+      s1.findIntersectionSL(sl_source, sl_target).y
+    }
+    s2.value = if(s2.isVertical){
+      sweep.y + epsilon
+    } else {
+      s2.findIntersectionSL(sl_source, sl_target).y
+    }
 
     s1.value.compare(s2.value)
   }
 
-  def computeSweepline(gap: Double = 0.0): LineString = {
+  def computeSweepline(gap: Double = 0.0): Array[Coordinate] = {
     val minY = envelope.getMinY - 2.0 // adding some gap to intersect sentinels...
-    val maxY = envelope.getMaxY - 2.0 // adding some gap to intersect sentinels...
+    val maxY = envelope.getMaxY + 2.0 // adding some gap to intersect sentinels...
     val p1 = new Coordinate(sweep.x, minY)
     val p2 = new Coordinate(sweep.x + gap, maxY) // adding a small gap if we want to compute the
                                                  // intersection just after the sweepline...
-    geofactory.createLineString(Array(p1, p2))
+    sweepline = geofa.createLineString(Array(p1, p2))
+    Array(p1, p2)
   }
 }

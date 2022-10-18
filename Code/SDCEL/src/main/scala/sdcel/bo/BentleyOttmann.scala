@@ -1028,6 +1028,14 @@ object Segment {
      }
    }
 
+   def getSlope: Double = {
+     if (dx == 0) {
+       if(dy >= 0) Double.MaxValue else Double.MinValue
+     } else {
+       dy / dx
+     }
+   }
+
    def envelope: Envelope = h.edge.getEnvelopeInternal
 
    def within(that: Segment): Boolean = this.h.edge.within(that.h.edge)
@@ -1155,7 +1163,7 @@ object Segment {
 
      val a2 = that.target.y - that.source.y
      val b2 = that.source.x - that.target.x
-     val c2 = a2 * source.x + b2 * source.y
+     val c2 = a2 * that.source.x + b2 * that.source.y
 
      val delta = a1 * b2 - a2 * b1
 
@@ -1185,6 +1193,21 @@ object Segment {
      val delta = a1 * b2 - a2 * b1
      // If lines are parallel, intersection point will contain infinite values
      new Coordinate( (b2 * c1 - b1 * c2) / delta, (a1 * c2 - a2 * c1) / delta )
+   }
+
+   /* Find intersection with sweepline.  Sweepline is represented by their endpoints. */
+   def findIntersectionSL(sl_source: Coordinate, sl_target: Coordinate): Coordinate = {
+     val a1 = this.target.y - this.source.y
+     val b1 = this.source.x - this.target.x
+     val c1 = a1 * this.source.x + b1 * this.source.y
+
+     val a2 = sl_target.y - sl_source.y
+     val b2 = sl_source.x - sl_target.x
+     val c2 = a2 * sl_source.x + b2 * sl_source.y
+
+     val delta = a1 * b2 - a2 * b1
+     // If lines are parallel, intersection point will contain infinite values
+     new Coordinate((b2 * c1 - b1 * c2) / delta, (a1 * c2 - a2 * c1) / delta)
    }
 
    def intersectionY(that_line: LineString): Double = {
