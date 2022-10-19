@@ -167,17 +167,15 @@ object SweepLiner {
                            (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
     val ss = y_order.asScala.clone()
     y_order.clear()
-    val sl = sweepComparator.setSweep(sweep_point)
+    sweepComparator.setSweep(sweep_point)
     y_order.putAll(ss.asJava)
     print("")
   }
 
   private def updateY_order2(sweep_point: Coordinate, tolerance: Double, segs: Set[Segment] = Set.empty[Segment])
-                           (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
-    //val ss = y_order.asScala.clone() ++ segs.map(x => x -> x)
+                            (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
     val ss = segs.map(x => x -> x).toMap
-    //y_order.clear()
-    val sl = sweepComparator.setSweep(sweep_point, tolerance)
+    sweepComparator.setSweep(sweep_point, tolerance)
     y_order.putAll(ss.asJava)
     print("")
   }
@@ -199,18 +197,18 @@ object SweepLiner {
                                (implicit x_order: TreeMap[Coordinate, List[Event]]): Boolean = {
     // intersection is left to the sweep line or in it and above sweep point...
     val a = sweep_point.x < intersection.x || (sweep_point.x == intersection.x && sweep_point.y < intersection.y)
-    // intersection is not in event queue...
+    // intersection is in event queue...
     val b = if( x_order.containsKey(intersection) ){
       val events_ids = x_order.get(intersection).map{ event => event.segment.id }
       if(ids.map{ case id => events_ids.contains(id) }.reduce{ _ && _ }){
-        // intersection is in event queue and it have the same segments...
+      // intersection is in event queue and it have the same segments...
         false
       } else {
-        // intersection is in event queue but it does not have the same segments...
+      // intersection is in event queue but it does not have the same segments...
         true
       }
     } else {
-      // intersection is not in event queue...
+    // intersection is not in event queue...
       true
     }
     a && b
@@ -226,7 +224,7 @@ object SweepLiner {
           val a = point.x < intersection.x
           val b = point.x == intersection.x && point.y < intersection.y
           val c = !x_order.containsKey(intersection)
-          if (checkIntersection(intersection, point, List(seg_pred.id, seg_pred.id))) {
+          if ( checkIntersection( intersection, point, List(seg_pred.id, seg_succ.id) ) ) {
             //println(s"Finding new event ($mode) at ${point} between ${seg_pred.id} and ${seg_succ.id}: ${intersection}")
             val event_pred = Event(intersection, seg_pred, "INTERSECTION")
             val event_succ = Event(intersection, seg_succ, "INTERSECTION")
@@ -257,13 +255,13 @@ object SweepLiner {
   }
 
   def main(args: Array[String]): Unit = {
-    val tolerance = 0.001
+    val tolerance = 0.00001
     implicit val model = new PrecisionModel(1.0 / tolerance)
     implicit val geofactory = new GeometryFactory(model)
     val debug: Boolean = true
     val generate: String = "random"
     val envelope_generate = new Envelope(0, 1000, 0, 1000)
-    val n = 1000
+    val n = 2000
     val length = envelope_generate.getWidth * 0.25
     val filename = "/home/and/RIDIR/tmp/edgesSS.wkt"
 
@@ -404,6 +402,7 @@ object SweepLiner {
       val ids = arr(3).replace("\n", "")
       (ids, reader.read(wkt))
     }
+    println(s"I1: ${I1.size} vs I2: ${I2.size}")
     (J1 union J2).groupBy(_._1).map{ case(key, values) =>
       val size = values.size
       val points = values.map(_._2)
@@ -413,18 +412,13 @@ object SweepLiner {
   }
 }
 
-class SweepComparator(envelope: Envelope) extends Comparator[Segment]{
-  private val model: PrecisionModel = new PrecisionModel(1e10)
-  private val geofa: GeometryFactory = new GeometryFactory(model)
+class SweepComparator(envelope: Envelope, epsilon: Double = 0.001) extends Comparator[Segment]{
   private var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
-  private val epsilon = 0.001
   var sweepline_endpoints: Array[Coordinate] = Array.empty[Coordinate]
-  var sweepline: LineString = geofa.createLineString(sweepline_endpoints)
 
-  def setSweep(p: Coordinate, tolerance: Double = 0.0): String = {
+  def setSweep(p: Coordinate, tolerance: Double = 0.0): Unit = {
     sweep = p
     sweepline_endpoints = computeSweepline(tolerance)
-    sweepline.toText
   }
 
   def compare(s1: Segment, s2: Segment): Int = {
@@ -450,7 +444,6 @@ class SweepComparator(envelope: Envelope) extends Comparator[Segment]{
     val p1 = new Coordinate(sweep.x, minY)
     val p2 = new Coordinate(sweep.x + gap, maxY) // adding a small gap if we want to compute the
                                                  // intersection just after the sweepline...
-    sweepline = geofa.createLineString(Array(p1, p2))
     Array(p1, p2)
   }
 }
