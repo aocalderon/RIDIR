@@ -1,25 +1,22 @@
-package edu.ucr.dblab.sweeptest
-
-import com.vividsolutions.jts.{geom, io}
-import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, LineString, PrecisionModel}
+import com.vividsolutions.jts.geom._
+import edu.ucr.dblab.sdcel.Utils.save
 import edu.ucr.dblab.sdcel.geometries.Half_edge
 import sdcel.bo.Segment
-import edu.ucr.dblab.sdcel.Utils.save
 
-import java.util.Comparator
-import java.util.TreeMap
+import java.util
+import java.util.{Comparator, TreeMap}
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-object SweepLiner {
-  private def mkSegment(p1: (Double, Double), p2: (Double, Double), id: Long, label: String = "A")
+object SweepLiner2 {
+  private def mkSegment(p1: (Double, Double), p2: (Double, Double), id: Long, label: String = "")
                        (implicit geofactory: GeometryFactory): Segment = {
     val c1 = new Coordinate(p1._1, p1._2)
     val c2 = new Coordinate(p2._1, p2._2)
     val line = geofactory.createLineString(Array(c1, c2))
-    val h = Half_edge(line);
+    val h = Half_edge(line)
     h.id = id
     Segment(h, label)
   }
@@ -51,75 +48,30 @@ object SweepLiner {
   }
 
   private def loadDataset(implicit geofactory: GeometryFactory): List[Segment] = {
-    val s1 = mkSegment( (2,4), (10,8), 1)
-    val s2 = mkSegment( (6,6), (10,5), 2)
-    val s3 = mkSegment( (3,9), (8,4), 3)
-    val s4 = mkSegment( (3,2), (6,6), 4)
-    val s5 = mkSegment( (5,2), (6,6), 5)
-    val s7 = mkSegment( (4,1), (8,2), 7)
-    val s8 = mkSegment( (4,9), (8,8), 8)
-    val s9 = mkSegment( (4,1), (4,6), 9)
-    val s10 = mkSegment( (6,6), (6,9), 10)
+    val s1 = mkSegment((3, 3), (5, 5), 1, "A")
+    val s2 = mkSegment((5, 5), (7, 3), 2, "A")
+    val s3 = mkSegment((7, 3), (5, 1), 3, "A")
+    val s4 = mkSegment((5, 1), (3, 3), 4, "A")
+    val s5 = mkSegment((1, 2), (3, 5), 5, "B")
+    val s6 = mkSegment((3, 5), (8, 2), 6, "B")
+    val s7 = mkSegment((8, 2), (1, 2), 7, "B")
 
-    List(s1, s2, s3, s4, s5, s7, s8, s9, s10)
+    List(s1, s2, s3, s4, s5, s6, s7)
   }
 
   private def loadDataset2(implicit geofactory: GeometryFactory): List[Segment] = {
-    val s1  = mkSegment(     (2, 8),    (5, 1), 1)
-    val s2  = mkSegment(     (3, 1),    (5, 3), 2)
-    val s3  = mkSegment(     (2, 1),    (5, 4), 3)
-    val s4  = mkSegment(    (3, 10),    (5, 5), 4)
-    val s5  = mkSegment(     (2, 3),    (5, 6), 5)
-    val s6  = mkSegment(     (2, 5),    (5, 7), 6)
-    val s7  = mkSegment(     (2, 9),    (5, 8), 7)
-    val s8  = mkSegment(     (2, 7),    (5,10), 8)
-    val s9  = mkSegment( (2.5, 0.5), (3.5,0.5), 9)
-    val s10 = mkSegment(   (4, 0.5), (4.5,0.5), 10)
+    val s1 = mkSegment(( 1, 1), ( 3, 8), 1, "A")
+    val s2 = mkSegment(( 3, 1), ( 5, 8), 2, "A")
+    val s3 = mkSegment(( 5, 1), ( 7, 8), 3, "A")
+    val s4 = mkSegment(( 7, 1), ( 9, 8), 4, "A")
+    val s5 = mkSegment(( 9, 1), (11, 8), 5, "A")
+    val s6 = mkSegment((11, 1), (13, 8), 6, "A")
+    val s7 = mkSegment((13, 1), (15, 8), 7, "A")
+    val s8 = mkSegment((15, 1), (17, 8), 8, "A")
+    val s9 = mkSegment((17, 4), (11, 4), 9, "B")
 
-    List(s1, s2, s3, s4, s5, s7, s8, s6, s9, s10)
+    List(s1, s2, s3, s4, s5, s6, s7, s8, s9)
   }
-
-  private def loadDataset3(implicit geofactory: GeometryFactory): List[Segment] = {
-    val s1 = mkSegment((0, 0), (0,-3), 1)
-    val s2 = mkSegment((0, 0), (1,-2), 2)
-    val s3 = mkSegment((0, 0), (2,-1), 3)
-    val s4 = mkSegment((0, 0), (3, 0), 4)
-    val s5 = mkSegment((0, 0), (2, 1), 5)
-    val s6 = mkSegment((0, 0), (1, 2), 6)
-    val s7 = mkSegment((0, 0), (0, 3), 7)
-
-    List(s1, s2, s3, s4, s5, s6, s7)
-  }
-
-  private def loadDataset4(implicit geofactory: GeometryFactory): List[Segment] = {
-    val s1 = mkSegment((2, 4), (10, 8), 1)
-    val s2 = mkSegment((6, 6), (10, 5), 2)
-    val s3 = mkSegment((3, 9), (8, 4), 3)
-    val s4 = mkSegment((3, 2), (6, 6), 4)
-    val s5 = mkSegment((5, 2), (6, 6), 5)
-    val s7 = mkSegment((4, 1), (8, 2), 7)
-    val s8 = mkSegment((4, 9), (8, 8), 8)
-    val s9 = mkSegment((4, 1), (4, 6), 9)
-    val s10 = mkSegment((6, 6), (6, 9), 10)
-    val s11 = mkSegment((6, 5), (6, 8), 11)
-    val s12 = mkSegment((6, 5), (7, 5), 12)
-    val s13 = mkSegment((6, 8), (7, 8), 13)
-
-    List(s1, s2, s3, s4, s5, s7, s8, s9, s10, s11, s12, s13)
-  }
-
-  private def loadDataset5(implicit geofactory: GeometryFactory): List[Segment] = {
-    val s1 = mkSegment((3, 3), (5, 5), 1)
-    val s2 = mkSegment((5, 5), (7, 3), 2)
-    val s3 = mkSegment((7, 3), (5, 1), 3)
-    val s4 = mkSegment((5, 1), (3, 3), 4)
-    val s5 = mkSegment((1, 2), (3, 5), 5)
-    val s6 = mkSegment((3, 5), (8, 2), 6)
-    val s7 = mkSegment((8, 2), (1, 2), 7)
-
-    List(s1, s2, s3, s4, s5, s6, s7)
-  }
-
   private def generateDataset(n: Int, envelope: Envelope, length: Double = 100)
                              (implicit geofactory: GeometryFactory): List[Segment] = {
     val x1 = envelope.getMinX
@@ -139,8 +91,9 @@ object SweepLiner {
   }
 
   private def readDataset(filename: String)(implicit geofactory: GeometryFactory): List[Segment] = {
-    import scala.io.Source
     import com.vividsolutions.jts.io.WKTReader
+
+    import scala.io.Source
 
     val reader = new WKTReader(geofactory)
     val buffer = Source.fromFile(filename)
@@ -156,15 +109,6 @@ object SweepLiner {
     }.toList
     buffer.close()
     segments
-  }
-
-  private def saveStatusOrder(p: Coordinate)(implicit status: TreeMap[Segment, Segment]): Unit = {
-    save(s"/tmp/edgesYO_${p.x.toString.replace(".", "-")}.wkt") {
-      status.asScala.iterator.filter(_._1.id >= 0).map { x =>
-        val s = x._1
-        s"POINT( ${p.x} ${s.value} )\t${s.id}\t${s.value}\n"
-      }.toList
-    }
   }
 
   private def getUCL(events: List[Event]): (Set[Segment], Set[Segment], Set[Segment]) = {
@@ -192,11 +136,12 @@ object SweepLiner {
     ucl(events, U, C, L)
   }
 
-  private def printY_order(implicit y_order: TreeMap[Segment, Segment]): Unit = {
+  private def printY_order(implicit y_order: util.TreeMap[Segment, Segment]): Unit = {
     print("")
   }
+
   private def updateY_order(sweep_point: Coordinate)
-                           (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
+                           (implicit sweepComparator: SweepComparator, y_order: util.TreeMap[Segment, Segment]): Unit = {
     val ss = y_order.asScala.clone()
     y_order.clear()
     sweepComparator.setSweep(sweep_point)
@@ -205,7 +150,7 @@ object SweepLiner {
   }
 
   private def updateY_order2(sweep_point: Coordinate, tolerance: Double, segs: Set[Segment] = Set.empty[Segment])
-                            (implicit sweepComparator: SweepComparator, y_order: TreeMap[Segment, Segment]): Unit = {
+                            (implicit sweepComparator: SweepComparator, y_order: util.TreeMap[Segment, Segment]): Unit = {
     val ss = segs.map(x => x -> x).toMap
     sweepComparator.setSweep(sweep_point, tolerance)
     y_order.putAll(ss.asJava)
@@ -213,26 +158,26 @@ object SweepLiner {
   }
 
   private def succ(p: Coordinate, tolerance: Double = 0.001)
-                  (implicit y_order: TreeMap[Segment, Segment], gf: GeometryFactory): Segment = {
+                  (implicit y_order: util.TreeMap[Segment, Segment], gf: GeometryFactory): Segment = {
     val query = mkSegment( (p.x, p.y), (p.x + tolerance, p.y + tolerance), -3) // dummy segment for query purposes...
     y_order.higherKey(query)
   }
 
   private def pred(p: Coordinate, tolerance: Double = 0.001)
-                  (implicit y_order: TreeMap[Segment, Segment], gf: GeometryFactory): Segment = {
+                  (implicit y_order: util.TreeMap[Segment, Segment], gf: GeometryFactory): Segment = {
     val query = mkSegment((p.x, p.y), (p.x + tolerance, p.y + tolerance), -3) // dummy segment for query purposes...
     y_order.lowerKey(query)
   }
 
   /* Check if intersection has to be added to event queue */
   private def checkIntersection(intersection: Coordinate, sweep_point: Coordinate, ids: List[Long])
-                               (implicit x_order: TreeMap[Coordinate, List[Event]]): Boolean = {
+                               (implicit x_order: util.TreeMap[Coordinate, List[Event]]): Boolean = {
     // intersection is left to the sweep line or in it and above sweep point...
     val a = sweep_point.x < intersection.x || (sweep_point.x == intersection.x && sweep_point.y < intersection.y)
     // intersection is in event queue...
     val b = if( x_order.containsKey(intersection) ){
       val events_ids = x_order.get(intersection).map{ event => event.segment.id }
-      if(ids.map{ case id => events_ids.contains(id) }.reduce{ _ && _ }){
+      if(ids.map(id => events_ids.contains(id)).reduce{ _ && _ }){
       // intersection is in event queue and it have the same segments...
         false
       } else {
@@ -246,42 +191,38 @@ object SweepLiner {
     a && b
   }
 
-  def findNewEvent(seg_pred: Segment, seg_succ: Segment, point: Coordinate)
-                  (implicit x_order: TreeMap[Coordinate, List[Event]]): Unit = {
-    val x = seg_pred.intersects(seg_succ)
-    print("")
-    if(seg_pred.intersects(seg_succ)) {
-      seg_pred.intersectionS(seg_succ) match {
-        case Some(intersection) => {
-          val a = point.x < intersection.x
-          val b = point.x == intersection.x && point.y < intersection.y
-          val c = !x_order.containsKey(intersection)
-          if ( checkIntersection( intersection, point, List(seg_pred.id, seg_succ.id) ) ) {
-            //println(s"Finding new event ($mode) at ${point} between ${seg_pred.id} and ${seg_succ.id}: ${intersection}")
-            val event_pred = Event(intersection, seg_pred, "INTERSECTION")
-            val event_succ = Event(intersection, seg_succ, "INTERSECTION")
-            val events = if (x_order.containsKey(intersection)) {
-              // if the intersection is already in the event queue we have to keep the possible previous segments...
-              List(event_pred, event_succ) ++ x_order.get(intersection)
-            } else {
-              List(event_pred, event_succ)
+  def findNewEventWithLabelRestriction(seg_pred: Segment, seg_succ: Segment, point: Coordinate)
+                  (implicit x_order: util.TreeMap[Coordinate, List[Event]]): Unit = {
+    if( seg_pred.label != seg_succ.label ) {
+      if (seg_pred.intersects(seg_succ)) {
+        seg_pred.intersectionS(seg_succ) match {
+          case Some(intersection) => {
+            if (checkIntersection(intersection, point, List(seg_pred.id, seg_succ.id))) {
+              val event_pred = Event(intersection, seg_pred, "INTERSECTION")
+              val event_succ = Event(intersection, seg_succ, "INTERSECTION")
+              val events = if (x_order.containsKey(intersection)) {
+                // if the intersection is already in the event queue we have to keep the possible previous segments...
+                List(event_pred, event_succ) ++ x_order.get(intersection)
+              } else {
+                List(event_pred, event_succ)
+              }
+              x_order.put(intersection, events)
             }
-            x_order.put(intersection, events)
           }
-        }
-        case None => {
-          //println(s"Finding new event ($mode) at ${point} between ${seg_pred.id} and ${seg_succ.id}")
+          case None => {
+            // skip
+          }
         }
       }
     }
   }
 
-  def sweepliner(dataset: List[Segment], debug: Boolean = true)(implicit geofactory: GeometryFactory): ListBuffer[String] ={
+  def sweepliner2(dataset: List[Segment], debug: Boolean = true)(implicit geofactory: GeometryFactory): ListBuffer[String] ={
     val envelope = getEnvelope(dataset)
     saveSegments(dataset, "/tmp/edgesSS.wkt")
-    implicit val x_order: TreeMap[Coordinate, List[Event]] = new TreeMap[Coordinate, List[Event]]
-    implicit val sweepComparator = new SweepComparator(envelope)
-    implicit val y_order: TreeMap[Segment, Segment] = new TreeMap[Segment, Segment](sweepComparator)
+    implicit val x_order: TreeMap[Coordinate, List[Event]] = new util.TreeMap[Coordinate, List[Event]]
+    implicit val sweepComparator: SweepComparator = new SweepComparator(envelope)
+    implicit val y_order: TreeMap[Segment, Segment] = new util.TreeMap[Segment, Segment](sweepComparator)
 
     dataset.flatMap { segment_prime =>
       // Segments need to be left or upwards oriented...
@@ -343,11 +284,14 @@ object SweepLiner {
 
       if ((u union c union l).size > 1) {
         val segments = u union c union l
-        val x = sweep_point.x
-        val y = sweep_point.y
-        val ids = segments.map(_.id).toList.sorted.mkString(" ")
-        val wkt = s"POINT($x $y)"
-        intersections.append(s"$wkt\t$x\t$y\t$ids")
+        val nlabels = segments.map(_.label).toList.distinct.size
+        if(nlabels > 1) {
+          val x = sweep_point.x
+          val y = sweep_point.y
+          val ids = segments.map(_.id).toList.sorted.mkString(" ")
+          val wkt = s"POINT($x $y)"
+          intersections.append(s"$wkt\t$x\t$y\t$ids")
+        }
       }
       // Deleting L(p) U C(p)...
       updateY_order(sweep_point)
@@ -356,17 +300,17 @@ object SweepLiner {
       val uc = u union c
       updateY_order2(sweep_point, 0.00001, uc)
 
-      if (uc.size == 0) {
+      if (uc.isEmpty) {
         val seg_pred = pred(sweep_point)
         val seg_succ = succ(sweep_point)
-        findNewEvent(seg_pred, seg_succ, sweep_point)
+        findNewEventWithLabelRestriction(seg_pred, seg_succ, sweep_point)
       } else {
         val seg_prime = uc.minBy(_.value) // the lowest segment in U(p) U C(p)...
         val seg_pred = y_order.lowerKey(seg_prime)
-        findNewEvent(seg_pred, seg_prime, sweep_point)
+        findNewEventWithLabelRestriction(seg_pred, seg_prime, sweep_point)
         val seg_prime_prime = uc.maxBy(_.value) // the highest segment in U(p) U C(p)...
         val seg_succ = y_order.higherKey(seg_prime_prime)
-        findNewEvent(seg_prime_prime, seg_succ, sweep_point)
+        findNewEventWithLabelRestriction(seg_prime_prime, seg_succ, sweep_point)
       }
     }
     intersections
@@ -394,16 +338,12 @@ object SweepLiner {
     val filename = "/home/and/RIDIR/tmp/edgesSS.wkt"
 
     val dataset = generate match {
-      case "sample"  => loadDataset2
-      case "slope"   => loadDataset3
-      case "overlap" => loadDataset4
-      case "poly"    => loadDataset5
       case "random"  => generateDataset(n, envelope_generate, length)
       case "read"    => readDataset(filename)
       case _ => loadDataset
     }
 
-    val intersections = sweepliner(dataset, debug)
+    val intersections = sweepliner2(dataset, debug)
 
     val I1 = intersections.map { i => s"$i\n" }.sorted
 

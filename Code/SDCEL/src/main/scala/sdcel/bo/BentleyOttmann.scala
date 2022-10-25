@@ -1011,6 +1011,7 @@ object Segment {
    val line: LineString = h.edge
    val lid: String = s"${label}${id}"
    val angle: Double = hangle(source, target)
+   var reversed: Boolean = false
    var value: Double = this.calculateValue(this.first.x)
    var sweep: Coordinate = new Coordinate(Double.MinValue, Double.MinValue)
    var start: Boolean = true
@@ -1142,7 +1143,9 @@ object Segment {
      val h = Half_edge(edge)
      h.id = this.h.id
 
-     Segment(h, this.label)
+     val s = Segment(h, this.label)
+     s.reversed = true
+     s
    }
 
    def intersects(that: Segment): Boolean = this.line.intersects(that.line)
