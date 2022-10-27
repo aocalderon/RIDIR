@@ -63,7 +63,7 @@ object YStructure_Tester4 extends AnyFlatSpec with should.Matchers {
       val arr = line.split("\t")
       val wkt = arr(0)
       val lab = arr(1).substring(0,1)
-      val id  = arr(3).toInt
+      val id  = arr(1).substring(1).toInt
       val l: LineString = reader.read(wkt).asInstanceOf[LineString]
       val h = Half_edge(l); h.id = id
       Segment(h, lab)

@@ -27,7 +27,29 @@ object BentleyOttmann {
   /**************************/
 
   case class SEdge(coords: Array[Coordinate], segment: Segment) extends Edge(coords)
-  def getIntersectionPoints(big_dataset: List[Segment], small_dataset: List[Segment]): List[Coordinate] = {
+
+  def getIntersectionPoints1(big_dataset: List[Segment]): List[Coordinate] = {
+    val bd_sedges = big_dataset.map { segment =>
+      val coords = Array(segment.source, segment.target)
+      SEdge(coords, segment)
+    }.asJava
+
+    val sweepline = new SimpleMCSweepLineIntersector()
+    val lineIntersector = new RobustLineIntersector()
+    val segmentIntersector = new SegmentIntersector(lineIntersector, true, true)
+    sweepline.computeIntersections(bd_sedges, bd_sedges, segmentIntersector)
+
+    val bd_intersections = bd_sedges.asScala.flatMap { sedge =>
+      sedge.getEdgeIntersectionList.iterator.asScala.map { i =>
+        val coord = i.asInstanceOf[EdgeIntersection].getCoordinate
+        coord
+      }
+    }.toList
+
+    bd_intersections.distinct
+  }
+
+  def getIntersectionPoints2(big_dataset: List[Segment], small_dataset: List[Segment]): List[Coordinate] = {
     val bd_sedges = big_dataset.map { segment =>
       val coords = Array(segment.source, segment.target)
       SEdge(coords, segment)
@@ -177,9 +199,7 @@ object BentleyOttmann {
         }
         sit_succ = succ( key(sit) )
         val sit_last: Seq_item = sit
-        if (settings.use_optimization) {
-          /* optimization, part 1  */
-        }
+
 
         // walk down
         var overlapping: Boolean = false
@@ -187,11 +207,7 @@ object BentleyOttmann {
           overlapping = false
           val s = key(sit)
           val w = last_node.get(s)
-          if (!settings.embed && s.source == original(s).source) {
-            new_edge(w, v, s)
-          } else {
-            new_edge(v, w, s)
-          }
+
           if (identical(p_sweep, s.target)) { // ending segment...
             val it = pred(key(sit))
             if (inf(it) == sit) {
@@ -265,15 +281,7 @@ object BentleyOttmann {
 
       /*** Compute new intersections and update X_structure... Start ***/
       if( sit_pred != null ) {
-        if( !settings.use_optimization ) {
-          change_inf(sit_pred, null)
-          compute_intersections(sit_pred)
-          sit = pred( key(sit_succ) )
-          if( sit != sit_pred )
-            compute_intersections(sit)
-        } else {
-          // optimization, part 2...
-        }
+
       }
       /*** Compute new intersections and update X_structure... End ***/
     }

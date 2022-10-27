@@ -13,9 +13,10 @@ import scala.collection.mutable.ArrayBuffer
 /* Case class to model global settings */
 case class Settings(
   debug: Boolean = false,
-  embed: Boolean = false,
-  use_optimization: Boolean = false,
   tolerance: Double = 1e-3,
+  appId: Int = 0,
+  tag1: String = "",
+  tag2: String = "",
   geofactory: GeometryFactory = new GeometryFactory()
 )
 
