@@ -232,7 +232,7 @@ object RangeTester1 extends AnyFlatSpec with should.Matchers {
     }
   }
 
-  private def readGeoms(filename: String, origin: Coordinate)(implicit geofactory: GeometryFactory): List[(Geometry, Double)] = {
+  private def readGeoms(filename: String, origin: Coordinate)(implicit geofactory: GeometryFactory): List[(Geometry, Double, Int)] = {
     import scala.io.Source
     import com.vividsolutions.jts.io.WKTReader
     val reader = new WKTReader(geofactory)
@@ -248,11 +248,22 @@ object RangeTester1 extends AnyFlatSpec with should.Matchers {
           case _ => geom.getGeometryN(0).asInstanceOf[Polygon].getExteriorRing
         }
 
-        (poly, geom.getCentroid.getCoordinate.distance(origin))
+        (poly, geom.getCentroid.getCoordinate.distance(origin), poly.getNumPoints)
       }.toList
     buffer.close()
 
-    geoms
+    var sum = 0
+    val list = new ListBuffer[Int]()
+    val geoms_iter = geoms.sortBy(_._2).toIterator
+    while(!geoms_iter.isEmpty){
+      val g = geoms_iter.next()
+      sum = sum + g._3
+      list.append(sum)
+    }
+    val geoms_prime = geoms.sortBy(_._2).zip(list.toList).map{ case(g, s) =>
+      (g._1, g._2, s)
+    }
+    geoms_prime
   }
   def generateDatasetsFromWKT(A: String, B: String, origin: Coordinate, sample_distance: Int, increase_distance: Int,
                               n: Int, path: String)(implicit geofactory: GeometryFactory): Unit = {
@@ -260,12 +271,12 @@ object RangeTester1 extends AnyFlatSpec with should.Matchers {
     val geomsA = readGeoms(A, origin)
     val geomsB = readGeoms(B, origin)
 
-    val sample = geomsA.filter(_._2 <= sample_distance).map(_._1)
+    val sample = geomsA.filter(_._3 <= sample_distance).map(_._1)
     val sd = getSegmentsFromGeometry(sample, "A")
     saveSegments(sd, path + "/A.wkt")
 
     (increase_distance to (increase_distance * n) by increase_distance).foreach{ x =>
-      val sample = geomsB.filter(_._2 <= x).map(_._1)
+      val sample = geomsB.filter(_._3 <= x).map(_._1)
       val bd = getSegmentsFromGeometry(sample, "B")
       saveSegments(bd, path + s"/B${x}.wkt")
     }
@@ -323,17 +334,17 @@ object RangeTester1 extends AnyFlatSpec with should.Matchers {
     val A = "/home/and/Datasets/BiasIntersections/PA/PA1.wkt"
     val B = "/home/and/Datasets/BiasIntersections/PA/PA2.wkt"
     val origin = new Coordinate(3686670, 1103563)
-    val sample_distance = 5000
-    val increase_distance = 10000
-    val n = 10
-    val path = "/home/and/RIDIR/Datasets/BiasIntersections/PA2"
-    //generateDatasetsFromWKT(A, B, origin, sample_distance, increase_distance, n, path)
+    val sample_distance = 3200
+    val increase_distance = 3200
+    val n = 7
+    val path = "/home/and/RIDIR/Datasets/BiasIntersections/PA3"
+    generateDatasetsFromWKT(A, B, origin, sample_distance, increase_distance, n, path)
 
     // Reading data...
     //val f1 = "/home/and/RIDIR/tmp/edgesBDL.wkt"
-    val f1 = "/home/and/RIDIR/Datasets/BiasIntersections/PA2/B10000.wkt"
+    val f1 = "/home/and/RIDIR/Datasets/BiasIntersections/PA2/B25K.wkt"
     //val f2 = "/home/and/RIDIR/tmp/edgesSDL.wkt"
-    val f2 = "/home/and/RIDIR/Datasets/BiasIntersections/PA2/A.wkt"
+    val f2 = "/home/and/RIDIR/Datasets/BiasIntersections/PA2/A7K.wkt"
     val big_dataset   = readSegmentsFromPolygons(filename = f1)
     val small_dataset = readSegmentsFromPolygons(filename = f2)
 

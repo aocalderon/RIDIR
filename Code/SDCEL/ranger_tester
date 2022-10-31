@@ -2,7 +2,16 @@
 
 JAR="$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar"
 LIBSPATH="$HOME/Spark/2.4/jars"
-LIBS="${LIBSPATH}/scallop_2.11-3.1.5.jar:${LIBSPATH}/scala-library-2.11.12.jar"
-CLASS="sdcel.bo.RangerTester$delayedInit$body"
+LIBS="${LIBSPATH}/geospark-1.2.0.jar:${LIBSPATH}/scallop_2.11-3.1.5.jar:${LIBSPATH}/scala-library-2.11.12.jar:${LIBSPATH}/jgrapht-core-1.4.0.jar"
+CLASS="sdcel.bo.RangeTester"
 
-scala -cp $LIBS:$JAR $CLASS 
+THE_PATH="/home/and/RIDIR/Datasets/BiasIntersections/PA2/"
+A="7K"
+BS=("25K" "67K" "104K" "133K" "158K")
+
+for N in {1..10}; do
+    for B in ${!BS[@]}; do
+	echo "scala -cp $LIBS:$JAR $CLASS --input1 ${THE_PATH}A${A}.wkt --input2 ${THE_PATH}B${BS[$B]}.wkt --tag1 $A --tag2 ${BS[$B]} --appid $N"
+	scala -cp $LIBS:$JAR $CLASS --input1 ${THE_PATH}A${A}.wkt --input2 ${THE_PATH}B${BS[$B]}.wkt --tag1 $A --tag2 ${BS[$B]} --appid $N
+    done
+done

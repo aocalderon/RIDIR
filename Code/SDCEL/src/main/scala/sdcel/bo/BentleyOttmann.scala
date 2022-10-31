@@ -29,7 +29,21 @@ object BentleyOttmann {
   case class SEdge(coords: Array[Coordinate], segment: Segment) extends Edge(coords)
 
   def getIntersectionPoints1(big_dataset: List[Segment]): List[Coordinate] = {
-    val bd_sedges = big_dataset.map { segment =>
+    val bd_sedges = big_dataset.map{ segment_prime =>
+      if (!segment_prime.isVertical) {
+        if (segment_prime.isLeftOriented) {
+          segment_prime
+        } else {
+          segment_prime.reverse
+        }
+      } else {
+        if (segment_prime.isUpwardsOriented) {
+          segment_prime
+        } else {
+          segment_prime.reverse
+        }
+      }
+    }.sortBy(_.source.x).map { segment =>
       val coords = Array(segment.source, segment.target)
       SEdge(coords, segment)
     }.asJava

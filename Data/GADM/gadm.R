@@ -1,5 +1,5 @@
 library(tidyverse)
-setwd("~/RIDIR/Data/gadm/")
+setwd("~/RIDIR/Data/GADM/")
 
 data0a = enframe(read_lines("GADM_v01.txt"), value="line")
 data0b = enframe(read_lines("GADM_v02.txt"), value="line")
@@ -40,4 +40,4 @@ p = ggplot(data3, aes(x = partitions, y = time, fill = stage)) +
   labs(x="Number of partitions", y="Time [s]", title=paste0("Performance GADM dataset (65M edges) for SDCEL computation"))
 plot(p)
 
-ggsave(paste0("gadm.pdf"), width = 8, height = 5)
+ggsave(paste0("gadm.pdf"), width = 6, height = 4)

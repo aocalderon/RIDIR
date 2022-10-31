@@ -18,36 +18,6 @@ object RangeTester {
     }
   }
 
-  case class EndPoint(point: Coordinate, segment: Segment, isStart: Boolean)
-
-  def getX_order(segments: List[Segment]): util.TreeMap[Coordinate, List[EndPoint]] = {
-    val x_order = new util.TreeMap[Coordinate, List[EndPoint]]()
-    val endpoints = segments.flatMap { segment_prime =>
-      // Segments need to be left or upwards oriented...
-      val segment = if (!segment_prime.isVertical) {
-        if (segment_prime.isLeftOriented) {
-          segment_prime
-        } else {
-          segment_prime.reverse
-        }
-      } else {
-        if (segment_prime.isUpwardsOriented) {
-          segment_prime
-        } else {
-          segment_prime.reverse
-        }
-      }
-      val a = EndPoint(segment.source, segment, isStart = true)
-      val b = EndPoint(segment.target, segment, isStart = false)
-      List(a, b)
-    }.groupBy(_.point)
-    endpoints.foreach { endpoints =>
-      val point = endpoints._1
-      x_order.put(point, endpoints._2)
-    }
-    x_order
-  }
-
   def getX_orderLeftOriented(segments: List[Segment]): List[Segment] = {
     segments.map { segment_prime =>
       // Segments need to be left or upwards oriented...
@@ -65,6 +35,10 @@ object RangeTester {
         }
       }
     }.sortBy(_.source.x)
+  }
+
+  def getX_order(segments: List[Segment]): List[Segment] = {
+    segments.sortBy(_.source.x)
   }
 
   def getX_orderBySegment(segments: List[Segment]): util.TreeMap[Coordinate, List[Segment]] = {
@@ -150,41 +124,49 @@ object RangeTester {
 
   case class Interval(range: Range, subset: List[Segment])
 
-  def extractIntervals2(dataset: List[Segment]): List[Interval] = {
+  def extractIntervals2(dataset: List[Segment])(implicit settings: Settings): List[Interval] = {
+    log(s"Sweeping11\tSTART\t0")
+    val start = System.currentTimeMillis()
     val x_order = getX_orderLeftOriented(dataset)
+    val end = System.currentTimeMillis()
+    log(s"Sweeping11\tEND\t${end - start}")
 
     @tailrec
     def getIntervals(current: Range, subset: List[Segment], segments: List[Segment], r: List[Interval]): List[Interval] = {
       segments match {
         case Nil => r :+ Interval(current, subset)
         case head :: tail =>
-          if (current.r >= head.source.x) {
-            val subset_ = subset :+ head
+          val (current_, subset_, r_) = if (current.r >= head.source.x) {
             val current_ = if (current.r >= head.target.x) current else Range(current.l, head.target.x)
-            getIntervals(current_, subset_, tail, r)
+            val subset_ = subset :+ head
+            val r_ = r
+            (current_, subset_, r_)
           } else {
-            val r_ = r :+ Interval(current, subset)
             val current_ = Range(head.source.x, head.target.x)
-            getIntervals(current_, List(head), tail, r_)
+            val subset_ = List(head)
+            val r_ = r :+ Interval(current, subset)
+            (current_, subset_, r_)
           }
+          getIntervals(current_, subset_, tail, r_)
       }
     }
 
     val first_segment = x_order.head
     val first_range = Range(first_segment.source.x, first_segment.target.x)
 
-    getIntervals(first_range, List(first_segment), x_order.tail, List.empty[Interval])
+    val intervals = getIntervals(first_range, List(first_segment), x_order.tail, List.empty[Interval])
+
+    intervals
   }
 
+  def extractInterval(dataset: List[Segment])(implicit settings: Settings): List[Interval] = {
+    val xorder = getX_order(dataset)
+    val l = xorder.head.source.x
+    val r = xorder.last.target.x
+    List(Interval(Range(l, r), dataset))
+  }
   def extractIntervals(dataset: List[Segment])(implicit settings: Settings): List[Interval] = {
     val I = extractIntervals2(dataset)
-
-    if (settings.debug) {
-      I.zipWithIndex.foreach { case (interval, i) =>
-        saveSegments(interval.subset, s"/tmp/edgesSDS$i.wkt")
-      }
-    }
-
     I
   }
 
@@ -223,7 +205,7 @@ object RangeTester {
 
   def log(msg: String)(implicit settings: Settings): Unit = {
     val now = System.currentTimeMillis
-    println(s"$now\t${settings.appId}\t${settings.tag1}\t${settings.tag2}\t$msg")
+    println(s"INFO\t$now\t${settings.appId}\t${settings.tag1}\t${settings.tag2}\t$msg")
   }
 
   def main(args: Array[String]): Unit = {
@@ -236,6 +218,7 @@ object RangeTester {
       tolerance = params.tolerance(),
       tag1 = params.tag1(),
       tag2 = params.tag2(),
+      appId = params.appid(),
       geofactory = geofactory
     )
 
@@ -246,22 +229,34 @@ object RangeTester {
     val small_dataset = readSegmentsFromPolygons(filename = f2)
 
     // Running traditional method...
-    log(s"Traditional\tSTART")
+    var start = System.currentTimeMillis()
+    log(s"Traditional\tSTART\t0")
     val bd = big_dataset ++ small_dataset
     val I1 = BentleyOttmann.getIntersectionPoints1(bd)
-    log(s"Traditional\tEND")
+    var end = System.currentTimeMillis()
+    log(s"Traditional\tEND\t${end - start}")
 
     // Running sweeping method...
-    log("Sweeping\tSTART")
-    val intervals: List[Interval] = extractIntervals(small_dataset)
+    log(s"Sweeping\tSTART\t0")
+    start = System.currentTimeMillis()
+    val intervals: List[Interval] = extractInterval(small_dataset)
+    //end = System.currentTimeMillis()
+    //log(s"Sweeping1\tEND\t${end - start}")
+    //log(s"Sweeping2\tSTART\t0")
+    //start = System.currentTimeMillis()
     val subsets = getSubsetsBySweep2(big_dataset, intervals)
+    //end = System.currentTimeMillis()
+    //log(s"Sweeping2\tEND\t${end - start}")
+    //log(s"Sweeping3\tSTART\t0")
+    //start = System.currentTimeMillis()
     val I2 = subsets.zip(intervals).map { case (bd, interval) =>
       val sd = interval.subset
       BentleyOttmann.getIntersectionPoints2(bd, sd)
     }.reduce {
       _ ++ _
     }
-    log("Sweeping\tEND")
+    end = System.currentTimeMillis()
+    log(s"Sweeping\tEND\t${end - start}")
 
     if (settings.debug) {
       save(s"/tmp/edgesINT1.wkt") {
@@ -285,11 +280,11 @@ object RangeTester {
 import org.rogach.scallop._
 class RangerParams(args: Seq[String]) extends ScallopConf(args) {
   val tolerance:   ScallopOption[Double]  = opt[Double]  (default = Some(0.001))
-  val input1:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA2/B50000.wkt"))
-  val input2:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA2/A.wkt"))
+  val input1:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA2/B133K.wkt"))
+  val input2:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA2/A7K.wkt"))
   val tag1:        ScallopOption[String]  = opt[String]  (default = Some("25K"))
   val tag2:        ScallopOption[String]  = opt[String]  (default = Some("7K"))
-  val appId:       ScallopOption[Int]     = opt[Int]     (default = Some(0))
+  val appid:       ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
   verify()
