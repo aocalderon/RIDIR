@@ -114,6 +114,19 @@ object SDCEL2 {
       (ldcelA, ma, ldcelB, mb)
     }
 
+    save(s"/tmp/nedges.tsv"){
+      ldcelA.zipPartitions(ldcelB,
+        preservesPartitioning=true){ (iterA, iterB) =>
+
+        val pid = TaskContext.getPartitionId
+        val cell = cells(pid)
+        val as = iterA.size
+        val bs = iterB.size
+
+        Iterator(s"$pid\t$as\t$bs\n")
+      }.collect
+    }
+    
     if(params.overlay()){
       // Overlay local dcels...
       settings.ooption match {
