@@ -5,4 +5,4 @@ LIBSPATH="$HOME/Spark/2.4/jars"
 LIBS="${LIBSPATH}/scallop_2.11-3.1.5.jar:${LIBSPATH}/scala-library-2.11.12.jar"
 CLASS="sdcel.bo.RangerTester$delayedInit$body"
 
-java -cp $LIBS:$JAR $CLASS 
+scala -cp $LIBS:$JAR $CLASS 
