@@ -95,6 +95,20 @@ object SDCEL2 {
       val non_emptiesB = getNonEmptyCells(edgesRDDB, "B")
       log2(s"TIME|read|$qtag")
 
+      /***/
+      save(s"/tmp/nedges.tsv"){
+        edgesRDDA.zipPartitions(edgesRDDB,
+          preservesPartitioning=true){ (iterA, iterB) =>
+
+          val pid = TaskContext.getPartitionId
+          val as = iterA.size
+          val bs = iterB.size
+
+          Iterator(s"$pid\t$as\t$bs\n")
+        }.collect
+      }
+      /***/
+
       // Creating local dcel layer A...
       val ldcelA = createLocalDCELs(edgesRDDA, "A")
       val ma = runEmptyCells(ldcelA, non_emptiesA, "A")
@@ -112,19 +126,6 @@ object SDCEL2 {
       }
 
       (ldcelA, ma, ldcelB, mb)
-    }
-
-    save(s"/tmp/nedges.tsv"){
-      ldcelA.zipPartitions(ldcelB,
-        preservesPartitioning=true){ (iterA, iterB) =>
-
-        val pid = TaskContext.getPartitionId
-        val cell = cells(pid)
-        val as = iterA.size
-        val bs = iterB.size
-
-        Iterator(s"$pid\t$as\t$bs\n")
-      }.collect
     }
     
     if(params.overlay()){
