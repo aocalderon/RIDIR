@@ -1,0 +1,21 @@
+#!/bin/bash
+
+PIDS=("05589" "11589" "18467" "12024" "04732" "05967" "18738" "16287" "10740")
+#PIDS=()
+
+PREFIXA="gadm/l3vsl2/P8000/edgesA/part-"
+SUFFIXA="-3bb47920-ca7c-43a1-b119-c13110622211-c000.txt"
+
+PREFIXB="gadm/l3vsl2/P8000/edgesB/part-"
+SUFFIXB="-4f636518-430b-47b1-9049-8829c8206a9e-c000.txt"
+
+OUTPATH="/home/acald013/tmp/test"
+
+for i in ${!PIDS[@]}
+do
+    echo "hdfs dfs -get $PREFIXA${PIDS[$i]}$SUFFIXA $OUTPATH/A$i.wkt"
+    hdfs dfs -get $PREFIXA${PIDS[$i]}$SUFFIXA $OUTPATH/A$i.wkt
+    
+    echo "hdfs dfs -get $PREFIXB${PIDS[$i]}$SUFFIXB $OUTPATH/B$i.wkt"
+    hdfs dfs -get $PREFIXB${PIDS[$i]}$SUFFIXB $OUTPATH/B$i.wkt
+done
