@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in {0..90..10}
+do
+    echo "rm -fR $i"
+    rm -fR $i
+    echo "mkdir $i"
+    mkdir $i
+done
