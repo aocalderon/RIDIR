@@ -211,16 +211,16 @@ object RangeTester {
   def run: Unit = {
     import scala.io.Source
     println("Running...")
-    val buffer = Source.fromFile("/home/and/RIDIR/tmp/f/realp.txt")
+    val buffer = Source.fromFile("/home/and/RIDIR/Code/R/nedges/pids/tester0.txt")
     val data = new util.TreeMap[Int, String]()
     buffer.getLines().zipWithIndex.foreach { case (line, i) => data.put(i, line) }
     buffer.close()
 
-    val index = (2 to 120 by 5).map { i =>
+    val index = (2 to data.size() by 5).map { i =>
       val arr = data.get(i).split("\\t")
       val t = arr(7).toDouble
       val p = arr(8).toDouble
-      val r = t * 0.1
+      val r = t * 0.05
       (i + 2, math.ceil( (p * t) + r ).toInt)
     }
 
@@ -231,7 +231,7 @@ object RangeTester {
       data.put(i, line)
     }
 
-    save("/home/and/RIDIR/tmp/f/realp2.txt") {
+    save("/home/and/RIDIR/Code/R/nedges/pids/tester1.txt") {
       data.asScala.iterator.map { case (i, line) => line + "\n" }.toList
     }
   }
@@ -283,8 +283,8 @@ object RangeTester {
       geofactory = geofactory
     )
 
-    //run
-    download
+    run
+    //download
 
     // Reading data...
     val f1 = params.input1()
