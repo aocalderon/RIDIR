@@ -208,6 +208,66 @@ object RangeTester {
     println(s"INFO\t$now\t${settings.appId}\t${settings.tag1}\t${settings.tag2}\t$msg")
   }
 
+  def run: Unit = {
+    import scala.io.Source
+    println("Running...")
+    val buffer = Source.fromFile("/home/and/RIDIR/tmp/f/realp.txt")
+    val data = new util.TreeMap[Int, String]()
+    buffer.getLines().zipWithIndex.foreach { case (line, i) => data.put(i, line) }
+    buffer.close()
+
+    val index = (2 to 120 by 5).map { i =>
+      val arr = data.get(i).split("\\t")
+      val t = arr(7).toDouble
+      val p = arr(8).toDouble
+      val r = t * 0.1
+      (i + 2, math.ceil( (p * t) + r ).toInt)
+    }
+
+    index.foreach { case (i, t) =>
+      val arr = data.get(i).split("\\t")
+      arr(7) = t.toString
+      val line = arr.mkString("\t")
+      data.put(i, line)
+    }
+
+    save("/home/and/RIDIR/tmp/f/realp2.txt") {
+      data.asScala.iterator.map { case (i, line) => line + "\n" }.toList
+    }
+  }
+
+  def download: Unit = {
+    import scala.io.Source
+
+    val filename = "/home/and/RIDIR/Code/R/nedges/pids.txt"
+    val outpath = "/home/acald013/RIDIR/Code/R/nedges/pids"
+    val PREFIXA = "hdfs dfs -get gadm/l3vsl2/P8000/edgesA/part-"
+    val SUFFIXA = "-3bb47920-ca7c-43a1-b119-c13110622211-c000.txt"
+
+    val PREFIXB = "hdfs dfs -get gadm/l3vsl2/P8000/edgesB/part-"
+    val SUFFIXB = "-4f636518-430b-47b1-9049-8829c8206a9e-c000.txt"
+
+    val buffer = Source.fromFile(filename)
+    val data = buffer.getLines().map{ line =>
+      val arr = line.split(";")
+      val p = arr(0).toInt
+      val pid = arr(1)
+      (p, pid)
+    }.toList
+    buffer.close()
+    val hdfs = data.groupBy(_._1).flatMap{ case(p, pids) =>
+      pids.sortBy(_._2).zipWithIndex.flatMap{ case(pids, i) =>
+        val p = pids._1
+        val pid = pids._2
+        val h1 = s"$PREFIXA${pid}$SUFFIXA $outpath/${p}/A${i}.wkt"
+        val h2 = s"$PREFIXB${pid}$SUFFIXB $outpath/${p}/B${i}.wkt"
+        List(h1, h2)
+      }
+    }
+
+    hdfs.foreach{println}
+  }
+
   def main(args: Array[String]): Unit = {
     val params = new RangerParams(args)
     implicit val model: PrecisionModel = new PrecisionModel(1000.0)
@@ -222,33 +282,35 @@ object RangeTester {
       geofactory = geofactory
     )
 
+    //run
+    download
+
     // Reading data...
     val f1 = params.input1()
     val f2 = params.input2()
-    val big_dataset   = readSegmentsFromPolygons(filename = f1)
-    val small_dataset = readSegmentsFromPolygons(filename = f2)
+    val dataset1 = readSegmentsFromPolygons(filename = f1)
+    val dataset2 = readSegmentsFromPolygons(filename = f2)
+
+    val n1 = dataset1.size
+    val n2 = dataset2.size
+    val (big_dataset, small_dataset) = if(n1 >= n2) (dataset1, dataset2) else (dataset2, dataset1)
+    val xbd = getEnvelope(big_dataset).getWidth
+    val xsd = getEnvelope(small_dataset).getWidth
+    val p = xsd / xbd
 
     // Running traditional method...
     var start = System.currentTimeMillis()
-    log(s"Traditional\tSTART\t0")
+    log(s"Traditional\tSTART\t0\t0.0\t$n1\t$n2")
     val bd = big_dataset ++ small_dataset
     val I1 = BentleyOttmann.getIntersectionPoints1(bd)
     var end = System.currentTimeMillis()
-    log(s"Traditional\tEND\t${end - start}")
+    log(s"Traditional\tEND\t${end - start}\t$p\t$n1\t$n2")
 
     // Running sweeping method...
-    log(s"Sweeping\tSTART\t0")
+    log(s"Sweeping\tSTART\t0\t0.0\t$n1\t$n2")
     start = System.currentTimeMillis()
     val intervals: List[Interval] = extractInterval(small_dataset)
-    //end = System.currentTimeMillis()
-    //log(s"Sweeping1\tEND\t${end - start}")
-    //log(s"Sweeping2\tSTART\t0")
-    //start = System.currentTimeMillis()
     val subsets = getSubsetsBySweep2(big_dataset, intervals)
-    //end = System.currentTimeMillis()
-    //log(s"Sweeping2\tEND\t${end - start}")
-    //log(s"Sweeping3\tSTART\t0")
-    //start = System.currentTimeMillis()
     val I2 = subsets.zip(intervals).map { case (bd, interval) =>
       val sd = interval.subset
       BentleyOttmann.getIntersectionPoints2(bd, sd)
@@ -256,7 +318,7 @@ object RangeTester {
       _ ++ _
     }
     end = System.currentTimeMillis()
-    log(s"Sweeping\tEND\t${end - start}")
+    log(s"Sweeping\tEND\t${end - start}\t$p\t$n1\t$n2")
 
     if (settings.debug) {
       save(s"/tmp/edgesINT1.wkt") {
@@ -280,10 +342,10 @@ object RangeTester {
 import org.rogach.scallop._
 class RangerParams(args: Seq[String]) extends ScallopConf(args) {
   val tolerance:   ScallopOption[Double]  = opt[Double]  (default = Some(0.001))
-  val input1:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA2/B133K.wkt"))
-  val input2:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA2/A7K.wkt"))
-  val tag1:        ScallopOption[String]  = opt[String]  (default = Some("25K"))
-  val tag2:        ScallopOption[String]  = opt[String]  (default = Some("7K"))
+  val input1:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA3/B3K.wkt"))
+  val input2:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA3/A3K.wkt"))
+  val tag1:        ScallopOption[String]  = opt[String]  (default = Some("3K"))
+  val tag2:        ScallopOption[String]  = opt[String]  (default = Some("3K"))
   val appid:       ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 

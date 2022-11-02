@@ -37,7 +37,7 @@ write_tsv(data3, "gadm.tsv")
 p = ggplot(data3, aes(x = partitions, y = time, fill = stage)) + 
   geom_col(width = 0.7, position="dodge") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x="Number of partitions", y="Time [s]", title=paste0("Performance GADM dataset (65M edges) for SDCEL computation"))
+  labs(x="Number of partitions", y="Time [s]", title=paste0("Performance GADM dataset for SDCEL computation"))
 plot(p)
 
 ggsave(paste0("gadm.pdf"), width = 6, height = 4)

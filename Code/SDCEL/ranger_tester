@@ -12,6 +12,6 @@ BS=("25K" "67K" "104K" "133K" "158K")
 for N in {1..10}; do
     for B in ${!BS[@]}; do
 	echo "scala -cp $LIBS:$JAR $CLASS --input1 ${THE_PATH}A${A}.wkt --input2 ${THE_PATH}B${BS[$B]}.wkt --tag1 $A --tag2 ${BS[$B]} --appid $N"
-	scala -cp $LIBS:$JAR $CLASS --input1 ${THE_PATH}A${A}.wkt --input2 ${THE_PATH}B${BS[$B]}.wkt --tag1 $A --tag2 ${BS[$B]} --appid $N
+	#scala -cp $LIBS:$JAR $CLASS --input1 ${THE_PATH}A${A}.wkt --input2 ${THE_PATH}B${BS[$B]}.wkt --tag1 $A --tag2 ${BS[$B]} --appid $N
     done
 done
