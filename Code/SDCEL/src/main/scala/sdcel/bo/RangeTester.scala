@@ -259,13 +259,14 @@ object RangeTester {
       pids.sortBy(_._2).zipWithIndex.flatMap{ case(pids, i) =>
         val p = pids._1
         val pid = pids._2
-        val h1 = s"$PREFIXA${pid}$SUFFIXA $outpath/${p}/A${i}.wkt"
-        val h2 = s"$PREFIXB${pid}$SUFFIXB $outpath/${p}/B${i}.wkt"
+        val h1 = s"$PREFIXA${pid}$SUFFIXA $outpath/${p}/A${i}.wkt\n"
+        val h2 = s"$PREFIXB${pid}$SUFFIXB $outpath/${p}/B${i}.wkt\n"
         List(h1, h2)
       }
+    }.toList
+    save("/home/and/RIDIR/Code/R/nedges/pids.sh") {
+      hdfs
     }
-
-    hdfs.foreach{println}
   }
 
   def main(args: Array[String]): Unit = {
