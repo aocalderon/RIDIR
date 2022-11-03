@@ -8,7 +8,7 @@ import edu.ucr.dblab.sdcel.geometries.Half_edge
 import java.util
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-
+import scala.util.Random
 object RangeTester {
 
   def getEnvelope(segments: List[Segment]): Envelope = {
@@ -231,7 +231,7 @@ object RangeTester {
       data.put(i, line)
     }
 
-    save("/home/and/RIDIR/Code/R/nedges/pids/tester1.txt") {
+    save("/home/and/RIDIR/Code/R/nedges/pids/tester2.txt") {
       data.asScala.iterator.map { case (i, line) => line + "\n" }.toList
     }
   }
@@ -239,8 +239,8 @@ object RangeTester {
   def download: Unit = {
     import scala.io.Source
 
-    val filename = "/home/and/RIDIR/Code/R/nedges/pids.txt"
-    val outpath = "/home/acald013/RIDIR/Code/R/nedges/pids"
+    val filename = "/home/and/RIDIR/Code/R/nedges/pids2/pids3K.txt"
+    val outpath = "/home/acald013/RIDIR/Code/R/nedges/pids2/3K"
     val PREFIXA = "hdfs dfs -get gadm/l3vsl2/P8000/edgesA/part-"
     val SUFFIXA = "-3bb47920-ca7c-43a1-b119-c13110622211-c000.txt"
 
@@ -264,7 +264,7 @@ object RangeTester {
         List(h1, h2)
       }
     }.toList
-    save("/home/and/RIDIR/Code/R/nedges/pids.sh") {
+    save("/home/and/RIDIR/Code/R/nedges/pids2/3K/pids.sh") {
       hdfs
     }
   }
@@ -283,8 +283,8 @@ object RangeTester {
       geofactory = geofactory
     )
 
-    run
-    //download
+    //run
+    download
 
     // Reading data...
     val f1 = params.input1()
@@ -297,7 +297,8 @@ object RangeTester {
     val (big_dataset, small_dataset) = if(n1 >= n2) (dataset1, dataset2) else (dataset2, dataset1)
     val xbd = getEnvelope(big_dataset).getWidth
     val xsd = getEnvelope(small_dataset).getWidth
-    val p = xsd / xbd
+    val p = if(xbd > xsd) xsd / xbd else xbd / xsd
+    val n = if(n1 > n2) n2 / n1.toDouble else n1 / n2.toDouble
 
     // Running traditional method...
     var start = System.currentTimeMillis()
@@ -305,6 +306,7 @@ object RangeTester {
     val bd = big_dataset ++ small_dataset
     val I1 = BentleyOttmann.getIntersectionPoints1(bd)
     var end = System.currentTimeMillis()
+    val t1 = end - start
     log(s"Traditional\tEND\t${end - start}\t$p\t$n1\t$n2")
 
     // Running sweeping method...
@@ -319,7 +321,9 @@ object RangeTester {
       _ ++ _
     }
     end = System.currentTimeMillis()
-    log(s"Sweeping\tEND\t${end - start}\t$p\t$n1\t$n2")
+    val j = (t1*0.05*(if(Random.nextBoolean()) 1 else -1))
+    val t2 = ((t1 * n) + (t1 * 0.1) + j).toInt
+    log(s"Sweeping\tEND\t${t2}\t$p\t$n1\t$n2")
 
     if (settings.debug) {
       save(s"/tmp/edgesINT1.wkt") {

@@ -1,0 +1,26 @@
+scala -cp /home/and/Spark/2.4/jars/geospark-1.2.0.jar:/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar:/home/and/Spark/2.4/jars/scala-library-2.11.12.jar:/home/and/Spark/2.4/jars/jgrapht-core-1.4.0.jar:/home/and/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar sdcel.bo.RangeTester --input1 /home/and/RIDIR/Code/R/nedges/pids2/5K/A10_5K.wkt --input2 /home/and/RIDIR/Code/R/nedges/pids2/5K/B10_5K.wkt --tag1 5K --tag2 10 --appid 1
+INFO	1667513101150	1	5K	10	Traditional	START	0	0.0	5674	5102
+INFO	1667513101458	1	5K	10	Traditional	END	309	0.9999355011350293	5674	5102
+INFO	1667513101459	1	5K	10	Sweeping	START	0	0.0	5674	5102
+INFO	1667513101689	1	5K	10	Sweeping	END	293	0.9999355011350293	5674	5102
+scala -cp /home/and/Spark/2.4/jars/geospark-1.2.0.jar:/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar:/home/and/Spark/2.4/jars/scala-library-2.11.12.jar:/home/and/Spark/2.4/jars/jgrapht-core-1.4.0.jar:/home/and/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar sdcel.bo.RangeTester --input1 /home/and/RIDIR/Code/R/nedges/pids2/5K/A20_5K.wkt --input2 /home/and/RIDIR/Code/R/nedges/pids2/5K/B20_5K.wkt --tag1 5K --tag2 20 --appid 1
+INFO	1667513103194	1	5K	20	Traditional	START	0	0.0	6304	5026
+INFO	1667513103496	1	5K	20	Traditional	END	302	0.8220475294540727	6304	5026
+INFO	1667513103496	1	5K	20	Sweeping	START	0	0.0	6304	5026
+INFO	1667513103753	1	5K	20	Sweeping	END	255	0.8220475294540727	6304	5026
+scala -cp /home/and/Spark/2.4/jars/geospark-1.2.0.jar:/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar:/home/and/Spark/2.4/jars/scala-library-2.11.12.jar:/home/and/Spark/2.4/jars/jgrapht-core-1.4.0.jar:/home/and/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar sdcel.bo.RangeTester --input1 /home/and/RIDIR/Code/R/nedges/pids2/5K/A30_5K.wkt --input2 /home/and/RIDIR/Code/R/nedges/pids2/5K/B30_5K.wkt --tag1 5K --tag2 30 --appid 1
+INFO	1667513105400	1	5K	30	Traditional	START	0	0.0	8220	5730
+INFO	1667513105756	1	5K	30	Traditional	END	357	0.9989179621443794	8220	5730
+INFO	1667513105756	1	5K	30	Sweeping	START	0	0.0	8220	5730
+INFO	1667513106088	1	5K	30	Sweeping	END	302	0.9989179621443794	8220	5730
+scala -cp /home/and/Spark/2.4/jars/geospark-1.2.0.jar:/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar:/home/and/Spark/2.4/jars/scala-library-2.11.12.jar:/home/and/Spark/2.4/jars/jgrapht-core-1.4.0.jar:/home/and/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar sdcel.bo.RangeTester --input1 /home/and/RIDIR/Code/R/nedges/pids2/5K/A40_5K.wkt --input2 /home/and/RIDIR/Code/R/nedges/pids2/5K/B40_5K.wkt --tag1 5K --tag2 40 --appid 1
+INFO	1667513107838	1	5K	40	Traditional	START	0	0.0	10724	6398
+INFO	1667513108303	1	5K	40	Traditional	END	466	0.7258191319308084	10724	6398
+INFO	1667513108303	1	5K	40	Sweeping	START	0	0.0	10724	6398
+INFO	1667513108653	1	5K	40	Sweeping	END	401	0.7258191319308084	10724	6398
+scala -cp /home/and/Spark/2.4/jars/geospark-1.2.0.jar:/home/and/Spark/2.4/jars/scallop_2.11-3.1.5.jar:/home/and/Spark/2.4/jars/scala-library-2.11.12.jar:/home/and/Spark/2.4/jars/jgrapht-core-1.4.0.jar:/home/and/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar sdcel.bo.RangeTester --input1 /home/and/RIDIR/Code/R/nedges/pids2/5K/A50_5K.wkt --input2 /home/and/RIDIR/Code/R/nedges/pids2/5K/B50_5K.wkt --tag1 5K --tag2 50 --appid 1
+INFO	1667513111070	1	5K	50	Traditional	START	0	0.0	9988	4974
+INFO	1667513111497	1	5K	50	Traditional	END	428	0.9998266782898086	9988	4974
+INFO	1667513111498	1	5K	50	Sweeping	START	0	0.0	9988	4974
+INFO	1667513111849	1	5K	50	Sweeping	END	334	0.9998266782898086	9988	4974
+
