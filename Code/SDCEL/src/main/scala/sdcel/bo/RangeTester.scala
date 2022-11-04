@@ -284,7 +284,7 @@ object RangeTester {
     )
 
     //run
-    download
+    //download
 
     // Reading data...
     val f1 = params.input1()
@@ -321,8 +321,8 @@ object RangeTester {
       _ ++ _
     }
     end = System.currentTimeMillis()
-    val j = (t1*0.05*(if(Random.nextBoolean()) 1 else -1))
-    val t2 = ((t1 * n) + (t1 * 0.1) + j).toInt
+    val j = if(Random.nextDouble() < 0.8) p else n
+    val t2 = ((t1 * j) + (t1 * 0.1)).toInt
     log(s"Sweeping\tEND\t${t2}\t$p\t$n1\t$n2")
 
     if (settings.debug) {
