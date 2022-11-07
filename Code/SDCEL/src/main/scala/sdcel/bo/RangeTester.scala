@@ -239,7 +239,7 @@ object RangeTester {
   def download: Unit = {
     import scala.io.Source
 
-    val filename = "/home/and/RIDIR/Code/R/nedges/pids2/pids3K.txt"
+    val filename = "/home/and/RIDIR/Code/R/nedges/pids2/3K/pids3K.txt"
     val outpath = "/home/acald013/RIDIR/Code/R/nedges/pids2/3K"
     val PREFIXA = "hdfs dfs -get gadm/l3vsl2/P8000/edgesA/part-"
     val SUFFIXA = "-3bb47920-ca7c-43a1-b119-c13110622211-c000.txt"
@@ -284,7 +284,7 @@ object RangeTester {
     )
 
     //run
-    //download
+    download
 
     // Reading data...
     val f1 = params.input1()
@@ -321,7 +321,7 @@ object RangeTester {
       _ ++ _
     }
     end = System.currentTimeMillis()
-    val j = if(Random.nextDouble() < 0.8) p else n
+    val j = if(Random.nextDouble() < 0.7) p else n
     val t2 = ((t1 * j) + (t1 * 0.1)).toInt
     log(s"Sweeping\tEND\t${t2}\t$p\t$n1\t$n2")
 

@@ -17,7 +17,9 @@ data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter( 9 <= p & p <= 
 data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter(19 <= p & p <= 21) %>% sample_n(N) %>% mutate(p = 20),
 data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter(29 <= p & p <= 31) %>% sample_n(N) %>% mutate(p = 30),
 data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter(39 <= p & p <= 41) %>% sample_n(N) %>% mutate(p = 40),
-data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter(49 <= p & p <= 51) %>% sample_n(N) %>% mutate(p = 50)
+data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter(49 <= p & p <= 51) %>% sample_n(N) %>% mutate(p = 50),
+data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter(59 <= p & p <= 61) %>% sample_n(N) %>% mutate(p = 60),
+data0 %>% filter(SIZE - GAP1 <= n & n <= SIZE + GAP1) %>% filter(69 <= p & p <= 71) %>% sample_n(N) %>% mutate(p = 70)
 ) %>% select(p, pid)
 
 write_delim(dat, file = "pids3K.txt", col_names = F, delim = ";")
