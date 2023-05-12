@@ -17,6 +17,7 @@ case class Settings(
   appId: Int = 0,
   tag1: String = "",
   tag2: String = "",
+  perc: Double = 10,
   geofactory: GeometryFactory = new GeometryFactory()
 )
 

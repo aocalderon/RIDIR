@@ -22,11 +22,14 @@ data3 = data2 %>%
 
 write_tsv(data3, "GADM_speedup.tsv")
 
-p = ggplot(data3, aes(x = nodes, y = time)) + 
+data4 = read_tsv("GADM_speedup_v01.tsv")
+stage.labs <- c("Layer A", "Layer B", "Overlay")
+names(stage.labs) <- c("layer1", "layer2","overlay")
+p = ggplot(data4, aes(x = as.factor(nodes), y = time)) + 
   geom_col(width = 0.7, position="dodge") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x="Number of nodes", y="Time [s]", title=paste0("Speed up for GADM dataset")) +
-  facet_wrap(~ stage)
+  labs(x="Number of nodes", y="Time [s]") +
+  facet_wrap(~ stage, labeller = labeller(stage = stage.labs))
 plot(p)
 
 ggsave(paste0("GADM_speedup.pdf"), width = 8, height = 5)
