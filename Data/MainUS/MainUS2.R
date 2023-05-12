@@ -21,16 +21,34 @@ data2 = data1 %>%
   add_column(size = "MainUS")
 
 data3 = data2 %>%
-  group_by(partitions, stage, size) %>% summarise(time = mean(time)) 
+  group_by(partitions, stage, size) %>% summarise(time = mean(time)) %>%
+  mutate(partitions = as.factor(partitions)) %>%
+  mutate(partitions = recode(partitions,
+                             "1000"  = "1K",
+                             "2000"  = "2K",
+                             "3000"  = "3K",
+                             "4000"  = "4K",
+                             "5000" = "5K",
+                             "6000" = "6K",
+                             "7000" = "7K",
+                             "8000" = "8K",
+                             "9000" = "9K",
+                             "10000" = "10K",
+                             "11000" = "11K",
+                             "12000" = "12K",
+                             "13000" = "13K",
+                             "14000" = "14K",
+                             "15000" = "15K"))
 
 write_tsv(data3, "MainUS.tsv")
 
 p = ggplot(data3, aes(x = partitions, y = time, fill = stage)) + 
   geom_col(width = 0.7) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_fill_discrete(labels=c('Layer A', 'Layer B', 'Overlay')) +
   labs(x="Number of cells", y="Time [s]") +
   guides(fill=guide_legend(title="Stages"))
 plot(p)
 
+W = as.numeric(Sys.getenv("R_WIDTH"))
+H = as.numeric(Sys.getenv("R_HEIGHT"))
 ggsave(paste0("MainUS2.pdf"), width = 6, height = 4)

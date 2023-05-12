@@ -27,9 +27,10 @@ stage.labs <- c("Layer A", "Layer B", "Overlay")
 names(stage.labs) <- c("layer1", "layer2","overlay")
 p = ggplot(data4, aes(x = as.factor(nodes), y = time)) + 
   geom_col(width = 0.7, position="dodge") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(x="Number of nodes", y="Time [s]") +
   facet_wrap(~ stage, labeller = labeller(stage = stage.labs))
 plot(p)
 
-ggsave(paste0("GADM_speedup.pdf"), width = 8, height = 5)
+W = as.numeric(Sys.getenv("R_WIDTH"))
+H = as.numeric(Sys.getenv("R_HEIGHT"))
+ggsave(paste0("GADM_speedup.pdf"), width = W, height = H)

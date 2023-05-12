@@ -30,16 +30,32 @@ data3 = data2 %>%
            partitions != 5000 & partitions != 7000 & 
            partitions != 9000 & partitions != 28000 &
            partitions != 30000
-         )
+         ) %>%
+  mutate(partitions = as.factor(partitions)) %>%
+  mutate(partitions = recode(partitions,
+         "2000"  = "2K",
+         "4000"  = "4K",
+         "6000"  = "6K",
+         "8000"  = "8K",
+         "10000" = "10K",
+         "12000" = "12K",
+         "14000" = "14K",
+         "16000" = "16K",
+         "18000" = "18K",
+         "20000" = "20K",
+         "22000" = "22K",
+         "24000" = "24K",
+         "26000" = "26K"))
 
 write_tsv(data3, "gadm.tsv")
 
 p = ggplot(data3, aes(x = partitions, y = time, fill = stage)) + 
   geom_col(width = 0.7) + 
   scale_fill_discrete(labels=c('Layer A', 'Layer B', 'Overlay')) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(x="Number of cells", y="Time [s]") +
   guides(fill=guide_legend(title="Stages"))
 plot(p)
 
-ggsave(paste0("GADM2.pdf"), width = 6, height = 4)
+W = as.numeric(Sys.getenv("R_WIDTH"))
+H = as.numeric(Sys.getenv("R_HEIGHT"))
+ggsave(paste0("GADM2.pdf"), width = W, height = H)

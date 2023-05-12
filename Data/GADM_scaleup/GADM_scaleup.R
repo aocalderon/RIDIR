@@ -1,7 +1,7 @@
 library(tidyverse)
 setwd("~/RIDIR/Data/GADM_scaleup/")
 
-data0 = enframe(read_lines("GADM_scaleup_v04.txt"), value="line")
+data0 = enframe(read_lines("GADM_scaleup_v01.txt"), value="line")
 
 data1 = data0 %>%
   filter(str_detect(line, 'TIME')) 
@@ -29,11 +29,10 @@ stage.labs <- c("Layer A", "Layer B", "Overlay")
 names(stage.labs) <- c("layer1", "layer2","overlay")
 p = ggplot(data3, aes(x = size, y = time)) + 
   geom_col(width = 0.7, position="dodge") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(x="Size [number of edges]", y="Time [s]") +
   facet_wrap(~ stage, labeller = labeller(stage = stage.labs))
 plot(p)
 
 W = as.numeric(Sys.getenv("R_WIDTH"))
 H = as.numeric(Sys.getenv("R_HEIGHT"))
-ggsave(paste0("GADM_scaleup.pdf"), width = 8, height = 5)
+ggsave(paste0("GADM_scaleup.pdf"), width = W, height = H)
