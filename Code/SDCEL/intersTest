@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-N=$1
-R=$2
-for r in $(seq 1 $R)
-do
-    echo "./tester edu.ucr.dblab.debug.BO2 \"--n $N --runid $r\""
-    ./tester edu.ucr.dblab.debug.BO2 "--n $N --runid $r"
-done
