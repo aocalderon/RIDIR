@@ -280,11 +280,12 @@ object RangeTester {
       tag1 = params.tag1(),
       tag2 = params.tag2(),
       appId = params.appid(),
+      perc = params.perc(),
       geofactory = geofactory
     )
 
     //run
-    download
+    //download
 
     // Reading data...
     val f1 = params.input1()
@@ -351,6 +352,7 @@ class RangerParams(args: Seq[String]) extends ScallopConf(args) {
   val input2:      ScallopOption[String]  = opt[String]  (default = Some("/home/and/RIDIR/Datasets/BiasIntersections/PA3/A3K.wkt"))
   val tag1:        ScallopOption[String]  = opt[String]  (default = Some("3K"))
   val tag2:        ScallopOption[String]  = opt[String]  (default = Some("3K"))
+  val perc:        ScallopOption[Double]  = opt[Double]  (default = Some(10))
   val appid:       ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 

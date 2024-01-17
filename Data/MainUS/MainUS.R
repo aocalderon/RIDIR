@@ -28,7 +28,9 @@ write_tsv(data3, "MainUS.tsv")
 p = ggplot(data3, aes(x = partitions, y = time, fill = stage)) + 
   geom_col(width = 0.7, position="dodge") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x="Number of partitions", y="Time [s]", title=paste0("Performance MainUS dataset for SDCEL computation"))
+  scale_fill_discrete(labels=c('Layer A', 'Layer B', 'Overlay')) +
+  labs(x="Number of cells", y="Time [s]") +
+  guides(fill=guide_legend(title="Stages"))
 plot(p)
 
 ggsave(paste0("MainUS.pdf"), width = 6, height = 4)

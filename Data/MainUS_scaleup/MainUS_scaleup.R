@@ -25,11 +25,14 @@ data3 = data2 %>%
 
 write_tsv(data3, "MainUS_scaleup.tsv")
 
+stage.labs <- c("Layer A", "Layer B", "Overlay")
+names(stage.labs) <- c("layer1", "layer2","overlay")
 p = ggplot(data3, aes(x = size, y = time)) + 
   geom_col(width = 0.7, position="dodge") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x="Size [number of edges]", y="Time [s]", title=paste0("Scale up for MainUS dataset")) +
-  facet_wrap(~ stage)
+  labs(x="Size [number of edges]", y="Time [s]") +
+  facet_wrap(~ stage, labeller = labeller(stage = stage.labs))
 plot(p)
 
-ggsave(paste0("MainUS_scaleup.pdf"), width = 4, height = 2.5)
+W = as.numeric(Sys.getenv("R_WIDTH"))
+H = as.numeric(Sys.getenv("R_HEIGHT"))
+ggsave(paste0("MainUS_scaleup.pdf"), width = W, height = H)
