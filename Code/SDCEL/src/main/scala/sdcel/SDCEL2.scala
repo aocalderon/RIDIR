@@ -91,22 +91,32 @@ object SDCEL2 {
       val non_emptiesB = getNonEmptyCells(edgesRDDB, "B")
       log2(s"TIME|read|$qtag")
 
-      /***/
-      save(s"/tmp/nedges.tsv"){
-        edgesRDDA.zipPartitions(edgesRDDB,
-          preservesPartitioning=true){ (iterA, iterB) =>
-
-          val pid = TaskContext.getPartitionId
-          val as = iterA.size
-          val bs = iterB.size
-
-          Iterator(s"$pid\t$as\t$bs\n")
-        }.collect
+      if(params.debug()){
+        save("/tmp/edgesRDDA.wkt"){
+          edgesRDDA.map{ edge =>
+            val wkt = edge.toText
+            s"$wkt\n"
+          }.collect
+        }
+        save("/tmp/edgesRDDB.wkt"){
+          edgesRDDB.map{ edge =>
+            val wkt = edge.toText
+            s"$wkt\n"
+          }.collect
+        }
       }
-      /***/
 
       // Creating local dcel layer A...
       val ldcelA = createLocalDCELs(edgesRDDA, "A")
+      if(params.debug()){
+        save("edgesA.wkt"){
+          ldcelA.map{ case(hedge, label, envelope, polygon) =>
+            val wkt = hedge.wkt
+
+            s"$wkt\t$label\n"
+          }.collect
+        }
+      }
       val ma = runEmptyCells(ldcelA, non_emptiesA, "A")
       log2(s"TIME|layer1|$qtag")
       if(params.savesdcel()){
@@ -115,6 +125,15 @@ object SDCEL2 {
 
       // Creating local dcel layer B...
       val ldcelB = createLocalDCELs(edgesRDDB, "B")
+      if(params.debug()){
+        save("edgesB.wkt"){
+          ldcelB.map{ case(hedge, label, envelope, polygon) =>
+            val wkt = hedge.wkt
+
+            s"$wkt\t$label\n"
+          }.collect
+        }
+      }
       val mb = runEmptyCells(ldcelB, non_emptiesB, "B")
       log2(s"TIME|layer2|$qtag")
       if(params.savesdcel()){
