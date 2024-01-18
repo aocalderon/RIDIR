@@ -1,20 +1,16 @@
 package edu.ucr.dblab.sdcel
 
-import org.apache.spark.serializer.KryoSerializer
-import org.apache.spark.sql.{SparkSession, SaveMode}
-import org.apache.spark.storage.StorageLevel
-import org.apache.spark.TaskContext
-
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
-import org.slf4j.{Logger, LoggerFactory}
-import ch.cern.sparkmeasure.TaskMetrics
-
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getNonEmptyCells, runEmptyCells}
-import edu.ucr.dblab.sdcel.PartitionReader.{readQuadtree, readEdges}
+import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import edu.ucr.dblab.sdcel.DCELOverlay2.{overlay, overlayByLevel, overlayMaster}
-import edu.ucr.dblab.sdcel.Utils.{Tick, Settings, save, saveSDCEL, loadSDCEL, log, log2, logger}
 import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
+import edu.ucr.dblab.sdcel.PartitionReader.{readEdges, readQuadtree}
+import edu.ucr.dblab.sdcel.Utils.{Settings, Tick, loadSDCEL, log, log2, save, saveSDCEL}
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getNonEmptyCells, runEmptyCells}
+import org.apache.spark.TaskContext
+import org.apache.spark.serializer.KryoSerializer
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.storage.StorageLevel
+import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 
 object SDCEL2 {
   def main(args: Array[String]) = {
