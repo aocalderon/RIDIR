@@ -16,7 +16,6 @@ import collection.JavaConverters._
 
 import PartitionReader._
 import edu.ucr.dblab.sdcel.DCELBuilder2.save
-import edu.ucr.dblab.sdcel.PolygonChecker2._
 import edu.ucr.dblab.sdcel.geometries.Cell
 import edu.ucr.dblab.sdcel.quadtree.Quadtree
 

@@ -6,7 +6,6 @@ import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
 import edu.ucr.dblab.sdcel.PartitionReader.{readEdges, readQuadtree}
 import edu.ucr.dblab.sdcel.Utils.{Settings, Tick, loadSDCEL, log, log2, save, saveSDCEL}
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getNonEmptyCells, runEmptyCells}
-import org.apache.spark.TaskContext
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel

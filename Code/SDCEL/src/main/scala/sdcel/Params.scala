@@ -4,7 +4,7 @@ import org.rogach.scallop._
 
 class Params(args: Seq[String]) extends ScallopConf(args) {
   val tolerance:   ScallopOption[Double]  = opt[Double]  (default = Some(0.001))
-  val scale:       ScallopOption[Double]  = opt[Double]  (default = Some(0.001))
+  val scale:       ScallopOption[Double]  = opt[Double]  (default = Some(1000))
   val input1:      ScallopOption[String]  = opt[String]  (default = Some(""))
   val input2:      ScallopOption[String]  = opt[String]  (default = Some(""))
   val quadtree:    ScallopOption[String]  = opt[String]  (default = Some(""))
@@ -13,6 +13,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val readid:      ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val partitions:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
   val partition:   ScallopOption[Int]     = opt[Int]     (default = Some(0))
+  val master:      ScallopOption[String]  = opt[String]  (default = Some("local[4]"))
 
   val fraction:    ScallopOption[Double]  = opt[Double]  (default = Some(0.01))
   val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
@@ -22,7 +23,6 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val debug:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val loadsdcel:   ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val savesdcel:   ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
-  val notmerge:    ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
   val overlay:     ScallopOption[Boolean] = opt[Boolean] (default = Some(true))
   val ooption:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val olevel:      ScallopOption[Int]     = opt[Int]     (default = Some(4))

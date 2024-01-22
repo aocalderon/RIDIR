@@ -1,22 +1,16 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{ GeometryFactory, PrecisionModel }
-import com.vividsolutions.jts.geom.{ Geometry, Envelope, Coordinate }
-import com.vividsolutions.jts.geom.{ Polygon, LineString, Point }
-import com.vividsolutions.jts.io.WKTReader
-import com.vividsolutions.jts.geomgraph.Edge
-
-import org.apache.spark.sql.{ SparkSession, Dataset, Row, functions, SaveMode }
-import org.apache.spark.rdd.RDD
-import org.apache.spark.storage.StorageLevel
-import org.apache.spark.{ TaskContext, SparkEnv }
-
 import ch.cern.sparkmeasure.TaskMetrics
-import org.slf4j.{ Logger, LoggerFactory }
-
-import edu.ucr.dblab.sdcel.geometries.{ Half_edge, Cell, EdgeData }
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{ getFaces, EmptyCell }
-import DCELMerger2.{groupByNextMBRPoly}
+import com.vividsolutions.jts.geom.{Envelope, GeometryFactory, Polygon}
+import com.vividsolutions.jts.io.WKTReader
+import edu.ucr.dblab.sdcel.DCELMerger2.groupByNextMBRPoly
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getFaces}
+import edu.ucr.dblab.sdcel.geometries.{Cell, Half_edge}
+import org.apache.spark.{SparkConf, SparkEnv}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql._
+import org.apache.spark.storage.StorageLevel
+import org.slf4j.{Logger, LoggerFactory}
 
 object Utils {
   //** Implicits
@@ -169,6 +163,41 @@ object Utils {
     val scale = Math.pow(10, decimals)
     Math.round(number * scale) / scale
   }
+
+  def printParams(implicit S: Settings): Unit = {
+    val command: String = System.getProperty("sun.java.command")
+    if (S.debug) {
+      log(s"INFO|command=$command")
+      log(s"INFO|tolerance=${S.tolerance}")
+      log(s"INFO|overlay_option=${S.ooption}")
+      log(s"INFO|overlay_level=${S.olevel}")
+      log(s"INFO|local=${S.local}")
+      log(s"INFO|appId=${S.appId}")
+      log(s"INFO|persistance=${S.persistance}")
+    }
+  }
+
+  def getSettings(implicit params: Params, spark: SparkSession ): Settings = {
+    implicit val conf: SparkConf = spark.sparkContext.getConf
+    val applicationId = conf.get("spark.app.id")
+
+    Settings(
+      tolerance = params.tolerance(),
+      debug = params.debug(),
+      local = params.local(),
+      ooption = params.ooption(),
+      olevel = params.olevel(),
+      appId = applicationId,
+      persistance = params.persistance() match {
+        case 0 => StorageLevel.NONE
+        case 1 => StorageLevel.MEMORY_ONLY
+        case 2 => StorageLevel.MEMORY_ONLY_SER
+        case 3 => StorageLevel.MEMORY_ONLY_2
+        case 4 => StorageLevel.MEMORY_ONLY_SER_2
+      }
+    )
+  }
+
 
   import Numeric.Implicits._
   def mean[T: Numeric](xs: Iterable[T]): Double = xs.sum.toDouble / xs.size
