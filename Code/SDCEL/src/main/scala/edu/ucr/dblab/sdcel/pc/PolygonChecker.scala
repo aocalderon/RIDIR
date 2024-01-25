@@ -3,7 +3,14 @@ package edu.ucr.dblab.sdcel.pc
 import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, Polygon, PrecisionModel}
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.Utils.save
+import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
+import org.datasyslab.geospark.enums.GridType
+import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
+import org.datasyslab.geospark.spatialOperator.JoinQuery
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
+
+import scala.collection.JavaConverters._
 
 object PolygonChecker {
 
@@ -57,7 +64,11 @@ object PolygonChecker {
   }
   def main(args: Array[String]): Unit = {
     implicit val G: GeometryFactory = new GeometryFactory(new PrecisionModel(100000))
-    implicit val spark: SparkSession = SparkSession.builder().master("local[1]").getOrCreate()
+    implicit val spark: SparkSession = SparkSession.builder()
+      .master("local[8]")
+      .config("spark.serializer",classOf[KryoSerializer].getName)
+      .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
+      .getOrCreate()
     import spark.implicits._
 
     //readOriginalPolygons("/home/acald013/Downloads/polygons.csv", "/home/acald013/Datasets/PolygonsDDCEL.wkt")
@@ -86,6 +97,26 @@ object PolygonChecker {
 
         s"$wkt\t$id\t$isSimple\t$isValid\n"
       }.collect
+    }
+
+    val polygonsRDD = new SpatialRDD[Polygon]()
+    polygonsRDD.setRawSpatialRDD(polygons.filter(_.isValid))
+    polygonsRDD.analyze()
+    polygonsRDD.spatialPartitioning(GridType.QUADTREE, 128)
+
+    try {
+      val join_results = JoinQuery.SpatialJoinQuery(polygonsRDD, polygonsRDD, false, false)
+
+      val overlaped = join_results.rdd.filter { case (a, bb) =>
+        bb.asScala.exists { b =>
+          a.overlaps(b)
+        }
+      }
+
+      println(s"Overlapped polygons: ${overlaped.count()}")
+    } catch {
+      case te: com.vividsolutions.jts.geom.TopologyException =>
+        println(s"Invalid polygon: ${te.getMessage} [${te.getCoordinate}]")
     }
 
     spark.close
