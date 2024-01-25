@@ -65,16 +65,18 @@ object PolygonChecker {
   def main(args: Array[String]): Unit = {
     implicit val G: GeometryFactory = new GeometryFactory(new PrecisionModel(100000))
     implicit val spark: SparkSession = SparkSession.builder()
-      .master("local[8]")
+      .master("local[3]")
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
     import spark.implicits._
 
-    //readOriginalPolygons("/home/acald013/Downloads/polygons.csv", "/home/acald013/Datasets/PolygonsDDCEL.wkt")
+    val home = sys.env("HOME")
+
+    //readOriginalPolygons(s"${home}/Downloads/polygons.csv", s"${home}/Datasets/PolygonsDDCEL.wkt")
 
     val polygons = spark.read.option("header", false).option("delimiter", "\t")
-      .csv("/home/acald013/Datasets/PolygonsDDCEL.wkt")
+      .csv(s"${home}/Datasets/PolygonsDDCEL.wkt")
       .rdd
       .mapPartitions{ rows =>
         val reader = new WKTReader(G)
@@ -86,8 +88,8 @@ object PolygonChecker {
           poly.setUserData(id)
           poly
         }
-      }
-    save("/tmp/edgesP2.wkt"){
+      }.filter(_.isValid)
+    save("/tmp/edgesPV.wkt"){
       polygons.map{ poly =>
         val wkt = poly.toText
         val  id = poly.getUserData.asInstanceOf[Int]
