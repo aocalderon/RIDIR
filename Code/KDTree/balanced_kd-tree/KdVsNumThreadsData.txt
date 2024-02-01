@@ -1,0 +1,7 @@
+# T_N = number of threads
+# S_N = sum of execution time
+T_N	S_N
+1	67.0
+2	37.0
+4	24.0
+8	23.0
