@@ -530,6 +530,8 @@ class KdTreeSingleThread {
 	 */
 	public static void main(String[] args) {
 
+
+
 		// Declare the coordinates array of three-dimensional points and define (x,y,z) coordinates.  This array
 		// may store points of any number of dimensions because he KdNode.buildKdTree method obtains the number of
 		// dimensions from references.length = coordinates[0].length.
@@ -539,7 +541,8 @@ class KdTreeSingleThread {
 				{3,4,5}, {1,6,8}, {9,5,3}, {2,1,3}, {8,7,6},
 				{5,4,2}, {6,3,1}, {8,7,6}, {9,6,7}, {2,1,3},
 				{7,2,6}, {4,7,9}, {1,6,8}, {3,4,5}, {9,4,1} };
-		
+
+
 		// Build the k-d tree.
 		KdNode root = KdNode.createKdTree(coordinates);
 

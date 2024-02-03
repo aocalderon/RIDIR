@@ -156,7 +156,7 @@ object PolygonChecker {
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
 
-    readOriginalPolygons(s"$home/Downloads/polygons.csv", s"$home/Datasets/PolygonsDDCEL.wkt")
+    readOriginalPolygons(s"$home/Datasets/polygons.csv", s"$home/Datasets/PolygonsDDCEL.wkt")
 
     extractValidPolygons(s"$home/Datasets/PolygonsDDCEL.wkt", s"$home/Datasets/PolygonsDDCEL_valids.wkt")
 

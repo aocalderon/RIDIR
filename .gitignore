@@ -13,6 +13,15 @@
 
 Code/SDCEL/.idea/*
 
+Code/KDTree/balanced_kd-tree/.idea/*
+Code/KDTree/balanced_kd-tree/balanced_kd-tree.iml
+Code/KDTree/balanced_kd-tree/out/*
+Code/KDTree/k-d_tree/.bsp/*
+Code/KDTree/k-d_tree/.idea/*
+Code/KDTree/k-d_tree/project/*
+Code/KDTree/k-d_tree/target/*
+
+
 Code/CGAL/DCEL/Makefile
 Code/CGAL/DCEL/CMakeFiles/*
 Code/CGAL/DCEL/dcel
