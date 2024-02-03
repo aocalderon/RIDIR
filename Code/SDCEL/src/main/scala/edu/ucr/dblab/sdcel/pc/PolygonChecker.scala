@@ -22,62 +22,68 @@ object PolygonChecker {
         val reader = new WKTReader(G)
         rows.map { row =>
           val geom = reader.read(row.getString(0)).asInstanceOf[Polygon]
-          geom.setUserData(row.getString(1).toInt)
+          geom.setUserData(row.getString(1).toLong)
           geom
         }
       }
   }
-  def readOriginalPolygons(input: String, output: String)(implicit spark: SparkSession, G: GeometryFactory): Unit = {
-    import spark.implicits._
+  private def formatRDD(polygons: RDD[Polygon]): Array[String] = {
+    polygons.map { polygon =>
+      val wkt = polygon.toText
+      val id = getPolygonId(polygon)
+
+      s"$wkt\t$id\n"
+    }.collect
+  }
+
+  private def getPolygonId(p: Polygon): Long = p.getUserData.asInstanceOf[Long]
+
+  private def readOriginalPolygons(input: String, output: String)(implicit spark: SparkSession, G: GeometryFactory): Unit = {
 
     val data = spark.read.option("header", value = false).csv(input)
-    println(data.count)
+    println(s"Number of original polygons: ${data.count}")
 
     val null_point = G.createPoint(new Coordinate(0.0, 0.0))
     val null_envelope = null_point.getEnvelopeInternal
     null_envelope.expandBy(1.0)
     val null_geom = G.toGeometry(null_envelope)
 
-    val geometries = data.rdd.zipWithUniqueId().mapPartitions{ lines =>
+    val geometries = data.rdd.mapPartitions{ lines =>
       val reader: WKTReader = new WKTReader(G)
-      lines.map{ case(row, index) =>
+      lines.map{ row =>
         try{
-          val id = row.getString(0).toInt
+          val id = row.getString(0).toLong
           val wkt = row.getString(1)
           val geom = reader.read(wkt)
           geom.setUserData(id)
           geom
         } catch {
           case e1: java.lang.Exception =>
-            println(s"$index: ${row.getString(0)} ${row.getString(1)}")
-            println(s"Error1: ${e1.getMessage}")
+            println(s"[Error 1] ${row.getString(0)}: ${row.getString(1)} (${e1.getMessage})")
             null_geom
           case e2: com.vividsolutions.jts.io.ParseException =>
-            println(s"$index: ${row.getString(0)} ${row.getString(1)}")
-            println(s"Error2: ${e2.getMessage}")
+            println(s"[Error 2] ${row.getString(0)}: ${row.getString(1)} (${e2.getMessage})")
             null_geom
         }
       }
-    }.filter(_.getCentroid != null_point.getCentroid)
-
-    geometries.take(10).foreach(println)
+    }.filter(_.getCentroid != null_point.getCentroid).zipWithUniqueId().map{ case(geom, index) =>
+      geom.setUserData(index)
+      geom
+    }
 
     val result = geometries.map{ geom =>
       val wkt = geom.toText
-      val  id = geom.getUserData.toString
+      val  id = geom.getUserData.asInstanceOf[Long]
 
       s"$wkt\t$id\n"
     }
-
-    result.toDF.show()
 
     save(output){
       result.collect()
     }
   }
 
-  def extractValidPoligons(input: String, output: String)(implicit spark: SparkSession, G: GeometryFactory): Unit = {
-    import spark.implicits._
+  private def extractValidPolygons(input: String, output: String)(implicit spark: SparkSession, G: GeometryFactory): Unit = {
 
     val polygons = spark.read.option("header", value = false).option("delimiter", "\t")
       .csv(input)
@@ -86,69 +92,75 @@ object PolygonChecker {
         val reader = new WKTReader(G)
         rows.map{ row =>
           val wkt = row.getString(0)
-          val  id = row.getString(1).toInt
+          val  id = row.getString(1).toLong
 
           val poly = reader.read(wkt).asInstanceOf[Polygon]
           poly.setUserData(id)
           poly
         }
-      }.filter(_.isValid)
-    save(output){
-      polygons.map{ poly =>
-        val wkt = poly.toText
-        val  id = poly.getUserData.asInstanceOf[Int]
+      }
 
-        s"$wkt\t$id\n"
-      }.collect
+    save("/tmp/edgesInvalids.wkt"){
+      val invalids = polygons.filter(!_.isValid).cache
+      println(s"Number of invalid polygons: ${invalids.count()}")
+      formatRDD( invalids )
+    }
+    save(output){
+      formatRDD( polygons.filter(_.isValid) )
     }
   }
+
+  private def extractOverlappedPolygons(input: String, output: String)(implicit spark: SparkSession, G: GeometryFactory): Unit = {
+
+    val polygons = readPolygons(input)
+    val polygonsRDD = new SpatialRDD[Polygon]()
+    polygonsRDD.setRawSpatialRDD(polygons)
+    polygonsRDD.analyze()
+    polygonsRDD.spatialPartitioning(GridType.QUADTREE, 64)
+
+    case class OverlapInfo(pid: Long, wkt: String, overlaps: List[Long]){
+      def toText: String = s"$wkt\t$pid\t${overlaps.mkString(", ")}\n"
+
+    }
+    val overlaps = JoinQuery.SpatialJoinQuery(polygonsRDD, polygonsRDD, false, true)
+      .rdd
+      .map { case (a, bb) =>
+        val  id = getPolygonId(a)
+        val wkt = a.toText
+        val ove = bb.asScala.filter{ b => a.overlaps(b) }.map{ b => getPolygonId(b) }.toList
+
+        OverlapInfo(id, wkt, ove)
+      }.filter( _.overlaps.nonEmpty ).cache
+
+    println(s"Number of overlapped polygons: ${overlaps.count}")
+
+    save("/tmp/edgesOverlaps.wkt"){
+      overlaps.map(_.toText).collect()
+    }
+
+    val overlapped_set = overlaps.map(_.pid).collect().sorted.toList
+    val clean = polygons.filter{ polygon => !overlapped_set.contains( getPolygonId(polygon) ) }
+
+    save(output){
+      formatRDD( clean )
+    }
+  }
+
   def main(args: Array[String]): Unit = {
     val home = sys.env("HOME")
-    implicit val G: GeometryFactory = new GeometryFactory(new PrecisionModel(100000))
+    val tolerance: Double = 1e-6
+    implicit val G: GeometryFactory = new GeometryFactory(new PrecisionModel(1/tolerance))
     implicit val spark: SparkSession = SparkSession.builder()
       .master("local[*]")
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
 
-    //readOriginalPolygons(s"$home/Downloads/polygons.csv", s"$home/Datasets/PolygonsDDCEL.wkt")
-    //extractValidPoligons(s"$home/Datasets/PolygonsDDCEL.wkt", s"$home/Datasets/PolygonsDDCEL_valids.wkt")
+    readOriginalPolygons(s"$home/Downloads/polygons.csv", s"$home/Datasets/PolygonsDDCEL.wkt")
 
-    val polygons = readPolygons(s"$home/Datasets/PolygonsDDCEL_valids.wkt")
-    val polygonsRDD = new SpatialRDD[Polygon]()
-    polygonsRDD.setRawSpatialRDD(polygons)
-    polygonsRDD.analyze()
-    polygonsRDD.spatialPartitioning(GridType.QUADTREE, 64)
+    extractValidPolygons(s"$home/Datasets/PolygonsDDCEL.wkt", s"$home/Datasets/PolygonsDDCEL_valids.wkt")
 
-    val join_results = JoinQuery.SpatialJoinQueryFlat(polygonsRDD, polygonsRDD, false, true)
-
-    val overlapped_ids = join_results.rdd.map { case (a, b) =>
-      val aId = a.getUserData.asInstanceOf[Int]
-      val bId = b.getUserData.asInstanceOf[Int]
-      val ove = a.overlaps(b)
-      (aId, bId, ove)
-    }.filter(_._3).filter { case (a, b, _) => a < b }.flatMap{ case(a, b, _) => List(a, b) }.distinct()
-
-    val o = overlapped_ids.count
-    println(s"Number of polygons involved: $o")
-
-    import spark.implicits._
-    val wkts = polygons.map{ poly =>
-      val wkt = poly.toText
-      val  id = poly.getUserData.asInstanceOf[Int]
-
-      (id, wkt)
-    }.toDF("id", "wkt")
-
-    val ids = overlapped_ids.toDF("id")
-
-    val overlaps = wkts.join(ids, wkts("id") === ids("id")).select($"wkt")
-
-    overlaps.show()
-
-    save("/tmp/edgesO.wkt"){
-      overlaps.map(_.getString(0) + "\n").collectAsList().asScala
-    }
+    extractOverlappedPolygons(s"$home/Datasets/PolygonsDDCEL_valids.wkt", s"$home/Datasets/PolygonsDDCEL_valids_no-overlap.wkt")
 
     spark.close
   }
