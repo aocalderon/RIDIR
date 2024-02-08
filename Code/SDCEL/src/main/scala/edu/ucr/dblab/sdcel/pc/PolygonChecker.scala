@@ -1,8 +1,9 @@
 package edu.ucr.dblab.sdcel.pc
 
-import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, Polygon, PrecisionModel}
+import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.Utils.save
+import edu.ucr.dblab.sdcel.kdtree.KDBTree
 import org.apache.spark.rdd.RDD
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
@@ -12,6 +13,7 @@ import org.datasyslab.geospark.spatialOperator.JoinQuery
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 
 import scala.collection.JavaConverters._
+import scala.io.Source
 
 object PolygonChecker {
 
@@ -156,11 +158,42 @@ object PolygonChecker {
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
 
-    readOriginalPolygons(s"$home/Datasets/polygons.csv", s"$home/Datasets/PolygonsDDCEL.wkt")
+    //readOriginalPolygons(s"$home/Datasets/polygons.csv", s"$home/Datasets/PolygonsDDCEL.wkt")
 
-    extractValidPolygons(s"$home/Datasets/PolygonsDDCEL.wkt", s"$home/Datasets/PolygonsDDCEL_valids.wkt")
+    //extractValidPolygons(s"$home/Datasets/PolygonsDDCEL.wkt", s"$home/Datasets/PolygonsDDCEL_valids.wkt")
 
-    extractOverlappedPolygons(s"$home/Datasets/PolygonsDDCEL_valids.wkt", s"$home/Datasets/PolygonsDDCEL_valids_no-overlap.wkt")
+    //extractOverlappedPolygons(s"$home/Datasets/PolygonsDDCEL_valids.wkt", s"$home/Datasets/PolygonsDDCEL_valids_no-overlap.wkt")
+
+    val envelope = new Envelope(0, 5000, 0, 5000)
+    val k = new KDBTree(100, 8, envelope)
+    val buffer = Source.fromFile(s"$home/RIDIR/Datasets/sample5K.tsv")
+    val coords = buffer.getLines().map{ _.split("\t").map(_.toInt) }.toList
+    buffer.close()
+
+    val points = coords.zipWithIndex.map{ case(coord, i) =>
+      val x = coord(0)
+      val y = coord(1)
+
+      val point = G.createPoint(new Coordinate(x, y))
+      point.setUserData(i)
+
+      point
+    }
+
+    points.foreach{ point =>
+      k.insert(point.getEnvelopeInternal)
+    }
+
+    k.assignLeafIds()
+    save("/tmp/edgesK.wkt") {
+      k.findLeafNodes(envelope).asScala.map { e =>
+        val wkt = G.toGeometry(e.getExtent).toText
+        val lid = e.getLeafId
+        val   n = e.getItemCount
+
+        s"$wkt\t$lid\t$n\n"
+      }
+    }
 
     spark.close
   }

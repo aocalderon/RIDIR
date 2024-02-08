@@ -319,7 +319,7 @@ public class KdTreeSingleThread {
          * @param depth - the depth in the k-d tree
          * @return the number of nodes in the k-d tree
          */
-        private int verifyKdTree(final int depth) {
+        public int verifyKdTree(final int depth) {
 
             if (point == null) {
                 throw new RuntimeException("point is null");
@@ -487,7 +487,7 @@ public class KdTreeSingleThread {
             for (int i = 0; i < depth; i++) {
                 System.out.print("         ");
             }
-            printTuple(point);
+            printTuple(point, verifyKdTree(depth));
             System.out.println();
             if (ltChild != null) {
                 ltChild.printKdTree(depth+1);
@@ -501,7 +501,7 @@ public class KdTreeSingleThread {
          *
          * @param p - the tuple
          */
-        public static void printTuple(final int[] p) {
+        public static void printTuple(final int[] p, final int count) {
             System.out.print("(");
             for (int i = 0; i < p.length; i++) {
                 System.out.print(p[i]);
@@ -509,7 +509,7 @@ public class KdTreeSingleThread {
                     System.out.print(", ");
                 }
             }
-            System.out.print(")");
+            System.out.print(")" + "[" + count + "]");
         }
     }
 
@@ -543,13 +543,13 @@ public class KdTreeSingleThread {
         int[] query = new int[] {4, 3, 1};
         List<KdNode> kdNodes = root.searchKdTree(query, maximumSearchDistance, 0);
         System.out.print("\n" + kdNodes.size() + " nodes within " + maximumSearchDistance + " units of ");
-        KdNode.printTuple(query);
+        KdNode.printTuple(query, 0);
         System.out.println(" in all dimensions.\n");
         if ( !kdNodes.isEmpty() ) {
             System.out.println("List of k-d nodes within " + maximumSearchDistance + "-unit search distance follows:\n");
             for (int i = 0; i < kdNodes.size(); i++) {
                 KdNode node = kdNodes.get(i);
-                KdNode.printTuple(node.point);
+                KdNode.printTuple(node.point, 0);
                 if (i < kdNodes.size() - 1) {
                     System.out.print("  ");
                 }
