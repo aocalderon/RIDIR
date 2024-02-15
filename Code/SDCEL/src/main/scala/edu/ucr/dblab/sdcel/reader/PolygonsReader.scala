@@ -58,12 +58,10 @@ object PolygonsReader {
     val quadtree = new StandardQuadTree[LineString](study_area, 0, params.maxentries(), 10) // study area, level, max items, max level...
     val sample = edgesRDD.sample(withReplacement = false, params.fraction(), 42).collect() // replacement, sample size, random seed...+
     val nSample = sample.length
-    println(s"Sample: $nSample")
     sample.foreach{ edge =>
       quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
     }
     val n = quadtree.getLeafZones.size()
-    println(s"Size: $n")
     quadtree.assignPartitionIds()
     quadtree.assignPartitionLineage()
     val cells = getCells(quadtree)
