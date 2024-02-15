@@ -18,7 +18,6 @@ object PolygonsReader {
       .config("spark.serializer", classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
-    import spark.implicits._
     val params = new Params(args)
     implicit val S: Settings = Settings(
       tolerance = params.tolerance(),
