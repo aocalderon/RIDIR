@@ -68,8 +68,8 @@ public class StandardQuadTree<T> implements Serializable {
         this.maxLevel = maxLevel;
         this.zone = definition;
         this.level = level;
-	this.epsilon = 0.0;
-	this.factor = 4;
+	    this.epsilon = 0.0;
+	    this.factor = 4;
     }
 
     public StandardQuadTree(QuadRectangle definition, int level, int maxItemsPerZone, int maxLevel, double epsilon, int factor)
@@ -78,8 +78,8 @@ public class StandardQuadTree<T> implements Serializable {
         this.maxLevel = maxLevel;
         this.zone = definition;
         this.level = level;
-	this.epsilon = epsilon;
-	this.factor = factor;
+	    this.epsilon = epsilon;
+	    this.factor = factor;
     }
 
     public StandardQuadTree<T>[] getRegions(){

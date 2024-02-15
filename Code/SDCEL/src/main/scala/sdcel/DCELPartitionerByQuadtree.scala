@@ -1,25 +1,14 @@
 package edu.ucr.dblab.sdcel
 
-import scala.collection.JavaConverters._
-import com.vividsolutions.jts.geom.{Coordinate, Envelope}
-import com.vividsolutions.jts.geom.{LineString, Polygon}
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.io.WKTReader
-import com.vividsolutions.jts.algorithm.CGAlgorithms
-import org.apache.spark.{SparkContext, SparkConf}
+import com.vividsolutions.jts.geom.{GeometryFactory, LineString, PrecisionModel}
+import edu.ucr.dblab.sdcel.DCELPartitioner2.{read, read2, saveToHDFSWithCrossingInfo}
+import edu.ucr.dblab.sdcel.PartitionReader.readQuadtree
+import edu.ucr.dblab.sdcel.Utils._
+import edu.ucr.dblab.sdcel.quadtree._
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.rdd.RDD
-import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
-
-import edu.ucr.dblab.sdcel.quadtree._
-
-import DCELPartitioner2.{read, read2, saveToHDFSWithCrossingInfo}
-import PartitionReader.readQuadtree
-import Utils._
 
 object DCELPartitionerByQuadtree {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")

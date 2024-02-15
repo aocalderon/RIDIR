@@ -62,7 +62,7 @@ public class QuadtreePartitioning implements Serializable
         // Make sure the tree doesn't get too deep in case of data skew
         int maxLevel = partitions;
         int maxItemsPerNode = samples.size() / partitions;
-        partitionTree = new StandardQuadTree(new QuadRectangle(boundary),
+        partitionTree = new StandardQuadTree(new edu.ucr.dblab.sdcel.quadtree.QuadRectangle(boundary),
 					     0,
 					     maxItemsPerNode,
 					     maxLevel,
@@ -73,7 +73,7 @@ public class QuadtreePartitioning implements Serializable
         }
 
         for (final Envelope sample : samples) {
-            partitionTree.insert(new QuadRectangle(sample), null);
+            partitionTree.insert(new edu.ucr.dblab.sdcel.quadtree.QuadRectangle(sample), null);
         }
 
         partitionTree.assignPartitionIds();

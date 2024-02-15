@@ -16,7 +16,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val master:      ScallopOption[String]  = opt[String]  (default = Some("local[4]"))
 
   val fraction:    ScallopOption[Double]  = opt[Double]  (default = Some(0.01))
-  val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(16))
+  val maxentries:  ScallopOption[Int]     = opt[Int]     (default = Some(100))
   val maxlevel:    ScallopOption[Int]     = opt[Int]     (default = Some(8))
 
   val local:       ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
