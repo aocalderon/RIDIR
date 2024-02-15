@@ -1,0 +1,138 @@
+\documentclass{beamer}
+
+\usefonttheme{professionalfonts} % using non standard fonts for beamer
+\usefonttheme{serif} % default family is serif
+
+%\usepackage{hyperref}
+
+%\usepackage{minted}
+
+\usepackage{animate}
+
+\usepackage{graphicx}
+
+\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+
+\usepackage{color}
+
+\usepackage{tikz}
+
+\usepackage{amssymb}
+
+\usepackage{enumerate}
+
+
+\newcommand\blfootnote[1]{%
+
+  \begingroup
+
+  \renewcommand\thefootnote{}\footnote{#1}%
+
+  \addtocounter{footnote}{-1}%
+
+  \endgroup
+
+}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+
+ % this default might be overridden by plain title style
+
+ \newcommand\makebeamertitle{\frame{\maketitle}}%
+
+ % (ERT) argument for the TOC
+
+ \AtBeginDocument{%
+
+   \let\origtableofcontents=\tableofcontents
+
+   \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+
+   \def\gobbletableofcontents#1{\origtableofcontents}
+
+ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+\usetheme{Malmoe}
+
+% or ...
+
+\useoutertheme{infolines}
+
+\addtobeamertemplate{headline}{}{\vskip2pt}
+
+
+
+\setbeamercovered{transparent}
+
+% or whatever (possibly just delete it)
+
+\makeatother
+
+\begin{document}
+\title[SDCEL report]{Geoinformatica paper extension}
+\author[AC]{}
+\institute[UCR]{University of California, Riverside}
+\makebeamertitle
+\newif\iflattersubsect
+
+% \AtBeginSection[] {
+%   \begin{frame}<beamer>
+%     \frametitle{Outline} 
+%     \tableofcontents[currentsection]  
+%   \end{frame}
+%   \lattersubsectfalse
+% }
+
+\AtBeginSubsection[] {
+  \begin{frame}<beamer>
+    \frametitle{Outline} 
+    \tableofcontents[currentsubsection]  
+  \end{frame}
+}
+
+\begin{frame}{So far...}
+  \begin{itemize}
+    \item Removing invalid and overlapping polygons.  Fixing precision error.
+    \item Done with code and pipeline compatibility.
+    \item Tested new implementation of k-d tree.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{So far...}
+  \begin{itemize}
+    \item Found a quite interesting paper and implementation of balanced k-d tree:
+    \begin{itemize}
+      \item \textit{Russell A. Brown, Building a Balanced k-d Tree in O(kn log n) Time, Journal of Computer Graphics Techniques (JCGT), vol. 4, no. 1, 50-68,   
+2015 
+Available online \url{http://jcgt.org/published/0004/01/03/}}
+    \end{itemize}
+
+    \item However during integration it arises two important issues:
+    \begin{itemize}
+      \item Some how I have to generate contiguos regions that represent the bounds of the leaves in the tree...
+      \item \textbf{During partitioning just a sample of the data is used.  At that point we do not know if a partition could be unbalanced...}
+    \end{itemize}
+
+  \end{itemize}
+\end{frame}
+
+
+%\begin{frame}{Some invalids polygons...}
+%    \centering 
+    %\includegraphics[width=0.8\textwidth]{figures/artifact02}
+%\end{frame}
+
+
+\begin{frame}{What's next...}
+  \begin{itemize}
+    \item Explore how to take advantage of interval finding at partition level...
+    \item Work on cell boundaries from points in leaves...
+  \end{itemize}
+\end{frame}
+
+
+\end{document}
