@@ -144,6 +144,8 @@ object Utils {
     logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
   }
 
+  def debug[R](block: => R)(implicit S: Settings): Unit = { if(S.debug) block }
+
   def clocktime = System.currentTimeMillis()
 
   def getPhaseMetrics(metrics: TaskMetrics, phaseName: String)(implicit settings: Settings): Dataset[Row] = {

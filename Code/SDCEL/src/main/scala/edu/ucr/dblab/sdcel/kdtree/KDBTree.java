@@ -20,10 +20,7 @@ package edu.ucr.dblab.sdcel.kdtree;
 import com.vividsolutions.jts.geom.Envelope;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * see https://en.wikipedia.org/wiki/K-D-B-tree
@@ -76,7 +73,9 @@ public class KDBTree
         } else {
             if (children == null) {
                 // Split over longer side
-                boolean splitX = extent.getWidth() > extent.getHeight();
+                double  width = extent.getWidth();
+                double height = extent.getHeight();
+                boolean splitX = width > height;
                 boolean ok = split(splitX);
                 if (!ok) {
                     // Try spitting by the other side
@@ -107,6 +106,20 @@ public class KDBTree
                 return true;
             }
         });
+    }
+
+    public Map<Integer, Envelope> getLeaves(){
+        final Map<Integer, Envelope> matches = new HashMap<>();
+        traverse(new Visitor() {
+            @Override
+            public boolean visit(KDBTree tree) {
+                if (tree.isLeaf()) {
+                    matches.put(tree.getLeafId(), tree.getExtent());
+                }
+                return true;
+            }
+        });
+        return matches;
     }
 
     public List<KDBTree> findLeafNodes(final Envelope envelope) {
