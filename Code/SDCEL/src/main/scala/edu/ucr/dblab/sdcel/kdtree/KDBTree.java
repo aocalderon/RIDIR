@@ -33,18 +33,23 @@ public class KDBTree
     private final Envelope extent;
     private final int level;
     private final List<Envelope> items = new ArrayList<>();
+    private final List<Envelope> sorted_items;
     private KDBTree[] children;
     private int leafId = 0;
 
     public KDBTree(int maxItemsPerNode, int maxLevels, Envelope extent) {
-        this(maxItemsPerNode, maxLevels, 0, extent);
+        this(maxItemsPerNode, maxLevels, 0, extent, new ArrayList<Envelope>());
     }
 
-    private KDBTree(int maxItemsPerNode, int maxLevels, int level, Envelope extent) {
+    public KDBTree(int maxItemsPerNode, int maxLevels, Envelope extent, List<Envelope> intervals) {
+        this(maxItemsPerNode, maxLevels, 0, extent, intervals);
+    }
+    private KDBTree(int maxItemsPerNode, int maxLevels, int level, Envelope extent, List<Envelope> intervals) {
         this.maxItemsPerNode = maxItemsPerNode;
         this.maxLevels = maxLevels;
         this.level = level;
         this.extent = extent;
+        this.sorted_items = intervals;
     }
 
     public int getItemCount() {
@@ -122,6 +127,25 @@ public class KDBTree
         return matches;
     }
 
+    public Map<Integer, List<Double>> getIntervals(){
+        final Map<Integer, List<Double>> matches = new HashMap<>();
+        traverse(tree -> {
+            if (tree.isLeaf()) {
+                //int id = tree.getLeafId();
+                int id = 0;
+                ArrayList<Double> xs = new ArrayList<>();
+                for(Envelope env: sorted_items){
+                    xs.add(env.getMinX());
+                    xs.add(env.getMaxX());
+                }
+                System.out.println(id + "\t" + tree.level + "\t" + xs.toString());
+                matches.put(id, xs);
+            }
+            return true;
+        });
+        return matches;
+    }
+
     public List<KDBTree> findLeafNodes(final Envelope envelope) {
         final List<KDBTree> matches = new ArrayList<>();
         traverse(new Visitor() {
@@ -190,9 +214,15 @@ public class KDBTree
         final Comparator<Envelope> comparator = splitX ? new XComparator() : new YComparator();
         Collections.sort(items, comparator);
 
+        List<Envelope> sorted = new ArrayList<>();
+        for(Envelope e: items){
+            sorted.add(new Envelope(e.getMinX(), e.getMinY(), 0, 0));
+        }
+
         final Envelope[] splits;
         final Splitter splitter;
-        Envelope middleItem = items.get((int) Math.floor(items.size() / 2));
+        int middle = (int) Math.floor(items.size() / 2);
+        Envelope middleItem = items.get(middle);
         if (splitX) {
             double x = middleItem.getMinX();
             if (x > extent.getMinX() && x < extent.getMaxX()) {
@@ -214,8 +244,13 @@ public class KDBTree
         }
 
         children = new KDBTree[2];
-        children[0] = new KDBTree(maxItemsPerNode, maxLevels, level + 1, splits[0]);
-        children[1] = new KDBTree(maxItemsPerNode, maxLevels, level + 1, splits[1]);
+        children[0] = new KDBTree(maxItemsPerNode, maxLevels, level + 1, splits[0], items.subList(0, middle));
+        children[1] = new KDBTree(maxItemsPerNode, maxLevels, level + 1, splits[1], items.subList(middle, items.size()));
+
+        /*
+        * Split intervals...
+        */
+
 
         // Move items
         splitItems(splitter);

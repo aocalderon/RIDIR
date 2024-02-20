@@ -263,8 +263,8 @@ object DCELPartitioner2 {
     }
   }
  
-  def saveToHDFSWithCrossingInfo(edges: RDD[LineString], cells: Map[Int, Cell],
-    name: String)(implicit spark: SparkSession, geofactory: GeometryFactory, settings: Settings): Unit = {
+  def saveToHDFSWithCrossingInfo(edges: RDD[LineString], cells: Map[Int, Cell], name: String)
+                                (implicit spark: SparkSession, geofactory: GeometryFactory, settings: Settings): Unit = {
     import spark.implicits._
 
     edges.mapPartitionsWithIndex{ (pid, edgesIt) =>

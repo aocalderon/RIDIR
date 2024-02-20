@@ -1,6 +1,6 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, PrecisionModel}
+import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, PrecisionModel}
 import edu.ucr.dblab.sdcel.Utils.{Settings, debug, log, save}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree
 import edu.ucr.dblab.sdcel.reader.PR_Utils.{getStudyArea, read}
@@ -8,14 +8,14 @@ import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.JavaConverters.{asScalaBufferConverter, mapAsScalaMapConverter}
 import scala.util.Random
 
 object KdtreeRunner {
   def main(args: Array[String]): Unit = {
     // Starting session...
     implicit val spark: SparkSession = SparkSession.builder()
-      .master("local[*]")
+      .master("local[3]")
       .config("spark.serializer", classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
@@ -32,7 +32,7 @@ object KdtreeRunner {
     implicit val G: GeometryFactory = new GeometryFactory(model)
     log("TIME|Start")
 
-
+/*
     // Reading data...
     val edgesRDDA = read(params.input1())
     val nEdgesRDDA = edgesRDDA.count()
@@ -59,11 +59,13 @@ object KdtreeRunner {
       }
     }
 
-    val n = edgesRDD.count.toInt
     val tree: KDBTree = new KDBTree(params.maxentries(), params.maxlevel(), study_area)
-    val sample = edgesRDD.flatMap{_.getCoordinates.map( c => (Random.nextInt(n), G.createPoint(c)) )}.sortBy(_._1).map(_._2).collect()
-    for(p <- sample) {
-      tree.insert(p.getEnvelopeInternal)
+    val sample = edgesRDD.sample(withReplacement = false, params.fraction(), 42).map(edge => {
+      val i = Random.nextLong()
+      (i, edge)
+    }).sortBy(_._1).map(_._2).collect
+    for(edge <- sample) {
+      tree.insert(edge.getEnvelopeInternal)
     }
     tree.assignLeafIds()
 
@@ -77,41 +79,47 @@ object KdtreeRunner {
       }
     }
 
+ */
 
-    val tree2: KDBTree = new KDBTree(16, 16, study_area)
-    val x0 = study_area.getMinX
-    val y0 = study_area.getMinY
-    val w = study_area.getWidth
-    val h = study_area.getHeight
-
-    val points = (0 until 1000).map{ i =>
-      val x = x0 + Random.nextDouble() * w
-      val y = y0 + Random.nextDouble() * h
+    val W = 10
+    val H = 10
+    val n = 20
+    val points = for(i <- 0 until n) yield {
+      val x = Random.nextInt(W)
+      val y = Random.nextInt(H)
       val p = G.createPoint(new Coordinate(x, y))
       p.setUserData(i)
       p
     }
-    save("/tmp/edgesP.wkt"){
-      points.map{_.toText + "\n"}
-    }
+    save("/tmp/edgesS.wkt"){
+      points.map{ point =>
+        val wkt = point.toText
+        val  id = point.getUserData.asInstanceOf[Int]
 
-    for(point <- points) {
-      //println(point.getUserData.toString)
-      tree2.insert(point.getEnvelopeInternal)
-    }
-    tree2.assignLeafIds()
-
-    debug {
-      save("/tmp/edgesCells2.wkt") {
-        tree2.findLeafNodes(study_area).asScala.map { node =>
-          val wkt = G.toGeometry(node.getExtent)
-          val  id = node.getLeafId
-          s"$wkt\t$id\n"
-        }.toList
+        s"$wkt\t$id\n"
       }
     }
 
+    val envelope = new Envelope(0, W, 0, H)
+    val sorted_tree: KDBTree = new KDBTree(5, 8, envelope)
+    points.foreach{ point =>
+      sorted_tree.insert(point.getEnvelopeInternal)
+    }
+    sorted_tree.assignLeafIds()
 
+    save("/tmp/edgesCells.wkt") {
+      sorted_tree.getLeaves.asScala.map { case (id, envelope) =>
+        val wkt = G.toGeometry(envelope).toText
+        s"$wkt\t$id\n"
+      }.toList
+    }
+
+    save("/tmp/intervals.tsv") {
+      sorted_tree.getIntervals.asScala.map { case (id, intervals) =>
+        val is = intervals.asScala.mkString(", ")
+        s"$id\t$is\n"
+      }.toList
+    }
 
     spark.close
   }
