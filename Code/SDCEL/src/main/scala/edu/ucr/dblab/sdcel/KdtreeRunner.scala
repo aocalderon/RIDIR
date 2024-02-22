@@ -1,6 +1,6 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, PrecisionModel}
+import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, LineString, PrecisionModel}
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree
 import edu.ucr.dblab.sdcel.kdtree.KDBTree.Visitor
@@ -82,10 +82,14 @@ object KdtreeRunner {
 
  */
 
-    val d = 2.0
-    val W = 100
-    val H = 100
-    val n = 200
+    val MAX_LEVEL=10
+    val CAPACITY=100
+    val FRACTION=0.1
+
+    val d = 10.0
+    val W = 2000
+    val H = 2000
+    val n = 50000
     val lines = for(i <- 0 until n) yield {
       val x1 = Random.nextInt(W)
       val y1 = Random.nextInt(H)
@@ -97,24 +101,26 @@ object KdtreeRunner {
       val y2 = y1 + (dy * ysig)
       val coords = Array(new Coordinate(x1,y1), new Coordinate(x2,y2))
       val p = G.createLineString(coords)
-      p.setUserData(i)
+      p.setUserData(i.toString)
       p
     }
-    save("/tmp/edgesL.wkt"){
+    save("/tmp/edgesLines.wkt"){
       lines.map{ line =>
         val wkt = line.toText
-        val  id = line.getUserData.asInstanceOf[Int]
+        val  id = line.getUserData.asInstanceOf[String]
 
         s"$wkt\t$id\n"
       }
     }
+    val linesRDD = spark.sparkContext.parallelize(lines)
     val lines_envelope = new Envelope(0 - d, W + d, 0 - d, H + d)
-    val lines_tree: KDBTree = new KDBTree(5, 8, lines_envelope)
-    lines.foreach{ lines =>
+    val lines_tree: KDBTree = new KDBTree(CAPACITY, MAX_LEVEL, lines_envelope)
+    val sample_lines = linesRDD.sample(withReplacement = false, FRACTION, 42L).collect()
+    sample_lines.foreach{ lines =>
       lines_tree.insert(lines.getEnvelopeInternal)
     }
     lines_tree.assignLeafIds()
-    save("/tmp/edgesLC.wkt") {
+    save("/tmp/edgesCells.wkt") {
       lines_tree.getLeaves.asScala.map { case (id, envelope) =>
         val wkt = G.toGeometry(envelope).toText
         s"$wkt\t$id\n"
@@ -127,7 +133,7 @@ object KdtreeRunner {
         true
       }
     })
-    save("/tmp/edgesG.wkt") {
+    save("/tmp/edgesEnvelopes.wkt") {
       matches.flatMap { case (id, envelopes) =>
         envelopes.map { envelope =>
           val wkt = G.toGeometry(envelope).toText
@@ -136,34 +142,31 @@ object KdtreeRunner {
       }.toList
     }
 
-    val points = for(i <- 0 until n) yield {
-      val x = Random.nextInt(W)
-      val y = Random.nextInt(H)
-      val p = G.createPoint(new Coordinate(x, y))
-      p.setUserData(i)
-      p
-    }
-    save("/tmp/edgesS.wkt"){
-      points.map{ point =>
-        val wkt = point.toText
-        val  id = point.getUserData.asInstanceOf[Int]
+    lines_tree.dropElements()
+    val partitioner = new edu.ucr.dblab.sdcel.SimplePartitioner[LineString](lines_tree.getLeaves.size())
 
-        s"$wkt\t$id\n"
+    val linesPartitionedRDD = linesRDD.mapPartitionsWithIndex{ (index, lines) =>
+      lines.flatMap{ line =>
+        val envelope = line.getEnvelopeInternal
+        lines_tree.findLeafNodes(envelope).asScala.map{ leaf =>
+          val nid = leaf.getLeafId
+          //val lid = line.getUserData.asInstanceOf[String]
+          //val data = s"$lid\t$index"
+          //line.setUserData(data)
+          (nid, line)
+        }
       }
-    }
+    }.partitionBy(partitioner).map(_._2).cache()
 
-    val envelope = new Envelope(0, W, 0, H)
-    val sorted_tree: KDBTree = new KDBTree(5, 8, envelope)
-    points.foreach{ point =>
-      sorted_tree.insert(point.getEnvelopeInternal)
-    }
-    sorted_tree.assignLeafIds()
+    save("/tmp/edgesOrder.wkt") {
+      linesPartitionedRDD.mapPartitionsWithIndex { (cid, lines) =>
+        lines.zipWithIndex.map { case (line, order) =>
+          val wkt = line.toText
+          val dat = line.getUserData.asInstanceOf[String]
 
-    save("/tmp/edgesCells.wkt") {
-      sorted_tree.getLeaves.asScala.map { case (id, envelope) =>
-        val wkt = G.toGeometry(envelope).toText
-        s"$wkt\t$id\n"
-      }.toList
+          s"$wkt\t$order\t$dat\t$cid\n"
+        }
+      }.collect()
     }
 
     spark.close
