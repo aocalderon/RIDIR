@@ -1,10 +1,13 @@
 package edu.ucr.dblab.sdcel.reader
 
 import com.vividsolutions.jts.geom._
-import edu.ucr.dblab.sdcel.Params
-import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
+import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
+import edu.ucr.dblab.sdcel.Utils.{Settings, log}
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{getNonEmptyCells, runEmptyCells}
+import edu.ucr.dblab.sdcel.geometries.Cell
 import edu.ucr.dblab.sdcel.quadtree.{QuadRectangle, StandardQuadTree}
 import edu.ucr.dblab.sdcel.reader.PR_Utils._
+import edu.ucr.dblab.sdcel.{DCELOverlay2, Params}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
@@ -41,36 +44,30 @@ object PolygonsReader {
     val edgesRDD = edgesRDDA.union( edgesRDDB ).cache()
     val nEdgesRDD = nEdgesRDDA + nEdgesRDDB
     log(s"INFO|TotalEdges=$nEdgesRDD")
-    log("TIME|Read")
-
-    debug {
-      save("/tmp/edgesE.wkt") {
-        edgesRDD.map { edge =>
-          val info = edge.getUserData.asInstanceOf[String]
-          val wkt = edge.toText
-
-          s"$wkt\t$info\n"
-        }.collect
-      }
-    }
 
     val study_area = new QuadRectangle( getStudyArea(edgesRDD) ) // getStudyArea returns an Envelope...
-    val quadtree = new StandardQuadTree[LineString](study_area, 0, params.maxentries(), 10) // study area, level, max items, max level...
+    implicit val quadtree: StandardQuadTree[LineString] = new StandardQuadTree[LineString](study_area, 0, params.maxentries(), 10) // study area, level, max items, max level...
     val sample = edgesRDD.sample(withReplacement = false, params.fraction(), 42).collect() // replacement, sample size, random seed...+
-    val nSample = sample.length
     sample.foreach{ edge =>
       quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
     }
-    val n = quadtree.getLeafZones.size()
     quadtree.assignPartitionIds()
     quadtree.assignPartitionLineage()
-    val cells = getCells(quadtree)
+    implicit val cells: Map[Int, Cell] = getCells(quadtree)
 
-    debug{
-      save("/tmp/edgesCells.wkt"){
-        cells.values.toList.map(_.wkt + "\n")
-      }
-    }
+    val edgesA = partitionEdges(edgesRDDA, quadtree, "A")
+    val edgesB = partitionEdges(edgesRDDB, quadtree, "B")
+
+    val non_emptiesA = getNonEmptyCells(edgesA)
+    val non_emptiesB = getNonEmptyCells(edgesB, "B")
+
+    val ldcelA = createLocalDCELs(edgesA)
+    val ma = runEmptyCells(ldcelA, non_emptiesA)
+
+    val ldcelB = createLocalDCELs(edgesB, "B")
+    val mb = runEmptyCells(ldcelB, non_emptiesB, "B")
+
+    DCELOverlay2.overlay(ldcelA, ma, ldcelB, mb)
 
     spark.close
   }

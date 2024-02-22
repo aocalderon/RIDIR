@@ -3,10 +3,11 @@ package edu.ucr.dblab.sdcel.reader
 import com.vividsolutions.jts.algorithm.CGAlgorithms
 import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.io.WKTReader
+import edu.ucr.dblab.sdcel.DCELPartitioner2
 import edu.ucr.dblab.sdcel.PartitionReader.envelope2ring
-import edu.ucr.dblab.sdcel.Utils.{Settings, log}
+import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.geometries.Cell
-import edu.ucr.dblab.sdcel.quadtree.StandardQuadTree
+import edu.ucr.dblab.sdcel.quadtree.{QuadRectangle, StandardQuadTree}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -27,11 +28,33 @@ object PR_Utils {
         val wkt = arr(0)
         val id  = arr(1).toLong
         val geom = reader.read(wkt)
-        (0 until geom.getNumGeometries).map{ i =>
-          (geom.getGeometryN(i).asInstanceOf[Polygon], id)
-        }.flatMap{ case(polygon, id) =>
-          getLineStrings(polygon, id)
-        }.toIterator
+
+        geom match {
+          case _: Polygon =>
+            (0 until geom.getNumGeometries).map { i =>
+              (geom.getGeometryN(i).asInstanceOf[Polygon], id)
+            }.flatMap { case (polygon, id) =>
+              getLineStrings(polygon, id)
+            }.toIterator
+          case _: LineString =>
+            val coords = geom.getCoordinates
+            coords.zip(coords.tail).zipWithIndex.map { case (pair, order) =>
+              val coord1 = pair._1
+              val coord2 = pair._2
+              val coords = Array(coord1, coord2)
+              val isHole = false
+              val n = geom.getNumPoints - 2
+
+              val line = G.createLineString(coords)
+              // Save info from the edge...
+              line.setUserData(s"$id\t0\t$order\t$isHole\t$n")
+
+              line
+            }
+          case _ =>
+            println(s"$id\tNot a valid geometry")
+            List.empty[LineString]
+        }
       }
     }.cache()
 
@@ -78,8 +101,8 @@ object PR_Utils {
     }
   }
 
-  def getCells(quadtree: StandardQuadTree[LineString])(implicit G: GeometryFactory): Map[Int, Cell] = {
-    quadtree.getLeafZones.asScala.map { leaf =>
+  def getCells(quadtree: StandardQuadTree[LineString])(implicit G: GeometryFactory, S: Settings): Map[Int, Cell] = {
+    val cells = quadtree.getLeafZones.asScala.map { leaf =>
       val id = leaf.partitionId.toInt
       val lineage = leaf.lineage
       val envelope = leaf.getEnvelope
@@ -88,8 +111,32 @@ object PR_Utils {
       val cell = Cell(id, lineage, mbr)
       id -> cell
     }.toMap
+
+    debug{
+      save("/tmp/edgesCells.wkt"){
+        cells.values.toList.map(_.wkt + "\n")
+      }
+    }
+
+    cells
   }
 
+  def partitionEdges(edgesRDD: RDD[LineString], quadtree: StandardQuadTree[LineString], label: String)
+                    (implicit spark: SparkSession, G: GeometryFactory, cells: Map[Int, Cell]): RDD[LineString] = {
+    val n = quadtree.getLeafZones.size()
+    val partitioner = new edu.ucr.dblab.sdcel.SimplePartitioner[LineString](n)
+
+    val edges = edgesRDD.mapPartitions{ edges =>
+      edges.flatMap { edge =>
+        val rectangle = new QuadRectangle(edge.getEnvelopeInternal)
+        quadtree.findZones(rectangle).asScala.map{ zone =>
+          (zone.partitionId, edge)
+        }
+      }
+    }.partitionBy(partitioner).map{_._2}
+
+    DCELPartitioner2.getEdgesWithCrossingInfo(edges, cells, label)
+  }
 
   def debug[R](block: => R)(implicit S: Settings): Unit = { if(S.debug) block }
 
