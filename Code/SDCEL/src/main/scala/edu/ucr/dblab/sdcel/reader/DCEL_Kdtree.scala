@@ -19,7 +19,7 @@ object DCEL_Kdtree {
   def main(args: Array[String]): Unit = {
     // Starting session...
     implicit val spark: SparkSession = SparkSession.builder()
-      .master("local[*]")
+      //.master("local[*]")
       .config("spark.serializer", classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
