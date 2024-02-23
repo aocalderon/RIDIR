@@ -33,6 +33,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val bpath:  ScallopOption[String] = opt[String] (default = Some("edgesB.wkt"))
   val qpath:  ScallopOption[String] = opt[String] (default = Some("quadtree.wkt"))
   val epath:  ScallopOption[String] = opt[String] (default = Some("boundary.wkt"))
+  val cpath:  ScallopOption[String] = opt[String] (default = Some("cells.wkt"))
   val qtag:   ScallopOption[String] = opt[String] (default = Some("tag"))
   val filter: ScallopOption[String] = opt[String] (default = Some("*"))
 

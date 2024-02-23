@@ -2,13 +2,13 @@ package edu.ucr.dblab.sdcel.reader
 
 import com.vividsolutions.jts.geom.{GeometryFactory, LineString, PrecisionModel}
 import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
-import edu.ucr.dblab.sdcel.{DCELOverlay2, Params}
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getNonEmptyCells}
 import edu.ucr.dblab.sdcel.geometries.{Cell, EdgeData}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree
 import edu.ucr.dblab.sdcel.quadtree.{QuadRectangle, StandardQuadTree}
 import edu.ucr.dblab.sdcel.reader.PR_Utils._
+import edu.ucr.dblab.sdcel.{DCELOverlay2, Params}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
@@ -127,7 +127,7 @@ object DCEL_Kdtree {
 
     DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx)
 
-    
+
     /*
     val ldcelB = createLocalDCELs(edgesB, "B")
     val mb = runEmptyCells(ldcelB, non_emptiesB, "B")
