@@ -25,8 +25,7 @@ import java.util.*;
 /**
  * see https://en.wikipedia.org/wiki/K-D-B-tree
  */
-public class KDBTree
-        implements Serializable {
+public class KDBTree implements Serializable {
 
     private final int maxItemsPerNode;
     private final int maxLevels;
@@ -199,7 +198,7 @@ public class KDBTree
         int middle = (int) Math.floor(items.size() / 2);
         Envelope middleItem = items.get(middle);
         if (splitX) {
-            double x = middleItem.getMinX();
+            double x = middleItem.centre().x;
             if (x > extent.getMinX() && x < extent.getMaxX()) {
                 splits = splitAtX(extent, x);
                 splitter = new XSplitter(x);
@@ -208,7 +207,7 @@ public class KDBTree
                 return false;
             }
         } else {
-            double y = middleItem.getMinY();
+            double y = middleItem.centre().y;
             if (y > extent.getMinY() && y < extent.getMaxY()) {
                 splits = splitAtY(extent, y);
                 splitter = new YSplitter(y);

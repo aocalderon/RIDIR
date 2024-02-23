@@ -7,11 +7,12 @@ import edu.ucr.dblab.sdcel.DCELPartitioner2
 import edu.ucr.dblab.sdcel.PartitionReader.envelope2ring
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.geometries.Cell
+import edu.ucr.dblab.sdcel.kdtree.KDBTree
 import edu.ucr.dblab.sdcel.quadtree.{QuadRectangle, StandardQuadTree}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
-import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.JavaConverters.{asScalaBufferConverter, mapAsScalaMapConverter}
 
 object PR_Utils {
   def read(input: String)(implicit spark: SparkSession, G: GeometryFactory, S: Settings): RDD[LineString] = {
@@ -121,7 +122,24 @@ object PR_Utils {
     cells
   }
 
-  def partitionEdges(edgesRDD: RDD[LineString], quadtree: StandardQuadTree[LineString], label: String)
+  def getCellsKdtree(kdtree: KDBTree)(implicit G: GeometryFactory, S: Settings): Map[Int, Cell] = {
+    val cells = kdtree.getLeaves.asScala.map { case(id, envelope) =>
+      val mbr = envelope2ring(envelope)
+
+      val cell = Cell(id, "", mbr)
+      id.toInt -> cell
+    }.toMap
+
+    debug{
+      save("/tmp/edgesCells.wkt"){
+        cells.values.toList.map(_.wkt + "\n")
+      }
+    }
+
+    cells
+  }
+
+  def partitionEdgesByQuadtree(edgesRDD: RDD[LineString], quadtree: StandardQuadTree[LineString], label: String)
                     (implicit spark: SparkSession, G: GeometryFactory, cells: Map[Int, Cell]): RDD[LineString] = {
     val n = quadtree.getLeafZones.size()
     val partitioner = new edu.ucr.dblab.sdcel.SimplePartitioner[LineString](n)
@@ -131,6 +149,22 @@ object PR_Utils {
         val rectangle = new QuadRectangle(edge.getEnvelopeInternal)
         quadtree.findZones(rectangle).asScala.map{ zone =>
           (zone.partitionId, edge)
+        }
+      }
+    }.partitionBy(partitioner).map{_._2}
+
+    DCELPartitioner2.getEdgesWithCrossingInfo(edges, cells, label)
+  }
+  def partitionEdgesByKdtree(edgesRDD: RDD[LineString], kdtree: KDBTree, label: String)
+                              (implicit spark: SparkSession, G: GeometryFactory, cells: Map[Int, Cell]): RDD[LineString] = {
+    val n = kdtree.getLeaves.size()
+    val partitioner = new edu.ucr.dblab.sdcel.SimplePartitioner[LineString](n)
+
+    val edges = edgesRDD.mapPartitions{ edges =>
+      edges.flatMap { edge =>
+        val envelope = edge.getEnvelopeInternal
+        kdtree.findLeafNodes(envelope).asScala.map{ node =>
+          (node.getLeafId, edge)
         }
       }
     }.partitionBy(partitioner).map{_._2}

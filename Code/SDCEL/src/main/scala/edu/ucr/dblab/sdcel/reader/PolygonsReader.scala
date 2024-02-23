@@ -55,8 +55,8 @@ object PolygonsReader {
     quadtree.assignPartitionLineage()
     implicit val cells: Map[Int, Cell] = getCells(quadtree)
 
-    val edgesA = partitionEdges(edgesRDDA, quadtree, "A")
-    val edgesB = partitionEdges(edgesRDDB, quadtree, "B")
+    val edgesA = partitionEdgesByQuadtree(edgesRDDA, quadtree, "A")
+    val edgesB = partitionEdgesByQuadtree(edgesRDDB, quadtree, "B")
 
     val non_emptiesA = getNonEmptyCells(edgesA)
     val non_emptiesB = getNonEmptyCells(edgesB, "B")

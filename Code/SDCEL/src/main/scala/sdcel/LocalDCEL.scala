@@ -1,28 +1,16 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{Polygon, LineString, Point, Coordinate, Envelope}
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geomgraph.index.SimpleMCSweepLineIntersector
-import com.vividsolutions.jts.geomgraph.index.SegmentIntersector
-import com.vividsolutions.jts.algorithm.RobustLineIntersector
-import com.vividsolutions.jts.geomgraph.EdgeIntersection
-import com.vividsolutions.jts.geomgraph.Edge
-
-import scala.collection.JavaConverters._
-import scala.annotation.tailrec
-
-import org.apache.spark.sql.SparkSession
+import com.vividsolutions.jts.geom._
+import edu.ucr.dblab.sdcel.DCELMerger2.{groupByNextMBRPoly, setTwins}
+import edu.ucr.dblab.sdcel.Utils._
+import edu.ucr.dblab.sdcel.geometries._
+import edu.ucr.dblab.sdcel.quadtree._
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
+import org.slf4j.Logger
 
-import org.slf4j.{Logger, LoggerFactory}
-
-import edu.ucr.dblab.sdcel.quadtree._
-import edu.ucr.dblab.sdcel.geometries._
-
-import SweepLine2.{getHedgesInsideCell, getLineSegments}
-import DCELMerger2.{setTwins, groupByNext, groupByNextMBR, groupByNextMBRPoly}
-import Utils._
+import scala.annotation.tailrec
+import scala.collection.JavaConverters._
 
 object LocalDCEL {
   def createLocalDCELs(edgesRDD: RDD[LineString], letter: String = "A")
@@ -73,6 +61,15 @@ object LocalDCEL {
 
       hedges.filter(_._2.split(" ").size == 1).toIterator
     }
+    if(TaskContext.getPartitionId() == 3) {
+      r.mapPartitionsWithIndex { (pid, hedges) =>
+        hedges.map { case (h, l, e, p) =>
+          val wkt = p.toText
+          s"$wkt\t$pid"
+        }
+      }.foreach{println}
+    }
+
     r
   }
 
