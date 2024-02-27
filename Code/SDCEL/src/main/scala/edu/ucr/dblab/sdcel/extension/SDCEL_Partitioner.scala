@@ -17,12 +17,12 @@ import scala.util.Random
 object SDCEL_Partitioner {
   def main(args: Array[String]): Unit = {
     // Starting session...
+    implicit val params = new Params(args)
     implicit val spark: SparkSession = SparkSession.builder()
-      .master("local[*]")
+      .master(params.master())
       .config("spark.serializer", classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
-    val params = new Params(args)
     implicit val S: Settings = Settings(
       tolerance = params.tolerance(),
       debug = params.debug(),
@@ -56,16 +56,30 @@ object SDCEL_Partitioner {
     val envelope_area = getStudyArea(edgesRDD) // getStudyArea returns an Envelope...
     val paddedBoundary = new Envelope(envelope_area.getMinX, envelope_area.getMaxX + 0.01, envelope_area.getMinY, envelope_area.getMaxY + 0.01)
     val numPartitions = params.partitions()
+
+    println(s"Input partitions: $numPartitions")
+
     val sample_size = SampleUtils.getSampleNumbers(numPartitions, nEdgesRDD)
+
+    println(s"Sample size: $sample_size")
+
     val fraction = SampleUtils.computeFractionForSampleSize(sample_size, nEdgesRDD, withReplacement = false)
-    val sample = edgesRDD.sample(withReplacement = false, fraction, 42).map(sample => (Random.nextDouble(), sample)).sortBy(_._1).map(_._2).collect()
-    val kdtree = new KDBTree(sample.length / numPartitions, numPartitions, paddedBoundary)
+
+    println(s"Fraction: $fraction")
+
+    val sample = edgesRDD.sample(withReplacement = false, fraction, 42)
+      .map(sample => (Random.nextDouble(), sample)).sortBy(_._1).map(_._2).collect()
+
+    val max_items_per_cell = sample.length / numPartitions
+    println(s"Max items per node: $max_items_per_cell")
+
+    val kdtree = new KDBTree(max_items_per_cell, numPartitions, paddedBoundary)
     sample.foreach { sample =>
       kdtree.insert(sample.getEnvelopeInternal)
     }
     kdtree.assignLeafIds()
     val n = kdtree.getLeaves.size()
-    log(s"Number of partitions: $n")
+    log(s"Number of kdtree partitions: $n")
 
     save(params.cpath()) {
       kdtree.getLeaves.asScala.map { case (id, envelope) =>
