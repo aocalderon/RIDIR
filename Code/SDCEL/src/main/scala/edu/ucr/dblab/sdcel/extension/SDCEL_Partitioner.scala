@@ -1,13 +1,15 @@
 package edu.ucr.dblab.sdcel.extension
 
-import com.vividsolutions.jts.geom.{Envelope, GeometryFactory, PrecisionModel}
+import com.vividsolutions.jts.geom.{Envelope, GeometryFactory, LineString, PrecisionModel}
 import edu.ucr.dblab.sdcel.Params
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree
 import edu.ucr.dblab.sdcel.reader.PR_Utils.{getStudyArea, read}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
+import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
 
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.util.Random
@@ -44,13 +46,20 @@ object SDCEL_Partitioner {
     val nEdgesRDD = edgesRDD.count()
     log(s"INFO|TotalEdges=$nEdgesRDD")
 
+    val edgesRaw = new SpatialRDD[LineString]()
+    edgesRaw.setRawSpatialRDD(edgesRDD)
+    edgesRaw.analyze()
+    edgesRaw.spatialPartitioning(GridType.KDBTREE, 15000)
+    val edgesPartitioned = edgesRaw.spatialPartitionedRDD.rdd.cache()
+    println(edgesPartitioned.getNumPartitions)
+
     val envelope_area = getStudyArea(edgesRDD) // getStudyArea returns an Envelope...
     val paddedBoundary = new Envelope(envelope_area.getMinX, envelope_area.getMaxX + 0.01, envelope_area.getMinY, envelope_area.getMaxY + 0.01)
     val numPartitions = params.partitions()
     val sample_size = SampleUtils.getSampleNumbers(numPartitions, nEdgesRDD)
     val fraction = SampleUtils.computeFractionForSampleSize(sample_size, nEdgesRDD, withReplacement = false)
     val sample = edgesRDD.sample(withReplacement = false, fraction, 42).map(sample => (Random.nextDouble(), sample)).sortBy(_._1).map(_._2).collect()
-    val kdtree = new KDBTree(sample.length / numPartitions, params.maxlevel(), paddedBoundary)
+    val kdtree = new KDBTree(sample.length / numPartitions, numPartitions, paddedBoundary)
     sample.foreach { sample =>
       kdtree.insert(sample.getEnvelopeInternal)
     }
