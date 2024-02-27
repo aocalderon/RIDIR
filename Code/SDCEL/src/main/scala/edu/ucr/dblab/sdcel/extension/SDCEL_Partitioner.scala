@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.{Envelope, GeometryFactory, LineString, Preci
 import edu.ucr.dblab.sdcel.Params
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree
+import edu.ucr.dblab.sdcel.quadtree.{QuadRectangle, StandardQuadTree}
 import edu.ucr.dblab.sdcel.reader.PR_Utils.{getStudyArea, read}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
@@ -11,7 +12,7 @@ import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 
-import scala.collection.JavaConverters.mapAsScalaMapConverter
+import scala.collection.JavaConverters.{asScalaBufferConverter, mapAsScalaMapConverter}
 import scala.util.Random
 
 object SDCEL_Partitioner {
@@ -50,8 +51,11 @@ object SDCEL_Partitioner {
     edgesRaw.setRawSpatialRDD(edgesRDD)
     edgesRaw.analyze()
     edgesRaw.spatialPartitioning(GridType.KDBTREE, 15000)
-    val edgesPartitioned = edgesRaw.spatialPartitionedRDD.rdd.cache()
-    println(edgesPartitioned.getNumPartitions)
+    val edgesPartitioned1 = edgesRaw.spatialPartitionedRDD.rdd.cache()
+    println(s"By Sedona KDTREE ${edgesPartitioned1.getNumPartitions}")
+    edgesRaw.spatialPartitioning(GridType.QUADTREE, 15000)
+    val edgesPartitioned2 = edgesRaw.spatialPartitionedRDD.rdd.cache()
+    println(s"By Sedona QUADTREE ${edgesPartitioned2.getNumPartitions}")
 
     val envelope_area = getStudyArea(edgesRDD) // getStudyArea returns an Envelope...
     val paddedBoundary = new Envelope(envelope_area.getMinX, envelope_area.getMaxX + 0.01, envelope_area.getMinY, envelope_area.getMaxY + 0.01)
@@ -78,12 +82,30 @@ object SDCEL_Partitioner {
       kdtree.insert(sample.getEnvelopeInternal)
     }
     kdtree.assignLeafIds()
-    val n = kdtree.getLeaves.size()
-    log(s"Number of kdtree partitions: $n")
+    val kn = kdtree.getLeaves.size()
+    log(s"Number of kdtree partitions: $kn")
 
     save(params.cpath()) {
       kdtree.getLeaves.asScala.map { case (id, envelope) =>
         val wkt = G.toGeometry(envelope)
+        s"$wkt\t$id\n"
+      }.toList
+    }
+
+    val quadtree = new StandardQuadTree[Int](new QuadRectangle(paddedBoundary), 0, max_items_per_cell, numPartitions)
+    sample.foreach{ edge =>
+      quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), 1)
+    }
+    quadtree.assignPartitionIds()
+    quadtree.assignPartitionLineage()
+    val qn = quadtree.getLeafZones.size()
+    log(s"Number of quadtree partitions: $qn")
+
+    save(params.qpath()) {
+      quadtree.getLeafZones.asScala.map { zone =>
+        val wkt = G.toGeometry(zone.getEnvelope)
+        val  id = zone.partitionId
+
         s"$wkt\t$id\n"
       }.toList
     }
