@@ -50,10 +50,10 @@ object SDCEL_Partitioner {
     val edgesRaw = new SpatialRDD[LineString]()
     edgesRaw.setRawSpatialRDD(edgesRDD)
     edgesRaw.analyze()
-    edgesRaw.spatialPartitioning(GridType.KDBTREE, 15000)
+    edgesRaw.spatialPartitioning(GridType.KDBTREE, params.partitions())
     val edgesPartitioned1 = edgesRaw.spatialPartitionedRDD.rdd.cache()
     println(s"By Sedona KDTREE ${edgesPartitioned1.getNumPartitions}")
-    edgesRaw.spatialPartitioning(GridType.QUADTREE, 15000)
+    edgesRaw.spatialPartitioning(GridType.QUADTREE, params.partitions())
     val edgesPartitioned2 = edgesRaw.spatialPartitionedRDD.rdd.cache()
     println(s"By Sedona QUADTREE ${edgesPartitioned2.getNumPartitions}")
 
