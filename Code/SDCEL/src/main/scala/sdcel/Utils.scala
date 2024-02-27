@@ -140,13 +140,30 @@ object Utils {
     f.write(content.mkString(""))
     f.close
     val end = clocktime
-    val time = "%.2f".format((end - start) / 1000.0)
+    val time = "%.2f".format((end - start) / 1e9)
     logger.info(s"Saved ${filename} in ${time}s [${content.size} records].")
   }
 
   def debug[R](block: => R)(implicit S: Settings): Unit = { if(S.debug) block }
 
-  def clocktime = System.currentTimeMillis()
+  def clocktime = System.nanoTime()
+
+
+  def timer[R](msg: String)(block: => R)(implicit logger: Logger): R = {
+    val t0 = clocktime
+    val result = block    // call-by-name
+    val t1 = clocktime
+    logger.info("%-30s|%6.2f".format(msg, (t1 - t0) / 1e9))
+    result
+  }
+
+  def timer[R](block: => R): (R, Double) = {
+    val t0 = clocktime
+    val result = block    // call-by-name
+    val t1 = clocktime
+    val time = (t1 - t0) / 1e9
+    (result, time)
+  }
 
   def getPhaseMetrics(metrics: TaskMetrics, phaseName: String)(implicit settings: Settings): Dataset[Row] = {
     metrics.createTaskMetricsDF()
