@@ -172,6 +172,19 @@ object PR_Utils {
     DCELPartitioner2.getEdgesWithCrossingInfo(edges, cells, label)
   }
 
+  def saveEdgesRDD(path: String, edgesRDD: RDD[LineString]): Unit = {
+    save(path) {
+      edgesRDD.mapPartitionsWithIndex { (cid, edges) =>
+        edges.map { edge =>
+          val wkt = edge.toText
+          val dat = edge.getUserData
+
+          s"$wkt\t$cid\t$dat\n"
+        }
+      }.collect
+    }
+  }
+
   def debug[R](block: => R)(implicit S: Settings): Unit = { if(S.debug) block }
 
 }
