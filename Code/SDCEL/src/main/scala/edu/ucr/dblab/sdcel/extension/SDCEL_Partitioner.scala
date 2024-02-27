@@ -1,6 +1,6 @@
 package edu.ucr.dblab.sdcel.extension
 
-import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
+import com.vividsolutions.jts.geom.{Envelope, GeometryFactory, PrecisionModel}
 import edu.ucr.dblab.sdcel.Params
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree
@@ -41,21 +41,25 @@ object SDCEL_Partitioner {
     val nEdgesRDDB = edgesRDDB.count()
     log(s"INFO|edgesB=$nEdgesRDDB")
     val edgesRDD = edgesRDDA.union(edgesRDDB).cache()
-    val nEdgesRDD = nEdgesRDDA + nEdgesRDDB
+    val nEdgesRDD = edgesRDD.count()
     log(s"INFO|TotalEdges=$nEdgesRDD")
 
     val envelope_area = getStudyArea(edgesRDD) // getStudyArea returns an Envelope...
-    val kdtree = new KDBTree(params.maxentries(), params.maxlevel(), envelope_area)
-    val sample = edgesRDD.sample(withReplacement = false, params.fraction(), 42).map( sample => (Random.nextDouble(), sample) ).sortBy(_._1).map(_._2).collect()
-    sample.foreach{ sample =>
+    val paddedBoundary = new Envelope(envelope_area.getMinX, envelope_area.getMaxX + 0.01, envelope_area.getMinY, envelope_area.getMaxY + 0.01)
+    val numPartitions = params.partitions()
+    val sample_size = SampleUtils.getSampleNumbers(numPartitions, nEdgesRDD)
+    val fraction = SampleUtils.computeFractionForSampleSize(sample_size, nEdgesRDD, withReplacement = false)
+    val sample = edgesRDD.sample(withReplacement = false, fraction, 42).map(sample => (Random.nextDouble(), sample)).sortBy(_._1).map(_._2).collect()
+    val kdtree = new KDBTree(sample.length / numPartitions, params.maxlevel(), paddedBoundary)
+    sample.foreach { sample =>
       kdtree.insert(sample.getEnvelopeInternal)
     }
     kdtree.assignLeafIds()
     val n = kdtree.getLeaves.size()
     log(s"Number of partitions: $n")
 
-    save(params.cpath()){
-      kdtree.getLeaves.asScala.map{ case(id, envelope) =>
+    save(params.cpath()) {
+      kdtree.getLeaves.asScala.map { case (id, envelope) =>
         val wkt = G.toGeometry(envelope)
         s"$wkt\t$id\n"
       }.toList

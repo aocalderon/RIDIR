@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.Utils._
 import edu.ucr.dblab.sdcel.geometries.{Cell, EdgeData, LEdge}
+import edu.ucr.dblab.sdcel.kdtree.FractionCalculator
 import edu.ucr.dblab.sdcel.quadtree._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.serializer.KryoSerializer

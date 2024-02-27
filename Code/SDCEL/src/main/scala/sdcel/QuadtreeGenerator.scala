@@ -3,10 +3,10 @@ package edu.ucr.dblab.sdcel
 import scala.collection.JavaConverters._
 import com.vividsolutions.jts.geom.{Coordinate, Envelope}
 import com.vividsolutions.jts.geom.{LineString, Polygon}
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
+import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
 import com.vividsolutions.jts.io.WKTReader
 import com.vividsolutions.jts.algorithm.CGAlgorithms
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.rdd.RDD
@@ -16,8 +16,8 @@ import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
 import edu.ucr.dblab.sdcel.quadtree._
 import edu.ucr.dblab.sdcel.geometries.{Cell, LEdge}
-
 import Utils._
+import edu.ucr.dblab.sdcel.kdtree.FractionCalculator
 
 object QuadtreeGenerator {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")

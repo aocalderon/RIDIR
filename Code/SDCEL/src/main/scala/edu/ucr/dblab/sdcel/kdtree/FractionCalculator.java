@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
-package edu.ucr.dblab.sdcel.quadtree;
+package edu.ucr.dblab.sdcel.kdtree;
 
 import org.apache.spark.util.random.SamplingUtils;
 import org.datasyslab.geospark.utils.RDDSampleUtils;
 
 public class FractionCalculator {
-    public FractionCalculator(){}
-    
-    public double getFraction(int numPartitions, long totalNumberOfRecords){
-	int sampleNumberOfRecords = RDDSampleUtils.getSampleNumbers(numPartitions, totalNumberOfRecords, -1);
-	final double fraction = SamplingUtils.computeFractionForSampleSize(sampleNumberOfRecords, totalNumberOfRecords, false);
-	return fraction;
+    public FractionCalculator() {
+    }
+
+    public double getFraction(int numPartitions, long totalNumberOfRecords) {
+        int sampleNumberOfRecords = RDDSampleUtils.getSampleNumbers(numPartitions, totalNumberOfRecords, -1);
+        final double fraction = SamplingUtils.computeFractionForSampleSize(sampleNumberOfRecords, totalNumberOfRecords, false);
+        return fraction;
     }
 }
