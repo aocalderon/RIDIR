@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PS=(1000 2000 4000 7000 10000 12500 15000)
+
+for n in $(seq 1 $1)
+do
+    for P in "${PS[@]}"
+    do
+	echo "
+	bash bash/sdcel_partitioner_spark --input1 extension/CA/A.wkt --input2 extension/CA/B.wkt --partitions $P --cpath /tmp/edgesCells_CA_${P}.wkt --qpath /tmp/edgesCells_CA_Q_${P}.wkt --master yarn"
+	bash bash/sdcel_partitioner_spark --input1 extension/CA/A.wkt --input2 extension/CA/B.wkt --partitions $P --cpath /tmp/edgesCells_CA_K_${P}.wkt --qpath /tmp/edgesCells_CA_Q_${P}.wkt --master yarn
+    done
+done

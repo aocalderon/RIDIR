@@ -49,6 +49,7 @@ object SDCEL_Partitioner {
     val nEdgesRDD = edgesRDD.count()
     log(s"INFO|TotalEdges=$nEdgesRDD")
 
+    /*
     val edgesRaw = new SpatialRDD[LineString]()
     edgesRaw.setRawSpatialRDD(edgesRDD)
     edgesRaw.analyze()
@@ -58,27 +59,28 @@ object SDCEL_Partitioner {
     edgesRaw.spatialPartitioning(GridType.QUADTREE, params.partitions())
     val edgesPartitioned2 = edgesRaw.spatialPartitionedRDD.rdd.cache()
     println(s"By Sedona QUADTREE ${edgesPartitioned2.getNumPartitions}")
+     */
 
     val envelope_area = getStudyArea(edgesRDD) // getStudyArea returns an Envelope...
     val paddedBoundary = new Envelope(envelope_area.getMinX, envelope_area.getMaxX + 0.01, envelope_area.getMinY, envelope_area.getMaxY + 0.01)
     val numPartitions = params.partitions()
 
-    println(s"Input partitions: $numPartitions")
+    log(s"INFO|Input_partitions|$numPartitions")
 
     val sample_size = SampleUtils.getSampleNumbers(numPartitions, nEdgesRDD)
 
-    println(s"Sample size: $sample_size")
+    log(s"INFO|Sample_size|$sample_size")
 
     val fraction = SampleUtils.computeFractionForSampleSize(sample_size, nEdgesRDD, withReplacement = false)
 
-    println(s"Fraction: $fraction")
+    log(s"INFO|Fraction|$fraction")
 
     val ( (kdtree, kdtree_space), kdtree_time) = timer{
       val sample = edgesRDD.sample(withReplacement = false, fraction, 42)
         .map(sample => (Random.nextDouble(), sample)).sortBy(_._1).map(_._2).collect()
 
       val max_items_per_cell = sample.length / numPartitions
-      log(s"INFO|Kdtree|maxItemsPerCell|$max_items_per_cell")
+      log(s"INFO|Kdtree|$numPartitions|maxItemsPerCell|$max_items_per_cell")
 
       val kdtree = new KDBTree(max_items_per_cell, numPartitions, paddedBoundary)
       sample.foreach { sample =>
@@ -86,11 +88,11 @@ object SDCEL_Partitioner {
       }
       kdtree.assignLeafIds()
       val kn = kdtree.getLeaves.size()
-      log(s"INFO|Kdtree|numPartitions|$kn")
+      log(s"INFO|Kdtree|$numPartitions|numPartitions|$kn")
 
       (kdtree, kn)
     }
-    log(s"TIME|Kdtree|$kdtree_space|$kdtree_time")
+    log(s"TIME|Kdtree|$numPartitions|$kdtree_space|$kdtree_time")
 
     save(params.cpath()) {
       kdtree.getLeaves.asScala.map { case (id, envelope) =>
@@ -102,7 +104,7 @@ object SDCEL_Partitioner {
     val ( (quadtree, quadtree_space), quadtree_time) = timer {
       val sample = edgesRDD.sample(withReplacement = false, fraction, 42).collect()
       val max_items_per_cell = sample.length / numPartitions
-      log(s"INFO|Quadtree|maxItemsPerCell|$max_items_per_cell")
+      log(s"INFO|Quadtree|$numPartitions|maxItemsPerCell|$max_items_per_cell")
       val quadtree = new StandardQuadTree[Int](new QuadRectangle(paddedBoundary), 0, max_items_per_cell, numPartitions)
       sample.foreach { edge =>
         quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), 1)
@@ -110,11 +112,11 @@ object SDCEL_Partitioner {
       quadtree.assignPartitionIds()
       quadtree.assignPartitionLineage()
       val qn = quadtree.getLeafZones.size()
-      log(s"INFO|Quadtree|numPartitions|$qn")
+      log(s"INFO|Quadtree|$numPartitions|numPartitions|$qn")
 
       (quadtree, qn)
     }
-    log(s"TIME|Quadtree|$quadtree_space|$quadtree_time")
+    log(s"TIME|Quadtree|$numPartitions|$quadtree_space|$quadtree_time")
 
     save(params.qpath()) {
       quadtree.getLeafZones.asScala.map { zone =>
