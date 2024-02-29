@@ -342,8 +342,12 @@ object DCELOverlay2 {
     }
 
     C.filter(_.getCoords.size >= 4).map{c =>
-      val poly = geofactory.createPolygon(c.getCoords)
-      poly
+      try{
+        val poly = geofactory.createPolygon(c.getCoords)
+        poly
+      }catch{
+        case e: java.lang.IllegalArgumentException => geofactory.createPolygon(Array.empty[Coordinate])
+      }
     }
   }
 

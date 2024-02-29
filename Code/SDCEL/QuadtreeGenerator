@@ -33,7 +33,7 @@ CORES=9
 DMEMORY=12g
 EMEMORY=30g
 SPARK_JARS=$HOME/Spark/2.4/jars/
-JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
+JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar
 CLASS="edu.ucr.dblab.sdcel.QuadtreeGenerator"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 

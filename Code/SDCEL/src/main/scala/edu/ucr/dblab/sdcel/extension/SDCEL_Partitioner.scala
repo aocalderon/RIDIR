@@ -122,12 +122,14 @@ object SDCEL_Partitioner {
     }
     log(s"TIME|Kdtree|kdtree_overlay|$numPartitions|$kdtree_space|$kdtree_overlay_time")
 
+    /*
     save(params.cpath()) {
       kdtree.getLeaves.asScala.map { case (id, envelope) =>
         val wkt = G.toGeometry(envelope)
         s"$wkt\t$id\n"
       }.toList
-    }
+     }
+     */
     //saveEdgesRDD("/tmp/edgesKA.wkt", edgesKA)
     //saveEdgesRDD("/tmp/edgesKB.wkt", edgesKB)
     save("/tmp/edgesKO.wkt") {
@@ -194,6 +196,7 @@ object SDCEL_Partitioner {
     }
     log(s"TIME|Quadtree|quadtree_overlay|$numPartitions|$quadtree_space|$quadtree_overlay_time")
 
+    /*
     save(params.qpath()) {
       quadtree.getLeafZones.asScala.map { zone =>
         val wkt = G.toGeometry(zone.getEnvelope)
@@ -201,7 +204,8 @@ object SDCEL_Partitioner {
 
         s"$wkt\t$id\n"
       }.toList
-    }
+     }
+     */
     //saveEdgesRDD("/tmp/edgesQA.wkt", edgesQA)
     //saveEdgesRDD("/tmp/edgesQB.wkt", edgesQB)
     save("/tmp/edgesQO.wkt") {

@@ -202,7 +202,7 @@ object LocalDCEL {
           
           split
         }
-        case 2 => {
+        case _ => {
           // If the edge has two different intersections we extract the section between
           // those two coords.  We sorted the coords according how close they are from the
           // start of the edge.

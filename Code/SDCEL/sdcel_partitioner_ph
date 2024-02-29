@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PS=(8 16 32 64 128 256)
+
+for n in $(seq 1 $1)
+do
+    for P in "${PS[@]}"
+    do
+	echo "bash bash/sdcel_partitioner_spark --input1 PH/A.wkt --input2 PH/B.wkt --partitions $P --cpath /tmp/edges_PH_${P}_KCells.wkt --qpath /tmp/edges_PH_${P}_QCells.wkt --master yarn"
+	bash bash/sdcel_partitioner_spark --input1 PH/A.wkt --input2 PH/B.wkt --partitions $P --cpath /tmp/edges_PH_${P}_KCells.wkt --qpath /tmp/edges_PH_${P}_QCells.wkt --master yarn
+    done
+done

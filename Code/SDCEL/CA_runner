@@ -2,9 +2,9 @@
 
 for n in $(seq 1 $1)
 do
-    for C in 1 2 5 10 25 50 100 200 500 1000
+    for P in $(seq 1000 1000 10000) 
     do
-	echo "Runing $n ./sdcel CA/${C}/ /home/acald013/RIDIR/local_path/CA/${C}/ 1e3"
-	./sdcel CA/${C}/ /home/acald013/RIDIR/local_path/CA/${C}/ 1e3
+	echo "./Perf -d Census/CA -t 1e-3 -p $P -m yarn -n 1"
+	./Perf -d Census/CA -t 1e-3 -p $P -m yarn -n 1
     done
 done

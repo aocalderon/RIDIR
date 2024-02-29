@@ -1,0 +1,140 @@
+./Perf -d Census/CA -t 1e-3 -p 1000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 1000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P1000/edgesA --input2 Census/CA/P1000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P1000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P1000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_1000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:40:18,653|14066|application_1709003950326_0222|14336|TIME|start|Census/CA_1e-3_0_4_1000_12_1
+2024-02-28 15:40:42,992|38405|application_1709003950326_0222|24339|TIME|read|Census/CA_1e-3_0_4_1000_12_1
+2024-02-28 15:40:45,818|41231|application_1709003950326_0222|2826|TIME|layer1|Census/CA_1e-3_0_4_1000_12_1
+2024-02-28 15:40:48,168|43581|application_1709003950326_0222|2350|TIME|layer2|Census/CA_1e-3_0_4_1000_12_1
+2024-02-28 15:40:55,783|51196|application_1709003950326_0222|7615|TIME|overlay|Census/CA_1e-3_0_4_1000_12_1
+2024-02-28 15:40:55,783|51196|application_1709003950326_0222|0|TIME|end|Census/CA_1e-3_0_4_1000_12_1
+./Perf -d Census/CA -t 1e-3 -p 2000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 2000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P2000/edgesA --input2 Census/CA/P2000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P2000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P2000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_2000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:41:14,243|14165|application_1709003950326_0223|14423|TIME|start|Census/CA_1e-3_0_4_2000_12_1
+2024-02-28 15:41:48,708|48630|application_1709003950326_0223|34465|TIME|read|Census/CA_1e-3_0_4_2000_12_1
+2024-02-28 15:41:53,326|53248|application_1709003950326_0223|4618|TIME|layer1|Census/CA_1e-3_0_4_2000_12_1
+2024-02-28 15:41:57,227|57149|application_1709003950326_0223|3901|TIME|layer2|Census/CA_1e-3_0_4_2000_12_1
+2024-02-28 15:42:07,710|67632|application_1709003950326_0223|10483|TIME|overlay|Census/CA_1e-3_0_4_2000_12_1
+2024-02-28 15:42:07,710|67632|application_1709003950326_0223|0|TIME|end|Census/CA_1e-3_0_4_2000_12_1
+./Perf -d Census/CA -t 1e-3 -p 3000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 3000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P3000/edgesA --input2 Census/CA/P3000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P3000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P3000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_3000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:42:26,474|14574|application_1709003950326_0224|14846|TIME|start|Census/CA_1e-3_0_4_3000_12_1
+2024-02-28 15:43:12,958|61058|application_1709003950326_0224|46484|TIME|read|Census/CA_1e-3_0_4_3000_12_1
+2024-02-28 15:43:20,216|68316|application_1709003950326_0224|7258|TIME|layer1|Census/CA_1e-3_0_4_3000_12_1
+2024-02-28 15:43:27,108|75208|application_1709003950326_0224|6892|TIME|layer2|Census/CA_1e-3_0_4_3000_12_1
+2024-02-28 15:43:43,319|91419|application_1709003950326_0224|16211|TIME|overlay|Census/CA_1e-3_0_4_3000_12_1
+2024-02-28 15:43:43,319|91419|application_1709003950326_0224|0|TIME|end|Census/CA_1e-3_0_4_3000_12_1
+./Perf -d Census/CA -t 1e-3 -p 4000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 4000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P4000/edgesA --input2 Census/CA/P4000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P4000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P4000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_4000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:44:02,609|14758|application_1709003950326_0225|15023|TIME|start|Census/CA_1e-3_0_4_4000_12_1
+2024-02-28 15:45:02,648|74797|application_1709003950326_0225|60039|TIME|read|Census/CA_1e-3_0_4_4000_12_1
+2024-02-28 15:45:16,749|88898|application_1709003950326_0225|14101|TIME|layer1|Census/CA_1e-3_0_4_4000_12_1
+2024-02-28 15:45:30,600|102749|application_1709003950326_0225|13851|TIME|layer2|Census/CA_1e-3_0_4_4000_12_1
+2024-02-28 15:45:55,594|127743|application_1709003950326_0225|24994|TIME|overlay|Census/CA_1e-3_0_4_4000_12_1
+2024-02-28 15:45:55,595|127744|application_1709003950326_0225|0|TIME|end|Census/CA_1e-3_0_4_4000_12_1
+./Perf -d Census/CA -t 1e-3 -p 5000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 5000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P5000/edgesA --input2 Census/CA/P5000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P5000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P5000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_5000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:46:14,826|14589|application_1709003950326_0226|14845|TIME|start|Census/CA_1e-3_0_4_5000_12_1
+2024-02-28 15:47:55,979|115742|application_1709003950326_0226|101153|TIME|read|Census/CA_1e-3_0_4_5000_12_1
+2024-02-28 15:48:26,506|146269|application_1709003950326_0226|30527|TIME|layer1|Census/CA_1e-3_0_4_5000_12_1
+2024-02-28 15:48:56,427|176190|application_1709003950326_0226|29921|TIME|layer2|Census/CA_1e-3_0_4_5000_12_1
+2024-02-28 15:49:32,657|212420|application_1709003950326_0226|36230|TIME|overlay|Census/CA_1e-3_0_4_5000_12_1
+2024-02-28 15:49:32,657|212420|application_1709003950326_0226|0|TIME|end|Census/CA_1e-3_0_4_5000_12_1
+./Perf -d Census/CA -t 1e-3 -p 6000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 6000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P6000/edgesA --input2 Census/CA/P6000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P6000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P6000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_6000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:49:52,620|14980|application_1709003950326_0227|15239|TIME|start|Census/CA_1e-3_0_4_6000_12_1
+2024-02-28 15:51:52,460|134820|application_1709003950326_0227|119840|TIME|read|Census/CA_1e-3_0_4_6000_12_1
+2024-02-28 15:52:26,541|168901|application_1709003950326_0227|34081|TIME|layer1|Census/CA_1e-3_0_4_6000_12_1
+2024-02-28 15:52:58,827|201187|application_1709003950326_0227|32286|TIME|layer2|Census/CA_1e-3_0_4_6000_12_1
+2024-02-28 15:53:46,788|249148|application_1709003950326_0227|47961|TIME|overlay|Census/CA_1e-3_0_4_6000_12_1
+2024-02-28 15:53:46,788|249148|application_1709003950326_0227|0|TIME|end|Census/CA_1e-3_0_4_6000_12_1
+./Perf -d Census/CA -t 1e-3 -p 7000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 7000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P7000/edgesA --input2 Census/CA/P7000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P7000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P7000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_7000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:54:06,991|15044|application_1709003950326_0228|15304|TIME|start|Census/CA_1e-3_0_4_7000_12_1
+2024-02-28 15:56:37,501|165554|application_1709003950326_0228|150510|TIME|read|Census/CA_1e-3_0_4_7000_12_1
+2024-02-28 15:57:33,379|221432|application_1709003950326_0228|55878|TIME|layer1|Census/CA_1e-3_0_4_7000_12_1
+2024-02-28 15:58:22,630|270683|application_1709003950326_0228|49251|TIME|layer2|Census/CA_1e-3_0_4_7000_12_1
+2024-02-28 15:59:32,752|340805|application_1709003950326_0228|70122|TIME|overlay|Census/CA_1e-3_0_4_7000_12_1
+2024-02-28 15:59:32,752|340805|application_1709003950326_0228|0|TIME|end|Census/CA_1e-3_0_4_7000_12_1
+./Perf -d Census/CA -t 1e-3 -p 8000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 8000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P8000/edgesA --input2 Census/CA/P8000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P8000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P8000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_8000_12_1 --ooption 0 --olevel 4
+2024-02-28 15:59:53,233|15085|application_1709003950326_0229|15355|TIME|start|Census/CA_1e-3_0_4_8000_12_1
+2024-02-28 16:03:10,452|212304|application_1709003950326_0229|197219|TIME|read|Census/CA_1e-3_0_4_8000_12_1
+2024-02-28 16:05:15,648|337500|application_1709003950326_0229|125196|TIME|layer1|Census/CA_1e-3_0_4_8000_12_1
+2024-02-28 16:07:11,058|452910|application_1709003950326_0229|115410|TIME|layer2|Census/CA_1e-3_0_4_8000_12_1
+2024-02-28 16:08:57,546|559398|application_1709003950326_0229|106488|TIME|overlay|Census/CA_1e-3_0_4_8000_12_1
+2024-02-28 16:08:57,547|559399|application_1709003950326_0229|1|TIME|end|Census/CA_1e-3_0_4_8000_12_1
+./Perf -d Census/CA -t 1e-3 -p 9000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 9000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P9000/edgesA --input2 Census/CA/P9000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P9000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P9000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_9000_12_1 --ooption 0 --olevel 4
+2024-02-28 16:09:17,406|14733|application_1709003950326_0230|15000|TIME|start|Census/CA_1e-3_0_4_9000_12_1
+2024-02-28 16:12:35,220|212547|application_1709003950326_0230|197814|TIME|read|Census/CA_1e-3_0_4_9000_12_1
+2024-02-28 16:14:09,583|306910|application_1709003950326_0230|94363|TIME|layer1|Census/CA_1e-3_0_4_9000_12_1
+2024-02-28 16:15:34,319|391646|application_1709003950326_0230|84736|TIME|layer2|Census/CA_1e-3_0_4_9000_12_1
+2024-02-28 16:17:19,337|496664|application_1709003950326_0230|105018|TIME|overlay|Census/CA_1e-3_0_4_9000_12_1
+2024-02-28 16:17:19,338|496665|application_1709003950326_0230|1|TIME|end|Census/CA_1e-3_0_4_9000_12_1
+./Perf -d Census/CA -t 1e-3 -p 10000 -m yarn -n 1
+DATASET    = Census/CA
+TOLERANCE  = 1e-3
+PARTITIONS = 10000
+ITERATIONS = 1
+MASTER     = yarn
+RUN        = 1
+spark-submit --files /home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --conf spark.driver.maxResultSize=4G --conf spark.kryoserializer.buffer.max=256m --conf spark.locality.wait=3s --jars /home/acald013/Spark/2.4/jars/geospark-1.2.0.jar,/home/acald013/Spark/2.4/jars/scallop_2.11-3.1.5.jar,/home/acald013/Spark/2.4/jars/fastutil-core-8.5.8.jar --master yarn --deploy-mode client --num-executors 12 --executor-cores 9 --executor-memory 20g --driver-memory 35g --class edu.ucr.dblab.sdcel.SDCEL2 /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/CA/P10000/edgesA --input2 Census/CA/P10000/edgesB --quadtree /home/acald013/RIDIR/local_path/Census/CA/P10000/quadtree.wkt --boundary /home/acald013/RIDIR/local_path/Census/CA/P10000/boundary.wkt --tolerance 1e-3 --qtag Census/CA_1e-3_0_4_10000_12_1 --ooption 0 --olevel 4
+2024-02-28 16:17:40,612|15688|application_1709003950326_0231|15953|TIME|start|Census/CA_1e-3_0_4_10000_12_1
+2024-02-28 16:22:45,063|320139|application_1709003950326_0231|304451|TIME|read|Census/CA_1e-3_0_4_10000_12_1
+2024-02-28 16:25:51,492|506568|application_1709003950326_0231|186429|TIME|layer1|Census/CA_1e-3_0_4_10000_12_1
+2024-02-28 16:28:39,204|674280|application_1709003950326_0231|167712|TIME|layer2|Census/CA_1e-3_0_4_10000_12_1
+2024-02-28 16:31:50,999|866075|application_1709003950326_0231|191795|TIME|overlay|Census/CA_1e-3_0_4_10000_12_1
+2024-02-28 16:31:51,000|866076|application_1709003950326_0231|0|TIME|end|Census/CA_1e-3_0_4_10000_12_1

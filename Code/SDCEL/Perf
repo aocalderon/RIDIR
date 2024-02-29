@@ -135,7 +135,7 @@ JAR_LIBS=$JAR_LIBS,${SPARK_JARS}scallop_2.11-3.1.5.jar
 JAR_LIBS=$JAR_LIBS,${SPARK_JARS}fastutil-core-8.5.8.jar
 #JAR_LIBS=$JAR_LIBS,${SPARK_JARS}spark-measure_2.11-0.16.jar
 
-JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.jar
+JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar
 CLASS="edu.ucr.dblab.sdcel.SDCEL2"
 LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
 
