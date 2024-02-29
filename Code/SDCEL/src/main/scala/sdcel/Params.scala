@@ -29,11 +29,12 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val output:      ScallopOption[String]  = opt[String]  (default = Some("tmp/"))
   val persistance: ScallopOption[Int]     = opt[Int]     (default = Some(1))
 
+  val grids:  ScallopOption[String] = opt[String] (default = Some("grids.wkt"))
   val apath:  ScallopOption[String] = opt[String] (default = Some("edgesA.wkt"))
   val bpath:  ScallopOption[String] = opt[String] (default = Some("edgesB.wkt"))
   val qpath:  ScallopOption[String] = opt[String] (default = Some("quadtree.wkt"))
   val epath:  ScallopOption[String] = opt[String] (default = Some("boundary.wkt"))
-  val cpath:  ScallopOption[String] = opt[String] (default = Some("cells.wkt"))
+  val kpath:  ScallopOption[String] = opt[String] (default = Some("kdtree.wkt"))
   val qtag:   ScallopOption[String] = opt[String] (default = Some("tag"))
   val filter: ScallopOption[String] = opt[String] (default = Some("*"))
 

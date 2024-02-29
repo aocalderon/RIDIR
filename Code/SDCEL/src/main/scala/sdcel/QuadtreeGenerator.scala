@@ -1,45 +1,40 @@
 package edu.ucr.dblab.sdcel
 
-import scala.collection.JavaConverters._
-import com.vividsolutions.jts.geom.{Coordinate, Envelope}
-import com.vividsolutions.jts.geom.{LineString, Polygon}
-import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
-import com.vividsolutions.jts.io.WKTReader
 import com.vividsolutions.jts.algorithm.CGAlgorithms
-import org.apache.spark.{SparkConf, SparkContext}
+import com.vividsolutions.jts.geom._
+import com.vividsolutions.jts.io.WKTReader
+import edu.ucr.dblab.sdcel.Utils._
+import edu.ucr.dblab.sdcel.kdtree.FractionCalculator
+import edu.ucr.dblab.sdcel.quadtree._
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.rdd.RDD
-import org.datasyslab.geospark.enums.GridType
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.slf4j.{Logger, LoggerFactory}
-import edu.ucr.dblab.sdcel.quadtree._
-import edu.ucr.dblab.sdcel.geometries.{Cell, LEdge}
-import Utils._
-import edu.ucr.dblab.sdcel.kdtree.FractionCalculator
+
+import scala.collection.JavaConverters._
 
 object QuadtreeGenerator {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
 
   def read(input: String)
-    (implicit spark: SparkSession, geofactory: GeometryFactory, settings: Settings):
+    (implicit spark: SparkSession, G: GeometryFactory, S: Settings):
       SpatialRDD[LineString] = {
 
     val polys = spark.read.textFile(input).rdd.persist
-    if(settings.debug){
+    if(S.debug){
       val nPolys = polys.count
       logger.info(s"TIME|npolys$nPolys")
     }
-    val edgesRaw = polys.mapPartitionsWithIndex{ case(index, lines) =>
-      val reader = new WKTReader(geofactory)
+    val edgesRaw = polys.mapPartitions{ lines=>
+      val reader = new WKTReader(G)
       lines.flatMap{ line0 =>
         val line = line0.split("\t")(0)
         val geom = reader.read(line.replaceAll("\"", ""))
           (0 until geom.getNumGeometries).map{ i =>
             geom.getGeometryN(i).asInstanceOf[Polygon]
           }
-      }.toIterator
+      }
     }.zipWithIndex.flatMap{ case(polygon, id) =>
         getLineStrings(polygon, id)
     }.persist

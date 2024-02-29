@@ -61,7 +61,7 @@ object DCELPartitioner2 {
       lines.flatMap{ line =>
         val arr = line.split("\t")
         val wkt = arr(0)
-        val id  = arr(1).tail.toLong
+        val id  = arr(1).toLong
         val geom = reader.read(wkt).asInstanceOf[Polygon]
           (0 until geom.getNumGeometries).map{ i =>
             (geom.getGeometryN(i).asInstanceOf[Polygon], id)
