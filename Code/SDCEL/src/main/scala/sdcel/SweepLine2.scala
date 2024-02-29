@@ -169,7 +169,7 @@ object SweepLine2 {
     (implicit geofactory: GeometryFactory): List[Half_edge] = {
 
     @tailrec
-    def nextOut(i: ConnectedIntersection, pid: Int,
+    def nextOut(i: ConnectedIntersection, pid: Long,
       iList: List[ConnectedIntersection]): (List[ConnectedIntersection], Half_edge) = {
       if(i.houts.map(_.data.polygonId).contains(pid)){
         val hout = i.houts.dequeueFirst(_.data.polygonId == pid).get

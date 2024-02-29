@@ -249,7 +249,7 @@ object EventPoint_Ordering extends Ordering[EventPoint] {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-case class EdgeData(polygonId: Int, ringId: Int, edgeId: Int, isHole: Boolean,
+case class EdgeData(polygonId: Long, ringId: Int, edgeId: Int, isHole: Boolean,
   label: String = "A", crossingInfo: String = "None", nedges: Int = -1) {
 
   def isCrossingBorder: Boolean = crossingInfo != "None"
@@ -404,9 +404,9 @@ case class Half_edge(edge: LineString){
   def leftPlusDelta(delta: Double):  Coordinate = new Coordinate(left.x, left.y + delta)
   def rightPlusDelta(delta: Double): Coordinate = new Coordinate(right.x, right.y + delta)
 
-  def getPolygonId(): Int = {
+  def getPolygonId(): Long = {
     @tailrec
-    def polyId(hedge: Half_edge): Int = {
+    def polyId(hedge: Half_edge): Long = {
       if(hedge.data.polygonId >= 0){
         hedge.data.polygonId
       } else {
@@ -1001,7 +1001,7 @@ case class Cell(id: Int, lineage: String, mbr: LinearRing){
     List(h1,h2,h3,h4)
   }
 
-  def toHalf_edge(polyId: Int, label: String)
+  def toHalf_edge(polyId: Long, label: String)
     (implicit geofactory: GeometryFactory): Half_edge = {
 
     val se = new Coordinate(boundary.getMinX, boundary.getMinY)

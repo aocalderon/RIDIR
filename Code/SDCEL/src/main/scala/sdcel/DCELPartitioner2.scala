@@ -265,7 +265,7 @@ object DCELPartitioner2 {
     edges.map{ edge =>
       val data = edge.l.getUserData
       val arr = data.asInstanceOf[String].split("\t")
-      val polygonId = arr(0).toInt
+      val polygonId = arr(0).toLong
       val ringId = arr(1).toInt
       val edgeId = arr(2).toInt
       val isHole = arr(3).toBoolean

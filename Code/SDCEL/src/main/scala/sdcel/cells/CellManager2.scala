@@ -26,7 +26,7 @@ object EmptyCellManager {
   // empty: the partition id of the empty cell.
   // polyId: the polygon id which the empty cell must be updated.
   case class EmptyCell(point: Point, pid: Int, empty:Int,
-    polyId: Int = -1, label: String = "*"){
+    polyId: Long = -1, label: String = "*"){
 
     override def toString: String = s"$point\t$pid\t$empty\t$polyId\t$label"
 
