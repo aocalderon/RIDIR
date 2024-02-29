@@ -505,7 +505,7 @@ case class Half_edge(edge: LineString){
         geofactory.createPolygon(coords)
       } else {
         logger.info("Error creating polygon face. Less than 4 vertices...")
-        logger.info(this.toString)
+        //logger.info(this.toString)
         emptyPolygon
       }
     } catch {
@@ -513,7 +513,7 @@ case class Half_edge(edge: LineString){
         logger.info("Error creating polygon face...")
         //println(e.getMessage)
         //println(coords.mkString(" "))
-        logger.info(this.toString)
+        //logger.info(this.toString)
         emptyPolygon
       }
     }
@@ -594,8 +594,8 @@ case class Half_edge(edge: LineString){
         val poly = if(ring.size >= 4)
           geofactory.createPolygon(ring)
         else{
-          logger.info(s"${hedges.head.toString}")
-          logger.info(hedges.mkString("\n"))
+          //logger.info(s"${hedges.head.toString}")
+          //logger.info(hedges.mkString("\n"))
           geofactory.createPolygon(Array.empty[Coordinate])
         }
         hedges.head.poly = poly

@@ -1,21 +1,17 @@
 package edu.ucr.dblab.sdcel
 
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.geom.{Geometry, Coordinate, Envelope}
-import com.vividsolutions.jts.geom.{Polygon, LineString}
+import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.io.WKTReader
-
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.rdd.RDD
-import org.apache.spark.TaskContext
-
-import scala.annotation.tailrec
-
-import edu.ucr.dblab.sdcel.geometries.{Half_edge, Cell, Segment, Coords, Coord}
-import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getFaces, getFullSetHedges}
+import edu.ucr.dblab.sdcel.CellAgg.aggregateSegments
 import edu.ucr.dblab.sdcel.DCELMerger2.merge
 import edu.ucr.dblab.sdcel.Utils.{Settings, logger, save}
-import edu.ucr.dblab.sdcel.CellAgg.{aggregateSegments, aggregateHedges}
+import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getFaces}
+import edu.ucr.dblab.sdcel.geometries._
+import org.apache.spark.TaskContext
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
+
+import scala.annotation.tailrec
 
 object DCELOverlay2 {
   def overlay(
@@ -342,8 +338,12 @@ object DCELOverlay2 {
     }
 
     C.filter(_.getCoords.size >= 4).map{c =>
-      val poly = geofactory.createPolygon(c.getCoords)
-      poly
+      try{
+        val poly = geofactory.createPolygon(c.getCoords)
+        poly
+      }catch{
+        case e: java.lang.IllegalArgumentException => geofactory.createPolygon(Array.empty[Coordinate])
+      }
     }
   }
 
@@ -362,7 +362,7 @@ object DCELOverlay2 {
         coords.filter(c => curr.touch(c.first.coord)).head
       } catch {
         case e: java.util.NoSuchElementException => {
-          logger.info(s"NoSuchElementException")
+          //logger.info(s"NoSuchElementException")
           coords.map{ c =>
             val d = curr.last.coord.distance(c.first.coord)
             (c, d)

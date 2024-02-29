@@ -5,7 +5,6 @@ import edu.ucr.dblab.sdcel.DCELMerger2.{groupByNextMBRPoly, setTwins}
 import edu.ucr.dblab.sdcel.Utils._
 import edu.ucr.dblab.sdcel.geometries._
 import edu.ucr.dblab.sdcel.quadtree._
-import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 import org.slf4j.Logger
 
@@ -60,14 +59,6 @@ object LocalDCEL {
         List.empty[(Half_edge, String, Envelope, Polygon)])
 
       hedges.filter(_._2.split(" ").size == 1).toIterator
-    }
-    if(TaskContext.getPartitionId() == 3) {
-      r.mapPartitionsWithIndex { (pid, hedges) =>
-        hedges.map { case (h, l, e, p) =>
-          val wkt = p.toText
-          s"$wkt\t$pid"
-        }
-      }.foreach{println}
     }
 
     r
@@ -202,7 +193,7 @@ object LocalDCEL {
           
           split
         }
-        case 2 => {
+        case _ => {
           // If the edge has two different intersections we extract the section between
           // those two coords.  We sorted the coords according how close they are from the
           // start of the edge.

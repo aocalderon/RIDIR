@@ -107,6 +107,10 @@ object SDCEL_Partitioner {
       val kcells = getCellsKdtree(kdtree)
       val edgesA = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDA, kcells, "A").cache()
       val edgesB = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDB, kcells, "B").cache()
+      val na = edgesA.count()
+      val nb = edgesB.count()
+      log(s"INFO|Kdtree|$numPartitions|nEdgesA|$na")
+      log(s"INFO|Kdtree|$numPartitions|nEdgesB|$nb")
 
       (edgesA, edgesB, kcells)
     }
@@ -119,24 +123,19 @@ object SDCEL_Partitioner {
       val mx = Map.empty[String, EmptyCell]
 
       val overlay = DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx).cache()
-      overlay.count()
+      val n = overlay.count()
+      log(s"INFO|Kdtree|$numPartitions|nOverlay|$n")
 
       overlay
     }
     log(s"TIME|$numPartitions|Kdtree|overlay|$kdtree_overlay_time")
 
     save(params.kpath()) {
-      kdtree.getLeaves.asScala.map { case (id, envelope) =>
+      kdtree.getLeaves.asScala.map{ case(id, envelope) =>
         val wkt = G.toGeometry(envelope)
+
         s"$wkt\t$id\n"
       }.toList
-    }
-    save("/tmp/edgesKO.wkt") {
-      kdtree_overlay.map { case (face, label) =>
-        val wkt = face.toText
-
-        s"$wkt\t$label\n"
-      }.collect()
     }
 
     /** **
@@ -179,6 +178,10 @@ object SDCEL_Partitioner {
       val qcells = getCells(quadtree)
       val edgesA = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDA, qcells, "A").cache()
       val edgesB = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDB, qcells, "B").cache()
+      val na = edgesA.count()
+      val nb = edgesB.count()
+      log(s"INFO|Quadtree|$numPartitions|nEdgesA|$na")
+      log(s"INFO|Quadtree|$numPartitions|nEdgesB|$nb")
 
       (edgesA, edgesB, qcells)
     }
@@ -191,7 +194,8 @@ object SDCEL_Partitioner {
       val mx = Map.empty[String, EmptyCell]
 
       val overlay = DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx).cache()
-      overlay.count()
+      val n = overlay.count()
+      log(s"INFO|Quadtree|$numPartitions|nOverlay|$n")
 
       overlay
     }
@@ -205,14 +209,9 @@ object SDCEL_Partitioner {
         s"$wkt\t$id\n"
       }.toList
     }
-    save("/tmp/edgesQO.wkt") {
-      quadtree_overlay.map { case (face, label) =>
-        val wkt = face.toText
-
-        s"$wkt\t$label\n"
-      }.collect()
-    }
 
     spark.close
+
+    log("TIME|End")
   }
 }
