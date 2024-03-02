@@ -18,6 +18,9 @@
 package edu.ucr.dblab.sdcel.kdtree;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
+import edu.ucr.dblab.sdcel.quadtree.StandardQuadTree;
 
 import java.io.Serializable;
 import java.util.*;
@@ -26,7 +29,6 @@ import java.util.*;
  * see https://en.wikipedia.org/wiki/K-D-B-tree
  */
 public class KDBTree implements Serializable {
-
     private final int maxItemsPerNode;
     private final int maxLevels;
     private final Envelope extent;
@@ -34,6 +36,8 @@ public class KDBTree implements Serializable {
     private final List<Envelope> items = new ArrayList<>();
     private KDBTree[] children;
     private int leafId = -1;
+    public String lineage = "";
+    public int splitX = -1;
 
     public KDBTree(int maxItemsPerNode, int maxLevels, Envelope extent) {
         this(maxItemsPerNode, maxLevels, 0, extent);
@@ -60,7 +64,8 @@ public class KDBTree implements Serializable {
 
     public int getLeafId() {
         if (!isLeaf()) {
-            throw new IllegalStateException();
+            //throw new IllegalStateException();
+            return -1;
         }
 
         return leafId;
@@ -125,6 +130,23 @@ public class KDBTree implements Serializable {
         return matches;
     }
 
+    public Map<Integer, Polygon> getCells(GeometryFactory G){
+        final Map<Integer, Polygon> matches = new HashMap<>();
+        traverse(new Visitor() {
+            @Override
+            public boolean visit(KDBTree tree) {
+                if (tree.isLeaf()) {
+                    int id = tree.getLeafId();
+                    Polygon mbr = (Polygon) G.toGeometry(tree.getExtent());
+                    mbr.setUserData(id + "\t" + tree.lineage + "\t" + tree.splitX);
+                    matches.put(id, mbr);
+                }
+                return true;
+            }
+        });
+        return matches;
+    }
+
     public List<KDBTree> findLeafNodes(final Envelope envelope) {
         final List<KDBTree> matches = new ArrayList<>();
         traverse(new Visitor() {
@@ -174,6 +196,49 @@ public class KDBTree implements Serializable {
         }
     }
 
+    private interface VisitorWithLineage
+    {
+        /**
+         * Visits a single node of the tree, with the traversal trace
+         *
+         * @param tree Node to visit
+         * @return true to continue traversing the tree; false to stop
+         */
+        boolean visit(KDBTree tree, String lineage);
+    }
+    /**
+     * Traverses the tree top-down breadth-first and calls the visitor
+     * for each node. Stops traversing if a call to Visitor.visit returns false.
+     * lineage will memorize the traversal path for each nodes
+     */
+    private void traverseWithTrace(KDBTree.VisitorWithLineage visitor, String lineage)
+    {
+        if (!visitor.visit(this, lineage)) {
+            return;
+        }
+
+        if (children != null) {
+            children[0].traverseWithTrace(visitor, lineage+0);
+            children[1].traverseWithTrace(visitor, lineage+1);
+        }
+    }
+
+    public void assignPartitionLineage()
+    {
+        traverseWithTrace(new VisitorWithLineage()
+        {
+            @Override
+            public boolean visit(KDBTree tree, String lineage)
+            {
+                //if (tree.isLeaf()) {
+                    tree.lineage = lineage;
+                //}
+                return true;
+            }
+        }, "");
+    }
+
+
     public void assignLeafIds() {
         traverse(new Visitor() {
             int id = 0;
@@ -197,9 +262,11 @@ public class KDBTree implements Serializable {
         final Splitter splitter;
         int middle = (int) Math.floor(items.size() / 2);
         Envelope middleItem = items.get(middle);
+        int spx = -1;
         if (splitX) {
             double x = middleItem.centre().x;
             if (x > extent.getMinX() && x < extent.getMaxX()) {
+                spx = 1;
                 splits = splitAtX(extent, x);
                 splitter = new XSplitter(x);
             } else {
@@ -209,6 +276,7 @@ public class KDBTree implements Serializable {
         } else {
             double y = middleItem.centre().y;
             if (y > extent.getMinY() && y < extent.getMaxY()) {
+                spx = 0;
                 splits = splitAtY(extent, y);
                 splitter = new YSplitter(y);
             } else {
@@ -219,7 +287,9 @@ public class KDBTree implements Serializable {
 
         children = new KDBTree[2];
         children[0] = new KDBTree(maxItemsPerNode, maxLevels, level + 1, splits[0]);
+        children[0].splitX = spx;
         children[1] = new KDBTree(maxItemsPerNode, maxLevels, level + 1, splits[1]);
+        children[1].splitX = spx;
 
         // Move items
         splitItems(splitter);
