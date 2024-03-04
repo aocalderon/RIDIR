@@ -30,7 +30,6 @@ object IDAdder {
       s"$wkt\t$id"
     }
 
-    dataset.take(10).foreach{println}
 
     dataset.toDF.write
       .mode(org.apache.spark.sql.SaveMode.Overwrite)

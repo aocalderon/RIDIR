@@ -1,0 +1,36 @@
+#!/bin/bash
+
+DATASET="CA"
+PARTITIONS=750
+
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 0 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 1 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+
+
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 2 --olevel 4 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 2 --olevel 5 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 2 --olevel 6 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 2 --olevel 7 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 2 --olevel 8 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 2 --olevel 9 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+bash bash/sdcel_partitioner_spark --input1 Census/S/${DATASET}/A.wkt --input2 Census/S/${DATASET}/B.wkt --master yarn \
+     --tolerance 1e-3 --ooption 2 --olevel 10 \
+     --partitions $PARTITIONS --kpath /tmp/edgesCells_${DATASET}_K_${PARTITIONS}.wkt --qpath /tmp/edgesCells_${DATASET}_Q_${PARTITIONS}.wkt 
+

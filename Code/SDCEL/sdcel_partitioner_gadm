@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PS=(5000 6000 7000 8000 9000 10000 11000 12000 13000 14000 15000)
+
+for n in $(seq 1 $1)
+do
+    for P in "${PS[@]}"
+    do
+	echo "
+	bash bash/sdcel_partitioner_spark --input1 gadm/kdtree/A --input2 gadm/kdtree/B --partitions $P --kpath /tmp/edgesCells_GADM_K_${P}.wkt --qpath /tmp/edgesCells_GADM_Q_${P}.wkt --master yarn"
+	bash bash/sdcel_partitioner_spark --input1 gadm/kdtree/A --input2 gadm/kdtree/B --partitions $P --kpath /tmp/edgesCells_GADM_K_${P}.wkt --qpath /tmp/edgesCells_GADM_Q_${P}.wkt --master yarn
+    done
+done
