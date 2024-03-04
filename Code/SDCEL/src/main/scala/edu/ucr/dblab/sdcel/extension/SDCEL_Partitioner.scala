@@ -1,6 +1,6 @@
 package edu.ucr.dblab.sdcel.extension
 
-import com.vividsolutions.jts.geom.{Envelope, GeometryFactory, LineString, PrecisionModel}
+import com.vividsolutions.jts.geom._
 import edu.ucr.dblab.sdcel.LocalDCEL.createLocalDCELs
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save, timer}
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.EmptyCell
@@ -122,7 +122,27 @@ object SDCEL_Partitioner {
       val ldcelB = createLocalDCELs(edgesKB)
       val mx = Map.empty[String, EmptyCell]
 
-      val overlay = DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx).cache()
+      //val overlay = DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx).cache()
+
+      val overlay = if(params.overlay()) {
+        // Overlay local dcels...
+        S.ooption match {
+          case 0 => {
+            DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx)
+          }
+          case 1 => {
+            val over = DCELOverlay2.overlayMaster(ldcelA, mx, ldcelB, mx)
+            spark.sparkContext.parallelize(over)
+          }
+          case 2 => {
+            val over = DCELOverlay2.overlayByLevel(ldcelA, mx, ldcelB, mx)
+            spark.sparkContext.parallelize(over)
+          }
+        }
+      } else {
+        spark.sparkContext.emptyRDD[(Polygon, String)]
+      }
+
       val n = overlay.count()
       log(s"INFO|Kdtree|$numPartitions|nOverlay|$n")
 
@@ -193,7 +213,27 @@ object SDCEL_Partitioner {
       val ldcelB = createLocalDCELs(edgesQB)
       val mx = Map.empty[String, EmptyCell]
 
-      val overlay = DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx).cache()
+      //val overlay = DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx).cache()
+
+      val overlay = if(params.overlay()) {
+        // Overlay local dcels...
+        S.ooption match {
+          case 0 => {
+            DCELOverlay2.overlay(ldcelA, mx, ldcelB, mx)
+          }
+          case 1 => {
+            val over = DCELOverlay2.overlayMaster(ldcelA, mx, ldcelB, mx)
+            spark.sparkContext.parallelize(over)
+          }
+          case 2 => {
+            val over = DCELOverlay2.overlayByLevel(ldcelA, mx, ldcelB, mx)
+            spark.sparkContext.parallelize(over)
+          }
+        }
+      } else {
+        spark.sparkContext.emptyRDD[(Polygon, String)]
+      }
+
       val n = overlay.count()
       log(s"INFO|Quadtree|$numPartitions|nOverlay|$n")
 

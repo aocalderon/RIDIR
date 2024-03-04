@@ -1,7 +1,7 @@
 package edu.ucr.dblab.sdcel.reader
 
 import edu.ucr.dblab.sdcel.Params
-import edu.ucr.dblab.sdcel.Utils.{Settings, log}
+import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 
@@ -29,11 +29,18 @@ object IDAdder {
     }.zipWithUniqueId().map{ case(wkt, id) =>
       s"$wkt\t$id"
     }
-
-
-    dataset.toDF.write
-      .mode(org.apache.spark.sql.SaveMode.Overwrite)
-      .text(params.output())
+    
+    if(params.local()){
+      save(params.output()) {
+        dataset.map { line =>
+          s"$line\n"
+        }.collect()
+      }
+    } else {
+      dataset.toDF.write
+        .mode(org.apache.spark.sql.SaveMode.Overwrite)
+        .text(params.output())
+    }
 
     log("TIME|End")
     spark.close
