@@ -1,0 +1,1265 @@
+./kdtree_overlay TN
+2024-03-04 14:58:59,673|13886|application_1709003950326_0568|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 0 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 14:58:59,673|13886|application_1709003950326_0568|TIME|Start
+2024-03-04 14:58:59,673|13886|application_1709003950326_0568|INFO|TN|scale|1000.0
+2024-03-04 14:59:08,939|23152|application_1709003950326_0568|INFO|TN|edgesA|1302126
+2024-03-04 14:59:14,319|28532|application_1709003950326_0568|INFO|TN|edgesB|1407077
+2024-03-04 14:59:14,827|29040|application_1709003950326_0568|INFO|TN|TotalEdges|2709203
+2024-03-04 14:59:15,005|29218|application_1709003950326_0568|INFO|TN|Requested_partitions|750
+2024-03-04 14:59:15,007|29220|application_1709003950326_0568|INFO|TN|Sample_size|27092
+2024-03-04 14:59:15,008|29221|application_1709003950326_0568|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 14:59:18,319|32532|application_1709003950326_0568|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 14:59:18,391|32604|application_1709003950326_0568|TIME|TN|750|Kdtree|creation|3.381688402
+2024-03-04 14:59:18,392|32605|application_1709003950326_0568|INFO|TN|750|Kdtree|space|1102
+2024-03-04 14:59:24,659|38872|application_1709003950326_0568|INFO|TN|Kdtree|750|nEdgesA|1312526
+2024-03-04 14:59:24,660|38873|application_1709003950326_0568|INFO|TN|Kdtree|750|nEdgesB|1418161
+2024-03-04 14:59:24,660|38873|application_1709003950326_0568|TIME|TN|750|Kdtree|partitioning|6.266654166
+2024-03-04 14:59:32,227|46440|application_1709003950326_0568|INFO|TN|Kdtree|750|nOverlay|2425
+2024-03-04 14:59:32,227|46440|application_1709003950326_0568|TIME|TN|750|Kdtree|overlay|7.557052108
+2024-03-04 14:59:32,346|46559|Saved /tmp/edgesCells_TN_K_750.wkt in 0.01s [1102 records].
+2024-03-04 14:59:32,428|46641|application_1709003950326_0568|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 14:59:32,539|46752|application_1709003950326_0568|TIME|TN|750|Quadtree|creation|0.191119528
+2024-03-04 14:59:32,539|46752|application_1709003950326_0568|INFO|TN|750|Quadtree|space|1963
+2024-03-04 14:59:38,759|52972|application_1709003950326_0568|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 14:59:38,759|52972|application_1709003950326_0568|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 14:59:38,759|52972|application_1709003950326_0568|TIME|TN|750|Quadtree|partitioning|6.218465667
+2024-03-04 14:59:45,361|59574|application_1709003950326_0568|INFO|TN|Quadtree|750|nOverlay|2461
+2024-03-04 14:59:45,361|59574|application_1709003950326_0568|TIME|TN|750|Quadtree|overlay|6.597409923
+2024-03-04 14:59:45,443|59656|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.01s [1963 records].
+2024-03-04 14:59:58,774|72987|application_1709003950326_0568|TIME|End
+2024-03-04 15:00:18,617|13841|application_1709003950326_0569|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 1 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:00:18,618|13842|application_1709003950326_0569|TIME|Start
+2024-03-04 15:00:18,618|13842|application_1709003950326_0569|INFO|TN|scale|1000.0
+2024-03-04 15:00:27,995|23219|application_1709003950326_0569|INFO|TN|edgesA|1302126
+2024-03-04 15:00:33,695|28919|application_1709003950326_0569|INFO|TN|edgesB|1407077
+2024-03-04 15:00:34,121|29345|application_1709003950326_0569|INFO|TN|TotalEdges|2709203
+2024-03-04 15:00:34,349|29573|application_1709003950326_0569|INFO|TN|Requested_partitions|750
+2024-03-04 15:00:34,350|29574|application_1709003950326_0569|INFO|TN|Sample_size|27092
+2024-03-04 15:00:34,351|29575|application_1709003950326_0569|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:00:37,547|32771|application_1709003950326_0569|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:00:37,635|32859|application_1709003950326_0569|TIME|TN|750|Kdtree|creation|3.282148126
+2024-03-04 15:00:37,635|32859|application_1709003950326_0569|INFO|TN|750|Kdtree|space|1104
+2024-03-04 15:00:44,630|39854|application_1709003950326_0569|INFO|TN|Kdtree|750|nEdgesA|1312904
+2024-03-04 15:00:44,630|39854|application_1709003950326_0569|INFO|TN|Kdtree|750|nEdgesB|1418524
+2024-03-04 15:00:44,631|39855|application_1709003950326_0569|TIME|TN|750|Kdtree|partitioning|6.993799327
+2024-03-04 15:00:51,736|46960|application_1709003950326_0569|INFO|TN|Kdtree|750|nOverlay|2429
+2024-03-04 15:00:51,736|46960|application_1709003950326_0569|TIME|TN|750|Kdtree|overlay|7.10381695
+2024-03-04 15:00:51,842|47066|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1104 records].
+2024-03-04 15:00:51,938|47162|application_1709003950326_0569|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:00:52,052|47276|application_1709003950326_0569|TIME|TN|750|Quadtree|creation|0.208998661
+2024-03-04 15:00:52,053|47277|application_1709003950326_0569|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:00:58,606|53830|application_1709003950326_0569|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:00:58,606|53830|application_1709003950326_0569|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:00:58,606|53830|application_1709003950326_0569|TIME|TN|750|Quadtree|partitioning|6.551933572
+2024-03-04 15:01:05,147|60371|application_1709003950326_0569|INFO|TN|Quadtree|750|nOverlay|2468
+2024-03-04 15:01:05,147|60371|application_1709003950326_0569|TIME|TN|750|Quadtree|overlay|6.536608475
+2024-03-04 15:01:05,215|60439|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:01:05,408|60632|application_1709003950326_0569|TIME|End
+2024-03-04 15:01:24,349|13552|application_1709003950326_0570|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 4 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:01:24,349|13552|application_1709003950326_0570|TIME|Start
+2024-03-04 15:01:24,349|13552|application_1709003950326_0570|INFO|TN|scale|1000.0
+2024-03-04 15:01:34,055|23258|application_1709003950326_0570|INFO|TN|edgesA|1302126
+2024-03-04 15:01:39,674|28877|application_1709003950326_0570|INFO|TN|edgesB|1407077
+2024-03-04 15:01:40,122|29325|application_1709003950326_0570|INFO|TN|TotalEdges|2709203
+2024-03-04 15:01:40,301|29504|application_1709003950326_0570|INFO|TN|Requested_partitions|750
+2024-03-04 15:01:40,303|29506|application_1709003950326_0570|INFO|TN|Sample_size|27092
+2024-03-04 15:01:40,304|29507|application_1709003950326_0570|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:01:43,255|32458|application_1709003950326_0570|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:01:43,323|32526|application_1709003950326_0570|TIME|TN|750|Kdtree|creation|3.017424511
+2024-03-04 15:01:43,324|32527|application_1709003950326_0570|INFO|TN|750|Kdtree|space|1096
+2024-03-04 15:01:50,331|39534|application_1709003950326_0570|INFO|TN|Kdtree|750|nEdgesA|1312549
+2024-03-04 15:01:50,332|39535|application_1709003950326_0570|INFO|TN|Kdtree|750|nEdgesB|1418233
+2024-03-04 15:01:50,332|39535|application_1709003950326_0570|TIME|TN|750|Kdtree|partitioning|7.0066087
+2024-03-04 15:01:59,695|48898|application_1709003950326_0570|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:01:59,695|48898|application_1709003950326_0570|TIME|TN|750|Kdtree|overlay|9.360409675
+2024-03-04 15:01:59,805|49008|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1096 records].
+2024-03-04 15:01:59,961|49164|application_1709003950326_0570|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:02:00,065|49268|application_1709003950326_0570|TIME|TN|750|Quadtree|creation|0.257520651
+2024-03-04 15:02:00,065|49268|application_1709003950326_0570|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:02:05,400|54603|application_1709003950326_0570|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:02:05,400|54603|application_1709003950326_0570|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:02:05,400|54603|application_1709003950326_0570|TIME|TN|750|Quadtree|partitioning|5.333945579
+2024-03-04 15:02:12,268|61471|application_1709003950326_0570|INFO|TN|Quadtree|750|nOverlay|2461
+2024-03-04 15:02:12,268|61471|application_1709003950326_0570|TIME|TN|750|Quadtree|overlay|6.866104163
+2024-03-04 15:02:12,333|61536|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:02:12,507|61710|application_1709003950326_0570|TIME|End
+2024-03-04 15:02:31,268|13419|application_1709003950326_0571|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 5 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:02:31,269|13420|application_1709003950326_0571|TIME|Start
+2024-03-04 15:02:31,269|13420|application_1709003950326_0571|INFO|TN|scale|1000.0
+2024-03-04 15:02:41,032|23183|application_1709003950326_0571|INFO|TN|edgesA|1302126
+2024-03-04 15:02:46,602|28753|application_1709003950326_0571|INFO|TN|edgesB|1407077
+2024-03-04 15:02:47,018|29169|application_1709003950326_0571|INFO|TN|TotalEdges|2709203
+2024-03-04 15:02:47,282|29433|application_1709003950326_0571|INFO|TN|Requested_partitions|750
+2024-03-04 15:02:47,283|29434|application_1709003950326_0571|INFO|TN|Sample_size|27092
+2024-03-04 15:02:47,285|29436|application_1709003950326_0571|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:02:50,294|32445|application_1709003950326_0571|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:02:50,359|32510|application_1709003950326_0571|TIME|TN|750|Kdtree|creation|3.072467751
+2024-03-04 15:02:50,360|32511|application_1709003950326_0571|INFO|TN|750|Kdtree|space|1125
+2024-03-04 15:02:56,911|39062|application_1709003950326_0571|INFO|TN|Kdtree|750|nEdgesA|1312903
+2024-03-04 15:02:56,911|39062|application_1709003950326_0571|INFO|TN|Kdtree|750|nEdgesB|1418479
+2024-03-04 15:02:56,911|39062|application_1709003950326_0571|TIME|TN|750|Kdtree|partitioning|6.55015489
+2024-03-04 15:03:04,309|46460|application_1709003950326_0571|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:03:04,309|46460|application_1709003950326_0571|TIME|TN|750|Kdtree|overlay|7.394875438
+2024-03-04 15:03:04,416|46567|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1125 records].
+2024-03-04 15:03:04,501|46652|application_1709003950326_0571|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:03:04,713|46864|application_1709003950326_0571|TIME|TN|750|Quadtree|creation|0.294833364
+2024-03-04 15:03:04,713|46864|application_1709003950326_0571|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:03:10,584|52735|application_1709003950326_0571|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:03:10,584|52735|application_1709003950326_0571|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:03:10,584|52735|application_1709003950326_0571|TIME|TN|750|Quadtree|partitioning|5.869317175
+2024-03-04 15:03:16,809|58960|application_1709003950326_0571|INFO|TN|Quadtree|750|nOverlay|2463
+2024-03-04 15:03:16,809|58960|application_1709003950326_0571|TIME|TN|750|Quadtree|overlay|6.220146257
+2024-03-04 15:03:16,877|59028|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:03:17,042|59193|application_1709003950326_0571|TIME|End
+2024-03-04 15:03:36,629|14231|application_1709003950326_0572|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 6 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:03:36,629|14231|application_1709003950326_0572|TIME|Start
+2024-03-04 15:03:36,630|14232|application_1709003950326_0572|INFO|TN|scale|1000.0
+2024-03-04 15:03:45,942|23544|application_1709003950326_0572|INFO|TN|edgesA|1302126
+2024-03-04 15:03:51,255|28857|application_1709003950326_0572|INFO|TN|edgesB|1407077
+2024-03-04 15:03:51,737|29339|application_1709003950326_0572|INFO|TN|TotalEdges|2709203
+2024-03-04 15:03:51,903|29505|application_1709003950326_0572|INFO|TN|Requested_partitions|750
+2024-03-04 15:03:51,905|29507|application_1709003950326_0572|INFO|TN|Sample_size|27092
+2024-03-04 15:03:51,906|29508|application_1709003950326_0572|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:03:54,987|32589|application_1709003950326_0572|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:03:55,057|32659|application_1709003950326_0572|TIME|TN|750|Kdtree|creation|3.150329651
+2024-03-04 15:03:55,058|32660|application_1709003950326_0572|INFO|TN|750|Kdtree|space|1096
+2024-03-04 15:04:00,888|38490|application_1709003950326_0572|INFO|TN|Kdtree|750|nEdgesA|1312779
+2024-03-04 15:04:00,888|38490|application_1709003950326_0572|INFO|TN|Kdtree|750|nEdgesB|1418418
+2024-03-04 15:04:00,888|38490|application_1709003950326_0572|TIME|TN|750|Kdtree|partitioning|5.828761432
+2024-03-04 15:04:07,481|45083|application_1709003950326_0572|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:04:07,481|45083|application_1709003950326_0572|TIME|TN|750|Kdtree|overlay|6.590013789
+2024-03-04 15:04:07,583|45185|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1096 records].
+2024-03-04 15:04:07,672|45274|application_1709003950326_0572|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:04:07,776|45378|application_1709003950326_0572|TIME|TN|750|Quadtree|creation|0.191137606
+2024-03-04 15:04:07,777|45379|application_1709003950326_0572|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:04:12,611|50213|application_1709003950326_0572|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:04:12,611|50213|application_1709003950326_0572|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:04:12,612|50214|application_1709003950326_0572|TIME|TN|750|Quadtree|partitioning|4.833525982
+2024-03-04 15:04:18,911|56513|application_1709003950326_0572|INFO|TN|Quadtree|750|nOverlay|2464
+2024-03-04 15:04:18,912|56514|application_1709003950326_0572|TIME|TN|750|Quadtree|overlay|6.296340946
+2024-03-04 15:04:18,976|56578|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:04:19,182|56784|application_1709003950326_0572|TIME|End
+2024-03-04 15:04:38,952|14356|application_1709003950326_0573|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 7 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:04:38,952|14356|application_1709003950326_0573|TIME|Start
+2024-03-04 15:04:38,953|14357|application_1709003950326_0573|INFO|TN|scale|1000.0
+2024-03-04 15:04:48,780|24184|application_1709003950326_0573|INFO|TN|edgesA|1302126
+2024-03-04 15:04:54,263|29667|application_1709003950326_0573|INFO|TN|edgesB|1407077
+2024-03-04 15:04:54,754|30158|application_1709003950326_0573|INFO|TN|TotalEdges|2709203
+2024-03-04 15:04:55,068|30472|application_1709003950326_0573|INFO|TN|Requested_partitions|750
+2024-03-04 15:04:55,069|30473|application_1709003950326_0573|INFO|TN|Sample_size|27092
+2024-03-04 15:04:55,070|30474|application_1709003950326_0573|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:04:58,285|33689|application_1709003950326_0573|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:04:58,369|33773|application_1709003950326_0573|TIME|TN|750|Kdtree|creation|3.298059147
+2024-03-04 15:04:58,370|33774|application_1709003950326_0573|INFO|TN|750|Kdtree|space|1113
+2024-03-04 15:05:04,635|40039|application_1709003950326_0573|INFO|TN|Kdtree|750|nEdgesA|1312980
+2024-03-04 15:05:04,636|40040|application_1709003950326_0573|INFO|TN|Kdtree|750|nEdgesB|1418735
+2024-03-04 15:05:04,636|40040|application_1709003950326_0573|TIME|TN|750|Kdtree|partitioning|6.264186237
+2024-03-04 15:05:12,056|47460|application_1709003950326_0573|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:05:12,056|47460|application_1709003950326_0573|TIME|TN|750|Kdtree|overlay|7.416037995
+2024-03-04 15:05:12,169|47573|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1113 records].
+2024-03-04 15:05:12,268|47672|application_1709003950326_0573|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:05:12,369|47773|application_1709003950326_0573|TIME|TN|750|Quadtree|creation|0.196484369
+2024-03-04 15:05:12,370|47774|application_1709003950326_0573|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:05:17,553|52957|application_1709003950326_0573|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:05:17,554|52958|application_1709003950326_0573|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:05:17,554|52958|application_1709003950326_0573|TIME|TN|750|Quadtree|partitioning|5.182824272
+2024-03-04 15:05:24,257|59661|application_1709003950326_0573|INFO|TN|Quadtree|750|nOverlay|2467
+2024-03-04 15:05:24,257|59661|application_1709003950326_0573|TIME|TN|750|Quadtree|overlay|6.70110121
+2024-03-04 15:05:24,334|59738|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.01s [1963 records].
+2024-03-04 15:05:24,515|59919|application_1709003950326_0573|TIME|End
+2024-03-04 15:05:44,920|13967|application_1709003950326_0574|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 8 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:05:44,921|13968|application_1709003950326_0574|TIME|Start
+2024-03-04 15:05:44,921|13968|application_1709003950326_0574|INFO|TN|scale|1000.0
+2024-03-04 15:05:54,257|23304|application_1709003950326_0574|INFO|TN|edgesA|1302126
+2024-03-04 15:05:59,706|28753|application_1709003950326_0574|INFO|TN|edgesB|1407077
+2024-03-04 15:06:00,163|29210|application_1709003950326_0574|INFO|TN|TotalEdges|2709203
+2024-03-04 15:06:00,341|29388|application_1709003950326_0574|INFO|TN|Requested_partitions|750
+2024-03-04 15:06:00,343|29390|application_1709003950326_0574|INFO|TN|Sample_size|27092
+2024-03-04 15:06:00,345|29392|application_1709003950326_0574|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:06:03,488|32535|application_1709003950326_0574|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:06:03,557|32604|application_1709003950326_0574|TIME|TN|750|Kdtree|creation|3.210371954
+2024-03-04 15:06:03,557|32604|application_1709003950326_0574|INFO|TN|750|Kdtree|space|1115
+2024-03-04 15:06:09,284|38331|application_1709003950326_0574|INFO|TN|Kdtree|750|nEdgesA|1312851
+2024-03-04 15:06:09,285|38332|application_1709003950326_0574|INFO|TN|Kdtree|750|nEdgesB|1418548
+2024-03-04 15:06:09,285|38332|application_1709003950326_0574|TIME|TN|750|Kdtree|partitioning|5.726089351
+2024-03-04 15:06:17,021|46068|application_1709003950326_0574|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:06:17,022|46069|application_1709003950326_0574|TIME|TN|750|Kdtree|overlay|7.73234869
+2024-03-04 15:06:17,134|46181|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1115 records].
+2024-03-04 15:06:17,214|46261|application_1709003950326_0574|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:06:17,306|46353|application_1709003950326_0574|TIME|TN|750|Quadtree|creation|0.170008709
+2024-03-04 15:06:17,306|46353|application_1709003950326_0574|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:06:22,425|51472|application_1709003950326_0574|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:06:22,426|51473|application_1709003950326_0574|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:06:22,426|51473|application_1709003950326_0574|TIME|TN|750|Quadtree|partitioning|5.118398945
+2024-03-04 15:06:30,907|59954|application_1709003950326_0574|INFO|TN|Quadtree|750|nOverlay|2461
+2024-03-04 15:06:30,908|59955|application_1709003950326_0574|TIME|TN|750|Quadtree|overlay|8.480007488
+2024-03-04 15:06:30,976|60023|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:06:31,172|60219|application_1709003950326_0574|TIME|End
+2024-03-04 15:06:51,199|13807|application_1709003950326_0575|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 9 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:06:51,200|13808|application_1709003950326_0575|TIME|Start
+2024-03-04 15:06:51,200|13808|application_1709003950326_0575|INFO|TN|scale|1000.0
+2024-03-04 15:07:00,676|23284|application_1709003950326_0575|INFO|TN|edgesA|1302126
+2024-03-04 15:07:06,094|28702|application_1709003950326_0575|INFO|TN|edgesB|1407077
+2024-03-04 15:07:06,506|29114|application_1709003950326_0575|INFO|TN|TotalEdges|2709203
+2024-03-04 15:07:06,856|29464|application_1709003950326_0575|INFO|TN|Requested_partitions|750
+2024-03-04 15:07:06,858|29466|application_1709003950326_0575|INFO|TN|Sample_size|27092
+2024-03-04 15:07:06,859|29467|application_1709003950326_0575|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:07:09,899|32507|application_1709003950326_0575|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:07:09,972|32580|application_1709003950326_0575|TIME|TN|750|Kdtree|creation|3.112120188
+2024-03-04 15:07:09,973|32581|application_1709003950326_0575|INFO|TN|750|Kdtree|space|1091
+2024-03-04 15:07:15,661|38269|application_1709003950326_0575|INFO|TN|Kdtree|750|nEdgesA|1312678
+2024-03-04 15:07:15,661|38269|application_1709003950326_0575|INFO|TN|Kdtree|750|nEdgesB|1418271
+2024-03-04 15:07:15,661|38269|application_1709003950326_0575|TIME|TN|750|Kdtree|partitioning|5.686322243
+2024-03-04 15:07:23,157|45765|application_1709003950326_0575|INFO|TN|Kdtree|750|nOverlay|2432
+2024-03-04 15:07:23,157|45765|application_1709003950326_0575|TIME|TN|750|Kdtree|overlay|7.494395139
+2024-03-04 15:07:23,264|45872|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1091 records].
+2024-03-04 15:07:23,350|45958|application_1709003950326_0575|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:07:23,466|46074|application_1709003950326_0575|TIME|TN|750|Quadtree|creation|0.200274392
+2024-03-04 15:07:23,466|46074|application_1709003950326_0575|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:07:29,397|52005|application_1709003950326_0575|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:07:29,397|52005|application_1709003950326_0575|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:07:29,397|52005|application_1709003950326_0575|TIME|TN|750|Quadtree|partitioning|5.929055368
+2024-03-04 15:07:36,783|59391|application_1709003950326_0575|INFO|TN|Quadtree|750|nOverlay|2464
+2024-03-04 15:07:36,783|59391|application_1709003950326_0575|TIME|TN|750|Quadtree|overlay|7.384482218
+2024-03-04 15:07:36,836|59444|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:07:37,131|59739|application_1709003950326_0575|TIME|End
+2024-03-04 15:07:56,685|13697|application_1709003950326_0576|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 10 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:07:56,686|13698|application_1709003950326_0576|TIME|Start
+2024-03-04 15:07:56,686|13698|application_1709003950326_0576|INFO|TN|scale|1000.0
+2024-03-04 15:08:06,184|23196|application_1709003950326_0576|INFO|TN|edgesA|1302126
+2024-03-04 15:08:11,731|28743|application_1709003950326_0576|INFO|TN|edgesB|1407077
+2024-03-04 15:08:12,110|29122|application_1709003950326_0576|INFO|TN|TotalEdges|2709203
+2024-03-04 15:08:12,386|29398|application_1709003950326_0576|INFO|TN|Requested_partitions|750
+2024-03-04 15:08:12,388|29400|application_1709003950326_0576|INFO|TN|Sample_size|27092
+2024-03-04 15:08:12,389|29401|application_1709003950326_0576|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:08:15,514|32526|application_1709003950326_0576|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:08:15,586|32598|application_1709003950326_0576|TIME|TN|750|Kdtree|creation|3.19474103
+2024-03-04 15:08:15,586|32598|application_1709003950326_0576|INFO|TN|750|Kdtree|space|1093
+2024-03-04 15:08:21,475|38487|application_1709003950326_0576|INFO|TN|Kdtree|750|nEdgesA|1312655
+2024-03-04 15:08:21,475|38487|application_1709003950326_0576|INFO|TN|Kdtree|750|nEdgesB|1418301
+2024-03-04 15:08:21,476|38488|application_1709003950326_0576|TIME|TN|750|Kdtree|partitioning|5.887885803
+2024-03-04 15:08:29,673|46685|application_1709003950326_0576|INFO|TN|Kdtree|750|nOverlay|2429
+2024-03-04 15:08:29,673|46685|application_1709003950326_0576|TIME|TN|750|Kdtree|overlay|8.194526718
+2024-03-04 15:08:29,777|46789|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1093 records].
+2024-03-04 15:08:29,866|46878|application_1709003950326_0576|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:08:29,964|46976|application_1709003950326_0576|TIME|TN|750|Quadtree|creation|0.185081722
+2024-03-04 15:08:29,964|46976|application_1709003950326_0576|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:08:36,050|53062|application_1709003950326_0576|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:08:36,051|53063|application_1709003950326_0576|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:08:36,051|53063|application_1709003950326_0576|TIME|TN|750|Quadtree|partitioning|6.085277203
+2024-03-04 15:08:43,095|60107|application_1709003950326_0576|INFO|TN|Quadtree|750|nOverlay|2467
+2024-03-04 15:08:43,095|60107|application_1709003950326_0576|TIME|TN|750|Quadtree|overlay|7.040838778
+2024-03-04 15:08:43,168|60180|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:08:43,443|60455|application_1709003950326_0576|TIME|End
+./kdtree_overlay TN
+2024-03-04 15:09:03,233|14169|application_1709003950326_0577|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 0 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:09:03,233|14169|application_1709003950326_0577|TIME|Start
+2024-03-04 15:09:03,233|14169|application_1709003950326_0577|INFO|TN|scale|1000.0
+2024-03-04 15:09:12,479|23415|application_1709003950326_0577|INFO|TN|edgesA|1302126
+2024-03-04 15:09:17,901|28837|application_1709003950326_0577|INFO|TN|edgesB|1407077
+2024-03-04 15:09:18,344|29280|application_1709003950326_0577|INFO|TN|TotalEdges|2709203
+2024-03-04 15:09:18,613|29549|application_1709003950326_0577|INFO|TN|Requested_partitions|750
+2024-03-04 15:09:18,614|29550|application_1709003950326_0577|INFO|TN|Sample_size|27092
+2024-03-04 15:09:18,616|29552|application_1709003950326_0577|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:09:21,710|32646|application_1709003950326_0577|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:09:21,777|32713|application_1709003950326_0577|TIME|TN|750|Kdtree|creation|3.159427034
+2024-03-04 15:09:21,778|32714|application_1709003950326_0577|INFO|TN|750|Kdtree|space|1100
+2024-03-04 15:09:28,623|39559|application_1709003950326_0577|INFO|TN|Kdtree|750|nEdgesA|1312844
+2024-03-04 15:09:28,623|39559|application_1709003950326_0577|INFO|TN|Kdtree|750|nEdgesB|1418483
+2024-03-04 15:09:28,624|39560|application_1709003950326_0577|TIME|TN|750|Kdtree|partitioning|6.844454397
+2024-03-04 15:09:37,238|48174|application_1709003950326_0577|INFO|TN|Kdtree|750|nOverlay|2433
+2024-03-04 15:09:37,239|48175|application_1709003950326_0577|TIME|TN|750|Kdtree|overlay|8.611100764
+2024-03-04 15:09:37,342|48278|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1100 records].
+2024-03-04 15:09:37,435|48371|application_1709003950326_0577|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:09:37,533|48469|application_1709003950326_0577|TIME|TN|750|Quadtree|creation|0.189378283
+2024-03-04 15:09:37,533|48469|application_1709003950326_0577|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:09:43,027|53963|application_1709003950326_0577|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:09:43,027|53963|application_1709003950326_0577|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:09:43,027|53963|application_1709003950326_0577|TIME|TN|750|Quadtree|partitioning|5.492663391
+2024-03-04 15:09:50,413|61349|application_1709003950326_0577|INFO|TN|Quadtree|750|nOverlay|2459
+2024-03-04 15:09:50,413|61349|application_1709003950326_0577|TIME|TN|750|Quadtree|overlay|7.381586119
+2024-03-04 15:09:50,477|61413|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:09:50,676|61612|application_1709003950326_0577|TIME|End
+2024-03-04 15:10:10,386|14109|application_1709003950326_0578|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 1 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:10:10,387|14110|application_1709003950326_0578|TIME|Start
+2024-03-04 15:10:10,387|14110|application_1709003950326_0578|INFO|TN|scale|1000.0
+2024-03-04 15:10:19,773|23496|application_1709003950326_0578|INFO|TN|edgesA|1302126
+2024-03-04 15:10:25,265|28988|application_1709003950326_0578|INFO|TN|edgesB|1407077
+2024-03-04 15:10:25,655|29378|application_1709003950326_0578|INFO|TN|TotalEdges|2709203
+2024-03-04 15:10:25,838|29561|application_1709003950326_0578|INFO|TN|Requested_partitions|750
+2024-03-04 15:10:25,839|29562|application_1709003950326_0578|INFO|TN|Sample_size|27092
+2024-03-04 15:10:25,840|29563|application_1709003950326_0578|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:10:29,032|32755|application_1709003950326_0578|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:10:29,101|32824|application_1709003950326_0578|TIME|TN|750|Kdtree|creation|3.258574482
+2024-03-04 15:10:29,101|32824|application_1709003950326_0578|INFO|TN|750|Kdtree|space|1103
+2024-03-04 15:10:35,276|38999|application_1709003950326_0578|INFO|TN|Kdtree|750|nEdgesA|1312669
+2024-03-04 15:10:35,276|38999|application_1709003950326_0578|INFO|TN|Kdtree|750|nEdgesB|1418317
+2024-03-04 15:10:35,276|38999|application_1709003950326_0578|TIME|TN|750|Kdtree|partitioning|6.173908366
+2024-03-04 15:10:43,438|47161|application_1709003950326_0578|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:10:43,438|47161|application_1709003950326_0578|TIME|TN|750|Kdtree|overlay|8.159407189
+2024-03-04 15:10:43,541|47264|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1103 records].
+2024-03-04 15:10:43,626|47349|application_1709003950326_0578|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:10:43,726|47449|application_1709003950326_0578|TIME|TN|750|Quadtree|creation|0.182627506
+2024-03-04 15:10:43,726|47449|application_1709003950326_0578|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:10:49,119|52842|application_1709003950326_0578|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:10:49,119|52842|application_1709003950326_0578|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:10:49,120|52843|application_1709003950326_0578|TIME|TN|750|Quadtree|partitioning|5.392291635
+2024-03-04 15:10:56,194|59917|application_1709003950326_0578|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:10:56,195|59918|application_1709003950326_0578|TIME|TN|750|Quadtree|overlay|7.071198405
+2024-03-04 15:10:56,262|59985|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:10:56,463|60186|application_1709003950326_0578|TIME|End
+2024-03-04 15:11:15,552|13493|application_1709003950326_0579|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 4 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:11:15,552|13493|application_1709003950326_0579|TIME|Start
+2024-03-04 15:11:15,553|13494|application_1709003950326_0579|INFO|TN|scale|1000.0
+2024-03-04 15:11:24,773|22714|application_1709003950326_0579|INFO|TN|edgesA|1302126
+2024-03-04 15:11:30,087|28028|application_1709003950326_0579|INFO|TN|edgesB|1407077
+2024-03-04 15:11:30,565|28506|application_1709003950326_0579|INFO|TN|TotalEdges|2709203
+2024-03-04 15:11:30,736|28677|application_1709003950326_0579|INFO|TN|Requested_partitions|750
+2024-03-04 15:11:30,737|28678|application_1709003950326_0579|INFO|TN|Sample_size|27092
+2024-03-04 15:11:30,738|28679|application_1709003950326_0579|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:11:33,884|31825|application_1709003950326_0579|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:11:33,951|31892|application_1709003950326_0579|TIME|TN|750|Kdtree|creation|3.211912631
+2024-03-04 15:11:33,952|31893|application_1709003950326_0579|INFO|TN|750|Kdtree|space|1102
+2024-03-04 15:11:40,482|38423|application_1709003950326_0579|INFO|TN|Kdtree|750|nEdgesA|1312997
+2024-03-04 15:11:40,482|38423|application_1709003950326_0579|INFO|TN|Kdtree|750|nEdgesB|1418582
+2024-03-04 15:11:40,482|38423|application_1709003950326_0579|TIME|TN|750|Kdtree|partitioning|6.529022487
+2024-03-04 15:11:48,130|46071|application_1709003950326_0579|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:11:48,130|46071|application_1709003950326_0579|TIME|TN|750|Kdtree|overlay|7.644466536
+2024-03-04 15:11:48,231|46172|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1102 records].
+2024-03-04 15:11:48,323|46264|application_1709003950326_0579|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:11:48,425|46366|application_1709003950326_0579|TIME|TN|750|Quadtree|creation|0.192486493
+2024-03-04 15:11:48,426|46367|application_1709003950326_0579|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:11:54,232|52173|application_1709003950326_0579|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:11:54,232|52173|application_1709003950326_0579|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:11:54,233|52174|application_1709003950326_0579|TIME|TN|750|Quadtree|partitioning|5.805499462
+2024-03-04 15:12:01,907|59848|application_1709003950326_0579|INFO|TN|Quadtree|750|nOverlay|2469
+2024-03-04 15:12:01,907|59848|application_1709003950326_0579|TIME|TN|750|Quadtree|overlay|7.672566472
+2024-03-04 15:12:02,002|59943|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.02s [1963 records].
+2024-03-04 15:12:02,213|60154|application_1709003950326_0579|TIME|End
+2024-03-04 15:12:21,251|13616|application_1709003950326_0580|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 5 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:12:21,251|13616|application_1709003950326_0580|TIME|Start
+2024-03-04 15:12:21,251|13616|application_1709003950326_0580|INFO|TN|scale|1000.0
+2024-03-04 15:12:30,621|22986|application_1709003950326_0580|INFO|TN|edgesA|1302126
+2024-03-04 15:12:35,988|28353|application_1709003950326_0580|INFO|TN|edgesB|1407077
+2024-03-04 15:12:36,457|28822|application_1709003950326_0580|INFO|TN|TotalEdges|2709203
+2024-03-04 15:12:36,628|28993|application_1709003950326_0580|INFO|TN|Requested_partitions|750
+2024-03-04 15:12:36,629|28994|application_1709003950326_0580|INFO|TN|Sample_size|27092
+2024-03-04 15:12:36,630|28995|application_1709003950326_0580|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:12:39,257|31622|application_1709003950326_0580|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:12:39,325|31690|application_1709003950326_0580|TIME|TN|750|Kdtree|creation|2.692610622
+2024-03-04 15:12:39,325|31690|application_1709003950326_0580|INFO|TN|750|Kdtree|space|1122
+2024-03-04 15:12:46,105|38470|application_1709003950326_0580|INFO|TN|Kdtree|750|nEdgesA|1312987
+2024-03-04 15:12:46,105|38470|application_1709003950326_0580|INFO|TN|Kdtree|750|nEdgesB|1418554
+2024-03-04 15:12:46,106|38471|application_1709003950326_0580|TIME|TN|750|Kdtree|partitioning|6.778991231
+2024-03-04 15:12:54,078|46443|application_1709003950326_0580|INFO|TN|Kdtree|750|nOverlay|2430
+2024-03-04 15:12:54,078|46443|application_1709003950326_0580|TIME|TN|750|Kdtree|overlay|7.968132039
+2024-03-04 15:12:54,182|46547|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1122 records].
+2024-03-04 15:12:54,277|46642|application_1709003950326_0580|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:12:54,383|46748|application_1709003950326_0580|TIME|TN|750|Quadtree|creation|0.19839528
+2024-03-04 15:12:54,383|46748|application_1709003950326_0580|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:12:59,459|51824|application_1709003950326_0580|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:12:59,459|51824|application_1709003950326_0580|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:12:59,459|51824|application_1709003950326_0580|TIME|TN|750|Quadtree|partitioning|5.074563784
+2024-03-04 15:13:05,674|58039|application_1709003950326_0580|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:13:05,674|58039|application_1709003950326_0580|TIME|TN|750|Quadtree|overlay|6.211629063
+2024-03-04 15:13:05,748|58113|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:13:05,947|58312|application_1709003950326_0580|TIME|End
+2024-03-04 15:13:24,822|13318|application_1709003950326_0581|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 6 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:13:24,823|13319|application_1709003950326_0581|TIME|Start
+2024-03-04 15:13:24,823|13319|application_1709003950326_0581|INFO|TN|scale|1000.0
+2024-03-04 15:13:34,748|23244|application_1709003950326_0581|INFO|TN|edgesA|1302126
+2024-03-04 15:13:40,312|28808|application_1709003950326_0581|INFO|TN|edgesB|1407077
+2024-03-04 15:13:40,806|29302|application_1709003950326_0581|INFO|TN|TotalEdges|2709203
+2024-03-04 15:13:40,977|29473|application_1709003950326_0581|INFO|TN|Requested_partitions|750
+2024-03-04 15:13:40,978|29474|application_1709003950326_0581|INFO|TN|Sample_size|27092
+2024-03-04 15:13:40,980|29476|application_1709003950326_0581|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:13:44,188|32684|application_1709003950326_0581|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:13:44,265|32761|application_1709003950326_0581|TIME|TN|750|Kdtree|creation|3.283296329
+2024-03-04 15:13:44,265|32761|application_1709003950326_0581|INFO|TN|750|Kdtree|space|1117
+2024-03-04 15:13:50,332|38828|application_1709003950326_0581|INFO|TN|Kdtree|750|nEdgesA|1313075
+2024-03-04 15:13:50,333|38829|application_1709003950326_0581|INFO|TN|Kdtree|750|nEdgesB|1418640
+2024-03-04 15:13:50,333|38829|application_1709003950326_0581|TIME|TN|750|Kdtree|partitioning|6.066155325
+2024-03-04 15:13:58,729|47225|application_1709003950326_0581|INFO|TN|Kdtree|750|nOverlay|2432
+2024-03-04 15:13:58,729|47225|application_1709003950326_0581|TIME|TN|750|Kdtree|overlay|8.392633321
+2024-03-04 15:13:58,841|47337|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1117 records].
+2024-03-04 15:13:58,932|47428|application_1709003950326_0581|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:13:59,058|47554|application_1709003950326_0581|TIME|TN|750|Quadtree|creation|0.215101049
+2024-03-04 15:13:59,058|47554|application_1709003950326_0581|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:14:04,361|52857|application_1709003950326_0581|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:14:04,361|52857|application_1709003950326_0581|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:14:04,361|52857|application_1709003950326_0581|TIME|TN|750|Quadtree|partitioning|5.301336602
+2024-03-04 15:14:11,605|60101|application_1709003950326_0581|INFO|TN|Quadtree|750|nOverlay|2463
+2024-03-04 15:14:11,605|60101|application_1709003950326_0581|TIME|TN|750|Quadtree|overlay|7.240684146
+2024-03-04 15:14:11,670|60166|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:14:11,848|60344|application_1709003950326_0581|TIME|End
+2024-03-04 15:14:31,193|13814|application_1709003950326_0582|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 7 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:14:31,194|13815|application_1709003950326_0582|TIME|Start
+2024-03-04 15:14:31,194|13815|application_1709003950326_0582|INFO|TN|scale|1000.0
+2024-03-04 15:14:40,934|23555|application_1709003950326_0582|INFO|TN|edgesA|1302126
+2024-03-04 15:14:46,442|29063|application_1709003950326_0582|INFO|TN|edgesB|1407077
+2024-03-04 15:14:46,885|29506|application_1709003950326_0582|INFO|TN|TotalEdges|2709203
+2024-03-04 15:14:47,058|29679|application_1709003950326_0582|INFO|TN|Requested_partitions|750
+2024-03-04 15:14:47,059|29680|application_1709003950326_0582|INFO|TN|Sample_size|27092
+2024-03-04 15:14:47,060|29681|application_1709003950326_0582|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:14:50,359|32980|application_1709003950326_0582|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:14:50,429|33050|application_1709003950326_0582|TIME|TN|750|Kdtree|creation|3.366987064
+2024-03-04 15:14:50,429|33050|application_1709003950326_0582|INFO|TN|750|Kdtree|space|1103
+2024-03-04 15:14:56,710|39331|application_1709003950326_0582|INFO|TN|Kdtree|750|nEdgesA|1312836
+2024-03-04 15:14:56,710|39331|application_1709003950326_0582|INFO|TN|Kdtree|750|nEdgesB|1418454
+2024-03-04 15:14:56,710|39331|application_1709003950326_0582|TIME|TN|750|Kdtree|partitioning|6.279519765
+2024-03-04 15:15:03,665|46286|application_1709003950326_0582|INFO|TN|Kdtree|750|nOverlay|2430
+2024-03-04 15:15:03,666|46287|application_1709003950326_0582|TIME|TN|750|Kdtree|overlay|6.952004978
+2024-03-04 15:15:03,778|46399|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1103 records].
+2024-03-04 15:15:03,875|46496|application_1709003950326_0582|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:15:03,978|46599|application_1709003950326_0582|TIME|TN|750|Quadtree|creation|0.197750357
+2024-03-04 15:15:03,978|46599|application_1709003950326_0582|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:15:09,438|52059|application_1709003950326_0582|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:15:09,438|52059|application_1709003950326_0582|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:15:09,438|52059|application_1709003950326_0582|TIME|TN|750|Quadtree|partitioning|5.458349741
+2024-03-04 15:15:15,496|58117|application_1709003950326_0582|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:15:15,496|58117|application_1709003950326_0582|TIME|TN|750|Quadtree|overlay|6.047455438
+2024-03-04 15:15:15,561|58182|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:15:15,757|58378|application_1709003950326_0582|TIME|End
+2024-03-04 15:15:34,494|13456|application_1709003950326_0583|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 8 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:15:34,494|13456|application_1709003950326_0583|TIME|Start
+2024-03-04 15:15:34,494|13456|application_1709003950326_0583|INFO|TN|scale|1000.0
+2024-03-04 15:15:44,465|23427|application_1709003950326_0583|INFO|TN|edgesA|1302126
+2024-03-04 15:15:49,992|28954|application_1709003950326_0583|INFO|TN|edgesB|1407077
+2024-03-04 15:15:50,389|29351|application_1709003950326_0583|INFO|TN|TotalEdges|2709203
+2024-03-04 15:15:50,646|29608|application_1709003950326_0583|INFO|TN|Requested_partitions|750
+2024-03-04 15:15:50,648|29610|application_1709003950326_0583|INFO|TN|Sample_size|27092
+2024-03-04 15:15:50,649|29611|application_1709003950326_0583|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:15:53,796|32758|application_1709003950326_0583|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:15:53,863|32825|application_1709003950326_0583|TIME|TN|750|Kdtree|creation|3.212220359
+2024-03-04 15:15:53,863|32825|application_1709003950326_0583|INFO|TN|750|Kdtree|space|1105
+2024-03-04 15:16:00,411|39373|application_1709003950326_0583|INFO|TN|Kdtree|750|nEdgesA|1312861
+2024-03-04 15:16:00,412|39374|application_1709003950326_0583|INFO|TN|Kdtree|750|nEdgesB|1418335
+2024-03-04 15:16:00,412|39374|application_1709003950326_0583|TIME|TN|750|Kdtree|partitioning|6.54734342
+2024-03-04 15:16:08,019|46981|application_1709003950326_0583|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:16:08,019|46981|application_1709003950326_0583|TIME|TN|750|Kdtree|overlay|7.604685118
+2024-03-04 15:16:08,121|47083|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1105 records].
+2024-03-04 15:16:08,209|47171|application_1709003950326_0583|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:16:08,306|47268|application_1709003950326_0583|TIME|TN|750|Quadtree|creation|0.183177408
+2024-03-04 15:16:08,306|47268|application_1709003950326_0583|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:16:13,581|52543|application_1709003950326_0583|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:16:13,582|52544|application_1709003950326_0583|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:16:13,582|52544|application_1709003950326_0583|TIME|TN|750|Quadtree|partitioning|5.274627437
+2024-03-04 15:16:19,911|58873|application_1709003950326_0583|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:16:19,911|58873|application_1709003950326_0583|TIME|TN|750|Quadtree|overlay|6.325590691
+2024-03-04 15:16:19,987|58949|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.01s [1963 records].
+2024-03-04 15:16:20,202|59164|application_1709003950326_0583|TIME|End
+2024-03-04 15:16:40,013|14323|application_1709003950326_0584|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 9 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:16:40,013|14323|application_1709003950326_0584|TIME|Start
+2024-03-04 15:16:40,014|14324|application_1709003950326_0584|INFO|TN|scale|1000.0
+2024-03-04 15:16:49,590|23900|application_1709003950326_0584|INFO|TN|edgesA|1302126
+2024-03-04 15:16:55,075|29385|application_1709003950326_0584|INFO|TN|edgesB|1407077
+2024-03-04 15:16:55,543|29853|application_1709003950326_0584|INFO|TN|TotalEdges|2709203
+2024-03-04 15:16:55,828|30138|application_1709003950326_0584|INFO|TN|Requested_partitions|750
+2024-03-04 15:16:55,830|30140|application_1709003950326_0584|INFO|TN|Sample_size|27092
+2024-03-04 15:16:55,831|30141|application_1709003950326_0584|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:16:59,044|33354|application_1709003950326_0584|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:16:59,114|33424|application_1709003950326_0584|TIME|TN|750|Kdtree|creation|3.281104824
+2024-03-04 15:16:59,114|33424|application_1709003950326_0584|INFO|TN|750|Kdtree|space|1101
+2024-03-04 15:17:05,856|40166|application_1709003950326_0584|INFO|TN|Kdtree|750|nEdgesA|1312712
+2024-03-04 15:17:05,856|40166|application_1709003950326_0584|INFO|TN|Kdtree|750|nEdgesB|1418364
+2024-03-04 15:17:05,856|40166|application_1709003950326_0584|TIME|TN|750|Kdtree|partitioning|6.234066405
+2024-03-04 15:17:12,802|47112|application_1709003950326_0584|INFO|TN|Kdtree|750|nOverlay|2433
+2024-03-04 15:17:12,803|47113|application_1709003950326_0584|TIME|TN|750|Kdtree|overlay|6.944340897
+2024-03-04 15:17:12,909|47219|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1101 records].
+2024-03-04 15:17:12,996|47306|application_1709003950326_0584|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:17:13,104|47414|application_1709003950326_0584|TIME|TN|750|Quadtree|creation|0.191985925
+2024-03-04 15:17:13,104|47414|application_1709003950326_0584|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:17:18,266|52576|application_1709003950326_0584|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:17:18,266|52576|application_1709003950326_0584|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:17:18,266|52576|application_1709003950326_0584|TIME|TN|750|Quadtree|partitioning|5.160214783
+2024-03-04 15:17:24,553|58863|application_1709003950326_0584|INFO|TN|Quadtree|750|nOverlay|2467
+2024-03-04 15:17:24,553|58863|application_1709003950326_0584|TIME|TN|750|Quadtree|overlay|6.283583214
+2024-03-04 15:17:24,616|58926|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:17:24,806|59116|application_1709003950326_0584|TIME|End
+2024-03-04 15:17:49,642|18519|application_1709003950326_0585|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 10 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:17:49,642|18519|application_1709003950326_0585|TIME|Start
+2024-03-04 15:17:49,643|18520|application_1709003950326_0585|INFO|TN|scale|1000.0
+2024-03-04 15:17:59,182|28059|application_1709003950326_0585|INFO|TN|edgesA|1302126
+2024-03-04 15:18:04,875|33752|application_1709003950326_0585|INFO|TN|edgesB|1407077
+2024-03-04 15:18:05,380|34257|application_1709003950326_0585|INFO|TN|TotalEdges|2709203
+2024-03-04 15:18:05,572|34449|application_1709003950326_0585|INFO|TN|Requested_partitions|750
+2024-03-04 15:18:05,574|34451|application_1709003950326_0585|INFO|TN|Sample_size|27092
+2024-03-04 15:18:05,576|34453|application_1709003950326_0585|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:18:08,743|37620|application_1709003950326_0585|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:18:08,811|37688|application_1709003950326_0585|TIME|TN|750|Kdtree|creation|3.233105257
+2024-03-04 15:18:08,811|37688|application_1709003950326_0585|INFO|TN|750|Kdtree|space|1112
+2024-03-04 15:18:14,813|43690|application_1709003950326_0585|INFO|TN|Kdtree|750|nEdgesA|1312874
+2024-03-04 15:18:14,814|43691|application_1709003950326_0585|INFO|TN|Kdtree|750|nEdgesB|1418466
+2024-03-04 15:18:14,814|43691|application_1709003950326_0585|TIME|TN|750|Kdtree|partitioning|6.001191088
+2024-03-04 15:18:22,617|51494|application_1709003950326_0585|INFO|TN|Kdtree|750|nOverlay|2429
+2024-03-04 15:18:22,617|51494|application_1709003950326_0585|TIME|TN|750|Kdtree|overlay|7.800946953
+2024-03-04 15:18:22,723|51600|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1112 records].
+2024-03-04 15:18:22,812|51689|application_1709003950326_0585|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:18:22,905|51782|application_1709003950326_0585|TIME|TN|750|Quadtree|creation|0.179358454
+2024-03-04 15:18:22,905|51782|application_1709003950326_0585|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:18:29,432|58309|application_1709003950326_0585|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:18:29,432|58309|application_1709003950326_0585|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:18:29,432|58309|application_1709003950326_0585|TIME|TN|750|Quadtree|partitioning|6.525637404
+2024-03-04 15:18:37,046|65923|application_1709003950326_0585|INFO|TN|Quadtree|750|nOverlay|2462
+2024-03-04 15:18:37,046|65923|application_1709003950326_0585|TIME|TN|750|Quadtree|overlay|7.60674731
+2024-03-04 15:18:37,111|65988|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:18:37,308|66185|application_1709003950326_0585|TIME|End
+./kdtree_overlay TN
+2024-03-04 15:18:56,625|13529|application_1709003950326_0586|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 0 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:18:56,626|13530|application_1709003950326_0586|TIME|Start
+2024-03-04 15:18:56,626|13530|application_1709003950326_0586|INFO|TN|scale|1000.0
+2024-03-04 15:19:06,191|23095|application_1709003950326_0586|INFO|TN|edgesA|1302126
+2024-03-04 15:19:11,584|28488|application_1709003950326_0586|INFO|TN|edgesB|1407077
+2024-03-04 15:19:12,027|28931|application_1709003950326_0586|INFO|TN|TotalEdges|2709203
+2024-03-04 15:19:12,281|29185|application_1709003950326_0586|INFO|TN|Requested_partitions|750
+2024-03-04 15:19:12,282|29186|application_1709003950326_0586|INFO|TN|Sample_size|27092
+2024-03-04 15:19:12,284|29188|application_1709003950326_0586|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:19:15,323|32227|application_1709003950326_0586|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:19:15,394|32298|application_1709003950326_0586|TIME|TN|750|Kdtree|creation|3.107591994
+2024-03-04 15:19:15,394|32298|application_1709003950326_0586|INFO|TN|750|Kdtree|space|1107
+2024-03-04 15:19:21,055|37959|application_1709003950326_0586|INFO|TN|Kdtree|750|nEdgesA|1312632
+2024-03-04 15:19:21,055|37959|application_1709003950326_0586|INFO|TN|Kdtree|750|nEdgesB|1418268
+2024-03-04 15:19:21,056|37960|application_1709003950326_0586|TIME|TN|750|Kdtree|partitioning|5.660293491
+2024-03-04 15:19:29,901|46805|application_1709003950326_0586|INFO|TN|Kdtree|750|nOverlay|2432
+2024-03-04 15:19:29,901|46805|application_1709003950326_0586|TIME|TN|750|Kdtree|overlay|8.843566885
+2024-03-04 15:19:30,006|46910|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1107 records].
+2024-03-04 15:19:30,108|47012|application_1709003950326_0586|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:19:30,232|47136|application_1709003950326_0586|TIME|TN|750|Quadtree|creation|0.224244551
+2024-03-04 15:19:30,232|47136|application_1709003950326_0586|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:19:36,261|53165|application_1709003950326_0586|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:19:36,262|53166|application_1709003950326_0586|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:19:36,262|53166|application_1709003950326_0586|TIME|TN|750|Quadtree|partitioning|6.027827633
+2024-03-04 15:19:43,377|60281|application_1709003950326_0586|INFO|TN|Quadtree|750|nOverlay|2463
+2024-03-04 15:19:43,377|60281|application_1709003950326_0586|TIME|TN|750|Quadtree|overlay|7.112015032
+2024-03-04 15:19:43,458|60362|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:19:43,636|60540|application_1709003950326_0586|TIME|End
+2024-03-04 15:20:03,742|14340|application_1709003950326_0587|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 1 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:20:03,743|14341|application_1709003950326_0587|TIME|Start
+2024-03-04 15:20:03,743|14341|application_1709003950326_0587|INFO|TN|scale|1000.0
+2024-03-04 15:20:13,007|23605|application_1709003950326_0587|INFO|TN|edgesA|1302126
+2024-03-04 15:20:18,419|29017|application_1709003950326_0587|INFO|TN|edgesB|1407077
+2024-03-04 15:20:18,883|29481|application_1709003950326_0587|INFO|TN|TotalEdges|2709203
+2024-03-04 15:20:19,052|29650|application_1709003950326_0587|INFO|TN|Requested_partitions|750
+2024-03-04 15:20:19,054|29652|application_1709003950326_0587|INFO|TN|Sample_size|27092
+2024-03-04 15:20:19,055|29653|application_1709003950326_0587|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:20:22,036|32634|application_1709003950326_0587|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:20:22,106|32704|application_1709003950326_0587|TIME|TN|750|Kdtree|creation|3.050104596
+2024-03-04 15:20:22,107|32705|application_1709003950326_0587|INFO|TN|750|Kdtree|space|1103
+2024-03-04 15:20:28,815|39413|application_1709003950326_0587|INFO|TN|Kdtree|750|nEdgesA|1313093
+2024-03-04 15:20:28,816|39414|application_1709003950326_0587|INFO|TN|Kdtree|750|nEdgesB|1418661
+2024-03-04 15:20:28,816|39414|application_1709003950326_0587|TIME|TN|750|Kdtree|partitioning|6.707535322
+2024-03-04 15:20:36,612|47210|application_1709003950326_0587|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:20:36,613|47211|application_1709003950326_0587|TIME|TN|750|Kdtree|overlay|7.793023802
+2024-03-04 15:20:36,716|47314|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1103 records].
+2024-03-04 15:20:36,806|47404|application_1709003950326_0587|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:20:36,908|47506|application_1709003950326_0587|TIME|TN|750|Quadtree|creation|0.190546684
+2024-03-04 15:20:36,908|47506|application_1709003950326_0587|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:20:44,948|55546|application_1709003950326_0587|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:20:44,949|55547|application_1709003950326_0587|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:20:44,949|55547|application_1709003950326_0587|TIME|TN|750|Quadtree|partitioning|8.038906008
+2024-03-04 15:20:52,185|62783|application_1709003950326_0587|INFO|TN|Quadtree|750|nOverlay|2468
+2024-03-04 15:20:52,185|62783|application_1709003950326_0587|TIME|TN|750|Quadtree|overlay|7.233094566
+2024-03-04 15:20:52,365|62963|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:20:52,827|63425|application_1709003950326_0587|TIME|End
+2024-03-04 15:21:13,007|14334|application_1709003950326_0588|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 4 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:21:13,007|14334|application_1709003950326_0588|TIME|Start
+2024-03-04 15:21:13,008|14335|application_1709003950326_0588|INFO|TN|scale|1000.0
+2024-03-04 15:21:22,343|23670|application_1709003950326_0588|INFO|TN|edgesA|1302126
+2024-03-04 15:21:27,752|29079|application_1709003950326_0588|INFO|TN|edgesB|1407077
+2024-03-04 15:21:28,336|29663|application_1709003950326_0588|INFO|TN|TotalEdges|2709203
+2024-03-04 15:21:28,635|29962|application_1709003950326_0588|INFO|TN|Requested_partitions|750
+2024-03-04 15:21:28,639|29966|application_1709003950326_0588|INFO|TN|Sample_size|27092
+2024-03-04 15:21:28,646|29973|application_1709003950326_0588|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:21:31,859|33186|application_1709003950326_0588|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:21:31,963|33290|application_1709003950326_0588|TIME|TN|750|Kdtree|creation|3.315006438
+2024-03-04 15:21:31,963|33290|application_1709003950326_0588|INFO|TN|750|Kdtree|space|1101
+2024-03-04 15:21:38,703|40030|application_1709003950326_0588|INFO|TN|Kdtree|750|nEdgesA|1312815
+2024-03-04 15:21:38,703|40030|application_1709003950326_0588|INFO|TN|Kdtree|750|nEdgesB|1418368
+2024-03-04 15:21:38,703|40030|application_1709003950326_0588|TIME|TN|750|Kdtree|partitioning|6.738359546
+2024-03-04 15:21:46,876|48203|application_1709003950326_0588|INFO|TN|Kdtree|750|nOverlay|2435
+2024-03-04 15:21:46,876|48203|application_1709003950326_0588|TIME|TN|750|Kdtree|overlay|8.169846815
+2024-03-04 15:21:46,979|48306|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1101 records].
+2024-03-04 15:21:47,070|48397|application_1709003950326_0588|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:21:47,171|48498|application_1709003950326_0588|TIME|TN|750|Quadtree|creation|0.190003309
+2024-03-04 15:21:47,171|48498|application_1709003950326_0588|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:21:53,345|54672|application_1709003950326_0588|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:21:53,345|54672|application_1709003950326_0588|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:21:53,346|54673|application_1709003950326_0588|TIME|TN|750|Quadtree|partitioning|6.172935934
+2024-03-04 15:21:59,453|60780|application_1709003950326_0588|INFO|TN|Quadtree|750|nOverlay|2469
+2024-03-04 15:21:59,453|60780|application_1709003950326_0588|TIME|TN|750|Quadtree|overlay|6.102354385
+2024-03-04 15:21:59,503|60830|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:21:59,710|61037|application_1709003950326_0588|TIME|End
+2024-03-04 15:22:19,457|14135|application_1709003950326_0589|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 5 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:22:19,457|14135|application_1709003950326_0589|TIME|Start
+2024-03-04 15:22:19,458|14136|application_1709003950326_0589|INFO|TN|scale|1000.0
+2024-03-04 15:22:28,849|23527|application_1709003950326_0589|INFO|TN|edgesA|1302126
+2024-03-04 15:22:34,372|29050|application_1709003950326_0589|INFO|TN|edgesB|1407077
+2024-03-04 15:22:34,827|29505|application_1709003950326_0589|INFO|TN|TotalEdges|2709203
+2024-03-04 15:22:34,996|29674|application_1709003950326_0589|INFO|TN|Requested_partitions|750
+2024-03-04 15:22:34,997|29675|application_1709003950326_0589|INFO|TN|Sample_size|27092
+2024-03-04 15:22:34,998|29676|application_1709003950326_0589|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:22:38,042|32720|application_1709003950326_0589|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:22:38,121|32799|application_1709003950326_0589|TIME|TN|750|Kdtree|creation|3.121770758
+2024-03-04 15:22:38,121|32799|application_1709003950326_0589|INFO|TN|750|Kdtree|space|1088
+2024-03-04 15:22:44,705|39383|application_1709003950326_0589|INFO|TN|Kdtree|750|nEdgesA|1312648
+2024-03-04 15:22:44,705|39383|application_1709003950326_0589|INFO|TN|Kdtree|750|nEdgesB|1418281
+2024-03-04 15:22:44,706|39384|application_1709003950326_0589|TIME|TN|750|Kdtree|partitioning|6.582679353
+2024-03-04 15:22:51,955|46633|application_1709003950326_0589|INFO|TN|Kdtree|750|nOverlay|2429
+2024-03-04 15:22:51,955|46633|application_1709003950326_0589|TIME|TN|750|Kdtree|overlay|7.246501528
+2024-03-04 15:22:52,057|46735|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1088 records].
+2024-03-04 15:22:52,135|46813|application_1709003950326_0589|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:22:52,239|46917|application_1709003950326_0589|TIME|TN|750|Quadtree|creation|0.180318488
+2024-03-04 15:22:52,239|46917|application_1709003950326_0589|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:22:58,156|52834|application_1709003950326_0589|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:22:58,156|52834|application_1709003950326_0589|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:22:58,157|52835|application_1709003950326_0589|TIME|TN|750|Quadtree|partitioning|5.916321739
+2024-03-04 15:23:05,255|59933|application_1709003950326_0589|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:23:05,255|59933|application_1709003950326_0589|TIME|TN|750|Quadtree|overlay|7.093914907
+2024-03-04 15:23:05,324|60002|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:23:05,527|60205|application_1709003950326_0589|TIME|End
+2024-03-04 15:23:24,356|13405|application_1709003950326_0590|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 6 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:23:24,357|13406|application_1709003950326_0590|TIME|Start
+2024-03-04 15:23:24,361|13410|application_1709003950326_0590|INFO|TN|scale|1000.0
+2024-03-04 15:23:34,269|23318|application_1709003950326_0590|INFO|TN|edgesA|1302126
+2024-03-04 15:23:39,577|28626|application_1709003950326_0590|INFO|TN|edgesB|1407077
+2024-03-04 15:23:39,958|29007|application_1709003950326_0590|INFO|TN|TotalEdges|2709203
+2024-03-04 15:23:40,227|29276|application_1709003950326_0590|INFO|TN|Requested_partitions|750
+2024-03-04 15:23:40,228|29277|application_1709003950326_0590|INFO|TN|Sample_size|27092
+2024-03-04 15:23:40,229|29278|application_1709003950326_0590|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:23:43,323|32372|application_1709003950326_0590|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:23:43,392|32441|application_1709003950326_0590|TIME|TN|750|Kdtree|creation|3.161709962
+2024-03-04 15:23:43,392|32441|application_1709003950326_0590|INFO|TN|750|Kdtree|space|1109
+2024-03-04 15:23:49,469|38518|application_1709003950326_0590|INFO|TN|Kdtree|750|nEdgesA|1313050
+2024-03-04 15:23:49,469|38518|application_1709003950326_0590|INFO|TN|Kdtree|750|nEdgesB|1418620
+2024-03-04 15:23:49,470|38519|application_1709003950326_0590|TIME|TN|750|Kdtree|partitioning|6.075508493
+2024-03-04 15:23:57,616|46665|application_1709003950326_0590|INFO|TN|Kdtree|750|nOverlay|2433
+2024-03-04 15:23:57,616|46665|application_1709003950326_0590|TIME|TN|750|Kdtree|overlay|8.144858016
+2024-03-04 15:23:57,719|46768|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1109 records].
+2024-03-04 15:23:57,807|46856|application_1709003950326_0590|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:23:57,907|46956|application_1709003950326_0590|TIME|TN|750|Quadtree|creation|0.186235681
+2024-03-04 15:23:57,907|46956|application_1709003950326_0590|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:24:03,614|52663|application_1709003950326_0590|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:24:03,614|52663|application_1709003950326_0590|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:24:03,614|52663|application_1709003950326_0590|TIME|TN|750|Quadtree|partitioning|5.705548049
+2024-03-04 15:24:10,073|59122|application_1709003950326_0590|INFO|TN|Quadtree|750|nOverlay|2463
+2024-03-04 15:24:10,073|59122|application_1709003950326_0590|TIME|TN|750|Quadtree|overlay|6.454453713
+2024-03-04 15:24:10,139|59188|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:24:10,330|59379|application_1709003950326_0590|TIME|End
+2024-03-04 15:24:29,774|13844|application_1709003950326_0591|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 7 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:24:29,776|13846|application_1709003950326_0591|TIME|Start
+2024-03-04 15:24:29,777|13847|application_1709003950326_0591|INFO|TN|scale|1000.0
+2024-03-04 15:24:40,038|24108|application_1709003950326_0591|INFO|TN|edgesA|1302126
+2024-03-04 15:24:45,416|29486|application_1709003950326_0591|INFO|TN|edgesB|1407077
+2024-03-04 15:24:45,861|29931|application_1709003950326_0591|INFO|TN|TotalEdges|2709203
+2024-03-04 15:24:46,048|30118|application_1709003950326_0591|INFO|TN|Requested_partitions|750
+2024-03-04 15:24:46,049|30119|application_1709003950326_0591|INFO|TN|Sample_size|27092
+2024-03-04 15:24:46,050|30120|application_1709003950326_0591|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:24:49,378|33448|application_1709003950326_0591|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:24:49,454|33524|application_1709003950326_0591|TIME|TN|750|Kdtree|creation|3.402032997
+2024-03-04 15:24:49,455|33525|application_1709003950326_0591|INFO|TN|750|Kdtree|space|1090
+2024-03-04 15:24:55,663|39733|application_1709003950326_0591|INFO|TN|Kdtree|750|nEdgesA|1312754
+2024-03-04 15:24:55,663|39733|application_1709003950326_0591|INFO|TN|Kdtree|750|nEdgesB|1418315
+2024-03-04 15:24:55,663|39733|application_1709003950326_0591|TIME|TN|750|Kdtree|partitioning|6.206667694
+2024-03-04 15:25:02,601|46671|application_1709003950326_0591|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:25:02,602|46672|application_1709003950326_0591|TIME|TN|750|Kdtree|overlay|6.935288248
+2024-03-04 15:25:02,708|46778|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1090 records].
+2024-03-04 15:25:02,789|46859|application_1709003950326_0591|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:25:02,892|46962|application_1709003950326_0591|TIME|TN|750|Quadtree|creation|0.181888014
+2024-03-04 15:25:02,892|46962|application_1709003950326_0591|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:25:08,005|52075|application_1709003950326_0591|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:25:08,005|52075|application_1709003950326_0591|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:25:08,005|52075|application_1709003950326_0591|TIME|TN|750|Quadtree|partitioning|5.111559013
+2024-03-04 15:25:14,797|58867|application_1709003950326_0591|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:25:14,797|58867|application_1709003950326_0591|TIME|TN|750|Quadtree|overlay|6.787809487
+2024-03-04 15:25:14,860|58930|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.01s [1963 records].
+2024-03-04 15:25:15,060|59130|application_1709003950326_0591|TIME|End
+2024-03-04 15:25:34,183|13412|application_1709003950326_0592|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 8 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:25:34,184|13413|application_1709003950326_0592|TIME|Start
+2024-03-04 15:25:34,184|13413|application_1709003950326_0592|INFO|TN|scale|1000.0
+2024-03-04 15:25:43,714|22943|application_1709003950326_0592|INFO|TN|edgesA|1302126
+2024-03-04 15:25:49,138|28367|application_1709003950326_0592|INFO|TN|edgesB|1407077
+2024-03-04 15:25:49,581|28810|application_1709003950326_0592|INFO|TN|TotalEdges|2709203
+2024-03-04 15:25:49,827|29056|application_1709003950326_0592|INFO|TN|Requested_partitions|750
+2024-03-04 15:25:49,829|29058|application_1709003950326_0592|INFO|TN|Sample_size|27092
+2024-03-04 15:25:49,832|29061|application_1709003950326_0592|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:25:52,969|32198|application_1709003950326_0592|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:25:53,066|32295|application_1709003950326_0592|TIME|TN|750|Kdtree|creation|3.231851264
+2024-03-04 15:25:53,067|32296|application_1709003950326_0592|INFO|TN|750|Kdtree|space|1092
+2024-03-04 15:25:59,198|38427|application_1709003950326_0592|INFO|TN|Kdtree|750|nEdgesA|1312637
+2024-03-04 15:25:59,198|38427|application_1709003950326_0592|INFO|TN|Kdtree|750|nEdgesB|1418272
+2024-03-04 15:25:59,198|38427|application_1709003950326_0592|TIME|TN|750|Kdtree|partitioning|6.128605897
+2024-03-04 15:26:07,091|46320|application_1709003950326_0592|INFO|TN|Kdtree|750|nOverlay|2429
+2024-03-04 15:26:07,091|46320|application_1709003950326_0592|TIME|TN|750|Kdtree|overlay|7.890264931
+2024-03-04 15:26:07,198|46427|Saved /tmp/edgesCells_TN_K_750.wkt in 0.01s [1092 records].
+2024-03-04 15:26:07,277|46506|application_1709003950326_0592|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:26:07,377|46606|application_1709003950326_0592|TIME|TN|750|Quadtree|creation|0.178002786
+2024-03-04 15:26:07,378|46607|application_1709003950326_0592|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:26:12,133|51362|application_1709003950326_0592|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:26:12,133|51362|application_1709003950326_0592|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:26:12,134|51363|application_1709003950326_0592|TIME|TN|750|Quadtree|partitioning|4.754166431
+2024-03-04 15:26:18,513|57742|application_1709003950326_0592|INFO|TN|Quadtree|750|nOverlay|2465
+2024-03-04 15:26:18,513|57742|application_1709003950326_0592|TIME|TN|750|Quadtree|overlay|6.376219903
+2024-03-04 15:26:18,659|57888|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.08s [1963 records].
+2024-03-04 15:26:18,847|58076|application_1709003950326_0592|TIME|End
+2024-03-04 15:26:39,236|14762|application_1709003950326_0593|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 9 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:26:39,237|14763|application_1709003950326_0593|TIME|Start
+2024-03-04 15:26:39,237|14763|application_1709003950326_0593|INFO|TN|scale|1000.0
+2024-03-04 15:26:48,961|24487|application_1709003950326_0593|INFO|TN|edgesA|1302126
+2024-03-04 15:26:54,416|29942|application_1709003950326_0593|INFO|TN|edgesB|1407077
+2024-03-04 15:26:54,839|30365|application_1709003950326_0593|INFO|TN|TotalEdges|2709203
+2024-03-04 15:26:55,156|30682|application_1709003950326_0593|INFO|TN|Requested_partitions|750
+2024-03-04 15:26:55,157|30683|application_1709003950326_0593|INFO|TN|Sample_size|27092
+2024-03-04 15:26:55,159|30685|application_1709003950326_0593|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:26:58,581|34107|application_1709003950326_0593|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:26:58,648|34174|application_1709003950326_0593|TIME|TN|750|Kdtree|creation|3.48779028
+2024-03-04 15:26:58,648|34174|application_1709003950326_0593|INFO|TN|750|Kdtree|space|1103
+2024-03-04 15:27:04,408|39934|application_1709003950326_0593|INFO|TN|Kdtree|750|nEdgesA|1312733
+2024-03-04 15:27:04,408|39934|application_1709003950326_0593|INFO|TN|Kdtree|750|nEdgesB|1418377
+2024-03-04 15:27:04,408|39934|application_1709003950326_0593|TIME|TN|750|Kdtree|partitioning|5.758120603
+2024-03-04 15:27:11,339|46865|application_1709003950326_0593|INFO|TN|Kdtree|750|nOverlay|2432
+2024-03-04 15:27:11,339|46865|application_1709003950326_0593|TIME|TN|750|Kdtree|overlay|6.928060671
+2024-03-04 15:27:11,450|46976|Saved /tmp/edgesCells_TN_K_750.wkt in 0.01s [1103 records].
+2024-03-04 15:27:11,548|47074|application_1709003950326_0593|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:27:11,679|47205|application_1709003950326_0593|TIME|TN|750|Quadtree|creation|0.226288068
+2024-03-04 15:27:11,679|47205|application_1709003950326_0593|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:27:17,022|52548|application_1709003950326_0593|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:27:17,022|52548|application_1709003950326_0593|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:27:17,023|52549|application_1709003950326_0593|TIME|TN|750|Quadtree|partitioning|5.341491879
+2024-03-04 15:27:23,748|59274|application_1709003950326_0593|INFO|TN|Quadtree|750|nOverlay|2470
+2024-03-04 15:27:23,748|59274|application_1709003950326_0593|TIME|TN|750|Quadtree|overlay|6.722134863
+2024-03-04 15:27:23,824|59350|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:27:24,095|59621|application_1709003950326_0593|TIME|End
+2024-03-04 15:27:44,497|13733|application_1709003950326_0594|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 10 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:27:44,498|13734|application_1709003950326_0594|TIME|Start
+2024-03-04 15:27:44,498|13734|application_1709003950326_0594|INFO|TN|scale|1000.0
+2024-03-04 15:27:53,912|23148|application_1709003950326_0594|INFO|TN|edgesA|1302126
+2024-03-04 15:27:59,352|28588|application_1709003950326_0594|INFO|TN|edgesB|1407077
+2024-03-04 15:27:59,805|29041|application_1709003950326_0594|INFO|TN|TotalEdges|2709203
+2024-03-04 15:28:00,080|29316|application_1709003950326_0594|INFO|TN|Requested_partitions|750
+2024-03-04 15:28:00,082|29318|application_1709003950326_0594|INFO|TN|Sample_size|27092
+2024-03-04 15:28:00,084|29320|application_1709003950326_0594|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:28:03,183|32419|application_1709003950326_0594|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:28:03,255|32491|application_1709003950326_0594|TIME|TN|750|Kdtree|creation|3.170083166
+2024-03-04 15:28:03,256|32492|application_1709003950326_0594|INFO|TN|750|Kdtree|space|1108
+2024-03-04 15:28:10,123|39359|application_1709003950326_0594|INFO|TN|Kdtree|750|nEdgesA|1312890
+2024-03-04 15:28:10,124|39360|application_1709003950326_0594|INFO|TN|Kdtree|750|nEdgesB|1418569
+2024-03-04 15:28:10,124|39360|application_1709003950326_0594|TIME|TN|750|Kdtree|partitioning|6.866694277
+2024-03-04 15:28:17,954|47190|application_1709003950326_0594|INFO|TN|Kdtree|750|nOverlay|2437
+2024-03-04 15:28:17,954|47190|application_1709003950326_0594|TIME|TN|750|Kdtree|overlay|7.826474911
+2024-03-04 15:28:18,068|47304|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1108 records].
+2024-03-04 15:28:18,247|47483|application_1709003950326_0594|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:28:18,361|47597|application_1709003950326_0594|TIME|TN|750|Quadtree|creation|0.290915836
+2024-03-04 15:28:18,361|47597|application_1709003950326_0594|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:28:23,473|52709|application_1709003950326_0594|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:28:23,473|52709|application_1709003950326_0594|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:28:23,473|52709|application_1709003950326_0594|TIME|TN|750|Quadtree|partitioning|5.110227092
+2024-03-04 15:28:30,979|60215|application_1709003950326_0594|INFO|TN|Quadtree|750|nOverlay|2468
+2024-03-04 15:28:30,979|60215|application_1709003950326_0594|TIME|TN|750|Quadtree|overlay|7.502872078
+2024-03-04 15:28:31,053|60289|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:28:31,247|60483|application_1709003950326_0594|TIME|End
+./kdtree_overlay TN
+2024-03-04 15:28:50,677|13876|application_1709003950326_0595|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 0 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:28:50,678|13877|application_1709003950326_0595|TIME|Start
+2024-03-04 15:28:50,678|13877|application_1709003950326_0595|INFO|TN|scale|1000.0
+2024-03-04 15:29:00,381|23580|application_1709003950326_0595|INFO|TN|edgesA|1302126
+2024-03-04 15:29:05,854|29053|application_1709003950326_0595|INFO|TN|edgesB|1407077
+2024-03-04 15:29:06,324|29523|application_1709003950326_0595|INFO|TN|TotalEdges|2709203
+2024-03-04 15:29:06,615|29814|application_1709003950326_0595|INFO|TN|Requested_partitions|750
+2024-03-04 15:29:06,616|29815|application_1709003950326_0595|INFO|TN|Sample_size|27092
+2024-03-04 15:29:06,617|29816|application_1709003950326_0595|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:29:09,629|32828|application_1709003950326_0595|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:29:09,697|32896|application_1709003950326_0595|TIME|TN|750|Kdtree|creation|3.078452522
+2024-03-04 15:29:09,697|32896|application_1709003950326_0595|INFO|TN|750|Kdtree|space|1096
+2024-03-04 15:29:15,914|39113|application_1709003950326_0595|INFO|TN|Kdtree|750|nEdgesA|1312746
+2024-03-04 15:29:15,915|39114|application_1709003950326_0595|INFO|TN|Kdtree|750|nEdgesB|1418349
+2024-03-04 15:29:15,915|39114|application_1709003950326_0595|TIME|TN|750|Kdtree|partitioning|6.215484335
+2024-03-04 15:29:23,408|46607|application_1709003950326_0595|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:29:23,409|46608|application_1709003950326_0595|TIME|TN|750|Kdtree|overlay|7.491669429
+2024-03-04 15:29:23,510|46709|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1096 records].
+2024-03-04 15:29:23,598|46797|application_1709003950326_0595|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:29:23,706|46905|application_1709003950326_0595|TIME|TN|750|Quadtree|creation|0.194374273
+2024-03-04 15:29:23,707|46906|application_1709003950326_0595|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:29:29,512|52711|application_1709003950326_0595|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:29:29,513|52712|application_1709003950326_0595|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:29:29,513|52712|application_1709003950326_0595|TIME|TN|750|Quadtree|partitioning|5.804830761
+2024-03-04 15:29:36,808|60007|application_1709003950326_0595|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:29:36,808|60007|application_1709003950326_0595|TIME|TN|750|Quadtree|overlay|7.290206969
+2024-03-04 15:29:36,876|60075|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:29:37,061|60260|application_1709003950326_0595|TIME|End
+2024-03-04 15:29:56,981|14075|application_1709003950326_0596|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 1 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:29:56,982|14076|application_1709003950326_0596|TIME|Start
+2024-03-04 15:29:56,982|14076|application_1709003950326_0596|INFO|TN|scale|1000.0
+2024-03-04 15:30:06,468|23562|application_1709003950326_0596|INFO|TN|edgesA|1302126
+2024-03-04 15:30:11,836|28930|application_1709003950326_0596|INFO|TN|edgesB|1407077
+2024-03-04 15:30:12,244|29338|application_1709003950326_0596|INFO|TN|TotalEdges|2709203
+2024-03-04 15:30:12,515|29609|application_1709003950326_0596|INFO|TN|Requested_partitions|750
+2024-03-04 15:30:12,516|29610|application_1709003950326_0596|INFO|TN|Sample_size|27092
+2024-03-04 15:30:12,517|29611|application_1709003950326_0596|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:30:15,636|32730|application_1709003950326_0596|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:30:15,723|32817|application_1709003950326_0596|TIME|TN|750|Kdtree|creation|3.204670849
+2024-03-04 15:30:15,723|32817|application_1709003950326_0596|INFO|TN|750|Kdtree|space|1106
+2024-03-04 15:30:21,241|38335|application_1709003950326_0596|INFO|TN|Kdtree|750|nEdgesA|1312650
+2024-03-04 15:30:21,241|38335|application_1709003950326_0596|INFO|TN|Kdtree|750|nEdgesB|1418199
+2024-03-04 15:30:21,241|38335|application_1709003950326_0596|TIME|TN|750|Kdtree|partitioning|5.51614919
+2024-03-04 15:30:30,814|47908|application_1709003950326_0596|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:30:30,814|47908|application_1709003950326_0596|TIME|TN|750|Kdtree|overlay|9.570852187
+2024-03-04 15:30:30,934|48028|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1106 records].
+2024-03-04 15:30:31,057|48151|application_1709003950326_0596|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:30:31,163|48257|application_1709003950326_0596|TIME|TN|750|Quadtree|creation|0.226764878
+2024-03-04 15:30:31,163|48257|application_1709003950326_0596|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:30:37,021|54115|application_1709003950326_0596|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:30:37,022|54116|application_1709003950326_0596|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:30:37,022|54116|application_1709003950326_0596|TIME|TN|750|Quadtree|partitioning|5.856940337
+2024-03-04 15:30:44,387|61481|application_1709003950326_0596|INFO|TN|Quadtree|750|nOverlay|2461
+2024-03-04 15:30:44,387|61481|application_1709003950326_0596|TIME|TN|750|Quadtree|overlay|7.361832011
+2024-03-04 15:30:44,451|61545|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:30:44,706|61800|application_1709003950326_0596|TIME|End
+2024-03-04 15:31:04,435|13765|application_1709003950326_0597|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 4 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:31:04,435|13765|application_1709003950326_0597|TIME|Start
+2024-03-04 15:31:04,436|13766|application_1709003950326_0597|INFO|TN|scale|1000.0
+2024-03-04 15:31:13,922|23252|application_1709003950326_0597|INFO|TN|edgesA|1302126
+2024-03-04 15:31:19,368|28698|application_1709003950326_0597|INFO|TN|edgesB|1407077
+2024-03-04 15:31:19,897|29227|application_1709003950326_0597|INFO|TN|TotalEdges|2709203
+2024-03-04 15:31:20,077|29407|application_1709003950326_0597|INFO|TN|Requested_partitions|750
+2024-03-04 15:31:20,079|29409|application_1709003950326_0597|INFO|TN|Sample_size|27092
+2024-03-04 15:31:20,080|29410|application_1709003950326_0597|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:31:22,922|32252|application_1709003950326_0597|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:31:22,995|32325|application_1709003950326_0597|TIME|TN|750|Kdtree|creation|2.914243664
+2024-03-04 15:31:22,996|32326|application_1709003950326_0597|INFO|TN|750|Kdtree|space|1110
+2024-03-04 15:31:29,430|38760|application_1709003950326_0597|INFO|TN|Kdtree|750|nEdgesA|1313019
+2024-03-04 15:31:29,430|38760|application_1709003950326_0597|INFO|TN|Kdtree|750|nEdgesB|1418681
+2024-03-04 15:31:29,431|38761|application_1709003950326_0597|TIME|TN|750|Kdtree|partitioning|6.433458433
+2024-03-04 15:31:36,978|46308|application_1709003950326_0597|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:31:36,979|46309|application_1709003950326_0597|TIME|TN|750|Kdtree|overlay|7.546421702
+2024-03-04 15:31:37,089|46419|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1110 records].
+2024-03-04 15:31:37,193|46523|application_1709003950326_0597|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:31:37,293|46623|application_1709003950326_0597|TIME|TN|750|Quadtree|creation|0.202223735
+2024-03-04 15:31:37,293|46623|application_1709003950326_0597|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:31:43,457|52787|application_1709003950326_0597|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:31:43,457|52787|application_1709003950326_0597|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:31:43,457|52787|application_1709003950326_0597|TIME|TN|750|Quadtree|partitioning|6.162269575
+2024-03-04 15:31:51,233|60563|application_1709003950326_0597|INFO|TN|Quadtree|750|nOverlay|2471
+2024-03-04 15:31:51,233|60563|application_1709003950326_0597|TIME|TN|750|Quadtree|overlay|7.772166176
+2024-03-04 15:31:51,307|60637|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:31:51,521|60851|application_1709003950326_0597|TIME|End
+2024-03-04 15:32:12,007|14529|application_1709003950326_0598|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 5 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:32:12,008|14530|application_1709003950326_0598|TIME|Start
+2024-03-04 15:32:12,008|14530|application_1709003950326_0598|INFO|TN|scale|1000.0
+2024-03-04 15:32:21,232|23754|application_1709003950326_0598|INFO|TN|edgesA|1302126
+2024-03-04 15:32:26,659|29181|application_1709003950326_0598|INFO|TN|edgesB|1407077
+2024-03-04 15:32:27,123|29645|application_1709003950326_0598|INFO|TN|TotalEdges|2709203
+2024-03-04 15:32:27,396|29918|application_1709003950326_0598|INFO|TN|Requested_partitions|750
+2024-03-04 15:32:27,398|29920|application_1709003950326_0598|INFO|TN|Sample_size|27092
+2024-03-04 15:32:27,399|29921|application_1709003950326_0598|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:32:30,843|33365|application_1709003950326_0598|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:32:30,913|33435|application_1709003950326_0598|TIME|TN|750|Kdtree|creation|3.510214272
+2024-03-04 15:32:30,913|33435|application_1709003950326_0598|INFO|TN|750|Kdtree|space|1111
+2024-03-04 15:32:36,960|39482|application_1709003950326_0598|INFO|TN|Kdtree|750|nEdgesA|1312927
+2024-03-04 15:32:36,960|39482|application_1709003950326_0598|INFO|TN|Kdtree|750|nEdgesB|1418588
+2024-03-04 15:32:36,960|39482|application_1709003950326_0598|TIME|TN|750|Kdtree|partitioning|6.045214304
+2024-03-04 15:32:44,314|46836|application_1709003950326_0598|INFO|TN|Kdtree|750|nOverlay|2433
+2024-03-04 15:32:44,314|46836|application_1709003950326_0598|TIME|TN|750|Kdtree|overlay|7.351723922
+2024-03-04 15:32:44,417|46939|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1111 records].
+2024-03-04 15:32:44,503|47025|application_1709003950326_0598|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:32:44,628|47150|application_1709003950326_0598|TIME|TN|750|Quadtree|creation|0.208983043
+2024-03-04 15:32:44,628|47150|application_1709003950326_0598|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:32:50,443|52965|application_1709003950326_0598|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:32:50,443|52965|application_1709003950326_0598|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:32:50,444|52966|application_1709003950326_0598|TIME|TN|750|Quadtree|partitioning|5.814143201
+2024-03-04 15:32:57,996|60518|application_1709003950326_0598|INFO|TN|Quadtree|750|nOverlay|2469
+2024-03-04 15:32:57,996|60518|application_1709003950326_0598|TIME|TN|750|Quadtree|overlay|7.548866868
+2024-03-04 15:32:58,062|60584|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:32:58,254|60776|application_1709003950326_0598|TIME|End
+2024-03-04 15:33:17,601|13506|application_1709003950326_0599|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 6 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:33:17,602|13507|application_1709003950326_0599|TIME|Start
+2024-03-04 15:33:17,602|13507|application_1709003950326_0599|INFO|TN|scale|1000.0
+2024-03-04 15:33:26,747|22652|application_1709003950326_0599|INFO|TN|edgesA|1302126
+2024-03-04 15:33:32,145|28050|application_1709003950326_0599|INFO|TN|edgesB|1407077
+2024-03-04 15:33:32,608|28513|application_1709003950326_0599|INFO|TN|TotalEdges|2709203
+2024-03-04 15:33:32,783|28688|application_1709003950326_0599|INFO|TN|Requested_partitions|750
+2024-03-04 15:33:32,784|28689|application_1709003950326_0599|INFO|TN|Sample_size|27092
+2024-03-04 15:33:32,785|28690|application_1709003950326_0599|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:33:35,862|31767|application_1709003950326_0599|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:33:35,987|31892|application_1709003950326_0599|TIME|TN|750|Kdtree|creation|3.200060792
+2024-03-04 15:33:35,987|31892|application_1709003950326_0599|INFO|TN|750|Kdtree|space|1114
+2024-03-04 15:33:42,153|38058|application_1709003950326_0599|INFO|TN|Kdtree|750|nEdgesA|1312845
+2024-03-04 15:33:42,153|38058|application_1709003950326_0599|INFO|TN|Kdtree|750|nEdgesB|1418398
+2024-03-04 15:33:42,153|38058|application_1709003950326_0599|TIME|TN|750|Kdtree|partitioning|6.164566519
+2024-03-04 15:33:49,918|45823|application_1709003950326_0599|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:33:49,918|45823|application_1709003950326_0599|TIME|TN|750|Kdtree|overlay|7.760789007
+2024-03-04 15:33:50,025|45930|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1114 records].
+2024-03-04 15:33:50,117|46022|application_1709003950326_0599|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:33:50,222|46127|application_1709003950326_0599|TIME|TN|750|Quadtree|creation|0.195193581
+2024-03-04 15:33:50,222|46127|application_1709003950326_0599|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:33:56,190|52095|application_1709003950326_0599|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:33:56,191|52096|application_1709003950326_0599|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:33:56,191|52096|application_1709003950326_0599|TIME|TN|750|Quadtree|partitioning|5.966893328
+2024-03-04 15:34:03,234|59139|application_1709003950326_0599|INFO|TN|Quadtree|750|nOverlay|2470
+2024-03-04 15:34:03,234|59139|application_1709003950326_0599|TIME|TN|750|Quadtree|overlay|7.040326442
+2024-03-04 15:34:03,307|59212|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:34:03,513|59418|application_1709003950326_0599|TIME|End
+2024-03-04 15:34:22,220|13334|application_1709003950326_0600|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 7 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:34:22,221|13335|application_1709003950326_0600|TIME|Start
+2024-03-04 15:34:22,221|13335|application_1709003950326_0600|INFO|TN|scale|1000.0
+2024-03-04 15:34:31,294|22408|application_1709003950326_0600|INFO|TN|edgesA|1302126
+2024-03-04 15:34:36,814|27928|application_1709003950326_0600|INFO|TN|edgesB|1407077
+2024-03-04 15:34:37,311|28425|application_1709003950326_0600|INFO|TN|TotalEdges|2709203
+2024-03-04 15:34:37,495|28609|application_1709003950326_0600|INFO|TN|Requested_partitions|750
+2024-03-04 15:34:37,497|28611|application_1709003950326_0600|INFO|TN|Sample_size|27092
+2024-03-04 15:34:37,498|28612|application_1709003950326_0600|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:34:40,595|31709|application_1709003950326_0600|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:34:40,662|31776|application_1709003950326_0600|TIME|TN|750|Kdtree|creation|3.162635612
+2024-03-04 15:34:40,663|31777|application_1709003950326_0600|INFO|TN|750|Kdtree|space|1089
+2024-03-04 15:34:46,736|37850|application_1709003950326_0600|INFO|TN|Kdtree|750|nEdgesA|1312646
+2024-03-04 15:34:46,736|37850|application_1709003950326_0600|INFO|TN|Kdtree|750|nEdgesB|1418327
+2024-03-04 15:34:46,736|37850|application_1709003950326_0600|TIME|TN|750|Kdtree|partitioning|6.072207111
+2024-03-04 15:34:54,496|45610|application_1709003950326_0600|INFO|TN|Kdtree|750|nOverlay|2430
+2024-03-04 15:34:54,496|45610|application_1709003950326_0600|TIME|TN|750|Kdtree|overlay|7.758123201
+2024-03-04 15:34:54,594|45708|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1089 records].
+2024-03-04 15:34:54,682|45796|application_1709003950326_0600|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:34:54,783|45897|application_1709003950326_0600|TIME|TN|750|Quadtree|creation|0.187238954
+2024-03-04 15:34:54,784|45898|application_1709003950326_0600|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:35:00,440|51554|application_1709003950326_0600|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:35:00,440|51554|application_1709003950326_0600|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:35:00,440|51554|application_1709003950326_0600|TIME|TN|750|Quadtree|partitioning|5.655184302
+2024-03-04 15:35:07,143|58257|application_1709003950326_0600|INFO|TN|Quadtree|750|nOverlay|2468
+2024-03-04 15:35:07,144|58258|application_1709003950326_0600|TIME|TN|750|Quadtree|overlay|6.699844899
+2024-03-04 15:35:07,210|58324|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.01s [1963 records].
+2024-03-04 15:35:07,545|58659|application_1709003950326_0600|TIME|End
+2024-03-04 15:35:26,557|13576|application_1709003950326_0601|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 8 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:35:26,557|13576|application_1709003950326_0601|TIME|Start
+2024-03-04 15:35:26,557|13576|application_1709003950326_0601|INFO|TN|scale|1000.0
+2024-03-04 15:35:37,291|24310|application_1709003950326_0601|INFO|TN|edgesA|1302126
+2024-03-04 15:35:42,853|29872|application_1709003950326_0601|INFO|TN|edgesB|1407077
+2024-03-04 15:35:43,349|30368|application_1709003950326_0601|INFO|TN|TotalEdges|2709203
+2024-03-04 15:35:43,532|30551|application_1709003950326_0601|INFO|TN|Requested_partitions|750
+2024-03-04 15:35:43,534|30553|application_1709003950326_0601|INFO|TN|Sample_size|27092
+2024-03-04 15:35:43,535|30554|application_1709003950326_0601|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:35:46,541|33560|application_1709003950326_0601|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:35:46,614|33633|application_1709003950326_0601|TIME|TN|750|Kdtree|creation|3.076150033
+2024-03-04 15:35:46,614|33633|application_1709003950326_0601|INFO|TN|750|Kdtree|space|1090
+2024-03-04 15:35:52,929|39948|application_1709003950326_0601|INFO|TN|Kdtree|750|nEdgesA|1312661
+2024-03-04 15:35:52,930|39949|application_1709003950326_0601|INFO|TN|Kdtree|750|nEdgesB|1418291
+2024-03-04 15:35:52,930|39949|application_1709003950326_0601|TIME|TN|750|Kdtree|partitioning|6.31453188
+2024-03-04 15:36:00,984|48003|application_1709003950326_0601|INFO|TN|Kdtree|750|nOverlay|2430
+2024-03-04 15:36:00,984|48003|application_1709003950326_0601|TIME|TN|750|Kdtree|overlay|8.050853204
+2024-03-04 15:36:01,088|48107|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1090 records].
+2024-03-04 15:36:01,169|48188|application_1709003950326_0601|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:36:01,278|48297|application_1709003950326_0601|TIME|TN|750|Quadtree|creation|0.18869082
+2024-03-04 15:36:01,278|48297|application_1709003950326_0601|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:36:06,597|53616|application_1709003950326_0601|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:36:06,597|53616|application_1709003950326_0601|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:36:06,598|53617|application_1709003950326_0601|TIME|TN|750|Quadtree|partitioning|5.317601814
+2024-03-04 15:36:13,725|60744|application_1709003950326_0601|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:36:13,725|60744|application_1709003950326_0601|TIME|TN|750|Quadtree|overlay|7.125853325
+2024-03-04 15:36:13,791|60810|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:36:14,026|61045|application_1709003950326_0601|TIME|End
+2024-03-04 15:36:33,560|14012|application_1709003950326_0602|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 9 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:36:33,561|14013|application_1709003950326_0602|TIME|Start
+2024-03-04 15:36:33,561|14013|application_1709003950326_0602|INFO|TN|scale|1000.0
+2024-03-04 15:36:43,331|23783|application_1709003950326_0602|INFO|TN|edgesA|1302126
+2024-03-04 15:36:48,788|29240|application_1709003950326_0602|INFO|TN|edgesB|1407077
+2024-03-04 15:36:49,266|29718|application_1709003950326_0602|INFO|TN|TotalEdges|2709203
+2024-03-04 15:36:49,504|29956|application_1709003950326_0602|INFO|TN|Requested_partitions|750
+2024-03-04 15:36:49,505|29957|application_1709003950326_0602|INFO|TN|Sample_size|27092
+2024-03-04 15:36:49,506|29958|application_1709003950326_0602|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:36:52,916|33368|application_1709003950326_0602|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:36:52,996|33448|application_1709003950326_0602|TIME|TN|750|Kdtree|creation|3.488386603
+2024-03-04 15:36:52,997|33449|application_1709003950326_0602|INFO|TN|750|Kdtree|space|1117
+2024-03-04 15:36:59,127|39579|application_1709003950326_0602|INFO|TN|Kdtree|750|nEdgesA|1312983
+2024-03-04 15:36:59,127|39579|application_1709003950326_0602|INFO|TN|Kdtree|750|nEdgesB|1418627
+2024-03-04 15:36:59,127|39579|application_1709003950326_0602|TIME|TN|750|Kdtree|partitioning|6.129147527
+2024-03-04 15:37:07,137|47589|application_1709003950326_0602|INFO|TN|Kdtree|750|nOverlay|2429
+2024-03-04 15:37:07,138|47590|application_1709003950326_0602|TIME|TN|750|Kdtree|overlay|8.003288127
+2024-03-04 15:37:07,244|47696|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1117 records].
+2024-03-04 15:37:07,324|47776|application_1709003950326_0602|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:37:07,432|47884|application_1709003950326_0602|TIME|TN|750|Quadtree|creation|0.186734048
+2024-03-04 15:37:07,432|47884|application_1709003950326_0602|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:37:13,013|53465|application_1709003950326_0602|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:37:13,014|53466|application_1709003950326_0602|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:37:13,014|53466|application_1709003950326_0602|TIME|TN|750|Quadtree|partitioning|5.580030128
+2024-03-04 15:37:19,505|59957|application_1709003950326_0602|INFO|TN|Quadtree|750|nOverlay|2467
+2024-03-04 15:37:19,505|59957|application_1709003950326_0602|TIME|TN|750|Quadtree|overlay|6.483176765
+2024-03-04 15:37:19,582|60034|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:37:19,764|60216|application_1709003950326_0602|TIME|End
+2024-03-04 15:37:39,723|14354|application_1709003950326_0603|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 10 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:37:39,723|14354|application_1709003950326_0603|TIME|Start
+2024-03-04 15:37:39,723|14354|application_1709003950326_0603|INFO|TN|scale|1000.0
+2024-03-04 15:37:49,149|23780|application_1709003950326_0603|INFO|TN|edgesA|1302126
+2024-03-04 15:37:54,771|29402|application_1709003950326_0603|INFO|TN|edgesB|1407077
+2024-03-04 15:37:55,219|29850|application_1709003950326_0603|INFO|TN|TotalEdges|2709203
+2024-03-04 15:37:55,476|30107|application_1709003950326_0603|INFO|TN|Requested_partitions|750
+2024-03-04 15:37:55,478|30109|application_1709003950326_0603|INFO|TN|Sample_size|27092
+2024-03-04 15:37:55,479|30110|application_1709003950326_0603|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:37:58,392|33023|application_1709003950326_0603|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:37:58,465|33096|application_1709003950326_0603|TIME|TN|750|Kdtree|creation|2.983993172
+2024-03-04 15:37:58,465|33096|application_1709003950326_0603|INFO|TN|750|Kdtree|space|1096
+2024-03-04 15:38:04,671|39302|application_1709003950326_0603|INFO|TN|Kdtree|750|nEdgesA|1312445
+2024-03-04 15:38:04,671|39302|application_1709003950326_0603|INFO|TN|Kdtree|750|nEdgesB|1418187
+2024-03-04 15:38:04,671|39302|application_1709003950326_0603|TIME|TN|750|Kdtree|partitioning|6.204387718
+2024-03-04 15:38:11,809|46440|application_1709003950326_0603|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:38:11,810|46441|application_1709003950326_0603|TIME|TN|750|Kdtree|overlay|7.134565638
+2024-03-04 15:38:11,915|46546|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1096 records].
+2024-03-04 15:38:11,997|46628|application_1709003950326_0603|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:38:12,095|46726|application_1709003950326_0603|TIME|TN|750|Quadtree|creation|0.177987187
+2024-03-04 15:38:12,095|46726|application_1709003950326_0603|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:38:17,086|51717|application_1709003950326_0603|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:38:17,086|51717|application_1709003950326_0603|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:38:17,086|51717|application_1709003950326_0603|TIME|TN|750|Quadtree|partitioning|4.989648934
+2024-03-04 15:38:23,302|57933|application_1709003950326_0603|INFO|TN|Quadtree|750|nOverlay|2469
+2024-03-04 15:38:23,303|57934|application_1709003950326_0603|TIME|TN|750|Quadtree|overlay|6.212056176
+2024-03-04 15:38:23,378|58009|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.01s [1963 records].
+2024-03-04 15:38:23,586|58217|application_1709003950326_0603|TIME|End
+./kdtree_overlay TN
+2024-03-04 15:38:43,530|13969|application_1709003950326_0604|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 0 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:38:43,531|13970|application_1709003950326_0604|TIME|Start
+2024-03-04 15:38:43,531|13970|application_1709003950326_0604|INFO|TN|scale|1000.0
+2024-03-04 15:38:52,930|23369|application_1709003950326_0604|INFO|TN|edgesA|1302126
+2024-03-04 15:38:58,597|29036|application_1709003950326_0604|INFO|TN|edgesB|1407077
+2024-03-04 15:38:59,004|29443|application_1709003950326_0604|INFO|TN|TotalEdges|2709203
+2024-03-04 15:38:59,340|29779|application_1709003950326_0604|INFO|TN|Requested_partitions|750
+2024-03-04 15:38:59,344|29783|application_1709003950326_0604|INFO|TN|Sample_size|27092
+2024-03-04 15:38:59,347|29786|application_1709003950326_0604|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:39:02,437|32876|application_1709003950326_0604|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:39:02,515|32954|application_1709003950326_0604|TIME|TN|750|Kdtree|creation|3.165007085
+2024-03-04 15:39:02,515|32954|application_1709003950326_0604|INFO|TN|750|Kdtree|space|1100
+2024-03-04 15:39:08,549|38988|application_1709003950326_0604|INFO|TN|Kdtree|750|nEdgesA|1312981
+2024-03-04 15:39:08,549|38988|application_1709003950326_0604|INFO|TN|Kdtree|750|nEdgesB|1418628
+2024-03-04 15:39:08,549|38988|application_1709003950326_0604|TIME|TN|750|Kdtree|partitioning|6.033086979
+2024-03-04 15:39:15,904|46343|application_1709003950326_0604|INFO|TN|Kdtree|750|nOverlay|2433
+2024-03-04 15:39:15,904|46343|application_1709003950326_0604|TIME|TN|750|Kdtree|overlay|7.351657888
+2024-03-04 15:39:16,005|46444|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1100 records].
+2024-03-04 15:39:16,100|46539|application_1709003950326_0604|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:39:16,205|46644|application_1709003950326_0604|TIME|TN|750|Quadtree|creation|0.197532935
+2024-03-04 15:39:16,205|46644|application_1709003950326_0604|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:39:22,624|53063|application_1709003950326_0604|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:39:22,624|53063|application_1709003950326_0604|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:39:22,624|53063|application_1709003950326_0604|TIME|TN|750|Quadtree|partitioning|6.41523067
+2024-03-04 15:39:30,836|61275|application_1709003950326_0604|INFO|TN|Quadtree|750|nOverlay|2460
+2024-03-04 15:39:30,837|61276|application_1709003950326_0604|TIME|TN|750|Quadtree|overlay|8.209096895
+2024-03-04 15:39:30,904|61343|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:39:31,109|61548|application_1709003950326_0604|TIME|End
+2024-03-04 15:39:51,178|13951|application_1709003950326_0605|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 1 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:39:51,179|13952|application_1709003950326_0605|TIME|Start
+2024-03-04 15:39:51,179|13952|application_1709003950326_0605|INFO|TN|scale|1000.0
+2024-03-04 15:40:00,515|23288|application_1709003950326_0605|INFO|TN|edgesA|1302126
+2024-03-04 15:40:05,840|28613|application_1709003950326_0605|INFO|TN|edgesB|1407077
+2024-03-04 15:40:06,297|29070|application_1709003950326_0605|INFO|TN|TotalEdges|2709203
+2024-03-04 15:40:06,472|29245|application_1709003950326_0605|INFO|TN|Requested_partitions|750
+2024-03-04 15:40:06,473|29246|application_1709003950326_0605|INFO|TN|Sample_size|27092
+2024-03-04 15:40:06,475|29248|application_1709003950326_0605|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:40:09,189|31962|application_1709003950326_0605|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:40:09,260|32033|application_1709003950326_0605|TIME|TN|750|Kdtree|creation|2.783529091
+2024-03-04 15:40:09,260|32033|application_1709003950326_0605|INFO|TN|750|Kdtree|space|1092
+2024-03-04 15:40:16,022|38795|application_1709003950326_0605|INFO|TN|Kdtree|750|nEdgesA|1312599
+2024-03-04 15:40:16,022|38795|application_1709003950326_0605|INFO|TN|Kdtree|750|nEdgesB|1418230
+2024-03-04 15:40:16,022|38795|application_1709003950326_0605|TIME|TN|750|Kdtree|partitioning|6.760662113
+2024-03-04 15:40:23,381|46154|application_1709003950326_0605|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:40:23,382|46155|application_1709003950326_0605|TIME|TN|750|Kdtree|overlay|7.356636
+2024-03-04 15:40:23,485|46258|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1092 records].
+2024-03-04 15:40:23,567|46340|application_1709003950326_0605|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:40:23,690|46463|application_1709003950326_0605|TIME|TN|750|Quadtree|creation|0.203260301
+2024-03-04 15:40:23,690|46463|application_1709003950326_0605|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:40:30,202|52975|application_1709003950326_0605|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:40:30,202|52975|application_1709003950326_0605|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:40:30,202|52975|application_1709003950326_0605|TIME|TN|750|Quadtree|partitioning|6.510273723
+2024-03-04 15:40:37,037|59810|application_1709003950326_0605|INFO|TN|Quadtree|750|nOverlay|2457
+2024-03-04 15:40:37,037|59810|application_1709003950326_0605|TIME|TN|750|Quadtree|overlay|6.826631795
+2024-03-04 15:40:37,104|59877|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:40:37,299|60072|application_1709003950326_0605|TIME|End
+2024-03-04 15:40:57,762|14047|application_1709003950326_0606|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 4 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:40:57,763|14048|application_1709003950326_0606|TIME|Start
+2024-03-04 15:40:57,763|14048|application_1709003950326_0606|INFO|TN|scale|1000.0
+2024-03-04 15:41:07,080|23365|application_1709003950326_0606|INFO|TN|edgesA|1302126
+2024-03-04 15:41:12,428|28713|application_1709003950326_0606|INFO|TN|edgesB|1407077
+2024-03-04 15:41:12,882|29167|application_1709003950326_0606|INFO|TN|TotalEdges|2709203
+2024-03-04 15:41:13,172|29457|application_1709003950326_0606|INFO|TN|Requested_partitions|750
+2024-03-04 15:41:13,173|29458|application_1709003950326_0606|INFO|TN|Sample_size|27092
+2024-03-04 15:41:13,174|29459|application_1709003950326_0606|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:41:16,432|32717|application_1709003950326_0606|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:41:16,510|32795|application_1709003950326_0606|TIME|TN|750|Kdtree|creation|3.334404499
+2024-03-04 15:41:16,510|32795|application_1709003950326_0606|INFO|TN|750|Kdtree|space|1107
+2024-03-04 15:41:22,225|38510|application_1709003950326_0606|INFO|TN|Kdtree|750|nEdgesA|1312798
+2024-03-04 15:41:22,226|38511|application_1709003950326_0606|INFO|TN|Kdtree|750|nEdgesB|1418412
+2024-03-04 15:41:22,226|38511|application_1709003950326_0606|TIME|TN|750|Kdtree|partitioning|5.713857984
+2024-03-04 15:41:30,643|46928|application_1709003950326_0606|INFO|TN|Kdtree|750|nOverlay|2432
+2024-03-04 15:41:30,644|46929|application_1709003950326_0606|TIME|TN|750|Kdtree|overlay|8.414901456
+2024-03-04 15:41:30,761|47046|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1107 records].
+2024-03-04 15:41:30,860|47145|application_1709003950326_0606|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:41:30,985|47270|application_1709003950326_0606|TIME|TN|750|Quadtree|creation|0.221434959
+2024-03-04 15:41:30,985|47270|application_1709003950326_0606|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:41:36,668|52953|application_1709003950326_0606|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:41:36,668|52953|application_1709003950326_0606|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:41:36,668|52953|application_1709003950326_0606|TIME|TN|750|Quadtree|partitioning|5.681719201
+2024-03-04 15:41:44,114|60399|application_1709003950326_0606|INFO|TN|Quadtree|750|nOverlay|2463
+2024-03-04 15:41:44,115|60400|application_1709003950326_0606|TIME|TN|750|Quadtree|overlay|7.441245246
+2024-03-04 15:41:44,182|60467|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:41:44,407|60692|application_1709003950326_0606|TIME|End
+2024-03-04 15:42:04,098|13943|application_1709003950326_0607|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 5 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:42:04,099|13944|application_1709003950326_0607|TIME|Start
+2024-03-04 15:42:04,099|13944|application_1709003950326_0607|INFO|TN|scale|1000.0
+2024-03-04 15:42:13,507|23352|application_1709003950326_0607|INFO|TN|edgesA|1302126
+2024-03-04 15:42:18,849|28694|application_1709003950326_0607|INFO|TN|edgesB|1407077
+2024-03-04 15:42:19,229|29074|application_1709003950326_0607|INFO|TN|TotalEdges|2709203
+2024-03-04 15:42:19,536|29381|application_1709003950326_0607|INFO|TN|Requested_partitions|750
+2024-03-04 15:42:19,537|29382|application_1709003950326_0607|INFO|TN|Sample_size|27092
+2024-03-04 15:42:19,538|29383|application_1709003950326_0607|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:42:22,313|32158|application_1709003950326_0607|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:42:22,383|32228|application_1709003950326_0607|TIME|TN|750|Kdtree|creation|2.842700069
+2024-03-04 15:42:22,383|32228|application_1709003950326_0607|INFO|TN|750|Kdtree|space|1101
+2024-03-04 15:42:29,648|39493|application_1709003950326_0607|INFO|TN|Kdtree|750|nEdgesA|1312773
+2024-03-04 15:42:29,651|39496|application_1709003950326_0607|INFO|TN|Kdtree|750|nEdgesB|1418430
+2024-03-04 15:42:29,652|39497|application_1709003950326_0607|TIME|TN|750|Kdtree|partitioning|7.26691593
+2024-03-04 15:42:37,633|47478|application_1709003950326_0607|INFO|TN|Kdtree|750|nOverlay|2429
+2024-03-04 15:42:37,633|47478|application_1709003950326_0607|TIME|TN|750|Kdtree|overlay|7.973941529
+2024-03-04 15:42:37,731|47576|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1101 records].
+2024-03-04 15:42:37,811|47656|application_1709003950326_0607|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:42:37,906|47751|application_1709003950326_0607|TIME|TN|750|Quadtree|creation|0.1733774
+2024-03-04 15:42:37,907|47752|application_1709003950326_0607|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:42:43,574|53419|application_1709003950326_0607|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:42:43,574|53419|application_1709003950326_0607|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:42:43,574|53419|application_1709003950326_0607|TIME|TN|750|Quadtree|partitioning|5.666484796
+2024-03-04 15:42:50,188|60033|application_1709003950326_0607|INFO|TN|Quadtree|750|nOverlay|2461
+2024-03-04 15:42:50,189|60034|application_1709003950326_0607|TIME|TN|750|Quadtree|overlay|6.61103122
+2024-03-04 15:42:50,255|60100|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:42:50,437|60282|application_1709003950326_0607|TIME|End
+2024-03-04 15:43:10,393|14311|application_1709003950326_0608|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 6 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:43:10,394|14312|application_1709003950326_0608|TIME|Start
+2024-03-04 15:43:10,394|14312|application_1709003950326_0608|INFO|TN|scale|1000.0
+2024-03-04 15:43:19,636|23554|application_1709003950326_0608|INFO|TN|edgesA|1302126
+2024-03-04 15:43:25,097|29015|application_1709003950326_0608|INFO|TN|edgesB|1407077
+2024-03-04 15:43:25,567|29485|application_1709003950326_0608|INFO|TN|TotalEdges|2709203
+2024-03-04 15:43:25,749|29667|application_1709003950326_0608|INFO|TN|Requested_partitions|750
+2024-03-04 15:43:25,750|29668|application_1709003950326_0608|INFO|TN|Sample_size|27092
+2024-03-04 15:43:25,752|29670|application_1709003950326_0608|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:43:29,008|32926|application_1709003950326_0608|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:43:29,084|33002|application_1709003950326_0608|TIME|TN|750|Kdtree|creation|3.330432534
+2024-03-04 15:43:29,084|33002|application_1709003950326_0608|INFO|TN|750|Kdtree|space|1096
+2024-03-04 15:43:34,896|38814|application_1709003950326_0608|INFO|TN|Kdtree|750|nEdgesA|1312702
+2024-03-04 15:43:34,897|38815|application_1709003950326_0608|INFO|TN|Kdtree|750|nEdgesB|1418237
+2024-03-04 15:43:34,897|38815|application_1709003950326_0608|TIME|TN|750|Kdtree|partitioning|5.809743621
+2024-03-04 15:43:42,294|46212|application_1709003950326_0608|INFO|TN|Kdtree|750|nOverlay|2436
+2024-03-04 15:43:42,294|46212|application_1709003950326_0608|TIME|TN|750|Kdtree|overlay|7.393933075
+2024-03-04 15:43:42,421|46339|Saved /tmp/edgesCells_TN_K_750.wkt in 0.01s [1096 records].
+2024-03-04 15:43:42,562|46480|application_1709003950326_0608|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:43:42,666|46584|application_1709003950326_0608|TIME|TN|750|Quadtree|creation|0.238925806
+2024-03-04 15:43:42,666|46584|application_1709003950326_0608|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:43:47,676|51594|application_1709003950326_0608|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:43:47,676|51594|application_1709003950326_0608|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:43:47,676|51594|application_1709003950326_0608|TIME|TN|750|Quadtree|partitioning|5.008594944
+2024-03-04 15:43:54,668|58586|application_1709003950326_0608|INFO|TN|Quadtree|750|nOverlay|2468
+2024-03-04 15:43:54,668|58586|application_1709003950326_0608|TIME|TN|750|Quadtree|overlay|6.989018673
+2024-03-04 15:43:54,735|58653|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:43:55,015|58933|application_1709003950326_0608|TIME|End
+2024-03-04 15:44:14,962|13925|application_1709003950326_0609|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 7 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:44:14,963|13926|application_1709003950326_0609|TIME|Start
+2024-03-04 15:44:14,963|13926|application_1709003950326_0609|INFO|TN|scale|1000.0
+2024-03-04 15:44:24,250|23213|application_1709003950326_0609|INFO|TN|edgesA|1302126
+2024-03-04 15:44:29,845|28808|application_1709003950326_0609|INFO|TN|edgesB|1407077
+2024-03-04 15:44:30,283|29246|application_1709003950326_0609|INFO|TN|TotalEdges|2709203
+2024-03-04 15:44:30,571|29534|application_1709003950326_0609|INFO|TN|Requested_partitions|750
+2024-03-04 15:44:30,572|29535|application_1709003950326_0609|INFO|TN|Sample_size|27092
+2024-03-04 15:44:30,573|29536|application_1709003950326_0609|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:44:33,671|32634|application_1709003950326_0609|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:44:33,747|32710|application_1709003950326_0609|TIME|TN|750|Kdtree|creation|3.172986219
+2024-03-04 15:44:33,748|32711|application_1709003950326_0609|INFO|TN|750|Kdtree|space|1100
+2024-03-04 15:44:40,354|39317|application_1709003950326_0609|INFO|TN|Kdtree|750|nEdgesA|1312863
+2024-03-04 15:44:40,354|39317|application_1709003950326_0609|INFO|TN|Kdtree|750|nEdgesB|1418467
+2024-03-04 15:44:40,354|39317|application_1709003950326_0609|TIME|TN|750|Kdtree|partitioning|6.604826859
+2024-03-04 15:44:48,953|47916|application_1709003950326_0609|INFO|TN|Kdtree|750|nOverlay|2431
+2024-03-04 15:44:48,954|47917|application_1709003950326_0609|TIME|TN|750|Kdtree|overlay|8.596207399
+2024-03-04 15:44:49,083|48046|Saved /tmp/edgesCells_TN_K_750.wkt in 0.01s [1100 records].
+2024-03-04 15:44:49,211|48174|application_1709003950326_0609|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:44:49,312|48275|application_1709003950326_0609|TIME|TN|750|Quadtree|creation|0.223339511
+2024-03-04 15:44:49,312|48275|application_1709003950326_0609|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:44:54,187|53150|application_1709003950326_0609|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:44:54,187|53150|application_1709003950326_0609|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:44:54,188|53151|application_1709003950326_0609|TIME|TN|750|Quadtree|partitioning|4.87375484
+2024-03-04 15:45:00,946|59909|application_1709003950326_0609|INFO|TN|Quadtree|750|nOverlay|2472
+2024-03-04 15:45:00,946|59909|application_1709003950326_0609|TIME|TN|750|Quadtree|overlay|6.754394632
+2024-03-04 15:45:01,065|60028|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:45:01,256|60219|application_1709003950326_0609|TIME|End
+2024-03-04 15:45:20,408|13499|application_1709003950326_0610|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 8 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:45:20,408|13499|application_1709003950326_0610|TIME|Start
+2024-03-04 15:45:20,409|13500|application_1709003950326_0610|INFO|TN|scale|1000.0
+2024-03-04 15:45:29,835|22926|application_1709003950326_0610|INFO|TN|edgesA|1302126
+2024-03-04 15:45:35,244|28335|application_1709003950326_0610|INFO|TN|edgesB|1407077
+2024-03-04 15:45:35,616|28707|application_1709003950326_0610|INFO|TN|TotalEdges|2709203
+2024-03-04 15:45:36,037|29128|application_1709003950326_0610|INFO|TN|Requested_partitions|750
+2024-03-04 15:45:36,042|29133|application_1709003950326_0610|INFO|TN|Sample_size|27092
+2024-03-04 15:45:36,044|29135|application_1709003950326_0610|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:45:39,234|32325|application_1709003950326_0610|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:45:39,383|32474|application_1709003950326_0610|TIME|TN|750|Kdtree|creation|3.335585349
+2024-03-04 15:45:39,384|32475|application_1709003950326_0610|INFO|TN|750|Kdtree|space|1106
+2024-03-04 15:45:44,994|38085|application_1709003950326_0610|INFO|TN|Kdtree|750|nEdgesA|1313131
+2024-03-04 15:45:44,994|38085|application_1709003950326_0610|INFO|TN|Kdtree|750|nEdgesB|1418755
+2024-03-04 15:45:44,995|38086|application_1709003950326_0610|TIME|TN|750|Kdtree|partitioning|5.608306121
+2024-03-04 15:45:52,612|45703|application_1709003950326_0610|INFO|TN|Kdtree|750|nOverlay|2430
+2024-03-04 15:45:52,612|45703|application_1709003950326_0610|TIME|TN|750|Kdtree|overlay|7.614227227
+2024-03-04 15:45:52,722|45813|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1106 records].
+2024-03-04 15:45:52,824|45915|application_1709003950326_0610|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:45:52,967|46058|application_1709003950326_0610|TIME|TN|750|Quadtree|creation|0.242727121
+2024-03-04 15:45:52,967|46058|application_1709003950326_0610|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:45:58,952|52043|application_1709003950326_0610|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:45:58,952|52043|application_1709003950326_0610|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:45:58,952|52043|application_1709003950326_0610|TIME|TN|750|Quadtree|partitioning|5.982881351
+2024-03-04 15:46:05,241|58332|application_1709003950326_0610|INFO|TN|Quadtree|750|nOverlay|2464
+2024-03-04 15:46:05,241|58332|application_1709003950326_0610|TIME|TN|750|Quadtree|overlay|6.28554781
+2024-03-04 15:46:05,313|58404|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:46:05,530|58621|application_1709003950326_0610|TIME|End
+2024-03-04 15:46:24,503|13576|application_1709003950326_0611|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 9 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:46:24,504|13577|application_1709003950326_0611|TIME|Start
+2024-03-04 15:46:24,504|13577|application_1709003950326_0611|INFO|TN|scale|1000.0
+2024-03-04 15:46:34,369|23442|application_1709003950326_0611|INFO|TN|edgesA|1302126
+2024-03-04 15:46:39,979|29052|application_1709003950326_0611|INFO|TN|edgesB|1407077
+2024-03-04 15:46:40,425|29498|application_1709003950326_0611|INFO|TN|TotalEdges|2709203
+2024-03-04 15:46:40,597|29670|application_1709003950326_0611|INFO|TN|Requested_partitions|750
+2024-03-04 15:46:40,598|29671|application_1709003950326_0611|INFO|TN|Sample_size|27092
+2024-03-04 15:46:40,599|29672|application_1709003950326_0611|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:46:43,778|32851|application_1709003950326_0611|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:46:43,847|32920|application_1709003950326_0611|TIME|TN|750|Kdtree|creation|3.245914044
+2024-03-04 15:46:43,847|32920|application_1709003950326_0611|INFO|TN|750|Kdtree|space|1088
+2024-03-04 15:46:49,794|38867|application_1709003950326_0611|INFO|TN|Kdtree|750|nEdgesA|1312803
+2024-03-04 15:46:49,794|38867|application_1709003950326_0611|INFO|TN|Kdtree|750|nEdgesB|1418428
+2024-03-04 15:46:49,794|38867|application_1709003950326_0611|TIME|TN|750|Kdtree|partitioning|5.945637347
+2024-03-04 15:46:57,558|46631|application_1709003950326_0611|INFO|TN|Kdtree|750|nOverlay|2427
+2024-03-04 15:46:57,559|46632|application_1709003950326_0611|TIME|TN|750|Kdtree|overlay|7.762552562
+2024-03-04 15:46:57,660|46733|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1088 records].
+2024-03-04 15:46:57,739|46812|application_1709003950326_0611|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:46:57,839|46912|application_1709003950326_0611|TIME|TN|750|Quadtree|creation|0.176905614
+2024-03-04 15:46:57,839|46912|application_1709003950326_0611|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:47:04,285|53358|application_1709003950326_0611|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:47:04,285|53358|application_1709003950326_0611|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:47:04,285|53358|application_1709003950326_0611|TIME|TN|750|Quadtree|partitioning|6.444850574
+2024-03-04 15:47:10,690|59763|application_1709003950326_0611|INFO|TN|Quadtree|750|nOverlay|2466
+2024-03-04 15:47:10,690|59763|application_1709003950326_0611|TIME|TN|750|Quadtree|overlay|6.401354639
+2024-03-04 15:47:10,758|59831|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:47:10,955|60028|application_1709003950326_0611|TIME|End
+2024-03-04 15:47:30,128|13634|application_1709003950326_0612|COMMAND|org.apache.spark.deploy.SparkSubmit --deploy-mode client --conf spark.kryoserializer.buffer.max=256m --conf spark.driver.memory=35g --conf spark.driver.maxResultSize=4G --conf spark.locality.wait=3s --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.SDCEL_Partitioner --files /home/acald013/Spark/2.4/conf/log4j.properties --num-executors 12 --executor-cores 9 --executor-memory 20g --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/E/TN/A.wkt --input2 Census/E/TN/B.wkt --master yarn --tag TN --tolerance 1e-3 --ooption 2 --olevel 10 --partitions 750 --kpath /tmp/edgesCells_TN_K_750.wkt --qpath /tmp/edgesCells_TN_Q_750.wkt
+2024-03-04 15:47:30,129|13635|application_1709003950326_0612|TIME|Start
+2024-03-04 15:47:30,129|13635|application_1709003950326_0612|INFO|TN|scale|1000.0
+2024-03-04 15:47:39,839|23345|application_1709003950326_0612|INFO|TN|edgesA|1302126
+2024-03-04 15:47:45,279|28785|application_1709003950326_0612|INFO|TN|edgesB|1407077
+2024-03-04 15:47:45,856|29362|application_1709003950326_0612|INFO|TN|TotalEdges|2709203
+2024-03-04 15:47:46,035|29541|application_1709003950326_0612|INFO|TN|Requested_partitions|750
+2024-03-04 15:47:46,036|29542|application_1709003950326_0612|INFO|TN|Sample_size|27092
+2024-03-04 15:47:46,037|29543|application_1709003950326_0612|INFO|TN|Fraction|0.010264165243826109
+2024-03-04 15:47:49,139|32645|application_1709003950326_0612|INFO|TN|Kdtree|maxItemsPerCell|36
+2024-03-04 15:47:49,211|32717|application_1709003950326_0612|TIME|TN|750|Kdtree|creation|3.172333811
+2024-03-04 15:47:49,212|32718|application_1709003950326_0612|INFO|TN|750|Kdtree|space|1096
+2024-03-04 15:47:55,585|39091|application_1709003950326_0612|INFO|TN|Kdtree|750|nEdgesA|1312865
+2024-03-04 15:47:55,585|39091|application_1709003950326_0612|INFO|TN|Kdtree|750|nEdgesB|1418399
+2024-03-04 15:47:55,585|39091|application_1709003950326_0612|TIME|TN|750|Kdtree|partitioning|6.371809607
+2024-03-04 15:48:02,668|46174|application_1709003950326_0612|INFO|TN|Kdtree|750|nOverlay|2428
+2024-03-04 15:48:02,668|46174|application_1709003950326_0612|TIME|TN|750|Kdtree|overlay|7.080160902
+2024-03-04 15:48:02,781|46287|Saved /tmp/edgesCells_TN_K_750.wkt in 0.00s [1096 records].
+2024-03-04 15:48:02,873|46379|application_1709003950326_0612|INFO|TN|Quadtree|750|maxItemsPerCell|36
+2024-03-04 15:48:02,980|46486|application_1709003950326_0612|TIME|TN|750|Quadtree|creation|0.197493045
+2024-03-04 15:48:02,980|46486|application_1709003950326_0612|INFO|TN|750|Quadtree|space|1963
+2024-03-04 15:48:08,459|51965|application_1709003950326_0612|INFO|TN|Quadtree|750|nEdgesA|1311765
+2024-03-04 15:48:08,459|51965|application_1709003950326_0612|INFO|TN|Quadtree|750|nEdgesB|1417494
+2024-03-04 15:48:08,459|51965|application_1709003950326_0612|TIME|TN|750|Quadtree|partitioning|5.477404174
+2024-03-04 15:48:14,580|58086|application_1709003950326_0612|INFO|TN|Quadtree|750|nOverlay|2468
+2024-03-04 15:48:14,581|58087|application_1709003950326_0612|TIME|TN|750|Quadtree|overlay|6.11726085
+2024-03-04 15:48:14,649|58155|Saved /tmp/edgesCells_TN_Q_750.wkt in 0.00s [1963 records].
+2024-03-04 15:48:14,848|58354|application_1709003950326_0612|TIME|End
