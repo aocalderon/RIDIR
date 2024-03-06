@@ -1,8 +1,7 @@
-package sdcel
+package edu.ucr.dblab.sdcel
 
 import com.vividsolutions.jts.geom.{GeometryFactory, LineString, Polygon, PrecisionModel}
 import com.vividsolutions.jts.io.WKTReader
-import edu.ucr.dblab.sdcel.Params
 import edu.ucr.dblab.sdcel.QuadtreeGenerator.{envelope2polygon, getLineStrings, save}
 import edu.ucr.dblab.sdcel.Utils.{Settings, log}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree

@@ -1,4 +1,4 @@
-package sdcel
+package edu.ucr.dblab.sdcel
 
 import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.index.strtree.STRtree
@@ -6,7 +6,6 @@ import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.DCELPartitioner2.{getEdgesWithCrossingInfo, read, read2, saveToHDFSWithCrossingInfo}
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.geometries.{Cell, EdgeData}
-import edu.ucr.dblab.sdcel.{Params, SimplePartitioner}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
@@ -17,6 +16,7 @@ import scala.io.Source
 
 object DCELPartitionerByGrids {
   implicit val logger: Logger = LoggerFactory.getLogger("myLogger")
+
   def readGrids(grids: String)(implicit G: GeometryFactory): Map[Int, Cell] = {
     val reader = new WKTReader(G)
     val buffer = Source.fromFile(grids)
@@ -31,6 +31,7 @@ object DCELPartitionerByGrids {
     buffer.close
     cells
   }
+
   def main(args: Array[String]) = {
     // Starting session...
     implicit val params: Params = new Params(args)

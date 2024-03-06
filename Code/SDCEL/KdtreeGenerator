@@ -1,0 +1,40 @@
+#!/bin/bash
+
+MASTER=yarn
+
+NPARTITIONS=$1
+HDFS_PATH=$2
+INPUT1=$HDFS_PATH/A.wkt
+INPUT2=$HDFS_PATH/B.wkt
+LOCAL_PATH=$HOME/RIDIR/local_kpath/$HDFS_PATH
+
+TOLERANCE=$3
+
+LOCAL_DIR="$LOCAL_PATH/P$NPARTITIONS"
+echo "Checking $LOCAL_DIR ..."
+[ ! -d $LOCAL_DIR ] && mkdir -p $LOCAL_DIR
+
+EXECUTORS=12
+CORES=9
+DMEMORY=12g
+EMEMORY=30g
+SPARK_JARS=$HOME/Spark/2.4/jars/
+JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar
+CLASS="edu.ucr.dblab.sdcel.KdtreeGenerator"
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
+
+spark-submit \
+    --master $MASTER \
+    --jars $HOME/Spark/2.4/jars/geospark-1.2.0.jar,$HOME/Spark/2.4/jars/scallop_2.11-3.1.5.jar \
+    --files $LOG_FILE \
+    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+    --jars ${SPARK_JARS}geospark-1.2.0.jar,${SPARK_JARS}scallop_2.11-3.1.5.jar,${SPARK_JARS}spark-measure_2.11-0.16.jar \
+    --master $MASTER --deploy-mode client \
+    --num-executors $EXECUTORS --executor-cores $CORES --executor-memory $EMEMORY --driver-memory $DMEMORY \
+    --class $CLASS $JAR \
+    --input1 $INPUT1 \
+    --input2 $INPUT2 \
+    --kpath $LOCAL_DIR/kdtree.wkt \
+    --epath $LOCAL_DIR/boundary.wkt \
+    --partitions $NPARTITIONS \
+    --tolerance $TOLERANCE

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+NPARTITIONS=$1
+
+HDFS_PATH=$2
+INPUT1=$HDFS_PATH/A.wkt
+INPUT2=$HDFS_PATH/B.wkt
+LOCAL_PATH=$HOME/RIDIR/local_kpath/$HDFS_PATH
+
+TOLERANCE=$3
+
+echo "Making folders..."
+hdfs dfs -mkdir $HDFS_PATH/P$NPARTITIONS
+mkdir -p $LOCAL_PATH
+echo "Creating kdtree..."
+echo "./KdtreeGenerator $NPARTITIONS $HDFS_PATH $TOLERANCE"
+./KdtreeGenerator $NPARTITIONS $HDFS_PATH $TOLERANCE
+echo "Partitioning edges..."
+echo "./sdcel_partitioner_bygrids $HDFS_PATH/A.wkt $HDFS_PATH/B.wkt $HDFS_PATH/P$NPARTITIONS $LOCAL_PATH/P$NPARTITIONS/kdtree.wkt $LOCAL_PATH/P$NPARTITIONS/boundary.wkt $TOLERANCE"
+./sdcel_partitioner_bygrids $HDFS_PATH/A.wkt $HDFS_PATH/B.wkt $HDFS_PATH/P$NPARTITIONS $LOCAL_PATH/P$NPARTITIONS/kdtree.wkt $LOCAL_PATH/P$NPARTITIONS/boundary.wkt $TOLERANCE

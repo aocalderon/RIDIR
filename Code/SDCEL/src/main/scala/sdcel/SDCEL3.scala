@@ -12,7 +12,7 @@ import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
-import sdcel.DCELPartitionerByGrids.readGrids
+import edu.ucr.dblab.sdcel.DCELPartitionerByGrids.readGrids
 
 object SDCEL3 {
   def main(args: Array[String]) = {
@@ -55,7 +55,7 @@ object SDCEL3 {
     implicit val geofactory = new GeometryFactory(model)
 
     // Reading the quadtree for partitioning...
-    val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
+    //val (quadtree, cells) = readQuadtree[Int](params.quadtree(), params.boundary())
 
     implicit val grids: Map[Int, Cell] = readGrids(params.grids())
 
@@ -125,7 +125,7 @@ object SDCEL3 {
       val mx = Map.empty[String, EmptyCell]
       log2(s"TIME|layer1|$qtag")
       if(params.savesdcel()){
-        saveSDCEL(s"${params.input1().split("edgesA")(0)}/ldcelA", ldcelA, ma)
+        saveSDCEL(s"${params.input1().split("edgesA")(0)}/ldcelA", ldcelA, mx)
       }
 
       // Creating local dcel layer B...
@@ -142,7 +142,7 @@ object SDCEL3 {
       //val mb = runEmptyCells(ldcelB, non_emptiesB, "B")
       log2(s"TIME|layer2|$qtag")
       if(params.savesdcel()){
-        saveSDCEL(s"${params.input2().split("edgesB")(0)}/ldcelB", ldcelB, mb)
+        saveSDCEL(s"${params.input2().split("edgesB")(0)}/ldcelB", ldcelB, mx)
       }
 
       (ldcelA, mx, ldcelB, mx)
