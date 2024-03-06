@@ -29,7 +29,7 @@ object IDAdder {
     }.zipWithUniqueId().map{ case(wkt, id) =>
       s"$wkt\t$id"
     }
-    
+
     if(params.local()){
       save(params.output()) {
         dataset.map { line =>

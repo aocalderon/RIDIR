@@ -3,7 +3,7 @@ package sdcel
 import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.index.strtree.STRtree
 import com.vividsolutions.jts.io.WKTReader
-import edu.ucr.dblab.sdcel.DCELPartitioner2.{getEdgesWithCrossingInfo, read, read2}
+import edu.ucr.dblab.sdcel.DCELPartitioner2.{getEdgesWithCrossingInfo, read, read2, saveToHDFSWithCrossingInfo}
 import edu.ucr.dblab.sdcel.Utils.{Settings, log, save}
 import edu.ucr.dblab.sdcel.geometries.{Cell, EdgeData}
 import edu.ucr.dblab.sdcel.{Params, SimplePartitioner}
@@ -87,30 +87,30 @@ object DCELPartitionerByGrids {
       }
     }.partitionBy(new SimplePartitioner[LineString](grids.size)).map(_._2).cache
 
+    if(params.local()) {
+      val A = getEdgesWithCrossingInfo(edgesA, grids, "A")
+      val B = getEdgesWithCrossingInfo(edgesB, grids, "B")
 
-    // Saving to HDFS adding info about edges crossing border cells...
-    //saveToHDFSWithCrossingInfo(edgesA, cells, params.apath())
-    //saveToHDFSWithCrossingInfo(edgesB, cells, params.bpath())
-    //log("TIMEP|Saving")
+      save("/tmp/edgesACross.wkt") {
+        A.map { edge =>
+          val wkt = edge.toText
+          val dat = edge.getUserData.asInstanceOf[EdgeData]
 
-    val A = getEdgesWithCrossingInfo(edgesA, grids, "A")
-    val B = getEdgesWithCrossingInfo(edgesB, grids, "B")
+          s"$wkt\t$dat\n"
+        }.collect
+      }
+      save("/tmp/edgesBCross.wkt") {
+        B.map { edge =>
+          val wkt = edge.toText
+          val dat = edge.getUserData.asInstanceOf[EdgeData]
 
-    save("/tmp/edgesACross.wkt") {
-      A.map{ edge =>
-        val wkt = edge.toText
-        val dat = edge.getUserData.asInstanceOf[EdgeData]
-
-        s"$wkt\t$dat\n"
-      }.collect
-    }
-    save("/tmp/edgesBCross.wkt") {
-      B.map{ edge =>
-        val wkt = edge.toText
-        val dat = edge.getUserData.asInstanceOf[EdgeData]
-
-        s"$wkt\t$dat\n"
-      }.collect
+          s"$wkt\t$dat\n"
+        }.collect
+      }
+    } else {
+      // Saving to HDFS adding info about edges crossing border cells...
+      saveToHDFSWithCrossingInfo(edgesA, grids, params.apath())
+      saveToHDFSWithCrossingInfo(edgesB, grids, params.bpath())
     }
 
     spark.close

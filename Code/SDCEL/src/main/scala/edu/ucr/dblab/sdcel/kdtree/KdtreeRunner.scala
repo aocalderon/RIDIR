@@ -8,7 +8,9 @@ import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 
+import scala.annotation.tailrec
 import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
@@ -101,18 +103,6 @@ object KdtreeRunner {
       val kcell = kcells(x_sibling)
       val sibling_orientation = kcell.splitX
 
-      log(s"In $i the parent  of $x_lineage is $x_parent")
-      log(s"In $i the sibling of $x_lineage is $x_sibling")
-
-      val ordering = (sibling_orientation, sibling_position) match {
-        case (true, true)   => "X Ascending"
-        case (true, false)  => "X Descending"
-        case (false, true)  => "Y Ascending"
-        case (false, false) => "Y Descending"
-      }
-
-      log(s"In $i the order is $ordering")
-
       val sibling_envelope = kcells(x_sibling).envelope
       sibling_envelope.expandBy(S.tolerance * -1.0)
       val nodes_presorted = lines_tree.findLeafNodes(sibling_envelope).asScala.toList
@@ -132,8 +122,39 @@ object KdtreeRunner {
       x_lineage = x_parent
     }
 
+    @tailrec
+    def find_siblings_cells(lineage: String,
+                            tree: KDBTree,
+                            kcells: mutable.HashMap[String, KDBTree_Utils.Kdbnode],
+                            r: List[KDBTree],
+                            i: Int): List[KDBTree] = {
+      if(lineage.isEmpty){
+        r
+      } else {
+        val parent = lineage.substring(0, lineage.length - 1)
+        val position = lineage.takeRight(1)
+        val sibling_position = position == "0"
+        val sibling = s"$parent${if (sibling_position) "1" else "0"}"
+        val kcell = kcells(sibling)
+        val sibling_orientation = kcell.splitX
+
+        val sibling_envelope = kcells(sibling).envelope
+        sibling_envelope.expandBy(S.tolerance * -1.0)
+        val nodes_presorted = tree.findLeafNodes(sibling_envelope).asScala.toList
+        val nodes_sorted = (sibling_orientation, sibling_position) match {
+          case (true, true)   => nodes_presorted.sortBy(_.getExtent.getMinX)
+          case (true, false)  => nodes_presorted.sortBy(_.getExtent.getMaxX)(Ordering[Double].reverse)
+          case (false, true)  => nodes_presorted.sortBy(_.getExtent.getMinY)
+          case (false, false) => nodes_presorted.sortBy(_.getExtent.getMaxY)(Ordering[Double].reverse)
+        }
+
+        find_siblings_cells(parent, tree, kcells, r ++ nodes_sorted, i + 1)
+      }
+    }
+    val nodes_order = find_siblings_cells(lineages(x), lines_tree, kcells, List.empty[KDBTree], 0)
+
     save("/tmp/edgesS.wkt") {
-      nodes.map { case(leaf, i) =>
+      nodes_order.zipWithIndex.map { case(leaf, i) =>
         val wkt = G.toGeometry(leaf.getExtent).toText
         val lin = leaf.lineage
         val cid = leaf.getLeafId
