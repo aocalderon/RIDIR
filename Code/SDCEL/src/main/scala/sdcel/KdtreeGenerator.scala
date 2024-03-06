@@ -3,7 +3,7 @@ package sdcel
 import com.vividsolutions.jts.geom.{GeometryFactory, LineString, Polygon, PrecisionModel}
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.Params
-import edu.ucr.dblab.sdcel.QuadtreeGenerator.getLineStrings
+import edu.ucr.dblab.sdcel.QuadtreeGenerator.{envelope2polygon, getLineStrings, save}
 import edu.ucr.dblab.sdcel.Utils.{Settings, log}
 import edu.ucr.dblab.sdcel.kdtree.KDBTree
 import edu.ucr.dblab.sdcel.reader.PR_Utils
@@ -13,6 +13,7 @@ import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.util.Random
 
 object KdtreeGenerator {
@@ -46,7 +47,6 @@ object KdtreeGenerator {
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
-    import spark.implicits._
     implicit val S: Settings = Settings(
       tolerance = params.tolerance(),
       debug = params.debug(),
@@ -91,9 +91,19 @@ object KdtreeGenerator {
     val kn = kdtree.getLeaves.size()
     log(s"TIME|Kdtree|creation|$partitions|$kn")
 
-
-
+    // Saving the boundary...
+    save{params.epath()}{
+      val wkt = envelope2polygon(boundary).toText
+      List(s"$wkt\n")
+    }
     // Saving the kdtree...
+    save{params.kpath()}{
+      kdtree.getLeaves.asScala.map{ case(id, envelope) =>
+        val wkt = G.toGeometry(envelope).toText
+
+        s"$wkt\t$id\n"
+      }.toList
+    }
 
     spark.close
     log("TIME|Close")
