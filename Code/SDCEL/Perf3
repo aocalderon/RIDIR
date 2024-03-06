@@ -1,0 +1,169 @@
+#!/bin/bash
+
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+	-d|--dataset)
+	    DATASET="$2"
+	    shift
+	    shift
+	    ;;
+	-t|--tolerance)
+	    TOLERANCE="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-f|--first)
+	    FIRST="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-i|--increment)
+	    INCREMENT="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-l|--last)
+	    LAST="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-n|--iterations)
+	    N="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-p|--partitions)
+	    PARTITIONS="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-m|--master)
+	    MASTER="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-x|--executors)
+	    EXECUTORS=$2
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-o|--ooption)
+	    OOPTION="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	-e|--olevel)
+	    OLEVEL="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;	
+	--debug)
+	    DEBUG="--debug"
+	    shift # past argument
+	    ;;
+	--loadsdcel)
+	    LOADSDCEL="--loadsdcel"
+	    shift # past argument
+	    ;;
+	--savesdcel)
+	    SAVESDCEL="--savesdcel"
+	    shift # past argument
+	    ;;
+	-a|--tag)
+	    TAG="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-w|--wait)
+	    WAIT="$2"
+	    shift # past argument
+	    shift # past value
+	    ;;
+	-*|--*)
+	    echo "Unknown option $1"
+	    exit 1
+	    ;;
+	*)
+	    POSITIONAL_ARGS+=("$1") # save positional arg
+	    shift # past argument
+	    ;;
+    esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+echo "DATASET    = ${DATASET}"
+echo "TOLERANCE  = ${TOLERANCE}"
+
+if [ -z ${PARTITIONS+x} ] # if PARTITIONS does not exist...
+then 
+    PS=(`seq $FIRST $INCREMENT $LAST`)
+    echo "FIRST      = ${FIRST}"
+    echo "INCREMENT  = ${INCREMENT}"
+    echo "LAST       = ${LAST}"    
+else 
+    PS=(`seq $PARTITIONS 1 $PARTITIONS`)    
+    echo "PARTITIONS = ${PARTITIONS}"
+fi
+
+if [ -v N ];         then echo "ITERATIONS = $N";         else N=1;          fi
+if [ -v DEBUG ];     then echo "DEBUG      = YES";        else DEBUG="";     fi
+if [ -v LOADSDCEL ]; then echo "LOADSDCEL  = YES";        else LOADSDCEL=""; fi
+if [ -v SAVESDCEL ]; then echo "SAVESDCEL  = YES";        else SAVESDCEL=""; fi
+if [ -v OOPTION ];   then echo "OOPTION    = $OOPTION";   else OOPTION=0;    fi
+if [ -v OLEVEL ];    then echo "OLEVEL     = $OLEVEL";    else OLEVEL=4;     fi
+if [ -v EXECUTORS ]; then echo "EXECUTORS  = $EXECUTORS"; else EXECUTORS=12; fi
+if [ -v WAIT ];      then echo "WAIT       = $WAIT";      else WAIT="3s";    fi
+
+if [ -v MASTER ]
+then
+    echo "MASTER     = ${MASTER}"
+else
+    MASTER="yarn"
+    echo "MASTER     = yarn"
+fi
+
+CORES=9
+DMEMORY=35g
+EMEMORY=20g
+MAX_RESULT_SIZE="4G"
+KRYO_BUFFER_MAX="256m"
+
+SPARK_JARS=$HOME/Spark/2.4/jars/
+JAR_LIBS=${SPARK_JARS}geospark-1.2.0.jar
+JAR_LIBS=$JAR_LIBS,${SPARK_JARS}scallop_2.11-3.1.5.jar
+JAR_LIBS=$JAR_LIBS,${SPARK_JARS}fastutil-core-8.5.8.jar
+#JAR_LIBS=$JAR_LIBS,${SPARK_JARS}spark-measure_2.11-0.16.jar
+
+JAR=$HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar
+CLASS="edu.ucr.dblab.sdcel.SDCEL3"
+LOG_FILE=$HOME/Spark/2.4/conf/log4j.properties
+
+for n in $(seq 1 $N)
+do
+    for P in "${PS[@]}"
+    do
+	echo "RUN        = $n"
+	TAG="${DATASET}_${TOLERANCE}_${OOPTION}_${OLEVEL}_${P}_${EXECUTORS}_${n}";
+	PARAMS=(
+	    --files $LOG_FILE \
+	    --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG_FILE \
+	    --conf spark.driver.maxResultSize=$MAX_RESULT_SIZE \
+	    --conf spark.kryoserializer.buffer.max=$KRYO_BUFFER_MAX \
+	    --conf spark.locality.wait=$WAIT \
+	    --jars $JAR_LIBS \
+	    --master $MASTER --deploy-mode client \
+	    --num-executors $EXECUTORS --executor-cores $CORES \
+	    --executor-memory $EMEMORY --driver-memory $DMEMORY \
+	    --class $CLASS $JAR \
+	    --input1 ${DATASET}/P${P}/edgesA \
+	    --input2 ${DATASET}/P${P}/edgesB \
+	    --grids ${HOME}/RIDIR/local_kpath/${DATASET}/P${P}/kdtree.wkt \
+	    --boundary ${HOME}/RIDIR/local_kpath/${DATASET}/P${P}/boundary.wkt \
+	    --tolerance $TOLERANCE --qtag $TAG --ooption $OOPTION --olevel $OLEVEL \
+	    $DEBUG $LOADSDCEL $SAVESDCEL
+	)
+	echo "spark-submit ${PARAMS[@]}"
+	spark-submit ${PARAMS[@]}
+    done
+done
