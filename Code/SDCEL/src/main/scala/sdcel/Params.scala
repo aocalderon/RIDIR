@@ -27,6 +27,7 @@ class Params(args: Seq[String]) extends ScallopConf(args) {
   val ooption:     ScallopOption[Int]     = opt[Int]     (default = Some(0))
   val olevel:      ScallopOption[Int]     = opt[Int]     (default = Some(4))
   val output:      ScallopOption[String]  = opt[String]  (default = Some("tmp/"))
+  val tag:         ScallopOption[String]  = opt[String]  (default = Some("tag"))
   val persistance: ScallopOption[Int]     = opt[Int]     (default = Some(1))
 
   val grids:  ScallopOption[String] = opt[String] (default = Some("grids.wkt"))

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DATASET=$1
+
+for n in $(seq 1 $2)
+do
+	echo "./kdtree_overlay $DATASET"
+	./kdtree_overlay $DATASET
+done

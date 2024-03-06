@@ -33,35 +33,36 @@ object SDCEL_Partitioner {
       debug = params.debug(),
       appId = spark.sparkContext.applicationId
     )
+    val tag = params.tag()
     val command = System.getProperty("sun.java.command")
     log(s"COMMAND|$command")
 
     log("TIME|Start")
 
-    log(s"INFO|scale|${S.scale}")
+    log(s"INFO|$tag|scale|${S.scale}")
     implicit val model: PrecisionModel = new PrecisionModel(S.scale)
     implicit val G: GeometryFactory = new GeometryFactory(model)
 
     // Reading data...
     val edgesRDDA = read(params.input1())
     val nEdgesRDDA = edgesRDDA.count()
-    log(s"INFO|edgesA|$nEdgesRDDA")
+    log(s"INFO|$tag|edgesA|$nEdgesRDDA")
     val edgesRDDB = read(params.input2())
     val nEdgesRDDB = edgesRDDB.count()
-    log(s"INFO|edgesB|$nEdgesRDDB")
+    log(s"INFO|$tag|edgesB|$nEdgesRDDB")
     val edgesRDD = edgesRDDA.union(edgesRDDB).cache()
     val nEdgesRDD = edgesRDD.count()
-    log(s"INFO|TotalEdges|$nEdgesRDD")
+    log(s"INFO|$tag|TotalEdges|$nEdgesRDD")
 
     // Collecting statistics for partitioning...
     val envelope_area = getStudyArea(edgesRDD) // getStudyArea returns an Envelope...
     val paddedBoundary = new Envelope(envelope_area.getMinX, envelope_area.getMaxX + 0.01, envelope_area.getMinY, envelope_area.getMaxY + 0.01)
     val numPartitions = params.partitions()
-    log(s"INFO|Requested_partitions|$numPartitions")
+    log(s"INFO|$tag|Requested_partitions|$numPartitions")
     val sample_size = SampleUtils.getSampleNumbers(numPartitions, nEdgesRDD)
-    log(s"INFO|Sample_size|$sample_size")
+    log(s"INFO|$tag|Sample_size|$sample_size")
     val fraction = SampleUtils.computeFractionForSampleSize(sample_size, nEdgesRDD, withReplacement = false)
-    log(s"INFO|Fraction|$fraction")
+    log(s"INFO|$tag|Fraction|$fraction")
 
     /** **
      * Testing Kdtree...
@@ -72,7 +73,7 @@ object SDCEL_Partitioner {
         .collect()
 
       val max_items_per_cell = sample.length / numPartitions
-      log(s"INFO|Kdtree|maxItemsPerCell|$max_items_per_cell")
+      log(s"INFO|$tag|Kdtree|maxItemsPerCell|$max_items_per_cell")
 
       val kdtree = new KDBTree(max_items_per_cell, numPartitions, paddedBoundary)
       sample.foreach { sample =>
@@ -85,8 +86,8 @@ object SDCEL_Partitioner {
 
       (kdtree, kn)
     }
-    log(s"TIME|$numPartitions|Kdtree|creation|$kdtree_creation_time")
-    log(s"INFO|$numPartitions|Kdtree|space|$kdtree_space")
+    log(s"TIME|$tag|$numPartitions|Kdtree|creation|$kdtree_creation_time")
+    log(s"INFO|$tag|$numPartitions|Kdtree|space|$kdtree_space")
 
     val ( (edgesKA, edgesKB, kcells), kdtree_partitioning_time) = timer {
       val edgesPartitionedRDDA = edgesRDDA.mapPartitions { edges =>
@@ -109,12 +110,12 @@ object SDCEL_Partitioner {
       val edgesB = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDB, kcells, "B").cache()
       val na = edgesA.count()
       val nb = edgesB.count()
-      log(s"INFO|Kdtree|$numPartitions|nEdgesA|$na")
-      log(s"INFO|Kdtree|$numPartitions|nEdgesB|$nb")
+      log(s"INFO|$tag|Kdtree|$numPartitions|nEdgesA|$na")
+      log(s"INFO|$tag|Kdtree|$numPartitions|nEdgesB|$nb")
 
       (edgesA, edgesB, kcells)
     }
-    log(s"TIME|$numPartitions|Kdtree|partitioning|$kdtree_partitioning_time")
+    log(s"TIME|$tag|$numPartitions|Kdtree|partitioning|$kdtree_partitioning_time")
 
     val (kdtree_overlay, kdtree_overlay_time) = timer {
       implicit val cells: Map[Int, Cell] = kcells
@@ -144,11 +145,11 @@ object SDCEL_Partitioner {
       }
 
       val n = overlay.count()
-      log(s"INFO|Kdtree|$numPartitions|nOverlay|$n")
+      log(s"INFO|$tag|Kdtree|$numPartitions|nOverlay|$n")
 
       overlay
     }
-    log(s"TIME|$numPartitions|Kdtree|overlay|$kdtree_overlay_time")
+    log(s"TIME|$tag|$numPartitions|Kdtree|overlay|$kdtree_overlay_time")
 
     save(params.kpath()) {
       kdtree.getLeaves.asScala.map{ case(id, envelope) =>
@@ -164,7 +165,7 @@ object SDCEL_Partitioner {
     val ((quadtree, quadtree_space), quadtree_creation_time) = timer {
       val sample = edgesRDD.sample(withReplacement = false, fraction, 42).collect()
       val max_items_per_cell = sample.length / numPartitions
-      log(s"INFO|Quadtree|$numPartitions|maxItemsPerCell|$max_items_per_cell")
+      log(s"INFO|$tag|Quadtree|$numPartitions|maxItemsPerCell|$max_items_per_cell")
       val quadtree = new StandardQuadTree[LineString](new QuadRectangle(paddedBoundary), 0, max_items_per_cell, numPartitions)
       sample.foreach { edge =>
         quadtree.insert(new QuadRectangle(edge.getEnvelopeInternal), edge)
@@ -176,8 +177,8 @@ object SDCEL_Partitioner {
 
       (quadtree, qn)
     }
-    log(s"TIME|$numPartitions|Quadtree|creation|$quadtree_creation_time")
-    log(s"INFO|$numPartitions|Quadtree|space|$quadtree_space")
+    log(s"TIME|$tag|$numPartitions|Quadtree|creation|$quadtree_creation_time")
+    log(s"INFO|$tag|$numPartitions|Quadtree|space|$quadtree_space")
 
     val ( (edgesQA, edgesQB, qcells), quadtree_partitioning_time) = timer {
       val edgesPartitionedRDDA = edgesRDDA.mapPartitions { edges =>
@@ -200,12 +201,12 @@ object SDCEL_Partitioner {
       val edgesB = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDB, qcells, "B").cache()
       val na = edgesA.count()
       val nb = edgesB.count()
-      log(s"INFO|Quadtree|$numPartitions|nEdgesA|$na")
-      log(s"INFO|Quadtree|$numPartitions|nEdgesB|$nb")
+      log(s"INFO|$tag|Quadtree|$numPartitions|nEdgesA|$na")
+      log(s"INFO|$tag|Quadtree|$numPartitions|nEdgesB|$nb")
 
       (edgesA, edgesB, qcells)
     }
-    log(s"TIME|$numPartitions|Quadtree|partitioning|$quadtree_partitioning_time")
+    log(s"TIME|$tag|$numPartitions|Quadtree|partitioning|$quadtree_partitioning_time")
 
     val (quadtree_overlay, quadtree_overlay_time) = timer{
       implicit val cells: Map[Int, Cell] = qcells
@@ -235,11 +236,11 @@ object SDCEL_Partitioner {
       }
 
       val n = overlay.count()
-      log(s"INFO|Quadtree|$numPartitions|nOverlay|$n")
+      log(s"INFO|$tag|Quadtree|$numPartitions|nOverlay|$n")
 
       overlay
     }
-    log(s"TIME|$numPartitions|Quadtree|overlay|$quadtree_overlay_time")
+    log(s"TIME|$tag|$numPartitions|Quadtree|overlay|$quadtree_overlay_time")
 
     save(params.qpath()) {
       quadtree.getLeafZones.asScala.map { zone =>
