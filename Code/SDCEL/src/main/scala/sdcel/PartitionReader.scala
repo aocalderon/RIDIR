@@ -1,21 +1,16 @@
 package edu.ucr.dblab.sdcel
 
+import com.vividsolutions.jts.algorithm.CGAlgorithms
+import com.vividsolutions.jts.geom._
+import com.vividsolutions.jts.io.WKTReader
+import edu.ucr.dblab.sdcel.Utils._
+import edu.ucr.dblab.sdcel.geometries._
+import edu.ucr.dblab.sdcel.quadtree._
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
+
 import scala.collection.JavaConverters._
 import scala.io.Source
-
-import com.vividsolutions.jts.geom.{Coordinate, Envelope}
-import com.vividsolutions.jts.geom.{LineString, Polygon, LinearRing}
-import com.vividsolutions.jts.geom.{PrecisionModel, GeometryFactory}
-import com.vividsolutions.jts.io.WKTReader
-import com.vividsolutions.jts.algorithm.CGAlgorithms
-
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.rdd.RDD
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
-
-import edu.ucr.dblab.sdcel.quadtree._
-import edu.ucr.dblab.sdcel.geometries._
-import edu.ucr.dblab.sdcel.Utils._
 
 object PartitionReader {
   def readQuadtree[T](qpath: String, epath: String)
@@ -62,10 +57,10 @@ object PartitionReader {
 
   def readEdges[T](input: String, label: String)
     (implicit geofactory: GeometryFactory, spark: SparkSession, settings: Settings,
-      quadtree: StandardQuadTree[T]): RDD[LineString] = {
+     cells: Map[Int, Cell]): RDD[LineString] = {
     
     // Reading data...
-    val partitions = quadtree.getLeafZones.size
+    val partitions = cells.size
     val edgesRDD = spark.read.textFile(input).rdd
       .mapPartitionsWithIndex{ case(index, lines) =>
         val reader = new WKTReader(geofactory)
