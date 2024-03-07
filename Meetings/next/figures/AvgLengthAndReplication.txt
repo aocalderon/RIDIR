@@ -1,0 +1,59 @@
+MAIN US
+
+acald013@mr-hn:~/RIDIR/Code/SDCEL$ bash bash/edgestats_spark --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --master yarn --partitions 10000
+2024-03-06 15:17:27,677|13055|application_1709003950326_0807|COMMAND|org.apache.spark.deploy.SparkSubmit --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:/home/acald013/Spark/2.4/conf/log4j.properties --class edu.ucr.dblab.sdcel.extension.EdgeStats --files /home/acald013/Spark/2.4/conf/log4j.properties --jars /home/acald013/.ivy2/cache/org.datasyslab/JTSplus/jars/JTSplus-0.1.4.jar,/home/acald013/.ivy2/cache/org.jgrapht/jgrapht-core/jars/jgrapht-core-1.4.0.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.26.jar,/home/acald013/.ivy2/cache/org.slf4j/slf4j-log4j12/jars/slf4j-log4j12-1.7.25.jar,/home/acald013/.ivy2/cache/org.rogach/scallop_2.11/jars/scallop_2.11-2.1.3.jar,/home/acald013/.ivy2/cache/org.scalactic/scalactic_2.11/bundles/scalactic_2.11-3.2.12.jar,/home/acald013/.ivy2/cache/com.google.guava/guava/bundles/guava-31.1-jre.jar,/home/acald013/.ivy2/cache/com.google.guava/failureaccess/bundles/failureaccess-1.0.1.jar,/home/acald013/.ivy2/cache/com.google.guava/listenablefuture/jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,/home/acald013/.ivy2/cache/org.glassfish.jersey.bundles.repackaged/jersey-guava/bundles/jersey-guava-2.22.2.jar,/home/acald013/RIDIR/Code/SDCEL/lib/geospark-1.2.0.jar /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar --input1 Census/MainUS/A.wkt --input2 Census/MainUS/B.wkt --master yarn --partitions 10000
+2024-03-06 15:17:27,678|13056|application_1709003950326_0807|TIME|Start
+2024-03-06 15:17:27,678|13056|application_1709003950326_0807|INFO|tag|scale|1000.0
+2024-03-06 15:18:16,435|61813|application_1709003950326_0807|INFO|tag|edgesA|35044458
+2024-03-06 15:18:57,449|102827|application_1709003950326_0807|INFO|tag|edgesB|36639412
+2024-03-06 15:20:13,961|179339|application_1709003950326_0807|INFO|tag|TotalEdges|71683870
+2024-03-06 15:21:33,690|259068|application_1709003950326_0807|INFO|tag|Requested_partitions|10000
+2024-03-06 15:21:33,691|259069|application_1709003950326_0807|INFO|tag|Sample_size|716838
+2024-03-06 15:21:33,693|259071|application_1709003950326_0807|INFO|tag|Fraction|0.010050811172486237
+2024-03-06 15:22:15,492|300870|application_1709003950326_0807|STAT|A|Both|10000|tag|Count|35044458
+2024-03-06 15:22:45,242|330620|application_1709003950326_0807|STAT|A|Both|10000|tag|Length|60.39802609014239
+2024-03-06 15:23:28,480|373858|application_1709003950326_0807|STAT|B|Both|10000|tag|Count|36639412
+2024-03-06 15:24:06,894|412272|application_1709003950326_0807|STAT|B|Both|10000|tag|Length|60.62039047355891
+2024-03-06 15:26:46,200|571578|application_1709003950326_0807|INFO|tag|Kdtree|maxItemsPerCell|72
+2024-03-06 15:26:47,361|572739|application_1709003950326_0807|TIME|tag|10000|Kdtree|creation|160.46388869
+2024-03-06 15:26:47,362|572740|application_1709003950326_0807|INFO|tag|10000|Kdtree|space|14457
+2024-03-06 15:32:27,734|913112|application_1709003950326_0807|TIME|tag|10000|Kdtree|partitioning|340.370013876
+2024-03-06 15:32:27,734|913112|application_1709003950326_0807|STAT|A|Kdtree|10000|tag|Replication|35255091
+2024-03-06 15:32:27,735|913113|application_1709003950326_0807|STAT|B|Kdtree|10000|tag|Replication|36860119
+2024-03-06 15:33:46,791|992169|application_1709003950326_0807|INFO|tag|Quadtree|10000|maxItemsPerCell|72
+2024-03-06 15:33:48,803|994181|application_1709003950326_0807|TIME|tag|10000|Quadtree|creation|81.061595075
+2024-03-06 15:33:48,803|994181|application_1709003950326_0807|INFO|tag|10000|Quadtree|space|24997
+2024-03-06 15:41:02,134|1427512|application_1709003950326_0807|TIME|tag|10000|Quadtree|partitioning|433.329477365
+2024-03-06 15:41:02,134|1427512|application_1709003950326_0807|STAT|A|Quadtree|10000|tag|Replication|35248299
+2024-03-06 15:41:02,135|1427513|application_1709003950326_0807|STAT|B|Quadtree|10000|tag|Replication|36854900
+2024-03-06 15:41:02,135|1427513|application_1709003950326_0807|TIME|End
+
+
+GADM
+
+2024-03-06 16:08:47,615|12921|application_1709003950326_0810|TIME|Start
+2024-03-06 16:08:47,615|12921|application_1709003950326_0810|INFO|tag|scale|1000.0
+2024-03-06 16:10:09,925|95231|application_1709003950326_0810|INFO|tag|edgesA|68779746
+2024-03-06 16:11:34,795|180101|application_1709003950326_0810|INFO|tag|edgesB|64598411
+2024-03-06 16:14:02,064|327370|application_1709003950326_0810|INFO|tag|TotalEdges|133378157
+2024-03-06 16:16:35,390|480696|application_1709003950326_0810|INFO|tag|Requested_partitions|10000
+2024-03-06 16:16:35,395|480701|application_1709003950326_0810|INFO|tag|Sample_size|1333781
+2024-03-06 16:16:35,398|480704|application_1709003950326_0810|INFO|tag|Fraction|0.01003722781272588
+2024-03-06 16:17:55,049|560355|application_1709003950326_0810|STAT|A|Both|10000|tag|Count|68779746
+2024-03-06 16:19:05,885|631191|application_1709003950326_0810|STAT|A|Both|10000|tag|Length|179.4309895029547
+2024-03-06 16:20:26,421|711727|application_1709003950326_0810|STAT|B|Both|10000|tag|Count|64598411
+2024-03-06 16:21:37,212|782518|application_1709003950326_0810|STAT|B|Both|10000|tag|Length|209.05952936009572
+2024-03-06 16:26:39,975|1085281|application_1709003950326_0810|INFO|tag|Kdtree|maxItemsPerCell|134
+2024-03-06 16:26:44,707|1090013|application_1709003950326_0810|TIME|tag|10000|Kdtree|creation|307.490805459
+2024-03-06 16:26:44,709|1090015|application_1709003950326_0810|INFO|tag|10000|Kdtree|space|14535
+2024-03-06 16:36:33,596|1678902|application_1709003950326_0810|TIME|tag|10000|Kdtree|partitioning|588.883614302
+2024-03-06 16:36:33,597|1678903|application_1709003950326_0810|STAT|A|Kdtree|10000|tag|Replication|69057469
+2024-03-06 16:36:33,597|1678903|application_1709003950326_0810|STAT|B|Kdtree|10000|tag|Replication|64818504
+2024-03-06 16:39:04,673|1829979|application_1709003950326_0810|INFO|tag|Quadtree|10000|maxItemsPerCell|134
+2024-03-06 16:39:43,883|1869189|application_1709003950326_0810|TIME|tag|10000|Quadtree|creation|190.282356539
+2024-03-06 16:39:43,883|1869189|application_1709003950326_0810|INFO|tag|10000|Quadtree|space|27181
+2024-03-06 17:08:16,896|3582202|application_1709003950326_0810|TIME|tag|10000|Quadtree|partitioning|1713.010573175
+2024-03-06 17:08:16,897|3582203|application_1709003950326_0810|STAT|A|Quadtree|10000|tag|Replication|69023011
+2024-03-06 17:08:16,897|3582203|application_1709003950326_0810|STAT|B|Quadtree|10000|tag|Replication|64777485
+2024-03-06 17:08:16,897|3582203|application_1709003950326_0810|TIME|End
+
