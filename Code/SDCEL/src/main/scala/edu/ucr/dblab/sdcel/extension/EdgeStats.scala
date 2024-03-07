@@ -41,10 +41,10 @@ object EdgeStats {
     implicit val G: GeometryFactory = new GeometryFactory(model)
 
     // Reading data...
-    val edgesRDDA = read(params.input1())
+    val edgesRDDA = read(params.input1()).cache
     val nEdgesRDDA = edgesRDDA.count()
     log(s"INFO|$tag|edgesA|$nEdgesRDDA")
-    val edgesRDDB = read(params.input2())
+    val edgesRDDB = read(params.input2()).cache
     val nEdgesRDDB = edgesRDDB.count()
     log(s"INFO|$tag|edgesB|$nEdgesRDDB")
     val edgesRDD = edgesRDDA.union(edgesRDDB).cache()
@@ -63,15 +63,15 @@ object EdgeStats {
 
     val LA = edgesRDDA.map{_.getLength}.cache()
     val nLA = LA.count()
-    log(s"STAT|A|Both|$tag|Count|$nLA")
+    log(s"STAT|A|Both|$numPartitions|$tag|Count|$nLA")
     val avgLenA = LA.sum() / nLA
-    log(s"STAT|A|Both|$tag|Length|$avgLenA")
+    log(s"STAT|A|Both|$numPartitions|$tag|Length|$avgLenA")
 
     val LB = edgesRDDB.map{_.getLength}.cache()
     val nLB = LB.count()
-    log(s"STAT|B|Both|$tag|Count|$nLB")
+    log(s"STAT|B|Both|$numPartitions|$tag|Count|$nLB")
     val avgLenB = LB.sum() / nLB
-    log(s"STAT|B|Both|$tag|Length|$avgLenB")
+    log(s"STAT|B|Both|$numPartitions|$tag|Length|$avgLenB")
 
     /** **
      * Testing Kdtree...
@@ -98,7 +98,7 @@ object EdgeStats {
     log(s"TIME|$tag|$numPartitions|Kdtree|creation|$kdtree_creation_time")
     log(s"INFO|$tag|$numPartitions|Kdtree|space|$kdtree_space")
 
-    val ( (edgesKA, edgesKB, kcells), kdtree_partitioning_time) = timer {
+    val ( (nKA, nKB), kdtree_partitioning_time) = timer {
       val edgesA = edgesRDDA.mapPartitions { edges =>
         edges.flatMap { edge =>
           kdtree.findLeafNodes(edge.getEnvelopeInternal).asScala.map { leaf =>
@@ -114,19 +114,14 @@ object EdgeStats {
         }
       }.partitionBy(new SimplePartitioner[LineString](kdtree_space)).map(_._2)
 
-      val kcells = getCellsKdtree(kdtree)
       val na = edgesA.count()
       val nb = edgesB.count()
-      log(s"INFO|$tag|Kdtree|$numPartitions|nEdgesA|$na")
-      log(s"INFO|$tag|Kdtree|$numPartitions|nEdgesB|$nb")
 
-      (edgesA, edgesB, kcells)
+      (na, nb)
     }
     log(s"TIME|$tag|$numPartitions|Kdtree|partitioning|$kdtree_partitioning_time")
-    val nEdgesKA = edgesKA.count()
-    log(s"STAT|A|Kdtree|$tag|Replication|$nEdgesKA")
-    val nEdgesKB = edgesKB.count()
-    log(s"STAT|B|Kdtree|$tag|Replication|$nEdgesKB")
+    log(s"STAT|A|Kdtree|$numPartitions|$tag|Replication|$nKA")
+    log(s"STAT|B|Kdtree|$numPartitions|$tag|Replication|$nKB")
 
     /** **
      * Testing Quadtree...
@@ -149,15 +144,15 @@ object EdgeStats {
     log(s"TIME|$tag|$numPartitions|Quadtree|creation|$quadtree_creation_time")
     log(s"INFO|$tag|$numPartitions|Quadtree|space|$quadtree_space")
 
-    val ( (edgesQA, edgesQB, qcells), quadtree_partitioning_time) = timer {
-      val edgesPartitionedRDDA = edgesRDDA.mapPartitions { edges =>
+    val ( (nQA, nQB), quadtree_partitioning_time) = timer {
+      val edgesA = edgesRDDA.mapPartitions { edges =>
         edges.flatMap { edge =>
           quadtree.findZones(new QuadRectangle(edge.getEnvelopeInternal)).asScala.map { leaf =>
             (leaf.partitionId, edge)
           }
         }
       }.partitionBy(new SimplePartitioner[LineString](quadtree_space)).map(_._2)
-      val edgesPartitionedRDDB = edgesRDDB.mapPartitions { edges =>
+      val edgesB = edgesRDDB.mapPartitions { edges =>
         edges.flatMap { edge =>
           quadtree.findZones(new QuadRectangle(edge.getEnvelopeInternal)).asScala.map { leaf =>
             (leaf.partitionId, edge)
@@ -165,21 +160,14 @@ object EdgeStats {
         }
       }.partitionBy(new SimplePartitioner[LineString](quadtree_space)).map(_._2)
 
-      val qcells = getCells(quadtree)
-      val edgesA = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDA, qcells, "A").cache()
-      val edgesB = DCELPartitioner2.getEdgesWithCrossingInfo(edgesPartitionedRDDB, qcells, "B").cache()
       val na = edgesA.count()
       val nb = edgesB.count()
-      log(s"INFO|$tag|Quadtree|$numPartitions|nEdgesA|$na")
-      log(s"INFO|$tag|Quadtree|$numPartitions|nEdgesB|$nb")
 
-      (edgesA, edgesB, qcells)
+      (na, nb)
     }
     log(s"TIME|$tag|$numPartitions|Quadtree|partitioning|$quadtree_partitioning_time")
-    val nEdgesQA = edgesQA.count()
-    log(s"STAT|A|Quadtree|$tag|Replication|$nEdgesQA")
-    val nEdgesQB = edgesQB.count()
-    log(s"STAT|B|Quadtree|$tag|Replication|$nEdgesQB")
+    log(s"STAT|A|Quadtree|$numPartitions|$tag|Replication|$nQA")
+    log(s"STAT|B|Quadtree|$numPartitions|$tag|Replication|$nQB")
 
 
     log("TIME|End")
