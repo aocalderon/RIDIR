@@ -14,7 +14,7 @@ import scala.annotation.tailrec
 import java.util.Comparator
 
 import edu.ucr.dblab.sdcel.Utils.logger
-import edu.ucr.dblab.debug.AVLTreeST
+import edu.ucr.dblab.sdcel.debug.AVLTreeST
 
 case class Tag(label: String, pid: Int){
   override def toString: String = s"$label$pid"
