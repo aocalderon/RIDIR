@@ -1,20 +1,13 @@
 package edu.ucr.dblab.sdcel.geometries
 
-import org.apache.spark.TaskContext
-
-import com.vividsolutions.jts.geom.{GeometryFactory, Coordinate, Geometry, Envelope}
-import com.vividsolutions.jts.geom.{MultiPolygon, Polygon, LineString, LinearRing, Point}
+import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.geomgraph.Edge
 import com.vividsolutions.jts.io.WKTReader
-
-import com.google.common.collect.TreeMultiset
-
-import scala.collection.JavaConverters._
-import scala.annotation.tailrec
-import java.util.Comparator
-
 import edu.ucr.dblab.sdcel.Utils.logger
-import edu.ucr.dblab.sdcel.debug.AVLTreeST
+import edu.ucr.dblab.sdcel.debuggin.AVLTreeST
+
+import scala.annotation.tailrec
+import scala.collection.JavaConverters._
 
 case class Tag(label: String, pid: Int){
   override def toString: String = s"$label$pid"

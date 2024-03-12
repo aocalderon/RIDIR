@@ -7,7 +7,7 @@
  *
  ******************************************************************************/
 
-package edu.ucr.dblab.debug;
+package edu.ucr.dblab.sdcel.debuggin;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;

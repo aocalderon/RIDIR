@@ -19,6 +19,7 @@ object SDCEL3 {
     implicit val now = Tick(System.currentTimeMillis)
     implicit val params = new Params(args)
     implicit val spark = SparkSession.builder()
+      .master(params.master())
       .config("spark.serializer",classOf[KryoSerializer].getName)
       .config("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .getOrCreate()
@@ -122,6 +123,8 @@ object SDCEL3 {
       }
       //val ma = runEmptyCells(ldcelA, non_emptiesA, "A")
       val mx = Map.empty[String, EmptyCell]
+      ldcelA.count()
+
       log2(s"TIME|layer1|$qtag")
       if(params.savesdcel()){
         saveSDCEL(s"${params.input1().split("edgesA")(0)}/ldcelA", ldcelA, mx)
@@ -139,6 +142,7 @@ object SDCEL3 {
         }
       }
       //val mb = runEmptyCells(ldcelB, non_emptiesB, "B")
+      ldcelB.count()
       log2(s"TIME|layer2|$qtag")
       if(params.savesdcel()){
         saveSDCEL(s"${params.input2().split("edgesB")(0)}/ldcelB", ldcelB, mx)
