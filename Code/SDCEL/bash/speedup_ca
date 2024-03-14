@@ -1,0 +1,10 @@
+#!/bin/bash
+
+for n in $(seq 1 $1)
+do
+    ./sdcel3 --input1 /home/acald013/Datasets/CA/S/A4_prime.wkt --input2 /home/acald013/Datasets/CA/S/B4_prime.wkt --grids /home/acald013/Datasets/CA/S/K4.wkt --master local[2] --qtag S1
+    ./sdcel3 --input1 /home/acald013/Datasets/CA/S/A4_prime.wkt --input2 /home/acald013/Datasets/CA/S/B4_prime.wkt --grids /home/acald013/Datasets/CA/S/K4.wkt --master local[4] --qtag S2	
+    ./sdcel3 --input1 /home/acald013/Datasets/CA/S/A4_prime.wkt --input2 /home/acald013/Datasets/CA/S/B4_prime.wkt --grids /home/acald013/Datasets/CA/S/K4.wkt --master local[8] --qtag S4
+done
+
+

@@ -42,12 +42,12 @@ object ScaleUpBuilder {
       val reader = new WKTReader(G)
       lines.map { line =>
         val arr = line.split("\t")
-        val poly = reader.read(arr(0)).asInstanceOf[Polygon]
+        val geom = reader.read(arr(0))
         val pid  = arr(1).toLong
-        val center = poly.getCentroid
-        val nedges = poly.getExteriorRing.getCoordinates.length
+        val center = geom.getCentroid
+        val nedges = geom.getCoordinates.length
 
-        (pid, center, nedges, poly)
+        (pid, center, nedges, geom)
       }
     }
 
@@ -55,6 +55,21 @@ object ScaleUpBuilder {
     boundary.expandBy(S.tolerance)
     val totalEdges = polygons.map(_._3).sum()
     val quadrant_size = totalEdges / 4
+
+    def acc_geoms(polygons: RDD[(Long, Point, Int, Geometry)], corner: Point): List[Long] = {
+      val sorted_polygons = polygons.map{ case(pid, center, nedges, _) =>
+        val d = center.distance(corner)
+        (d, (pid, nedges))
+      }.sortBy(_._1).map(_._2).collect()
+
+      var acc = 0
+      val corner_acc = for(i <- sorted_polygons.indices) yield {
+        val (pid, n) = sorted_polygons(i)
+        acc += n
+        (pid, acc)
+      }
+      corner_acc.filter(_._2 < quadrant_size).map(_._1).toList
+    }
 
     def acc_polygons(polygons: RDD[(Long, Point, Int, Polygon)], corner: Point): List[Long] = {
       val sorted_polygons = polygons.map{ case(pid, center, nedges, _) =>
@@ -71,11 +86,11 @@ object ScaleUpBuilder {
       corner_acc.filter(_._2 < quadrant_size).map(_._1).toList
     }
 
-    val label = "A"
-    val path_ca = "/home/acald013/Datasets/CA/S"
+    val label = "B"
+    val path_ca = "/home/acald013/Datasets/MainUS/S"
 
     val NW = G.createPoint(new Coordinate(boundary.getMinX, boundary.getMaxY))
-    val p1 = acc_polygons(polygons, NW)
+    val p1 = acc_geoms(polygons, NW)
     save(s"$path_ca/${label}1.wkt"){
       polygons.filter{ case(pid, _, _, _) =>
         p1.contains(pid)
@@ -88,7 +103,7 @@ object ScaleUpBuilder {
 
     val NE = G.createPoint(new Coordinate(boundary.getMaxX, boundary.getMaxY))
     val polygons2 = polygons.filter{ case(pid, _, _, _) => !p1.contains(pid) }
-    val p2 = acc_polygons(polygons2, NE)
+    val p2 = acc_geoms(polygons2, NE)
     save(s"$path_ca/${label}2.wkt"){
       polygons.filter{ case(pid, _, _, _) =>
         p2.contains(pid)
@@ -100,7 +115,7 @@ object ScaleUpBuilder {
 
     val SW = G.createPoint(new Coordinate(boundary.getMinX, boundary.getMinY))
     val polygons3 = polygons2.filter{ case(pid, _, _, _) => !p2.contains(pid) }
-    val p3 = acc_polygons(polygons3, SW)
+    val p3 = acc_geoms(polygons3, SW)
     save(s"$path_ca/${label}3.wkt"){
       polygons.filter{ case(pid, _, _, _) =>
         p3.contains(pid)
@@ -112,7 +127,7 @@ object ScaleUpBuilder {
 
     val SE = G.createPoint(new Coordinate(boundary.getMinX, boundary.getMinY))
     val polygons4 = polygons3.filter{ case(pid, _, _, _) => !p3.contains(pid) }
-    val p4 = acc_polygons(polygons4, SE)
+    val p4 = acc_geoms(polygons4, SE)
     save(s"$path_ca/${label}4.wkt"){
       polygons.filter{ case(pid, _, _, _) =>
         p4.contains(pid)

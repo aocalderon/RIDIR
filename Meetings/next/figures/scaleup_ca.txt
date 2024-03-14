@@ -1,0 +1,108 @@
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:44:18,878|2937|local-1710276258501|2185|TIME|start|1
+2024-03-12 13:44:41,394|25453|local-1710276258501|22516|TIME|read|1
+2024-03-12 13:44:45,831|29890|local-1710276258501|4437|TIME|layer1|1
+2024-03-12 13:45:04,732|48791|local-1710276258501|18901|TIME|layer2|1
+2024-03-12 13:45:56,364|100423|local-1710276258501|51632|TIME|overlay|1
+2024-03-12 13:45:56,364|100423|local-1710276258501|0|TIME|end|1
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:46:01,655|3055|local-1710276361250|2246|TIME|start|2
+2024-03-12 13:46:28,046|29446|local-1710276361250|26391|TIME|read|2
+2024-03-12 13:46:33,477|34877|local-1710276361250|5431|TIME|layer1|2
+2024-03-12 13:46:56,175|57575|local-1710276361250|22698|TIME|layer2|2
+2024-03-12 13:47:58,164|119564|local-1710276361250|61989|TIME|overlay|2
+2024-03-12 13:47:58,164|119564|local-1710276361250|0|TIME|end|2
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:48:03,893|3078|local-1710276483462|2317|TIME|start|4
+2024-03-12 13:48:40,960|40145|local-1710276483462|37067|TIME|read|4
+2024-03-12 13:48:48,452|47637|local-1710276483462|7492|TIME|layer1|4
+2024-03-12 13:49:17,063|76248|local-1710276483462|28611|TIME|layer2|4
+2024-03-12 13:50:48,578|167763|local-1710276483462|91515|TIME|overlay|4
+2024-03-12 13:50:48,578|167763|local-1710276483462|0|TIME|end|4
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:51:17,045|2967|local-1710276676669|2181|TIME|start|1
+2024-03-12 13:51:39,923|25845|local-1710276676669|22878|TIME|read|1
+2024-03-12 13:51:44,434|30356|local-1710276676669|4511|TIME|layer1|1
+2024-03-12 13:52:02,525|48447|local-1710276676669|18091|TIME|layer2|1
+2024-03-12 13:52:51,333|97255|local-1710276676669|48808|TIME|overlay|1
+2024-03-12 13:52:51,333|97255|local-1710276676669|0|TIME|end|1
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:52:56,518|2955|local-1710276776125|2169|TIME|start|2
+2024-03-12 13:53:23,406|29843|local-1710276776125|26888|TIME|read|2
+2024-03-12 13:53:28,831|35268|local-1710276776125|5425|TIME|layer1|2
+2024-03-12 13:53:50,663|57100|local-1710276776125|21832|TIME|layer2|2
+2024-03-12 13:54:50,890|117327|local-1710276776125|60227|TIME|overlay|2
+2024-03-12 13:54:50,891|117328|local-1710276776125|1|TIME|end|2
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:54:56,281|2961|local-1710276895860|2208|TIME|start|4
+2024-03-12 13:55:33,096|39776|local-1710276895860|36815|TIME|read|4
+2024-03-12 13:55:40,585|47265|local-1710276895860|7489|TIME|layer1|4
+2024-03-12 13:56:12,040|78720|local-1710276895860|31455|TIME|layer2|4
+2024-03-12 13:57:47,814|174494|local-1710276895860|95774|TIME|overlay|4
+2024-03-12 13:57:47,816|174496|local-1710276895860|2|TIME|end|4
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:57:53,313|2902|local-1710277072914|2186|TIME|start|1
+2024-03-12 13:58:15,432|25021|local-1710277072914|22119|TIME|read|1
+2024-03-12 13:58:20,012|29601|local-1710277072914|4580|TIME|layer1|1
+2024-03-12 13:58:38,978|48567|local-1710277072914|18966|TIME|layer2|1
+2024-03-12 13:59:30,996|100585|local-1710277072914|52018|TIME|overlay|1
+2024-03-12 13:59:30,996|100585|local-1710277072914|0|TIME|end|1
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 13:59:36,244|2927|local-1710277175885|2173|TIME|start|2
+2024-03-12 14:00:02,425|29108|local-1710277175885|26182|TIME|read|2
+2024-03-12 14:00:07,696|34379|local-1710277175885|5271|TIME|layer1|2
+2024-03-12 14:00:28,048|54731|local-1710277175885|20352|TIME|layer2|2
+2024-03-12 14:01:25,899|112582|local-1710277175885|57851|TIME|overlay|2
+2024-03-12 14:01:25,900|112583|local-1710277175885|1|TIME|end|2
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/home/acald013/Spark/2.4/jars/slf4j-simple-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+2024-03-12 14:01:31,231|2908|local-1710277290845|2161|TIME|start|4
+2024-03-12 14:02:08,254|39931|local-1710277290845|37023|TIME|read|4
+2024-03-12 14:02:16,178|47855|local-1710277290845|7924|TIME|layer1|4
+2024-03-12 14:02:46,743|78420|local-1710277290845|30565|TIME|layer2|4
+2024-03-12 14:04:21,271|172948|local-1710277290845|94528|TIME|overlay|4
+2024-03-12 14:04:21,271|172948|local-1710277290845|0|TIME|end|4

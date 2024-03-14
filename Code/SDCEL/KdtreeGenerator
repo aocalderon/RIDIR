@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MASTER=yarn
+MASTER=local[*]
 
 NPARTITIONS=$1
 HDFS_PATH=$2
