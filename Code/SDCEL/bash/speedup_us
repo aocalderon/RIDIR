@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for n in $(seq 1 $1)
+do
+    ./sdcel3 --input1 MainUS/S/S4/edgesA --input2 MainUS/S/S4/edgesB --grids /data/acald013/Datasets/MainUS/S/K4.wkt --master yarn --qtag S4
+done
+
+

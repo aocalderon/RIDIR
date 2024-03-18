@@ -6,8 +6,7 @@ INPUT1=$1
 INPUT2=$2
 HDFS_PATH=$3
 GRIDS_PATH=$4
-BOUNDARY_PATH=$5
-TOLERANCE=$6
+TOLERANCE=$5
 
 echo "rm -f -r ${HDFS_PATH}/edgesA/"
 rm -f -r ${HDFS_PATH}/edgesA/
@@ -33,7 +32,7 @@ spark-submit \
     --class $CLASS $JAR \
     --input1 $INPUT1 \
     --input2 $INPUT2 \
-    --grids $GRIDS_PATH --boundary $BOUNDARY_PATH \
+    --grids $GRIDS_PATH \
     --apath $HDFS_PATH/edgesA \
     --bpath $HDFS_PATH/edgesB \
     --tolerance $TOLERANCE --master $MASTER
