@@ -34,7 +34,7 @@ dataCreation <- dataTime |> filter(stage == "creation") |>
 p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested partitions", y="Creation Tree Time(s)") +
+  labs(x="Number of requested cells", y="Creation Tree Time(s)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +
@@ -51,7 +51,7 @@ dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
 p = ggplot(dataPartitioning, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested partitions", y="Partitioning Time(s)") +
+  labs(x="Number of requested cells", y="Partitioning Time(s)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +
@@ -69,7 +69,7 @@ dataOverlay <- read_tsv("gadm_overlay.tsv")
 p = ggplot(dataOverlay, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested partitions", y="Overlay Time(s)") +
+  labs(x="Number of requested cells", y="Overlay Time(s)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +
@@ -98,7 +98,7 @@ dataSpace <- dataSpace_1 |> bind_rows(dataSpace_2) |> filter(partitions < 22000)
 p = ggplot(dataSpace, aes(x = as.factor(partitions), y = nodes, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested partitions", y="Space (number of nodes)") +
+  labs(x="Number of requested cells", y="Space (number of nodes)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +

@@ -21,4 +21,4 @@ PARAMS=(
  --class  edu.ucr.dblab.sdcel.reader.IDAdder  
 )
 
-spark-submit ${PARAMS[@]} /home/acald013/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar $* 
+spark-submit ${PARAMS[@]} $HOME/RIDIR/Code/SDCEL/target/scala-2.11/sdcel_2.11-0.1.0.jar $* 
