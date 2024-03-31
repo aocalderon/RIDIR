@@ -351,11 +351,11 @@ object DCELMerger2 {
     }.toList
   }
 
-  def getRTree(hlep: List[(Half_edge,String,Envelope, Polygon)]): STRtree = {
+  def getRTree(hlep: List[(Half_edge,String,Envelope, Polygon)])(implicit G: GeometryFactory): STRtree = {
     val rtree = new STRtree()
     hlep.foreach{ case(h,l,e,p) =>
       h.mbr = e
-      h.poly = p
+      h.poly = G.createPolygon(p.getExteriorRing.getCoordinates)
       rtree.insert(e, h)
     }
     rtree

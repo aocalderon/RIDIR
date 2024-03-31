@@ -37,6 +37,10 @@ object PR_Utils {
             }.flatMap { case (polygon, id) =>
               getLineStrings(polygon, id)
             }.toIterator
+          case _: MultiPolygon =>
+            val polygon = geom.getGeometryN(0).asInstanceOf[Polygon]
+            getLineStrings(polygon, id)
+
           case _: LineString =>
             val coords = geom.getCoordinates
             coords.zip(coords.tail).zipWithIndex.map { case (pair, order) =>
