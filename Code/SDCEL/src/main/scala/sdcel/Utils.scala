@@ -27,7 +27,8 @@ object Utils {
     appId: String = "0",
     persistance: StorageLevel = StorageLevel.MEMORY_ONLY_2,
     ooption: Int = 0,
-    olevel: Int = 4
+    olevel: Int = 4,
+    output: String = "/tmp/Overlay.wkt"
   ){
     val scale = 1 / tolerance
   }

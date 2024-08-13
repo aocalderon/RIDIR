@@ -24,13 +24,12 @@ object DCELOverlay2 {
     val segments    = collectSegments(sdcel_prime)
     val sdcel       = mergeSegments(segments)
 
-    if(settings.debug){
-      save("/tmp/edgesO.wkt"){
-        sdcel.map{ case(polygon, label) =>
-          s"${polygon.toText}\t$label\t${polygon.getUserData}\n"
-        }.collect
-      }
+    save(s"${settings.output}"){
+      sdcel.map{ case(polygon, label) =>
+        s"${polygon.toText}\t$label\t${polygon.getUserData}\n"
+      }.collect
     }
+
     sdcel.count
     sdcel    
   }
