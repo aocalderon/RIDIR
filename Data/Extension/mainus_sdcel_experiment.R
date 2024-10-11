@@ -17,6 +17,8 @@ dataTime <- data |> select(partitions, stage, tree, time)
 dataCreation <- dataTime |> filter(stage == "creation") |>
   select(partitions, time, tree)
 
+dataCreation |> write_tsv("mainus_creation_times.tsv")
+
 p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
@@ -29,10 +31,12 @@ plot(p)
 
 W = 6
 H = 4
-ggsave(paste0("K_Creation_US.pdf"), width = W, height = H)
+#ggsave(paste0("K_Creation_US.pdf"), width = W, height = H)
 
 dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
   select(partitions, time, tree)
+
+dataPartitioning |> write_tsv("mainus_partitioning_times.tsv")
 
 p = ggplot(dataPartitioning, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
@@ -47,6 +51,8 @@ ggsave(paste0("K_Partitioning_US.pdf"), width = W, height = H)
 
 dataOverlay <- dataTime |> filter(stage == "overlay") |>
   select(partitions, time, tree)
+
+dataOverlay |> write_tsv("mainus_overlay_times.tsv")
 
 p = ggplot(dataOverlay, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 

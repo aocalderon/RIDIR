@@ -31,6 +31,8 @@ dataTime <- data |> select(partitions, stage, tree, time)
 dataCreation <- dataTime |> filter(stage == "creation") |>
   select(partitions, time, tree)
 
+dataCreation |> write_tsv("gadm_creation_times.tsv")
+
 p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
@@ -47,6 +49,8 @@ H = 4
 
 dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
   select(partitions, time, tree)
+
+dataPartitioning |> write_tsv("gadm_partitioning_times.tsv")
 
 p = ggplot(dataPartitioning, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
