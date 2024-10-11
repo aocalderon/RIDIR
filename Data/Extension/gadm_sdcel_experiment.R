@@ -43,7 +43,7 @@ plot(p)
 
 W = 6
 H = 4
-ggsave(paste0("K_Creation_GADM.pdf"), width = W, height = H)
+#ggsave(paste0("K_Creation_GADM.pdf"), width = W, height = H)
 
 dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
   select(partitions, time, tree)
@@ -57,7 +57,7 @@ p = ggplot(dataPartitioning, aes(x = as.factor(partitions), y = time, group = tr
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-ggsave(paste0("K_Partitioning_GADM.pdf"), width = W, height = H)
+#ggsave(paste0("K_Partitioning_GADM.pdf"), width = W, height = H)
 
 dataOverlay <- dataTime |> filter(stage == "overlay") |>
   select(partitions, time, tree)
@@ -73,7 +73,7 @@ p = ggplot(dataOverlay, aes(x = as.factor(partitions), y = time, group = tree)) 
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-ggsave(paste0("K_Overlay_GADM.pdf"), width = W, height = H)
+#ggsave(paste0("K_Overlay_GADM.pdf"), width = W, height = H)
 
 ## Space plot
 dataSpace_1 <- enframe(read_lines("gadm_sdcel_experiment1.txt"), value = "line") |>
@@ -103,4 +103,4 @@ p = ggplot(dataSpace, aes(x = as.factor(partitions), y = nodes, group = tree)) +
   theme_bw()
 plot(p) 
 
-ggsave(paste0("K_Space_GADM.pdf"), width = W, height = H)
+#ggsave(paste0("K_Space_GADM.pdf"), width = W, height = H)

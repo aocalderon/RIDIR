@@ -24,12 +24,15 @@ write_tsv(data3, "MainUS_speedup.tsv")
 
 stage.labs <- c("Layer A", "Layer B", "Overlay")
 names(stage.labs) <- c("layer1", "layer2","overlay")
-p = ggplot(data3, aes(x = nodes, y = time)) + 
+
+data4 = data3 |> filter(nodes!="9")
+
+p = ggplot(data4, aes(x = nodes, y = time)) + 
   geom_col(width = 0.7, position="dodge") + 
   labs(x="Number of nodes", y="Time [s]") +
   facet_wrap(~ stage, labeller = labeller(stage = stage.labs))
 plot(p)
 
-W = as.numeric(Sys.getenv("R_WIDTH"))
-H = as.numeric(Sys.getenv("R_HEIGHT"))
+W = 7
+H = 5
 ggsave(paste0("MainUS_speedup.pdf"), width = W, height = H)

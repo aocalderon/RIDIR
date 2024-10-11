@@ -25,14 +25,16 @@ data3 = data2 %>%
 
 write_tsv(data3, "GADM_scaleup.tsv")
 
+data4 = data3 |> filter(size!="24M")
+
 stage.labs <- c("Layer A", "Layer B", "Overlay")
 names(stage.labs) <- c("layer1", "layer2","overlay")
-p = ggplot(data3, aes(x = size, y = time)) + 
+p = ggplot(data4, aes(x = size, y = time)) + 
   geom_col(width = 0.7, position="dodge") + 
   labs(x="Size [number of edges]", y="Time [s]") +
   facet_wrap(~ stage, labeller = labeller(stage = stage.labs))
 plot(p)
 
-W = as.numeric(Sys.getenv("R_WIDTH"))
-H = as.numeric(Sys.getenv("R_HEIGHT"))
+W = 7
+H = 5
 ggsave(paste0("GADM_scaleup.pdf"), width = W, height = H)

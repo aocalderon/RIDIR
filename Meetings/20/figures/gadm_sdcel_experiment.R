@@ -24,7 +24,8 @@ data_2 <- kdtree |> bind_rows(quadtree) |>
   mutate(partitions = as.numeric(partitions), time = as.numeric(time)) |>
   group_by(partitions, tree, stage) |> summarise(time = mean(time)) 
 
-data <- data_1 |> bind_rows(data_2) |> filter(partitions < 22000)
+data <- data_1 |> bind_rows(data_2) |> filter(partitions < 22000) |>
+  mutate(partitions = partitions / 1000)
 
 dataTime <- data |> select(partitions, stage, tree, time)
 
@@ -34,16 +35,16 @@ dataCreation <- dataTime |> filter(stage == "creation") |>
 p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested cells", y="Creation Tree Time(s)") +
+  labs(x="Number of requested cells (x1000)", y="Creation Tree Time(s)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
 
-W = 8
-H = 6
-ggsave(paste0("GADM_KdtreeVsQuadtree_Creation.pdf"), width = W, height = H)
+W = 7
+H = 5
+ggsave(paste0("K_Creation_GADM.pdf"), width = W, height = H)
 
 dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
   select(partitions, time, tree)
@@ -51,13 +52,13 @@ dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
 p = ggplot(dataPartitioning, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested cells", y="Partitioning Time(s)") +
+  labs(x="Number of requested cells (x1000)", y="Partitioning Time(s)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-ggsave(paste0("GADM_KdtreeVsQuadtree_Partitioning.pdf"), width = W, height = H)
+ggsave(paste0("K_Partitioning_GADM.pdf"), width = W, height = H)
 
 dataOverlay <- dataTime |> filter(stage == "overlay") |>
   select(partitions, time, tree)
@@ -69,13 +70,13 @@ dataOverlay <- read_tsv("gadm_overlay.tsv")
 p = ggplot(dataOverlay, aes(x = as.factor(partitions), y = time, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested cells", y="Overlay Time(s)") +
+  labs(x="Number of requested cells (x1000)", y="Overlay Time(s)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-ggsave(paste0("GADM_KdtreeVsQuadtree_Overlay.pdf"), width = W, height = H)
+ggsave(paste0("K_Overlay_GADM.pdf"), width = W, height = H)
 
 ## Space plot
 dataSpace_1 <- enframe(read_lines("gadm_sdcel_experiment1.txt"), value = "line") |>
@@ -93,16 +94,17 @@ dataSpace_2 <- enframe(read_lines("gadm_sdcel_experiment2.txt"), value = "line")
   mutate(partitions = as.numeric(partitions), nodes = as.numeric(nodes)) |>
   group_by(partitions, tree) |> summarise(nodes = mean(nodes)) 
 
-dataSpace <- dataSpace_1 |> bind_rows(dataSpace_2) |> filter(partitions < 22000)
+dataSpace <- dataSpace_1 |> bind_rows(dataSpace_2) |> filter(partitions < 22000) |>
+  mutate(partitions = partitions / 1000)
 
 p = ggplot(dataSpace, aes(x = as.factor(partitions), y = nodes, group = tree)) +
   geom_line(aes(linetype = tree, color = tree)) + 
   geom_point(aes(shape = tree, color = tree), size = 3) +
-  labs(x="Number of requested cells", y="Space (number of nodes)") +
+  labs(x="Number of requested cells (x1000)", y="Space (number of nodes)") +
   scale_color_discrete("Tree") +
   scale_shape_discrete("Tree") +
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
 
-ggsave(paste0("GADM_KdtreeVsQuadtree_Space.pdf"), width = W, height = H)
+ggsave(paste0("K_Space_GADM.pdf"), width = W, height = H)
