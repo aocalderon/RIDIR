@@ -43,7 +43,7 @@ p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree))
   theme_bw()
 plot(p) 
 
-W = 6
+W = 5
 H = 4
 #ggsave(paste0("K_Creation_GADM.pdf"), width = W, height = H)
 
@@ -77,7 +77,7 @@ p = ggplot(dataOverlay, aes(x = as.factor(partitions), y = time, group = tree)) 
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-#ggsave(paste0("K_Overlay_GADM.pdf"), width = W, height = H)
+ggsave(paste0("K_Overlay_GADM.pdf"), width = W, height = H)
 
 ## Space plot
 dataSpace_1 <- enframe(read_lines("gadm_sdcel_experiment1.txt"), value = "line") |>

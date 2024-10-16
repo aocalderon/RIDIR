@@ -29,7 +29,7 @@ p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree))
   theme_bw()
 plot(p) 
 
-W = 6
+W = 5
 H = 4
 #ggsave(paste0("K_Creation_US.pdf"), width = W, height = H)
 
