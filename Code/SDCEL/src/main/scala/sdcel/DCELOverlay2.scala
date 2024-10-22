@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom._
 import com.vividsolutions.jts.io.WKTReader
 import edu.ucr.dblab.sdcel.CellAgg.aggregateSegments
 import edu.ucr.dblab.sdcel.DCELMerger2.merge
-import edu.ucr.dblab.sdcel.Utils.{Settings, logger, save}
+import edu.ucr.dblab.sdcel.Utils.{Settings, log, logger, save}
 import edu.ucr.dblab.sdcel.cells.EmptyCellManager2.{EmptyCell, getFaces}
 import edu.ucr.dblab.sdcel.geometries._
 import org.apache.spark.TaskContext
@@ -254,6 +254,11 @@ object DCELOverlay2 {
       .map{ case(s,l) => (l,List(s.getLine)) }
       .reduceByKey{ case(a, b) => a ++ b }
       .persist(settings.persistance) // Persistance due to repartition...
+
+    val nedges = sdcel.count()
+    val nedges_open = sdcel.filter(!_._1.isClose).count()
+    val nlabels = sdcel.filter(!_._1.isClose).map(_._2).distinct().count()
+    log(s"$nedges\t$nedges_open\t$nlabels")
 
     val faces = segmentsRepartitionByLabel.mapPartitionsWithIndex{ (pid, it) =>
       val reader = new WKTReader(geofactory)
