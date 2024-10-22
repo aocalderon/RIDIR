@@ -22,12 +22,12 @@ object PR_Utils {
       val nPolys = polys.count
       log(s"INFO|npolys=$nPolys")
     }
-    val edgesRaw = polys.mapPartitions{ lines =>
+    val edgesRaw = polys.zipWithUniqueId().mapPartitions{ lines =>
       val reader = new WKTReader(G)
-      lines.flatMap{ line =>
+      lines.flatMap{ case(line, id) =>
         val arr = line.split("\t")
         val wkt = arr(0)
-        val id  = arr(1).toLong
+
         val geom = reader.read(wkt)
 
         geom match {

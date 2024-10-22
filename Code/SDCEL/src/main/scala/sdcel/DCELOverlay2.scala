@@ -250,15 +250,17 @@ object DCELOverlay2 {
   def mergeSegments(sdcel: RDD[(Segment, String)])
     (implicit geofactory: GeometryFactory, settings: Settings): RDD[(Polygon, String)] = {
 
+    sdcel.cache()
+    val nedges = sdcel.count()
+    val sdcel2 = sdcel.filter(!_._1.isClose).cache()
+    val nedges_open = sdcel2.count()
+    val nlabels = sdcel2.map(_._2).distinct().count()
+    log(s"$nedges\t$nedges_open\t$nlabels")
+
     val segmentsRepartitionByLabel = sdcel//.filter{!_._1.isClose}
       .map{ case(s,l) => (l,List(s.getLine)) }
       .reduceByKey{ case(a, b) => a ++ b }
       .persist(settings.persistance) // Persistance due to repartition...
-
-    val nedges = sdcel.count()
-    val nedges_open = sdcel.filter(!_._1.isClose).count()
-    val nlabels = sdcel.filter(!_._1.isClose).map(_._2).distinct().count()
-    log(s"$nedges\t$nedges_open\t$nlabels")
 
     val faces = segmentsRepartitionByLabel.mapPartitionsWithIndex{ (pid, it) =>
       val reader = new WKTReader(geofactory)
