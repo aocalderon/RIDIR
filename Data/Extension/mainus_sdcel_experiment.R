@@ -29,9 +29,9 @@ p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree))
   theme_bw()
 plot(p) 
 
-W = 5
+W = 6
 H = 4
-#ggsave(paste0("K_Creation_US.pdf"), width = W, height = H)
+ggsave(paste0("K_Creation_US.pdf"), width = W, height = H)
 
 dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
   select(partitions, time, tree)
@@ -83,5 +83,4 @@ p = ggplot(dataSpace, aes(x = as.factor(partitions), y = nodes, group = tree)) +
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-
 ggsave(paste0("K_Space_US.pdf"), width = W, height = H)
