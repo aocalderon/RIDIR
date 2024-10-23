@@ -43,9 +43,9 @@ p = ggplot(dataCreation, aes(x = as.factor(partitions), y = time, group = tree))
   theme_bw()
 plot(p) 
 
-W = 5
+W = 6
 H = 4
-#ggsave(paste0("K_Creation_GADM.pdf"), width = W, height = H)
+ggsave(paste0("K_Creation_GADM.pdf"), width = W, height = H)
 
 dataPartitioning <- dataTime |> filter(stage == "partitioning") |>
   select(partitions, time, tree)
@@ -61,7 +61,7 @@ p = ggplot(dataPartitioning, aes(x = as.factor(partitions), y = time, group = tr
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-#ggsave(paste0("K_Partitioning_GADM.pdf"), width = W, height = H)
+ggsave(paste0("K_Partitioning_GADM.pdf"), width = W, height = H)
 
 dataOverlay <- dataTime |> filter(stage == "overlay") |>
   select(partitions, time, tree)
@@ -106,5 +106,4 @@ p = ggplot(dataSpace, aes(x = as.factor(partitions), y = nodes, group = tree)) +
   guides(linetype = "none") +
   theme_bw()
 plot(p) 
-
-#ggsave(paste0("K_Space_GADM.pdf"), width = W, height = H)
+ggsave(paste0("K_Space_GADM.pdf"), width = W, height = H)
