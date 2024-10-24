@@ -1,0 +1,338 @@
+\section{Experimental Evaluation} \label{sec:experiments}
+
+For our experimental evaluation, we used a 12-node Linux cluster (kernel 3.10) and Apache Spark 2.4. Each node has 9 cores (each core is an Intel Xeon CPU at 1.70GHz) and 2G memory.
+
+\textbf{Evaluation datasets}.
+The details of the real datasets of polygons that we use are summarized in Table \ref{tab:datasets}. The first dataset (MainUS) contains the complete Census Tracts for all the states on the US mainland for the years 2000 (layer A) and 2010 (layer B). It was collected from the official website of the United States Census Bureau\footnote{\url{https://www2.census.gov/geo/tiger/TIGER2010/TRACT/}}. The data was clipped to select just the states inside the continent. Something to note with this dataset is that the two layers present a spatial gap (which was due to improvements in the precision introduced for 2010). As a result, there are considerably more intersections between the two layers, thus creating many new faces for the DCEL.
+
+The second dataset, GADM - taken from Global Administration Areas\footnote{\url{https://gadm.org/}}, collects the geographical boundaries of the countries and their administrative divisions around the globe. For our experiments, one layer selects the States (administrative level 2), and the other has Counties (administrative level 3). Since GADM may contain multi-polygons, we split them into their individual polygons. 
+
+Since these two datasets are too large, a third, smaller dataset was created for comparisons with the sequential algorithm. This dataset is the California Census Tracts (CCT), a subset from MainUS for the state of California; layer A corresponds to the CA census tracts from the year 2000, while layer B corresponds to 2010. Below, we also use other states to create datasets with different numbers of faces.  
+To test the scalable approach, a sequential algorithm for DCEL creation was implemented based on the pseudo-code outlined in \cite{berg_computational_2008}.
+
+\begin{table}
+    \small
+    \caption{Evaluation Datasets}
+    \label{tab:datasets}
+    \begin{tabular}{c c c c}
+        \toprule
+        Dataset & Layer & Number        & Number    \\
+                &       & of polygons   & of edges  \\
+        \midrule
+        MainUS& Polygons for 2000 & 64983 & 35417146        \\
+              & Polygons for 2010 & 72521 & 36764043        \\
+        GADM  & Polygons for Level 2 & 160241 & 64598411    \\
+              & Polygons for Level 3 & 223490 & 68779746    \\
+        CCT   & Polygons for 2000 & 7028 & 2711639          \\
+              & Polygons for 2010 & 8047 & 2917450          \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The scalable approach was implemented over the Apache Spark framework.  From a Map-Reduce point of view the stages described in Section  \ref{sec:methods} were implemented using several transformations and actions supported by Spark.  For example, the partitioning and load balancing described in Section \ref{sec:pstrategies} and \ref{sec:partitioning_ddcel} was implemented using a Quadtree, where its leaves were used to map and balance the number of edges that have to be sent to the worker nodes.  Mostly, map operations were used to process and locate the edges in the corresponding leaf to exploit proximity among them while at the same time dividing the amount of work among worker nodes.
+Similarly, the edges at each partition were processed using chains of transformations at local level (see Section \ref{sec:methods}) followed by reducer actions to post-process incomplete faces which could span over multiples partitions and have to be combined or re-distributed to obtain the final answer.  In addition, the reduce actions were further optimized as described in Section \ref{sec:alternative_methods}.
+
+\subsection{Overlay face optimizations}\label{sec:overlay_optimization}
+We first examine the optimizations in Section \ref{sec:optimizing}. To consider different distributions of faces, for these experiments, we used 8 states from the MainUS dataset with different numbers of tracts (faces). In particular, we used, in decreasing order of number of tracts, CA, TX, NC, TN, GA, VA, PA, and FL. For each state, we computed the distributed overlay between two layers (2000 and 2010). For each computation, we compared the baseline; master at the root node, with intermediate reducers at different levels: $i$ varied from 4 to 10. 
+
+Figure \ref{fig:overlay_tester} shows the results for the distributed overlay computation stage; after the local DCELs were computed at each cell. 
+Note that for each state experiment, we tested different numbers of cells for the quadtree and reported the configuration with the best performance. To determine this, we sampled 1\% of the edges for each state and evaluated the best number of cells ranging from 200 to 2000. In most cases, the best number of cells was around 3000.
+As expected, there is a trade-off between parallelism and how much work is left to the final reduce job. For different states, the optimal $i$ varied between levels 4 and 6. The figure also shows the optimization that re-partitions the faces by label id. This approach has actually the best performance. This is because few faces with the same label can be combined independently. This results in smaller jobs better distributed among the cluster nodes, and no reduce phase is needed. As a result, we use the label re-partition approach for the rest of the experiments to implement the overlay computation stage.
+
+Finally we note that the overlay face optimizations involve shuffling of the incomplete faces. Table \ref{tab:percentages} shows the percentage of incomplete faces for three states, assuming 3000 cells. As it can be seen, the incomplete faces is small (in average 12.89\%) and moreover, for the \textit{By Label} approach, this shuffling is parallelized.
+
+\begin{table}
+    \centering
+    \caption{Percentages of edges in incomplete faces for three states} \label{tab:percentages}
+    \begin{tabular}{cccc}
+        \hline
+                & Number of & Edges in         &            \\
+        Dataset & edges     & incomplete faces & Percentage \\
+        \hline
+        CA &  47834 &  6339 & 13.25\% \\
+        TX &  41227 &  4436 & 10.75\%\\
+        FL &  24152 &  3547 & 14.68\%\\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{Overlay_Tester}
+    \caption{Overlay methods evaluation.}\label{fig:overlay_tester}
+\end{figure}
+
+\subsection{Unbalanced layers optimization}
+
+For these experiments, we compared the traditional sweep approach with the `filtered-sweep' approach that considers only the areas where the smaller layer has edges (Section \ref{sec:unbalance}).  To create the smaller cell layer, we picked a reference point in the state of Pennsylvania, from the MainUS dataset, and added 2000 census tracts until the number of edges reached 3K. We then varied the size of the larger cell layer in a controlled way: using the same reference point but using data from the 2010 census, and we started adding tracts to create a layer that had around 2x, 3x, ..., 7x the number of edges of the smaller dataset. 
+
+Since this optimization occurs per cell, we used a single node to perform the overlay computation within that cell. Figure \ref{fig:unbalance_tests}(a) shows the behavior of the two methods (filtered-sweep vs. traditional sweep) under the above-described data for the overlay computation stage.  Clearly, as the data from one layer grows much larger than the other layer, the filtered-sweep approach overcomes the traditional one.
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+       \includegraphics[width=0.49\linewidth]{Unbalance_Tester01}  & \includegraphics[width=0.49\linewidth]{Unbalance_Tester02} \\
+       (a) & (b)
+    \end{tabular}
+    \caption{Evaluation of the unbalanced layers optimization.}\label{fig:unbalance_tests}
+\end{figure}
+
+We also performed an experiment where the difference in size between the two layers varies between 10\% and 70\%. For this experiment, we first identified cells from the GADM dataset where the smaller layer had around 3K edges. Among these cells, we then identified those where the larger layer had 10\%, 20\%, ... up to 70\% more edges. In each category, we picked 10 representative cells and computed the overlay for the cells in that category.  
+
+Figure \ref{fig:unbalance_tests}(b) shows the results; in each category, we show the average time to compute the overlay among the 10 cells in that category. The filtered-sweep approach shows better performance as the percentage difference between layers increases. Based on these results, one could apply the optimization on those cells where the layer difference is significant (more than 50\%).
+We anticipate that this optimization will be particularly beneficial for datasets where the two input layers contain many cells with significantly different edge counts.
+
+\subsection{Varying the number of cells}
+The quadtree configuration allows for performance tuning by setting the \textit{maximum capacity} of a cell. The quadtree continues splitting until this capacity is reached. There is an inverse relationship between the capacity and the number of leaf cells: a lower capacity results in more cells, while a higher capacity leads to fewer leaf cells. In skewed datasets, the quadtree may become unbalanced, with some branches splitting more frequently. As a result, the final number of partitions is not necessarily a multiple of four. In the figures, we round the number of leaf cells to the nearest thousand.
+
+The number of cells affects the performance of our scalable overlay implementation, termed as SDCEL, since it relates to the average cell capacity given by the number of edges it could contain. As it was said before, a fewer number of cells implies larger cell capacity and thus more edges to process within each cell. Complementary, creating more cells increases the number of jobs to be executed.  
+
+Figure \ref{fig:ca}(a) shows the SDCEL performance using the two layers of the CCT dataset while varying the number of cells from 100 to 15K (by multiple of 1000). Each bar corresponds to the time taken to create the DCEL for each layer and then combine them to create the distributed overlay. Clearly, there is a trade-off: as the number of cells increases, the SDCEL performance improves until a point where the larger number of cells adds an overhead. Figure \ref{fig:ca}(b) focuses on that area; the best SDCEL performance was around 7K cells.
+
+In addition, Figure \ref{fig:ca}(a) shows the performance of the sequential solution (CGAL library) for computing the overlay of the two layers in the CCT dataset using one of the cluster nodes. Clearly, the scalable approach is much more efficient as it takes advantage of parallelism. Note that the CGAL library would crash when processing the larger datasets (MainUS and GADM).
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.50\linewidth]{CA} & 
+        \includegraphics[width=0.45\linewidth]{CA_sample} \\
+        (a) & (b)
+    \end{tabular}
+    \caption{SDCEL performance while varying the number of cells in the CCT dataset.} \label{fig:ca}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.49\linewidth]{MainUS} &
+        \includegraphics[width=0.49\linewidth]{GADM}   \\
+        (a) & (b)
+    \end{tabular}
+    \caption{Performance with (a) MainUS and (b) GADM datasets.} \label{fig:mainus}
+\end{figure}
+
+Figure \ref{fig:mainus} shows the results when using the larger MainUS and GADM datasets, while again varying the number of cells parameter from 8K to 18K and from 16K to 34K, respectively. In this figure, we also show the time taken by each stage of the overlay computation.  This is, the time to create the DCEL for layer A, for layer B, and for their combination to create their distributed overlay. We can see a similar trade-off in each of the stages. The best performance is given when setting the number of cells parameter to 12K for the MainUS and 22K for the GADM dataset. Note that in the MainUS dataset, the two layers have a similar number of edges; as can be seen, their DCEL computations are similar.  
+
+Interestingly, the overlay computation is expensive since as mentioned earlier there are many intersections between the two layers. An interesting observation from the GADM plots is that layer B takes more time than layer A; this is because there are more edges in the counties than in the states. Moreover, county polygons are included in the (larger) state polygons. When the size of cells is small (i.e., a larger number of cells like in the case of 34K cells), these cells mainly contain counties from layer B. As a result, there are not many intersections between the layers in each cell, and the overlay computation is thus faster. On the other hand, with large cell sizes (smaller number of cells), the area covered by the cell is larger, containing more edges from states and thus increasing the number of intersections, resulting in higher overlay computation.
+
+Additionally, Table \ref{tab:cell_stats} provides statistics on the cells. It shows that in larger datasets, an average cell size of approximately 3000 edges produces the best results. This cell size ensures a relatively small amount of data to transmit, which minimizes the impact on data shuffling and processing.
+Table \ref{tab:orphans} presents the number of cells, original holes, and the orphan cells and holes generated after partitioning.
+
+\begin{table}
+    \centering
+    \caption{Cell size statistics.}
+    \label{tab:cell_stats}
+    \begin{tabular}{ccccccc}
+        \hline
+        Dataset & Min & 1st Qu. & Median & Mean & 3rd Qu. & Max   \\
+        \hline
+        GADM    & 0   & 0       & 2768   & 3141 & 5052    & 16978 \\
+        MainUS  & 0   & 1538    & 2582   & 2853 & 3970    & 10944 \\
+        CCT     & 0   & 122     & 324    & 390  & 546     & 1230  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \small
+    \caption{Orphan cells and orphan holes description}
+    \label{tab:orphans}
+    \begin{tabular}{c c c c}
+        \toprule
+                &          &          & Number       \\
+                & Number   & Number   & of orphans   \\
+        Dataset & of cells & of holes & (cell/holes) \\
+        \midrule
+        GADM  & 21970      & 1999     & 4310 \\
+        MainUS& 12343      & 850      & 1069 \\
+        CCT   & 7124       & 40       & 215  \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Speed-up and Scale-up experiments}\label{sec:speed_scale}
+
+The speed-up behavior of SDCEL appears in Figure \ref{fig:mainus_speed_scale}(a) (for the MainUS dataset) and in Figure \ref{fig:gadm_speed_scale}(a) (for the GADM dataset); in both cases, we show the performance for each stage. For these experiments, we varied the number of nodes to 3, 6, and 12 while keeping the input layers the same. Clearly, as the number of nodes increases, the performance improves. SDCEL shows good speed-up characteristics: as the number of nodes doubles from 3 to 6 and then from 6 to 12, the performance improves by almost half. 
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+       \includegraphics[width=0.49\linewidth]{MainUS_speedup} & \includegraphics[width=0.49\linewidth]{MainUS_scaleup} \\
+       (a) & (b)
+    \end{tabular}
+    \caption{Speed-up and Scale-up experiments for the MainUS dataset.} \label{fig:mainus_speed_scale}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+       \includegraphics[width=0.49\linewidth]{GADM_speedup} & \includegraphics[width=0.49\linewidth]{GADM_scaleup} \\
+       (a) & (b)
+    \end{tabular}
+    \caption{Speed-up and Scale-up experiments for the GADM dataset.} \label{fig:gadm_speed_scale}
+\end{figure}
+
+To examine the scale-up behavior, we created smaller datasets out of the MainUS and similarly out of the GADM so that we could control the number of edges. To create such a dataset, we picked a centroid and started increasing the area covered by this dataset until the number of edges was closed to a specific number. For example, from the MainUS, we created datasets of sizes 8M, 16M, and 32M edges for each layer. We then used two layers of the same size as input to a different number of nodes while keeping the input-to-node ratio fixed. That is, the layers of size 8M were processed using 3 nodes, the layers of size 16M using 6 nodes, and the 32M using 12 nodes. We used the same process for the scale-up experiments with the GADM dataset. The results appear in Figure \ref{fig:mainus_speed_scale}(b) and Figure \ref{fig:gadm_speed_scale}(b).  Overall, SDCEL shows good scale-up performance; it remains almost constant as the work per node is similar (there are slight variations because we could not control perfectly the number of edges and their intersection). 
+
+
+\subsection{Kd-tree versus quadtree performance}
+\label{sec:comparison}
+
+In order to compare the quadtree and the kd-tree partition strategies we analyze their performance during the construction of the spatial data structure which defines the cells that the partition will use based on the sample, the cost of partitioning; populating the cells with the full datasets, and the overall time to complete the phases of the overlay operation using each partitioning approach. 
+%In this section, we compare the performance of the quadtree and kd-tree partition strategies in the phases mentioned above and the number of nodes used by each structure.  
+We use the datasets of MainUS and GADM described in Table \ref{tab:datasets}.
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.49\linewidth]{K_Creation_US.pdf} & \includegraphics[width=0.49\linewidth]{K_Creation_GADM.pdf} \\
+        (a) & (b) 
+    \end{tabular}
+    \caption{Construction time for the spatial data structure in the (a) MainUS and (b) GADM datasets.} \label{fig:k_creation_us}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.49\linewidth]{K_Space_US.pdf} & \includegraphics[width=0.49\linewidth]{K_Space_GADM.pdf} \\
+        (a) & (b) 
+    \end{tabular}
+    \caption{Number of cells created by each spatial data structure in the (a) MainUS and (b) GADM datasets.} \label{fig:k_space_us}
+\end{figure}
+
+Figure \ref{fig:k_creation_us} depicts the construction time during the sampling of the input layers and the generation of the partitioning cells after requesting a different number of divisions. We can see that the kd-tree takes more time, particularly because of the sorting done at each split, so as to organize the data and localize the middle point. 
+In average, Quadtree takes 23.13\% the time it takes for Kdtree to be created (21.55\% in MainUS and 24.72\% in GADM). However, the Kdtree creation is just 5.86\% of the overall time during the total DCEL construction (6.88\% in MainUS and 4.87\% in GADM).
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.49\linewidth]{K_Partitioning_US.pdf} & \includegraphics[width=0.49\linewidth]{K_Partitioning_GADM.pdf} \\
+        (a) & (b) 
+    \end{tabular}
+    \caption{Data partitioning time using a spatial data structure (a) in the MainUS dataset and (b) in the GADM dataset.} \label{fig:k_partitioning_us}
+\end{figure}
+
+An important characteristic of the behavior of each partitioning scheme is the number of cells (partitions) each sample data structure creates. 
+Figure \ref{fig:k_space_us} depicts the number of cells created by each spatial data structure. As the quadtree follows a space-oriented technique, it creates more nodes (4 at each split) and thus generates more leaves (cells); more of them are prone to be empty compared to the kd-tree. 
+
+Figure \ref{fig:k_partitioning_us} shows the cost to partition the full content of both layers. Given a sample tree data structure, each edge is assigned to a cell (partition) depending on which leaf the edge is located; edges are assigned (copied) to all leaves they intersect. Then, a shuffle operation is performed to move the data to the corresponding node that will handle this cell (partition). This figure shows that the quadtree partitioning takes more time. This depends largely on the number of leaves created by the sample tree and the number of edges that overlap partitions (which is expected to be larger for the quadtree since it uses more and thus smaller cells). 
+
+%As we will see the Quadtree partitioning creates many more leaves, affecting the number of cells used.
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.49\linewidth]{K_Overlay_US.pdf} & \includegraphics[width=0.49\linewidth]{K_Overlay_GADM.pdf} \\
+        (a) & (b) 
+    \end{tabular}
+    \caption{Execution time for the overlay operation using a spatial data structure in the MainUS (a)and GADM (b) dataset.} \label{fig:k_overlay_us}
+\end{figure}
+
+Once the data is assigned to their partitions, the overlay operation can be executed.  Figure \ref{fig:k_overlay_us} shows the overlay performance under each partition strategy, for different number of cells. The Kd-tree approach performs better; as the quadtree tends to generate more and emptier cells, its performance is directly affected.
+
+As it was said before, in particular on partitioning based on Kdtree, the smaller number of cells/partitions used in this approach give also an improvement on the impact of shuffling during the partition strategy because the number and size of the resulting partitions have a lower impact into the communication cost.
+
+Finally, we consider the speed-up and scale-up performance using the kd-tree partitioning. Figure \ref{fig:k_scale_speed_us}(a) shows the speed-up performance using the MainUS dataset (36M edges) while varying the number of nodes (for 3, 6, and 12 nodes). Similar to the quadtree partitioning strategy, the kd-tree partitioning shows good speed-up performance. As resources duplicate the execution time improves almost by a half. 
+
+Figure \ref{fig:k_scale_speed_us}(b) shows the scale-up performance of the kd-tree partitioning approach. We followed the same procedure described in Section \ref{sec:speed_scale} to generate datasets for 8M, 16M, and 32M edges from the MainUS dataset and ran the kd-tree partitioning strategy with 3, 6, and 12 nodes, respectively. Again the kd-tree partitioning shows good speed-up performance, which remains flat as the load per node is almost equal.
+
+
+
+\begin{figure}
+    \centering
+    \begin{tabular}{cc}
+        \includegraphics[width=0.49\linewidth]{US_speedup.pdf} & \includegraphics[width=0.49\linewidth]{US_scaleup.pdf} \\
+        (a) & (b) 
+    \end{tabular}
+    \caption{(a)Speed Up and (b) Scale Up performance of the Kdtree partitioning using the MainUS dataset.} \label{fig:k_scale_speed_us}
+\end{figure}
+
+
+
+\subsection{Polygonization Scalability}
+\label{sec:expr:query}
+
+
+\begin{table}
+    \caption{Polygonization Evaluation Dataset}
+    \label{table:polygonization:datasets}
+    \begin{tabular}{c c c c c}
+        \toprule
+        Dataset  & Area & Number of Line Segments & Faces \\
+        \midrule
+        USA & 9.83 $Mkm^2$ & 152$M$ & 5$M$ \\
+        South America & 17.8 $Mkm^2$ & 155$M$ & 7$M$\\
+        North America & 24.7 $Mkm^2$ & 240$M$ & 10$M$ \\
+        Africa & 30.4 $Mkm^2$ & 288$M$ & 10$M$  \\
+        Europe & 10.2 $Mkm^2$ & 563$M$ & 25$M$ \\ 
+        Asia & 44.6 $Mkm^2$ & 557$M$ & 23$M$ \\ 
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.48\linewidth]{Experiments/n_records.eps}
+\includegraphics[width=0.48\linewidth]{Experiments/area.eps}
+\caption{Polygonization Performance on Real Road Networks.}
+\label{fig:exp:query}
+\end{figure}
+
+Figure~\ref{fig:exp:query} evaluates the scalability of the polygonization approach using the different evaluation datasets summarized in Table \ref{table:polygonization:datasets}. 
+We implemented our polygonization framework on Apache Sedona \cite{YZS18}. The experiment is based on a Java 8 implementation and utilizes a Spark 2.3 cluster with two driver nodes and 12 worker nodes. All nodes run Linux CentOS 8.2 (64-bit). Each driver node is equipped with 128GB of RAM, while each worker node has 64GB of RAM. To increase parallelism, we divided the 12 worker nodes into 84 worker executors. Each executor is a separate JVM process with dedicated resources, such as memory and CPU cores. The distribution of these executors across the nodes is managed by the resource negotiator (YARN), which allocates resources for Spark jobs based on the availability of cores and memory. YARN typically balances resources across the cluster, so executors are likely to be evenly distributed, though some variation may occur due to resource availability at runtime. Assuming an even distribution, each worker node would run approximately 7 executors, as calculated by $\frac{84}{12} = 7$.
+
+As discussed in Section~\ref{sec:rem}, the Rem Phase has two different approaches depending on the input data received from the Gen Phase. The first approach is to process the remaining half-edges iteratively, denoted as \textit{DCEL-RH}. In comparison, the second approach processes the incomplete cycles generated from the first phase iteratively denoted as \textit{DCEL-IC}.
+
+From Figure~\ref{fig:exp:query}, we draw three conclusions; 
+(1) first, the cardinality of the input dataset has a positive correlation with the build time; as the number of line segments increases, the build time also increases, as shown in Figure~\ref{fig:exp:query}(a). However, we see that we have close cardinality for Asia (557M) and Europe (563M) datasets, but there is a noticeable difference in the build time; moreover, the build time for the Europe dataset is less than that of the Asia dataset. 
+This drives us to the second conclusion;  
+(2)~for datasets with close or similar cardinalities, the area of the dataset has a positive correlation with the build time shown in Figure~\ref{fig:exp:query}(b). 
+Hence the build time of the Europe dataset (10.2 $Mkm^2$) is less than that of the Asia dataset (44.6 $Mkm^2$), even though Europe has a slightly larger dataset.
+(3)~The third conclusion is that for all evaluated datasets, the \textit{DCEL-IC} beats \textit{DCEL-RH}.
+
+\subsection{Polygonization Speed Up Evaluation}
+\label{sec:expr:speedup}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=8.8cm]{Experiments/speedup.eps}
+	\caption[caption]{Polygonization speed up evaluation using the USA dataset}
+	\label{fig:exp:speedup}
+\end{figure}
+
+Figure~\ref{fig:exp:speedup} shows the effect of increasing the number of executors on the build time for the USA dataset. 
+At each step in the figure, we add 7 more executors, which is approximately equivalent to adding one additional node.
+Overall, our approach has good speedup performance. As the number of executors is doubled from 7~executors to 14~executors, the build time is almost halved. This trend goes on as we double the number of executors. As we increase the number of executors from 7 to 84, the build time is decreased by a factor of 8. 
+
+\subsection{Overlaying Polygons with Dangle and Cut Edges}
+
+\begin{table}
+    \caption{Overlaying Polygons with Dangle and Cut Edges Dataset}
+    \label{tab:dangles}
+    \begin{tabular}{c c c c}
+        \toprule
+        Dataset & Number Layer $A$ of Polygons & Number of Layer $B$ Edges & Result Polygons \\
+        \midrule
+        TN & 1,272 & 3,380,780 & 41,761 \\
+        GA & 1,633 & 4,647,171 & 49,125 \\
+        NC & 1,272 & 7,212,604 & 22,413 \\
+        TX & 4,399  & 8,682,950 & 98,635 \\
+        VA & 1,554 & 8,977,361 & 38,941 \\
+        CA & 7,038 & 9,103,610 & 96,916\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{states.pdf}
+    \caption{Overlaying State polygons with dangle and cut edges.}
+    \label{fig:dangle}
+\end{figure}
+
+In this section, we examine the performance of overlaying polygons with dangle and cut edges resulting from the polygonization as detailed in Section \ref{sec:over_dang}.
+Table \ref{tab:dangles} shows the number of polygons for each state for the first layer of the overlay. It also shows the number of dangle and cut edges per state for the second layer of the overlay. Finally, it shows the number of resultant polygons per state.
+From Figure \ref{fig:dangle}, we conclude that the running time is affected by the number of dangle and cut edges and the number of intersections between the two layers (represented by the number of generated polygons). 
+TN and GA have a relatively smaller number of dangle and cut edges, so they have lower execution times compared to VA, TX, and CA. However, since the intersections in NC are significantly less than those of TN and GA, NC has the lowest execution time. TX, VA, and CA have a comparable number of edges; however, VA has the least number of intersections, resulting in lower execution time compared to TX and CA. 

@@ -1,0 +1,34 @@
+\section{Related Work}\label{sec:related}
+The fundamentals of the DCEL data structure were introduced in the seminal paper by Muller and Preparata  \cite{muller_finding_1978}. The advantages of DCELs are highlighted in \cite{preparata_computational_1985, berg_computational_2008}. Examples of using DCELs for diverse applications appear in \cite{barequet_dcel_1998, boltcheva_topological-based_2020, freiseisen_colored_1998}.
+Our related work lies in two main areas, namely, \textit{overlay operations} and \textit{polygonization}, each discussed below.
+
+\textbf{Overlay operations}.
+Once the overlay DCEL is created by combining two layers, overlay operators like union, difference, etc., can be computed in linear time to the number of faces in their overlay \cite{freiseisen_colored_1998}. 
+Currently, few sequential implementations are available: LEDA \cite{mehlhorn_leda_1995}, Holmes3D
+\cite{holmes_dcel_2021} and CGAL \cite{fogel_cgal_2012}. Among them, CGAL is an open-source project widely used for computational geometry research. To the best of our knowledge, there is no scalable implementation for the computation of DCEL overlay.
+
+While there is a lot of work on using spatial access methods to support spatial joins, intersections, unions etc. in a parallel way (using clusters, multicores or GPUs), \cite{challa_dd-rtree_2016, sabek_spatial_2017, li_scalable_2019, franklin_data_2018, magalhaes_fast_2015, puri_efficient_2013, puri_mapreduce_2013} these approaches are different in two ways: (i) after the index filtering, they need a time-consuming refine phase where the operator (union, intersection etc.) has to be applied on each pair of (typically) complex spatial objects; (ii) if the operator changes, we need to run the filter/refine phases from scratch (in contrast, the same overlay DCEL can be used to run all operators.)
+
+\vspace{4pt}
+
+\textbf{Polygonization}.
+All available implementations for the polygonization procedure are built upon the JTS/GEOS implementation~\cite{web:jts:polygonizer, web:geos:polygonizer}. 
+While the JTS library is used in many modern distributed spatial analytics systems~\cite{PVK21}, including Hadoop-GIS~\cite{AWV+13}, SpatialHadoop~\cite{EM15}, GeoSpark~\cite{YZS18}, and SpatialSpark~\cite{YZG15}, the implementation of the polygonization algorithm~\cite{web:jts:polygonizer} has not been extended to work in these distributed frameworks.
+
+
+A data-parallel algorithm for polygonizing a collection of line segments represented by a data-parallel bucket PMR quadtree, a data-parallel $R$-tree, and a data-parallel $R^+$-tree was proposed in ~\cite{HS03}. 
+The algorithm starts by partitioning the data using the given data-parallel structure (i.e., the PMR quadtree, the $R$-tree, or the $R^+$-tree), beginning the polygonization at the leaf nodes. 
+The polygonization starts by finding each line segment's left and right polygon identifiers in each node. Then children nodes are merged into their direct parent node, at which redundancy is resolved. This procedure is recursively called until the root node is reached, where all line segments have their final left and right polygon identifiers assigned. 
+Each merging operation partitions the input data into a smaller number of partitions. At each iteration, the number of partitions decreases while the number of line segments entering and exiting each iteration remains constant.
+This implies that at the last iteration, the whole input line segment dataset must be processed on only one partition at the root node level.
+In the era of big data, where the use of commodity machines as worker nodes is common, this becomes a bottleneck when processing datasets of hundreds of millions of records on one machine.
+While our work and the approach in \cite{HS03} rely on iterative data re-partitioning, \cite{HS03} uses a constant input to each iteration while significantly decreasing the number of partitions.
+On the other hand, our input size decreases as the number of partitions decreases (thus avoiding processing the whole dataset on a single partition).
+
+% Our work differs in three main aspects: 
+% (a)~first, the approach in~\cite{HS03} only works with directed line segments, whereas our approach is more generic and works with undirected edges, 
+% (b)~second, our output is organized in a novel distributed DCEL data structure which is an extension of popular data structure used in a wide variety of applications,
+% (c)~third, while both approaches rely on iterative data re-partitioning, ~\cite{HS03} uses a constant input to each iteration while significantly decreasing the number of partitions.
+% On the other hand, our input size decreases as the number of partitions decreases (thus avoiding processing the whole dataset on a single partition).
+
+% \textbf{\color{red} TODO: fix any missing citations errors. \color{blue}[DONE] Adding entries for SSTD and MDM Papers}

@@ -1,0 +1,40 @@
+\subsection{Rem Phase}
+\label{sec:rem}
+
+The Rem Phase accepts the remaining half-edges or incomplete cycles as input. 
+To be included in the remaining half-edges set, a half-edge cannot be a dangle or a cut edge. Also, the half-edge should not have been bounded to a face yet.
+An incomplete cycle is a sequence of half-edges that acts as a candidate face. This incomplete cycle could not be completed since their marginal half-edges span multiple partitions.
+
+
+The Rem Phase is an iterative phase, where each iteration $j$ generates a subset of faces $F_j$. The unused input data at iteration $j$ is passed to the next iteration $j+1$.
+Faces generated from the Gen phase and the Rem phase constitute the whole faces of the subdivision $F$.
+In each iteration, the Rem Phase starts with re-partitioning the input data across the worker nodes using a new set of partitions.
+This new set of partitions satisfies the convergence criteria; the new number of partitions ($k_j$) at iteration $j$ must be less than the number of partitions ($k_{j-1}$) at iteration $j-1$. This criterion ($k_j < k_{j-1}$) ensures there is an iteration ($m$) at which the remaining line segments are re-partitioned to one partition only, where $m$ is the total number of iterations of the Rem Phase, converging the problem into a sequential one and guaranteeing the termination of the procedure.
+After the data re-partitioning, we proceed with generating a subset of the remaining faces. Two approaches are employed for the remaining faces generation, depending on the phase input data.
+The first approach assumes the phase input is a set of the \underline{R}emaining \underline{H}alf-edges (RH Approach). 
+While the second approach assumes the input is a set of the \underline{I}ncomplete \underline{C}ycles (IC Approach). 
+
+\vspace{4pt}
+\textit{\textbf{RH Approach: Iterate over the Remaining Half-edges.}}
+\\
+At each iteration $j$ and on each new data partition, a subset of the remaining half-edges is received. 
+Duplicate half-edges received on one new partition are merged into a single half-edge choosing the half-edge with the available next half-edge.
+We follow the same procedure of generating faces in the Gen Phase. Starting from an arbitrary half-edge as our initial half-edge $h_{initial}$, we assign our $h_{current}$ half-edge pointer initially to $h_{initial}$. We advance the $h_{current}$ pointer at each iteration to the $h_{current}$'s next ($h_{current} = h_{current}.next$), storing all visited half-edges in a list $cycle$. We keep advancing the $h_{current}$ pointer till we reach one of the following cases:
+(1) We return to the initial half-edge $h_{initial}$, which means that we have found a face. In this case, we add the found face $f$ to the faces collection $F_j$ and assign $h.incidentF = f, \;\; \forall h \in cycle$.
+(2) The $h_{current}.next$ is not available, and $h_{current}$ is a half-edge that is not wholly contained in the new partition MBR.
+Once we finish processing this cycle, we mark all visited half-edges as such, clear the cycle, and proceed with a new arbitrary half-edge to be $h_{initial}$.
+This iteration is terminated when all the remaining half-edges are visited. All half-edges that have not been assigned to any face yet are passed to the next iteration.
+The Rem Phase terminates if (1) there are no more remaining half-edges, i.e., all non-dangle non-cut edge half-edges are assigned to a face, or (2) the remaining half-edges have been processed on one partition.
+
+
+\vspace{4pt}
+\textit{\textbf{IC Approach: Iterate over the Incomplete Cycles.}}
+\\
+At each iteration $j$, and on each new data partition, a subset of the incomplete cycles is received. 
+Starting from an arbitrary incomplete cycle $c_{initial}$ with first half-edge $first(c_{initial})$ and last half-edge $last(c_{initial})$, where the first and last half-edges are the incomplete cycle's terminal half-edges, we search for a match $c_{match}$ in the remaining incomplete cycles such that the $last(c_{initial}) = first(c_{match})$. When a match is found, we merge the two cycles such that the $last(c_{initial})$ is now the $last(c_{match})$. We keep merging cycles till we reach one of the following cases:
+(1) The $last(c_{match}) = first(c_{initial})$, which means the cycle is now completed. In this case, we add the found face $f$ to the faces collection $F_j$ and remove all incomplete cycles used from the set of the incomplete cycles.
+(2) We can not find a match for the current last half-edge, and the last half-edge is not wholly contained within the new partition's MBR. In this case, the incomplete cycle needs more information from the neighboring partitions to be completed, and the current partition's data is insufficient to produce this face.
+Once we finish processing this matching process, we mark all visited incomplete cycles as such and proceed with a new arbitrary incomplete cycle to be $c_{initial}$.
+This iteration $j$ is terminated when all the incomplete cycles are visited. All incomplete cycles that are not completed yet are passed into the next iteration.
+The Rem Phase terminates if (1) there are no more remaining incomplete cycles, i.e., all cycles have been completed, or (2) the incomplete cycles have been processed on one partition.
+In Figure~\ref{fig:ddcel:faces}, the hatched faces are the faces generated in the first iteration ($j=1$) of the Rem Phase.

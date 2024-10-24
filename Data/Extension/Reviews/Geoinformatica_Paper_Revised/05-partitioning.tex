@@ -1,0 +1,39 @@
+
+\subsection{Data Partitioning}
+\label{sec:partitioning_ddcel}
+
+%For the input spatial lines partitioning, we used a spatial quadtree structure because of its ability to adapt to high skewness (common in several spatial networks) by adapting the tree depth in different spatial areas based on the density.
+%Given a parameter \textit{capacity} that defines how many data points (line segments) are allowed within a quadtree partition, the quadtree partitioner starts by inserting the whole set of lines into the root tree node.
+%If the node capacity is exceeded, it is divided into four child nodes with an equal spatial area, and its data is distributed among the four child nodes.
+%If any child node has exceeded its capacity, it is further divided into four nodes recursively and so on, until each node holds at most its parameterized \textit{capacity}.
+%This standard mechanism divides spatial areas with high data densities into deeper tree levels, while sparse areas result in shallow tree depth.
+%The optimal goal is to hold an equal data load in each partition, which balances the distributed query processing time when this data is processed for incoming queries.
+%Nevertheless, generating a tree using all the data is expensive for enormous input data sets with hundreds of millions of records and requires a powerful master node. 
+%Apache Sedona~\cite{YZS18} offers data sampling, where only a sample of the data is used to generate the partitions. These partitions are then used to partition the whole dataset.
+
+% move to 4.1.1
+% figure 21
+% page 30 talk about figure 21
+
+The quadtree partitioner is used again to distribute the data amongst the worker nodes across the cluster. In the Gen Phase, the quadtree leaf nodes are used as the initial data partitions.
+The output of the Gen Phase, whether the remaining half-edges or the incomplete cycles, is iteratively re-partitioned into new sets of partitions.
+Each iteration set of partitions must satisfy the convergence criterion to ensure that the Rem Phase will terminate.
+We employ the same quadtree partitioner to generate the new partitions. 
+Assume we have a quadtree built on the input line segments of height $L$. 
+At the Gen Phase, we use nodes at the leaf level $L$ as our initial data partitions. For each iteration $j$ in the Rem Phase, we level up in the quadtree and choose different level nodes, aside from the leaves, to be our current data partitions.  
+We keep leveling up in the quadtree till we reach the root ($l=0$), which means that all data is located on only one partition (the root).
+Going up in the quadtree ensures that the number of partitions at iteration $j+1$ is less than that at iteration $j$ since the number of nodes at any arbitrary level $l$ visited at iteration $j$ is more than that at level $l_{chosen}, \ \forall l_{chosen} < l$ visited at iteration $j+1$.
+
+
+We always start with the leaf nodes level $L$ in the Gen Phase. Choosing which levels to visit next in each iteration $j$ is a system parameter. 
+% In the experimental evaluation section, we compare different schemes for the visited quadtree levels. 
+We offer different schemes for the visited quadtree levels: 
+\begin{enumerate}
+    \item Going directly to the root node at $l=0$ after the leaf nodes, i.e., visiting only levels L in the Gen and 0 in the Rem phases. However, the experimental evaluation shows that collecting the data after the Gen phase on one node is prohibitive, and one worker node will not be able to process the Gen phase's output.
+    \item Going \underline{1} \underline{L}evel \underline{U}p (1LU) each iteration, i.e. if we visit level $l$ at iteration $j$, we go to level $l-1$ at iteration $j+1$. This means the Rem Phase visits all the quadtree levels resulting in $L$ iterations.
+    \item Going \underline{2} \underline{L}evels \underline{U}p (2LU) each iteration resulting in half the number of iterations $\frac{L}{2}$ compared to 1LU.
+    \item Skipping to the \underline{M}iddle of the tree at level $\frac{L}{2}$, then continue going 1 level up for the remaining levels (M1LU), which will also result in $\frac{L}{2}$ iterations.
+    \item Skipping to the \underline{M}iddle of the tree every time, dividing the current level by two each iteration (MU); this will result in $\log_2(L)$ iterations.
+\end{enumerate}
+The goal is to find a re-partitioning scheme with a minimal number of iterations, thus reducing the workload of the Rem Phase while ensuring that the worker nodes can process the chunk of the data it receives at each iteration $j$.
+The extreme case of having only one iteration at the Rem Phase will not work since the data is too big to fit one partition and be processed by only one worker node. On the other hand, the more unnecessary iterations we have, the more overhead on the system resulting in higher query latency.

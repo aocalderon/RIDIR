@@ -1,0 +1,85 @@
+\section{Scalable Polygon Extraction for Line-based Input} \label{sec:polygonization}
+
+% \textbf{\color{red} TODO: you might need to suggest a better title for this section}
+
+% \textbf{\color{blue} I think if the goal is to support multiple input formats, we can change the title to \textit{scalable polygon extraction} (or something similar) and format the section focusing on the polygonization. Or change the title to reflect that this is used in a pipeline, something similar to supporting polygons in different formats or a generic input pipeline? not sure.}
+
+
+% \textbf{\color{blue} This whole section is new to the paper and solicited from Laila paper, please review this carefully}
+
+Our discussion so far assumed the input data is a set of clean and closed polygons in the two input layers to be overlayed.
+However, several real-world polygons, such as city blocks formed by individual road segments represented as spatial lines, are unavailable in the polygonal form.
+Forming polygons in such cases at a large scale is non-trivial and takes significant computing cost.
+This section further extends our scalable DCEL overlay operations to handle scattered line segments as input through a scalable polygonization~\cite{LailaMDMPaper} process.
+Such a feature enables spatial data scientists to seamlessly exploit a rich set of publicly available datasets, e.g., spatial road networks worldwide~\cite{web:data:continents,web:data:usa}.
+
+
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.75 \linewidth ]{model/overview_updated.png}
+	\caption[caption]{DCEL Constructor for Polygonization Overview}
+	\label{fig:overview_ddcel}
+\end{figure}
+
+
+% The DCEL data structure is used to extract all closed polygons formed by a collection of planar line segments during invocation of the \textit{polygonization} procedure. 
+Building a DCEL data structure from an input of planar line segments extracts all closed polygons during the invocation of the \textit{polygonization} procedure. 
+In our work in~\cite{LailaMDMPaper}, we proposed a scalable distributed framework to build a DCEL and extract polygons in parallel from the input line segments.
+Figure~\ref{fig:overview_ddcel} shows an overview of the DCEL constructor. 
+To create a DCEL data structure from input line segments, the \textit{DCEL constructor} undergoes a two-phase paradigm. 
+The \textit{Gen Phase}, detailed in Section~\ref{sec:gen}, spatially partitions the input lines, generating the subdivision's vertices ($V$) and half-edges ($H$), and a subset of the subdivision's faces ($F_0$). 
+The remaining line segments that are not assigned to a face yet are passed to the subsequent phase in the form of half-edges or incomplete cycles. 
+An incomplete cycle is a connected half-edge list that is a candidate face.
+The \textit{Rem Phase}, detailed in Section~\ref{sec:rem}, generates the subdivision's remaining faces, $F_j, \ \forall j > 0$. 
+Section~\ref{sec:partitioning_ddcel} discusses different data re-partitioning schemes with a minimal number of iterations to reduce the workload of the \textit{Rem Phase} without compromising correctness. 
+The polygonization procedure produces two outputs: first, a set of closed polygons formed by the input planar line segments, and second, any edges that are not a part of any polygon, i.e., dangle or cut edges. Overlaying the polygons generated with any polygon layer follows the approaches discussed in sections~\ref{sec:methods} and~\ref{sec:alternative_methods}. In section~\ref{sec:over_dang}, we extend the overlay approaches to handle overlaying a polygon layer with the remaining edges (the dangle and cut edges).
+
+
+% \textbf{\color{red} TODO: Andres needs to revise this section after Laila finishes her pass to make sure the terminology and notions are compliant with the rest of the paper}
+
+
+\input{04a-gen}
+\input{04b-rem}
+\input{05-partitioning}
+
+\subsection{Overlaying Polygons with Dangle and Cut Edges} \label{sec:over_dang}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.75 \linewidth ]{model/DangleOverlay1.pdf}
+	\caption[caption]{Spatial partitioning of input layers A and B}
+	\label{fig:dangleoverlay:input}
+\end{figure}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.75 \linewidth ]{model/DangleOverlay2.pdf}
+	\caption[caption]{Re-Partitioning of polygon $A_0$ with edges it intersects with}
+	\label{fig:dangleoverlay:inter}
+\end{figure}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.75 \linewidth ]{model/DangleOverlay3.pdf}
+	\caption[caption]{The result of polygonization of $A_0$ with $B_0, B_1, B_2$}
+	\label{fig:dangleoverlay:result}
+\end{figure}
+
+
+The polygonization procedure produces two outputs: first, a set of closed polygons formed by the input planar line segments, and second, any edges that are not a part of any polygon, i.e., dangle or cut edges. 
+Overlaying the polygons generated with any polygon layer follows the approaches discussed in sections \ref{sec:methods} and \ref{sec:alternative_methods}.
+However, we need to modify the algorithms provided in these previous sections to overlay an input polygon layer $A$ with the dangle and cut edges, i.e. layer $B$. In particular, we modify the reduce phase.
+Figure \ref{fig:dangleoverlay:input} illustrates the spatial partitioning of the two input layers, $A$ and $B$. Layer $A$ contains two input polygons, $A_0$ and $A_1$, while Layer $B$ consists of three dangle edges, $B_0$, $B_1$, and $B_2$.
+
+Each edge from layer $B$ is labeled a unique label and is fed as an input to the overlay module.
+The local overlay is performed by finding intersections between the input polygon layer $A$ and layer $B$ on each data partition.
+If a polygon with $id = i$ from polygon layer $A$ intersects with edges with ids $id = a, id = b, id = c$ from layer $B$ at some data partition, we generate a label to match these intersections $A_{i} B_{a} B_{b} B_{c}$. 
+At the reduce phase, we re-partition the data by the first label, meaning we collect all edges that intersect with the first label.
+If two data partitions produced the labels $A_{i} B_{a} B_{b} B_{c}$ and $A_{i} B_{x} B_{y}$, we repartition the data such that $A_{i}$ is on one partition with all edges it is intersecting, i.e., $B_{a}, B_{b}, B_{c}, B_{x}, B_{y}$.
+In Figure \ref{fig:dangleoverlay:inter}, Polygon $A_0$ is re-partitioned along with the edges it intersects, specifically $B_0$, $B_1$, and $B_2$.
+
+After re-partitioning the data, we have all edges from both layers intersecting each other on the same partition. The next step is to find the polygons generated by these intersections. Since there is no guarantee that only one polygon is generated, we substitute the polygon concatenation proposed in Section~\ref{sec:reduce} by performing \textit{polygonization} on each partition. The polygonization procedure ensures it generates all new possible polygons. The polygonization procedure follows the algorithm mentioned in Section~\ref{sec:gen}. It starts with generating the new vertices and half-edges, then marking the current dangles and cut edges, then setting the next pointers and finally generating the partition polygons.
+Figure \ref{fig:dangleoverlay:result} shows the result of polygonizing the edges from Polygon $A_0$ and $B_0$, $B_1$, and $B_2$, resulting in two polygons, $A_01$ and $A_02$.
+
+Polygons from all partitions generate the overlay between the polygon layer $A$ and layer $B$.
