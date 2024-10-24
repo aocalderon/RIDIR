@@ -10,6 +10,7 @@ import edu.ucr.dblab.sdcel.geometries._
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.slf4j.Logger
 
 import scala.annotation.tailrec
 
@@ -396,7 +397,7 @@ object DCELOverlay2 {
 
   /*  Collect segments by parittion  */
   def collectSegments(sdcel: RDD[(Half_edge, String)])
-    (implicit geofactory: GeometryFactory, settings: Settings): RDD[(Segment, String)] = {
+    (implicit geofactory: GeometryFactory, settings: Settings, logger: Logger): RDD[(Segment, String)] = {
 
     if(settings.debug){
       sdcel.persist(settings.persistance)
@@ -412,7 +413,7 @@ object DCELOverlay2 {
     }
     
     val S = sdcel.mapPartitionsWithIndex{ (pid, it) =>
-      it.flatMap{ case(hedge, label) =>
+      val SS = it.flatMap{ case(hedge, label) =>
         if(hedge.isValid){
           val segments = getValidSegments(hedge, hedge.prev, List(hedge), List.empty[Segment])
           segments.map{ segment => segment.hedges.foreach(_.tag = label); (segment, label) }
@@ -425,7 +426,20 @@ object DCELOverlay2 {
             segments.map{ segment => segment.hedges.foreach(_.tag = label); (segment, label) }
           }
         }
-      }
+      }.toList
+
+      val nsegs = SS.length
+      val nlabels = SS.map{ case(segment, label) =>
+        if(!segment.isClose){
+          label
+        } else {
+          ""
+        }
+      }.distinct.length
+      val perc = nlabels / nsegs
+      logger.info(s"$pid\t$nsegs\t$nlabels\t")
+
+      SS.toIterator
     }
 
     if(settings.debug){
