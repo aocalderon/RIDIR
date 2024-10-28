@@ -1,0 +1,16 @@
+\documentclass[border=1]{standalone}
+\usepackage{tikz}
+
+\tikzset{
+    point/.style={ draw, scale=0.25, color=blue, circle, fill },
+    cell/.style={draw, dashed},
+    line/.style={draw}
+}
+
+\begin{document}
+    \begin{tikzpicture}
+        \input{cells_prime}
+        \input{linesu_prime}
+        \input{points_prime}
+    \end{tikzpicture}
+\end{document}

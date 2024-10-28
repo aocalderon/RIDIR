@@ -1,0 +1,32 @@
+\documentclass[border=1]{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows, arrows.meta, patterns}
+
+\tikzset{
+    point/.style={ draw, scale=0.25, color=blue, circle, fill },
+    cell/.style={draw, dashed},
+    p1/.style={solid,pattern color=red!75, pattern=dots},
+    p2/.style={solid,pattern color=cyan!75, pattern={north east lines}},
+    line/.style={ % style that just defines the arrow tip
+        >={Triangle[left,length=5pt,width=5pt]},
+        double,
+        semithick,
+        <->
+    },
+    whites/.style={
+        thick, 
+        color=white
+    }
+}
+
+\begin{document}
+    \begin{tikzpicture}
+        \input{polygons1_prime}
+        \input{polygons2_prime}
+        \input{cells_prime}
+        \input{lines_prime}
+        \input{linesw_prime}
+        \input{points_prime}
+    \end{tikzpicture}
+\end{document}

@@ -1,0 +1,28 @@
+\documentclass[border=1]{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows, arrows.meta}
+
+\tikzset{
+    point/.style={ draw, scale=0.25, color=blue, circle, fill },
+    cell/.style={draw, dashed},
+    line/.style={ % style that just defines the arrow tip
+        >={Triangle[left,length=5pt,width=5pt]},
+        double,
+        semithick,
+        <->
+    },
+    whites/.style={
+        thick, 
+        color=white
+    }
+}
+
+\begin{document}
+    \begin{tikzpicture}
+        \input{cells_prime}
+        \input{lines_prime}
+        \input{linesw_prime}
+        \input{points_prime}
+    \end{tikzpicture}
+\end{document}

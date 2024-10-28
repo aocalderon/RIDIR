@@ -1,0 +1,65 @@
+\documentclass[border=0cm]{standalone}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows, arrows.meta}
+\tikzset{    
+    barbarrow/.style={ % style that just defines the arrow tip
+        %>={Straight Barb[left,length=5pt,width=5pt]},
+        >={Triangle[left,length=5pt,width=5pt]},
+        double,
+        semithick,
+        <->
+    },
+    whites/.style={
+        thick, 
+        color=white
+    }
+}
+\definecolor{light-gray}{gray}{0.975}
+\definecolor{pcolor}{rgb}{0.21, 0.27, 0.31}
+\definecolor{pgreen}{rgb}{0.0, 0.5, 0.0}
+\begin{document}
+\begin{tikzpicture}
+    \tikzstyle{node1}=[draw,scale=0.4,shape=circle,color=black,fill=black]
+    \tikzstyle{node2}=[draw,scale=0.4,shape=circle,color=red,fill=red]
+    \tikzstyle{text}=[draw,scale=0.5,color=black]
+    \draw[color=light-gray, style=dashed] (4,4) grid (8,8);
+    \draw[color=pcolor, style=dashed, step=4] (4,4) grid (8,8);
+    \node[scale=0.85, color = pcolor] at (7.75, 7.75) {$2$};
+    
+    \node[node1] (M) at (4,6) {};
+    \node[node1] (R) at (6,4) {};
+    \node[node1] (Z) at (4,4) {};
+
+    \node[node1] (L) at (4,4) {};
+    \node[node1] (N) at (4,8) {};
+    \node[node1] (S) at (6,6) {};
+    \node[node1] (T) at (8,4) {};
+   
+    \draw[barbarrow, color=blue] (L) -- (S); 
+    \draw[barbarrow, color=blue] (N) -- (S); 
+    \draw[barbarrow, color=blue] (S) -- (T);
+    \draw[barbarrow, color=blue] (L) -- (T);
+    \draw[barbarrow, color=blue] (L) -- (N);
+    \draw[whites] (L) -- (S); 
+    \draw[whites] (N) -- (S); 
+    \draw[whites] (S) -- (T);
+    \draw[whites] (L) -- (T);
+    \draw[whites] (L) -- (N);
+
+    \draw[barbarrow, color=pgreen] (M) -- (R);
+    \draw[barbarrow, color=pgreen] (Z) -- (R);
+    \draw[barbarrow, color=pgreen] (Z) -- (M);
+    \draw[whites] (M) -- (R);
+    \draw[whites] (Z) -- (R);
+    \draw[whites] (Z) -- (M);
+
+    \node[node1] (M) at (4,6) {};
+    \node[node1] (R) at (6,4) {};
+
+    \node[color=pgreen] at (4.5,4.85) {$A_2$};
+    \node[color=blue] at (6,4.75) {$B_2$};
+    \node[color=blue] at (4.75,6) {$B_3$};
+    
+\end{tikzpicture}
+\end{document}
