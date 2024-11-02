@@ -1,0 +1,21 @@
+\documentclass[varwidth,border=2pt]{standalone}
+\usepackage{subcaption}
+\usepackage[labelformat=parens,labelsep=quad, skip=3pt]{caption}
+\usepackage{graphicx}
+
+\begin{document}
+    \begin{figure}
+        \centering
+        \setcaptionsubtype
+        \captionsetup{justification=centering}
+        \begin{subfigure}{6cm}
+            \centering\includegraphics[width=6cm]{CA}
+            \caption{}
+        \end{subfigure}%
+        \begin{subfigure}{6cm}
+            \centering
+            \includegraphics[width=5.75cm]{CA_sample}
+            \caption{}
+        \end{subfigure}
+    \end{figure}
+\end{document}

@@ -1,0 +1,18 @@
+\documentclass[border=0.1cm]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows, arrows.meta}
+
+\tikzset{
+    node1/.style={
+        above right
+    }
+}
+\begin{document}
+    \begin{tikzpicture}
+        \node[node1,label={\LARGE $A \cup B$}]           at (0,8)  {\includegraphics[scale=0.75]{DCELUnion}};
+        \node[node1,label={\LARGE $A \cap B$}]           at (7,8)  {\includegraphics[scale=0.75]{DCELIntersection}};
+        \node[node1,label={\LARGE $A \setminus B$}]      at (14,8) {\includegraphics[scale=0.75]{DCELDiffA}};
+        \node[node1,label={\LARGE $B \setminus A$}]      at (0,0)  {\includegraphics[scale=0.75]{DCELDiffB}};
+        \node[node1,label={\LARGE $A \bigtriangleup B$}] at (7,0)  {\includegraphics[scale=0.75]{DCELDiff}};
+    \end{tikzpicture}
+\end{document}
