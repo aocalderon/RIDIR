@@ -17,10 +17,10 @@ lazy val buildSettings = (project in file("."))
 
     libraryDependencies += "org.rogach" % "scallop_2.11" % "2.1.3",
 
+    libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.15" % Test,
+
     libraryDependencies += "org.locationtech.geotrellis" %% "geotrellis-raster" % "3.5.1",
     libraryDependencies += "org.locationtech.geotrellis" %% "geotrellis-vector" % "3.5.1",
-    
-    libraryDependencies += "org.slf4j" % "slf4j-api" % "2.0.9",
 
     resolvers += "LocationTech Releases" at "https://repo.locationtech.org/content/groups/releases/"
   )

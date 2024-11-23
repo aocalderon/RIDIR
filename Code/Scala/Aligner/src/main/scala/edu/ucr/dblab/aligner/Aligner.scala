@@ -12,7 +12,7 @@ object Aligner {
     implicit val params: AParams = new AParams(args)
 
     implicit val spark = SparkSession.builder()
-      .config("spark.serializer",classOf[KryoSerializer].getName)
+      .config("spark.serializer", classOf[KryoSerializer].getName)
       .master(params.master())
       .appName("Aligner").getOrCreate()
     import spark.implicits._
@@ -22,7 +22,11 @@ object Aligner {
 
     /////////////////////////////
 
-    GeoTiffReader.getInfo(params.dataset())
+    val datasets = params.datasets().split(",").map{ _.trim }
+    datasets.foreach{ dataset =>
+      logger.info{s"${dataset}'s info..."}
+      GeoTiffReader.getInfo(dataset)
+    }
 
     /////////////////////////////
 
@@ -34,7 +38,7 @@ object Aligner {
 import org.rogach.scallop._
 class AParams(args: Seq[String]) extends ScallopConf(args) {
 
-  val dataset: ScallopOption[String] = opt[String] (default = Some("/mnt/Data1/J/fuzzies/FuzzyArroz.tif"))
+  val datasets: ScallopOption[String] = opt[String] (default = Some("/mnt/Data1/J/fuzzies/FuzzyArroz.tif, /mnt/Data1/J/fuzzies/FuzzyCacao.tif"))
   val master:  ScallopOption[String] = opt[String] (default = Some("local[3]"))
 
   verify()
