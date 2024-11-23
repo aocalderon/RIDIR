@@ -13,13 +13,6 @@ object Aligner {
 
     implicit val spark = SparkSession.builder()
       .config("spark.serializer",classOf[KryoSerializer].getName)
-      .config("spark.driver.memory","35g")
-      .config("deploy.moce","client")
-      .config("spark.executor.memory","20g")
-      .config("spark.memory.offHeap.enabled",true)
-      .config("spark.memory.offHeap.size","16g")
-      .config("spark.driver.maxResultSize","4g")
-      .config("spark.kryoserializer.buffer.max","256m")
       .master(params.master())
       .appName("Aligner").getOrCreate()
     import spark.implicits._

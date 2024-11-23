@@ -11,6 +11,14 @@
 *~
 *#
 
+Code/Scala/Aligner/target/*
+Code/Scala/Aligner/project/*
+Code/Scala/Aligner/.idea
+Code/Scala/Aligner/.ensime
+Code/Scala/Aligner/.metals/*
+Code/Scala/Aligner/.bloop/*
+Code/Scala/Aligner/.ensime_cache/*
+
 Code/SDCEL/.idea/*
 
 Code/KDTree/balanced_kd-tree/.idea/*
@@ -20,7 +28,6 @@ Code/KDTree/k-d_tree/.bsp/*
 Code/KDTree/k-d_tree/.idea/*
 Code/KDTree/k-d_tree/project/*
 Code/KDTree/k-d_tree/target/*
-
 
 Code/CGAL/DCEL/Makefile
 Code/CGAL/DCEL/CMakeFiles/*
