@@ -13,6 +13,7 @@
 
 Code/Scala/Aligner/target/*
 Code/Scala/Aligner/project/*
+Code/Scala/Aligner/.bsp/*
 Code/Scala/Aligner/.idea
 Code/Scala/Aligner/.ensime
 Code/Scala/Aligner/.metals/*
