@@ -1,0 +1,1 @@
+bash/aligner_spark --filenames /home/acald013/Datasets/fuzzies/FuzzyArroz.tif,/home/acald013/Datasets/fuzzies/FuzzyCacao.tif,/home/acald013/Datasets/fuzzies/FuzzyCana.tif,/home/acald013/Datasets/fuzzies/FuzzyPlatano.tif,/home/acald013/Datasets/fuzzies/FuzzyMaiz.tif --debug

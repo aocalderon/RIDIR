@@ -1,0 +1,4 @@
+[0m[[0m[33mwarn[0m] [0m[0m/home/acald013/opt/Aligner/src/main/scala/edu/ucr/dblab/aligner/Aligner.scala:41:34: method rasterToFeature in object Raster is deprecated: Implicit conversions considered unsafe[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val envelope = rasters.map(_.raster.geom.getEnvelopeInternal).reduce{ (a, b) =>[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m

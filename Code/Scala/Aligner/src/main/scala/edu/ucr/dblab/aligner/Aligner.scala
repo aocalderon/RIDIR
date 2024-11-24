@@ -15,12 +15,11 @@ object Aligner {
   def main(args: Array[String]): Unit = {
     implicit val params: AParams = new AParams(args)
 
-    implicit val spark = SparkSession.builder()
+    implicit val spark: SparkSession = SparkSession.builder().master("local[3]")
       .config("spark.serializer", classOf[KryoSerializer].getName)
       .appName("Aligner").getOrCreate()
-    import spark.implicits._
 
-    implicit val G = new GeometryFactory(new PrecisionModel(1e3))
+    implicit val G: GeometryFactory = new GeometryFactory(new PrecisionModel(1e3))
     val appId = spark.sparkContext.applicationId
     logger.info(s"START|$appId")
 
@@ -35,7 +34,7 @@ object Aligner {
     if( params.debug() ){
       rasters.map( raster => GeoTiffReader.getInfo(raster) )
         .collect
-        .map{ info => logger.info( info ) }
+        .foreach{ info => logger.info( info ) }
     }
 
     val envelope = rasters.map(_.raster.geom.getEnvelopeInternal).reduce{ (a, b) =>
