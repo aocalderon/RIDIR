@@ -11,6 +11,15 @@
 *~
 *#
 
+Code/Scala/Aligner2/target/*
+Code/Scala/Aligner2/project/*
+Code/Scala/Aligner2/.bsp/*
+Code/Scala/Aligner2/.idea
+Code/Scala/Aligner2/.ensime
+Code/Scala/Aligner2/.metals/*
+Code/Scala/Aligner2/.bloop/*
+Code/Scala/Aligner2/.ensime_cache/*
+
 Code/Scala/Aligner/target/*
 Code/Scala/Aligner/project/*
 Code/Scala/Aligner/.bsp/*
