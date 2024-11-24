@@ -2,30 +2,29 @@ package edu.ucr.dblab.aligner
 
 import geotrellis.raster._
 import geotrellis.raster.io.geotiff._
-import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.{GeometryFactory, Envelope}
+
+import edu.ucr.dblab.aligner.Aligner.RasterName
 
 object GeoTiffReader {
-  def getInfo(geoTiffPath: String)(implicit G: GeometryFactory) = {
-    // Read the GeoTIFF file
-    val geoTiff: SinglebandGeoTiff = SinglebandGeoTiff(geoTiffPath)
 
-    // Get raster data
-    val raster: Raster[Tile] = geoTiff.raster
+  def getRaster(raster_path: String): RasterName = {
+    val geotiff: SinglebandGeoTiff = SinglebandGeoTiff(raster_path)
+    val raster: Raster[Tile] = geotiff.raster
+    val name: String = raster_path.split("/").last.split("\\.").head
 
-    // Print some information
-    println(s"CRS: ${geoTiff.crs}")
-    println(s"Extent: ${geoTiff.extent}")
-    println(s"Cell Type: ${geoTiff.cellType}")
-    println(s"Dimensions: ${geoTiff.cols}x${geoTiff.rows}")
+    RasterName(name, raster)
+  }
 
-    // Access individual pixel data (e.g., at the center of the raster)
-    val tile = geoTiff.tile
-    val (col, row) = (geoTiff.cols / 2, geoTiff.rows / 2)
-    val pixelValue = tile.getDouble(col, row)
-    println(s"Pixel value at ($col, $row): $pixelValue")
+  def getInfo(R: RasterName): String = {
+    val buffer = new StringBuilder(s"\n${R.name}:\n")
+    buffer.append(s"Extent: ${R.raster.extent}\n")
+    buffer.append(s"Cell Type: ${R.raster.cellType}\n")
+    val cell: CellSize = R.raster.cellSize
+    buffer.append(s"Cell Size: ${cell.width}x${cell.height} (${cell.resolution})\n")
+    buffer.append(s"Dimensions: ${R.raster.cols}x${R.raster.rows}\n")
 
-    val envelope = raster.geom.getEnvelopeInternal
-    println(G.toGeometry(envelope).toText)
+    buffer.toString
   }
 }
 
