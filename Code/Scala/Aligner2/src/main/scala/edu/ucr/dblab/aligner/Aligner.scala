@@ -17,6 +17,7 @@ object Aligner {
 
     implicit val spark = SparkSession.builder()
       .config("spark.serializer", classOf[KryoSerializer].getName)
+      .master("local[3]")
       .appName("Aligner").getOrCreate()
     import spark.implicits._
 
@@ -47,8 +48,6 @@ object Aligner {
       logger.info(s"\nEnvelope: ${G.toGeometry(envelope).toText}")
     }
 
-    
-
     /////////////////////////////
 
     spark.close()
@@ -59,7 +58,7 @@ object Aligner {
 import org.rogach.scallop._
 class AParams(args: Seq[String]) extends ScallopConf(args) {
 
-  val filenames: ScallopOption[String] = opt[String] (default = Some("/home/acald013/Datasets/fuzzies/FuzzyArroz.tif, /home/acald013/Datasets/fuzzies/FuzzyCacao.tif"))
+  val filenames: ScallopOption[String] = opt[String] (default = Some("/home/acald013/tmp/arroz.tif, /home/acald013/tmp/cacao.tif"))
   val debug:     ScallopOption[Boolean] = opt[Boolean] (default = Some(false))
 
   verify()

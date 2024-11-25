@@ -37,7 +37,6 @@ lazy val buildSettings = (project in file("."))
     libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.0" % Test
   )
 
-
 // When creating fat jar, remote some files with
 // bad signatures and resolve conflicts by taking the first
 // versions of shared packaged types.
@@ -51,7 +50,7 @@ assemblyMergeStrategy in assembly := {
   case _ => MergeStrategy.first
 }
 
-initialCommands in console := """
+initialCommands / console := """
  |import geotrellis.raster._
  |import geotrellis.vector._
  |import geotrellis.proj4._
