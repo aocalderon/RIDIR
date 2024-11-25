@@ -11,6 +11,16 @@
 *~
 *#
 
+Code/Scala/GeoReader/target/*
+Code/Scala/GeoReader/project/*
+Code/Scala/GeoReader/.bsp/*
+Code/Scala/GeoReader/.idea
+Code/Scala/GeoReader/.ensime
+Code/Scala/GeoReader/.metals/*
+Code/Scala/GeoReader/.bloop/*
+Code/Scala/GeoReader/.ensime_cache/*
+Code/Scala/GeoReader/.vscode/*
+
 Code/Scala/Aligner2/target/*
 Code/Scala/Aligner2/project/*
 Code/Scala/Aligner2/.bsp/*
